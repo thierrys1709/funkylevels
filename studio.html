@@ -50,6 +50,25 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
 .ov button{font-family:'Press Start 2P',monospace;font-size:8px;background:#e0e0e0;color:#111;border:none;padding:9px 20px;cursor:pointer;border-radius:2px;}
 .ov button:hover{background:#fff;}
 #ovWin h2{color:#40ff90;}#ovDie h2{color:#ff4455;}#ovStart h2{color:#f0e040;}
+
+/* ── Publish modal ── */
+#publish-modal{display:none;position:fixed;inset:0;background:#000000bb;z-index:200;align-items:center;justify-content:center;}
+#publish-modal.show{display:flex;}
+.pub-box{background:#0f0f1e;border:2px solid #1e1e35;border-radius:6px;padding:28px 24px;width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 0 40px #000000cc;}
+.pub-box h3{font-size:9px;color:#40c0f0;text-align:center;}
+.pub-box label{font-size:6px;color:#666;letter-spacing:2px;}
+.pub-box input{background:#0a0a16;border:1.5px solid #252535;border-radius:3px;color:#ccc;font-family:'Press Start 2P',monospace;font-size:8px;padding:10px 12px;outline:none;width:100%;transition:border-color .2s;}
+.pub-box input:focus{border-color:#40c0f0;}
+.pub-row{display:flex;gap:10px;}
+.pub-btn{flex:1;font-family:'Press Start 2P',monospace;font-size:7px;padding:11px;border:none;border-radius:3px;cursor:pointer;transition:all .15s;}
+.pub-btn.ok{background:#40c0f0;color:#111;}
+.pub-btn.ok:hover{background:#80e0ff;}
+.pub-btn.ok:disabled{opacity:.5;cursor:not-allowed;}
+.pub-btn.cancel{background:#1a1a2a;color:#888;border:1.5px solid #333;}
+.pub-btn.cancel:hover{color:#ccc;}
+.pub-msg{font-size:6px;padding:8px;border-radius:3px;text-align:center;display:none;line-height:2;}
+.pub-msg.ok{background:#40f09020;border:1px solid #40f090;color:#40f090;display:block;}
+.pub-msg.err{background:#f0406020;border:1px solid #f04060;color:#f04060;display:block;}
 </style>
 </head>
 <body>
@@ -95,6 +114,7 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
     <button class="act-btn" id="btn-save" onclick="saveLevel()" title="💾 SAVE">💾 SAVE</button>
     <button class="act-btn" id="btn-load" onclick="loadLevel()" title="📂 LOAD">📂 LOAD</button>
     <button class="act-btn" id="btn-clear" onclick="clearLevel()" title="🗑 VIDER">🗑 VIDER</button>
+    <button class="act-btn" id="btn-publish" onclick="openPublish()" title="🚀 PUBLIER" style="background:#0d1a2a;border-color:#3a7a9a;color:#40c0f0;">🚀 PUBLIER</button>
   </div>
   <div class="sep"></div>
   <div class="tb-group" style="gap:5px;align-items:center;">
@@ -215,6 +235,7 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
 <div class="ov" id="ovWin"><h2>ARRIVÉ !</h2><p id="win-msg"></p><button onclick="stopGame()">ÉDITEUR</button></div>
 <input type="file" id="fileInput" accept=".json" style="display:none" onchange="loadFile(event)">
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  ÉDITEUR
@@ -716,8 +737,8 @@ function gUpdate(now){
   const isHorizGrav=(gd==='l'||gd==='r');
 
   if(isHorizGrav){
-    if(left)      {gPlayer.vy=(gd==='r')?-zoneSpd:zoneSpd; gPlayer.facing=-1;}
-    else if(right){gPlayer.vy=(gd==='r')?zoneSpd:-zoneSpd; gPlayer.facing=1;}
+    if(left)      {gPlayer.vy=(gd==='r')?-zoneSpd:zoneSpd; gPlayer.facing=1;}
+    else if(right){gPlayer.vy=(gd==='r')?zoneSpd:-zoneSpd; gPlayer.facing=-1;}
     else          {gPlayer.vy*=0.75;}
     if(jump&&gPlayer.onGround){
       gPlayer.vx=(gd==='r')?-zoneJspd:zoneJspd;
@@ -747,7 +768,7 @@ function gUpdate(now){
   else if(gd==='l') gPlayer.vx=Math.max(gPlayer.vx-activeStr,-20);
 
   // ── Rotation ───────────────────────────────────────────────
-  const TARGET_ANGLES={d:0,u:180,r:90,l:270};
+  const TARGET_ANGLES={d:0,u:180,r:270,l:90};
   gPlayer.targetAngle=TARGET_ANGLES[gd]||0;
   const angleDiff=((gPlayer.targetAngle-(gPlayer.angle||0))+540)%360-180;
   gPlayer.angle=(gPlayer.angle||0)+Math.sign(angleDiff)*Math.min(15,Math.abs(angleDiff));
@@ -828,7 +849,16 @@ function gUpdate(now){
       else if(m===oL){t.x=f.x-t.w;t.vx=0;}
       else if(m===oR){t.x=f.x+f.w;t.vx=0;}
     });
-    if(ov(gPlayer,t)){const oT=(gPlayer.y+gPlayer.h)-t.y,oB=(t.y+t.h)-gPlayer.y,oL=(gPlayer.x+gPlayer.w)-t.x,oR=(t.x+t.w)-gPlayer.x,m=Math.min(oT,oB,oL,oR);if(m===oT&&gPlayer.vy>=0){gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}else if(m===oB&&gPlayer.vy<0){gPlayer.y=t.y+t.h;gPlayer.vy=0;}else if(m===oL){t.vx=Math.max(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x-gPlayer.w;}else if(m===oR){t.vx=Math.min(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x+t.w;}}
+    if(ov(gPlayer,t)){
+      const oT=(gPlayer.y+gPlayer.h)-t.y,oB=(t.y+t.h)-gPlayer.y,oL=(gPlayer.x+gPlayer.w)-t.x,oR=(t.x+t.w)-gPlayer.x,m=Math.min(oT,oB,oL,oR);
+      if(m===oB&&t.vy>2){
+        // Bloc qui tombe sur le joueur → écrasement
+        killPlayer();
+      }else if(m===oT&&gPlayer.vy>=0){gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}
+      else if(m===oB&&gPlayer.vy<0){gPlayer.y=t.y+t.h;gPlayer.vy=0;}
+      else if(m===oL){t.vx=Math.max(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x-gPlayer.w;}
+      else if(m===oR){t.vx=Math.min(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x+t.w;}
+    }
     if(t.y>EH+200){t.x=t.ox;t.y=t.oy;t.vx=0;t.vy=0;}
   });
 
@@ -968,6 +998,94 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('keyup',e=>gKeys[e.code]=false);
 
 redraw();
+</script>
+<!-- PUBLISH MODAL -->
+<div id="publish-modal">
+  <div class="pub-box">
+    <h3 id="pub-title-lbl">🚀 PUBLIER LE NIVEAU</h3>
+    <div>
+      <label id="pub-name-lbl">NOM DU NIVEAU</label>
+      <input type="text" id="pub-name" placeholder="Mon niveau funky..." maxlength="40" style="margin-top:8px;">
+    </div>
+    <div id="pub-msg" class="pub-msg"></div>
+    <div class="pub-row">
+      <button class="pub-btn cancel" onclick="closePublish()" id="pub-cancel-btn">ANNULER</button>
+      <button class="pub-btn ok" onclick="doPublish()" id="pub-ok-btn">PUBLIER →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Supabase ──────────────────────────────
+const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
+const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
+const _sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+// ── Lang (sync with rest of site) ─────────
+const _lang=()=>localStorage.getItem('fl_lang')||'fr';
+const _PT={
+  fr:{title:'🚀 PUBLIER LE NIVEAU',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',cancel:'ANNULER',ok:'PUBLIER →',publishing:'PUBLICATION...',needLogin:'Tu dois être connecté pour publier !',needTitle:'Donne un nom à ton niveau !',needBlocks:'Ton niveau est vide !',success:'Niveau publié ! 🎉',errorTxt:'Erreur : '},
+  en:{title:'🚀 PUBLISH LEVEL',nameLbl:'LEVEL NAME',ph:'My funky level...',cancel:'CANCEL',ok:'PUBLISH →',publishing:'PUBLISHING...',needLogin:'You must be logged in to publish!',needTitle:'Give your level a name!',needBlocks:'Your level is empty!',success:'Level published! 🎉',errorTxt:'Error: '}
+};
+
+function _applyPubLang(){
+  const t=_PT[_lang()];
+  document.getElementById('pub-title-lbl').textContent=t.title;
+  document.getElementById('pub-name-lbl').textContent=t.nameLbl;
+  document.getElementById('pub-name').placeholder=t.ph;
+  document.getElementById('pub-cancel-btn').textContent=t.cancel;
+  document.getElementById('pub-ok-btn').textContent=t.ok;
+}
+
+function openPublish(){
+  _applyPubLang();
+  document.getElementById('pub-msg').className='pub-msg';
+  document.getElementById('pub-name').value='';
+  document.getElementById('publish-modal').classList.add('show');
+  document.getElementById('pub-name').focus();
+}
+function closePublish(){document.getElementById('publish-modal').classList.remove('show');}
+
+document.getElementById('publish-modal').addEventListener('click',e=>{if(e.target===document.getElementById('publish-modal'))closePublish();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePublish();if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();});
+
+async function doPublish(){
+  const t=_PT[_lang()];
+  const title=document.getElementById('pub-name').value.trim();
+  const msgEl=document.getElementById('pub-msg');
+  const okBtn=document.getElementById('pub-ok-btn');
+
+  // Vérif session
+  const{data:sess}=await _sb.auth.getSession();
+  if(!sess.session){msgEl.className='pub-msg err';msgEl.textContent=t.needLogin;return;}
+
+  // Vérif titre
+  if(!title){msgEl.className='pub-msg err';msgEl.textContent=t.needTitle;return;}
+
+  // Vérif niveau non vide
+  const totalBlocks=(lv.fixed||[]).length+(lv.trap||[]).length+(lv.slider||[]).length+(lv.mobile||[]).length+(lv.bounce||[]).length+(lv.push||[]).length+(lv.invis||[]).length;
+  if(totalBlocks===0){msgEl.className='pub-msg err';msgEl.textContent=t.needBlocks;return;}
+
+  // Publish !
+  okBtn.disabled=true;okBtn.textContent=t.publishing;
+  msgEl.className='pub-msg';
+
+  const user=sess.session.user;
+  const username=user.user_metadata?.username||user.email.split('@')[0];
+
+  const{error}=await _sb.from('levels').insert({
+    user_id:user.id,
+    title:title,
+    author:username,
+    data:lv,
+    plays:0
+  });
+
+  okBtn.disabled=false;okBtn.textContent=t.ok;
+
+  if(error){msgEl.className='pub-msg err';msgEl.textContent=t.errorTxt+error.message;}
+  else{msgEl.className='pub-msg ok';msgEl.textContent=t.success;setTimeout(()=>closePublish(),1800);}
+}
 </script>
 </body>
 </html>
