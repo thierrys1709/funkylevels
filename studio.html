@@ -1021,6 +1021,28 @@ const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
 const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
 const _sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
+// ── Charger niveau depuis URL ?level=id ───
+(async()=>{
+  const params=new URLSearchParams(window.location.search);
+  const lid=params.get('level');
+  const mode=params.get('mode'); // 'play' or 'edit'
+  if(!lid)return;
+  const{data,error}=await _sb.from('levels').select('*').eq('id',lid).single();
+  if(error||!data){alert('Niveau introuvable.');return;}
+  snapshot();
+  lv=data.data;
+  if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
+  if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
+  if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+  redraw();
+  // Incrémenter plays si mode=play
+  if(mode==='play'){
+    await _sb.from('levels').update({plays:(data.plays||0)+1}).eq('id',lid);
+    setTimeout(()=>playLevel(),300);
+  }
+  status('Niveau "'+data.title+'" chargé.');
+})();
+
 // ── Lang (sync with rest of site) ─────────
 const _lang=()=>localStorage.getItem('fl_lang')||'fr';
 const _PT={
@@ -1057,11 +1079,7 @@ async function doPublish(){
 
   // Vérif session
   const{data:sess}=await _sb.auth.getSession();
-  if(!sess.session){
-  closePublish();
-  window.location.href='login.html?redirect=studio.html';
-  return;
-}
+  if(!sess.session){msgEl.className='pub-msg err';msgEl.textContent=t.needLogin;return;}
 
   // Vérif titre
   if(!title){msgEl.className='pub-msg err';msgEl.textContent=t.needTitle;return;}
