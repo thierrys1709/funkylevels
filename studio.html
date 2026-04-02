@@ -51,6 +51,19 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
 .ov button:hover{background:#fff;}
 #ovWin h2{color:#40ff90;}#ovDie h2{color:#ff4455;}#ovStart h2{color:#f0e040;}
 
+/* ── Load modal ── */
+#load-modal{display:none;position:fixed;inset:0;background:#000000bb;z-index:200;align-items:center;justify-content:center;}
+#load-modal.show{display:flex;}
+.load-box{background:#0f0f1e;border:2px solid #1e1e35;border-radius:6px;padding:24px;width:380px;max-height:80vh;display:flex;flex-direction:column;gap:14px;box-shadow:0 0 40px #000000cc;}
+.load-box h3{font-size:9px;color:#90a0f0;text-align:center;flex-shrink:0;}
+#load-list{overflow-y:auto;display:flex;flex-direction:column;gap:8px;flex:1;}
+.load-item{background:#0a0a18;border:1.5px solid #1e1e35;border-radius:3px;padding:12px 14px;cursor:pointer;transition:all .15s;}
+.load-item:hover{border-color:#5050c0;background:#0d0d22;}
+.load-item-title{font-size:8px;color:#ccc;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.load-item-meta{font-size:6px;color:#444466;}
+.load-close{font-family:'Press Start 2P',monospace;font-size:7px;padding:10px;background:#1a1a2a;border:1.5px solid #333;border-radius:3px;color:#888;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.load-close:hover{color:#ccc;}
+
 /* ── Publish modal ── */
 #publish-modal{display:none;position:fixed;inset:0;background:#000000bb;z-index:200;align-items:center;justify-content:center;}
 #publish-modal.show{display:flex;}
@@ -442,7 +455,49 @@ function findBlockAt(x,y){const types=['fixed','trap','slider','invis','bounce',
 function deleteSelected(){if(!selection.length)return;snapshot();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
 function zoom(d){ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));EC.style.transform=`scale(${ZOOM})`;EC.style.transformOrigin='top left';document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%';}
 function saveLevel(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));a.download='level.json';a.click();status('Sauvegardé.');}
-function loadLevel(){document.getElementById('fileInput').click();}
+function loadLevel(){openLoadModal();}
+
+// ── Load modal ────────────────────────────
+async function openLoadModal(){
+  const modal=document.getElementById('load-modal');
+  const list=document.getElementById('load-list');
+  modal.classList.add('show');
+  list.innerHTML='<div style="font-size:7px;color:#666;text-align:center;padding:20px;">Chargement...</div>';
+
+  const{data:sess}=await _sb.auth.getSession();
+  if(!sess.session){
+    list.innerHTML='<div style="font-size:7px;color:#f04060;text-align:center;padding:20px;">Connecte-toi pour voir tes niveaux.</div>';
+    return;
+  }
+
+  const{data,error}=await _sb.from('levels').select('*').eq('user_id',sess.session.user.id).order('created_at',{ascending:false});
+  if(error||!data||data.length===0){
+    list.innerHTML='<div style="font-size:7px;color:#666;text-align:center;padding:20px;">Aucun niveau sauvegardé.</div>';
+    return;
+  }
+
+  list.innerHTML=data.map(l=>`
+    <div class="load-item" onclick="doLoadLevel('${l.id}','${(l.title||'Sans titre').replace(/'/g,'\'')}')">
+      <div class="load-item-title">${l.title||'Sans titre'}</div>
+      <div class="load-item-meta">${new Date(l.created_at).toLocaleDateString()} · ▶ ${l.plays||0}</div>
+    </div>
+  `).join('');
+}
+
+function closeLoadModal(){document.getElementById('load-modal').classList.remove('show');}
+
+async function doLoadLevel(id,title){
+  const{data,error}=await _sb.from('levels').select('*').eq('id',id).single();
+  if(error||!data){alert('Erreur lors du chargement.');return;}
+  snapshot();
+  lv=data.data;
+  if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
+  if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
+  if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+  redraw();
+  closeLoadModal();
+  status('Niveau "'+title+'" chargé.');
+}
 function loadFile(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
@@ -999,6 +1054,15 @@ document.addEventListener('keyup',e=>gKeys[e.code]=false);
 
 redraw();
 </script>
+<!-- LOAD MODAL -->
+<div id="load-modal">
+  <div class="load-box">
+    <h3>📂 MES NIVEAUX</h3>
+    <div id="load-list"></div>
+    <button class="load-close" onclick="closeLoadModal()">✕ FERMER</button>
+  </div>
+</div>
+
 <!-- PUBLISH MODAL -->
 <div id="publish-modal">
   <div class="pub-box">
