@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FunkyLevels — Accueil</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#08080f;--panel:#0f0f1e;--panel2:#12122a;--border:#1e1e35;--accent:#f0e040;--accent2:#a040f0;--green:#40f090;--red:#f04060;--blue:#4090f0;--text:#cccccc;--muted:#444466;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);font-family:'Press Start 2P',monospace;min-height:100vh;color:var(--text);}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:32px 32px;opacity:.35;pointer-events:none;}
+
+/* ── NAVBAR ── */
+nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(10px);border-bottom:2px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;}
+.nav-logo{font-size:12px;color:var(--accent);text-shadow:0 0 15px var(--accent);text-decoration:none;letter-spacing:1px;}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-btn{font-family:'Press Start 2P',monospace;font-size:6px;padding:8px 12px;border-radius:3px;cursor:pointer;transition:all .15s;text-decoration:none;border:1.5px solid var(--border);background:transparent;color:var(--muted);}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.nav-btn.primary{background:var(--accent);color:#111;border-color:var(--accent);}
+.nav-btn.primary:hover{background:#fff;border-color:#fff;}
+.lang-btn{font-family:'Press Start 2P',monospace;font-size:6px;padding:6px 8px;border:1.5px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.lang-btn.active{border-color:var(--accent);color:var(--accent);background:#f0e04012;}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:60px 20px 40px;position:relative;}
+.hero h1{font-size:clamp(14px,4vw,28px);color:var(--accent);text-shadow:0 0 30px var(--accent);line-height:1.8;margin-bottom:16px;animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{text-shadow:0 0 20px var(--accent)}50%{text-shadow:0 0 40px var(--accent),0 0 80px var(--accent)}}
+.hero p{font-size:7px;color:var(--muted);line-height:2.5;max-width:500px;margin:0 auto 28px;}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.hero-btn{font-family:'Press Start 2P',monospace;font-size:8px;padding:14px 20px;border-radius:3px;cursor:pointer;transition:all .15s;text-decoration:none;border:2px solid;}
+.hero-btn.a{background:var(--accent);color:#111;border-color:var(--accent);}
+.hero-btn.a:hover{background:#fff;transform:translateY(-2px);box-shadow:0 6px 25px #f0e04055;}
+.hero-btn.b{background:transparent;color:var(--accent2);border-color:var(--accent2);}
+.hero-btn.b:hover{background:#a040f015;transform:translateY(-2px);}
+
+/* ── STATS ── */
+.stats{display:flex;justify-content:center;gap:0;max-width:600px;margin:0 auto 40px;border:2px solid var(--border);border-radius:4px;overflow:hidden;}
+.stat{flex:1;padding:16px 8px;text-align:center;border-right:2px solid var(--border);background:var(--panel);}
+.stat:last-child{border-right:none;}
+.stat-val{font-size:14px;color:var(--accent);margin-bottom:8px;}
+.stat-lbl{font-size:5px;color:var(--muted);letter-spacing:1px;}
+
+/* ── SEARCH ── */
+.search-bar{max-width:800px;margin:0 auto 32px;padding:0 20px;display:flex;gap:10px;}
+.search-bar input{flex:1;background:var(--panel);border:1.5px solid var(--border);border-radius:3px;color:var(--text);font-family:'Press Start 2P',monospace;font-size:7px;padding:12px 14px;outline:none;transition:border-color .2s;}
+.search-bar input:focus{border-color:var(--accent2);}
+.search-bar input::placeholder{color:var(--muted);}
+.search-bar button{font-family:'Press Start 2P',monospace;font-size:7px;padding:12px 16px;background:var(--accent2);border:none;border-radius:3px;color:#fff;cursor:pointer;transition:all .15s;}
+.search-bar button:hover{background:#b060ff;}
+
+/* ── TABS ── */
+.section-tabs{display:flex;gap:0;max-width:800px;margin:0 auto 20px;padding:0 20px;border-bottom:2px solid var(--border);}
+.stab{font-family:'Press Start 2P',monospace;font-size:7px;padding:12px 16px;background:transparent;border:none;color:var(--muted);cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.stab:hover{color:var(--text);}
+.stab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── LEVEL GRID ── */
+.levels-grid{max-width:800px;margin:0 auto;padding:0 20px 60px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+
+/* ── LEVEL CARD ── */
+.level-card{background:var(--panel);border:1.5px solid var(--border);border-radius:5px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative;}
+.level-card:hover{border-color:var(--accent2);transform:translateY(-3px);box-shadow:0 8px 30px #a040f022;}
+.level-thumb{height:100px;background:var(--panel2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.level-thumb-bg{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:16px 16px;opacity:.5;}
+.level-thumb-icon{font-size:28px;position:relative;z-index:1;}
+.level-body{padding:14px 12px;}
+.level-title{font-size:7px;color:var(--text);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.level-meta{display:flex;justify-content:space-between;align-items:center;}
+.level-author{font-size:5px;color:var(--muted);}
+.level-stars{font-size:8px;color:var(--accent);}
+.level-plays{font-size:5px;color:var(--muted);margin-top:6px;}
+.level-badge{position:absolute;top:8px;right:8px;font-size:5px;padding:3px 6px;border-radius:2px;background:var(--accent);color:#111;}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty p{font-size:7px;line-height:2.5;margin-top:12px;}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:40px;font-size:7px;color:var(--muted);}
+.dot-anim::after{content:'...';animation:dots 1.2s steps(4,end) infinite;}
+@keyframes dots{0%,20%{content:'.'}40%{content:'..'}60%,100%{content:'...'}}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--panel);border:1.5px solid var(--green);color:var(--green);font-size:7px;padding:12px 20px;border-radius:4px;z-index:999;transition:transform .3s;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── USER MENU ── */
+.user-info{font-size:6px;color:var(--accent2);padding:6px 10px;border:1.5px solid var(--accent2);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="home.html" class="nav-logo">⚡ FUNKYLEVELS</a>
+  <div class="nav-right">
+    <div style="display:flex;gap:4px;">
+      <button class="lang-btn active" id="btn-fr" onclick="setLang('fr')">🇫🇷</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">🇬🇧</button>
+    </div>
+    <span id="nav-user" style="display:none;" class="user-info"></span>
+    <a href="index.html" class="nav-btn" id="nav-create">✏️ CRÉER</a>
+    <a href="login.html" class="nav-btn primary" id="nav-login">CONNEXION</a>
+    <button class="nav-btn" id="nav-logout" style="display:none;" onclick="doLogout()">DÉCONNEXION</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1 id="hero-title">⚡ FUNKYLEVELS</h1>
+  <p id="hero-sub">Crée des niveaux de platformer fous,<br>partage-les et joue à ceux des autres !</p>
+  <div class="hero-btns">
+    <a href="index.html" class="hero-btn a" id="hero-btn-create">✏️ CRÉER UN NIVEAU</a>
+    <a href="#levels" class="hero-btn b" id="hero-btn-browse">🎮 PARCOURIR</a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-val" id="stat-levels">-</div><div class="stat-lbl" id="stat-levels-lbl">NIVEAUX</div></div>
+  <div class="stat"><div class="stat-val" id="stat-players">-</div><div class="stat-lbl" id="stat-players-lbl">JOUEURS</div></div>
+  <div class="stat"><div class="stat-val" id="stat-plays">-</div><div class="stat-lbl" id="stat-plays-lbl">PARTIES</div></div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-bar">
+  <input type="text" id="search-input" placeholder="🔍 Rechercher un niveau..." oninput="onSearch()">
+  <button onclick="onSearch()" id="search-btn">CHERCHER</button>
+</div>
+
+<!-- SECTION TABS -->
+<div class="section-tabs" id="anchor-levels">
+  <button class="stab active" id="stab-new" onclick="switchSection('new')">🆕 <span id="stab-new-txt">NOUVEAUX</span></button>
+  <button class="stab" id="stab-top" onclick="switchSection('top')">🏆 <span id="stab-top-txt">MEILLEURS</span></button>
+  <button class="stab" id="stab-mine" onclick="switchSection('mine')">👤 <span id="stab-mine-txt">MES NIVEAUX</span></button>
+</div>
+
+<!-- LEVELS GRID -->
+<div class="levels-grid" id="levels-grid">
+  <div class="loading"><span class="dot-anim" id="loading-txt">Chargement</span></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
+const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+// ── TRADUCTIONS ──────────────────────────
+const T={
+  fr:{
+    heroTitle:'⚡ FUNKYLEVELS',
+    heroSub:'Crée des niveaux de platformer fous,\npartage-les et joue à ceux des autres !',
+    btnCreate:'✏️ CRÉER UN NIVEAU',btnBrowse:'🎮 PARCOURIR',
+    statLevels:'NIVEAUX',statPlayers:'JOUEURS',statPlays:'PARTIES',
+    searchPh:'🔍 Rechercher un niveau...',searchBtn:'CHERCHER',
+    stabNew:'NOUVEAUX',stabTop:'MEILLEURS',stabMine:'MES NIVEAUX',
+    navCreate:'✏️ CRÉER',navLogin:'CONNEXION',navLogout:'DÉCONNEXION',
+    loading:'Chargement',
+    emptyNew:'Aucun niveau pour l\'instant.\nSois le premier à en créer un !',
+    emptyTop:'Aucun niveau noté pour l\'instant.',
+    emptyMine:'Tu n\'as pas encore créé de niveau.',
+    emptySearch:'Aucun résultat pour cette recherche.',
+    notLogged:'Connecte-toi pour voir tes niveaux.',
+    plays:'parties',
+    noRating:'pas encore noté',
+    new:'NOUVEAU',
+    logoutOk:'Déconnecté !',
+  },
+  en:{
+    heroTitle:'⚡ FUNKYLEVELS',
+    heroSub:'Create crazy platformer levels,\nshare them and play others\'!',
+    btnCreate:'✏️ CREATE A LEVEL',btnBrowse:'🎮 BROWSE',
+    statLevels:'LEVELS',statPlayers:'PLAYERS',statPlays:'GAMES',
+    searchPh:'🔍 Search a level...',searchBtn:'SEARCH',
+    stabNew:'NEW',stabTop:'TOP RATED',stabMine:'MY LEVELS',
+    navCreate:'✏️ CREATE',navLogin:'LOGIN',navLogout:'LOGOUT',
+    loading:'Loading',
+    emptyNew:'No levels yet.\nBe the first to create one!',
+    emptyTop:'No rated levels yet.',
+    emptyMine:'You haven\'t created any level yet.',
+    emptySearch:'No results for this search.',
+    notLogged:'Log in to see your levels.',
+    plays:'plays',
+    noRating:'not rated yet',
+    new:'NEW',
+    logoutOk:'Logged out!',
+  }
+};
+
+let lang=localStorage.getItem('fl_lang')||'fr';
+let currentSection='new';
+let currentUser=null;
+let searchTimer=null;
+
+function setLang(l){
+  lang=l;localStorage.setItem('fl_lang',l);
+  document.getElementById('btn-fr').classList.toggle('active',l==='fr');
+  document.getElementById('btn-en').classList.toggle('active',l==='en');
+  const t=T[l];
+  document.getElementById('hero-title').textContent=t.heroTitle;
+  document.getElementById('hero-sub').innerHTML=t.heroSub.replace('\n','<br>');
+  document.getElementById('hero-btn-create').textContent=t.btnCreate;
+  document.getElementById('hero-btn-browse').textContent=t.btnBrowse;
+  document.getElementById('stat-levels-lbl').textContent=t.statLevels;
+  document.getElementById('stat-players-lbl').textContent=t.statPlayers;
+  document.getElementById('stat-plays-lbl').textContent=t.statPlays;
+  document.getElementById('search-input').placeholder=t.searchPh;
+  document.getElementById('search-btn').textContent=t.searchBtn;
+  document.getElementById('stab-new-txt').textContent=t.stabNew;
+  document.getElementById('stab-top-txt').textContent=t.stabTop;
+  document.getElementById('stab-mine-txt').textContent=t.stabMine;
+  document.getElementById('nav-create').textContent=t.navCreate;
+  document.getElementById('nav-login').textContent=t.navLogin;
+  document.getElementById('nav-logout').textContent=t.navLogout;
+  document.getElementById('loading-txt').textContent=t.loading;
+  loadSection(currentSection);
+}
+setLang(lang);
+
+// ── AUTH ─────────────────────────────────
+async function checkAuth(){
+  const{data}=await sb.auth.getSession();
+  if(data.session){
+    currentUser=data.session.user;
+    const username=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
+    document.getElementById('nav-user').textContent='👤 '+username;
+    document.getElementById('nav-user').style.display='';
+    document.getElementById('nav-login').style.display='none';
+    document.getElementById('nav-logout').style.display='';
+  }
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  showToast(T[lang].logoutOk);
+  setTimeout(()=>location.reload(),800);
+}
+
+// ── STATS ─────────────────────────────────
+async function loadStats(){
+  const{count:lc}=await sb.from('levels').select('*',{count:'exact',head:true});
+  const{data:plays}=await sb.from('levels').select('plays');
+  const totalPlays=plays?.reduce((a,b)=>a+(b.plays||0),0)||0;
+  document.getElementById('stat-levels').textContent=lc||0;
+  document.getElementById('stat-players').textContent='?';
+  document.getElementById('stat-plays').textContent=totalPlays;
+}
+
+// ── SECTIONS ──────────────────────────────
+function switchSection(s){
+  currentSection=s;
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('stab-'+s).classList.add('active');
+  loadSection(s);
+}
+
+async function loadSection(s){
+  const grid=document.getElementById('levels-grid');
+  const t=T[lang];
+  grid.innerHTML=`<div class="loading"><span class="dot-anim">${t.loading}</span></div>`;
+  const q=document.getElementById('search-input').value.trim();
+  let levels=[];
+
+  if(s==='new'){
+    let query=sb.from('levels').select('*').order('created_at',{ascending:false}).limit(24);
+    if(q)query=query.ilike('title','%'+q+'%');
+    const{data}=await query;
+    levels=data||[];
+  }else if(s==='top'){
+    const{data}=await sb.from('levels').select('*').order('plays',{ascending:false}).limit(24);
+    levels=data||[];
+  }else if(s==='mine'){
+    if(!currentUser){grid.innerHTML=`<div class="empty"><div style="font-size:24px">🔒</div><p>${t.notLogged}</p></div>`;return;}
+    const{data}=await sb.from('levels').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+    levels=data||[];
+  }
+
+  if(!levels.length){
+    const msg=q?t.emptySearch:s==='new'?t.emptyNew:s==='top'?t.emptyTop:t.emptyMine;
+    grid.innerHTML=`<div class="empty"><div style="font-size:32px">${s==='mine'?'🎮':'🌟'}</div><p>${msg.replace('\n','<br>')}</p></div>`;
+    return;
+  }
+  grid.innerHTML=levels.map(l=>levelCard(l)).join('');
+}
+
+function levelCard(l){
+  const t=T[lang];
+  const age=(Date.now()-new Date(l.created_at).getTime())/1000/3600;
+  const isNew=age<48;
+  const stars=l.rating?'⭐'.repeat(Math.round(l.rating)):'—';
+  const ratingTxt=l.rating?stars:t.noRating;
+  const icons=['🌟','🎮','🔥','⚡','🌈','🎯','💫','🏆'];
+  const icon=icons[Math.abs(l.id?.charCodeAt(0)||0)%icons.length];
+  return`<div class="level-card" onclick="playLevel('${l.id}')">
+    ${isNew?`<div class="level-badge">${t.new}</div>`:''}
+    <div class="level-thumb">
+      <div class="level-thumb-bg"></div>
+      <div class="level-thumb-icon">${icon}</div>
+    </div>
+    <div class="level-body">
+      <div class="level-title">${escHtml(l.title||'Sans titre')}</div>
+      <div class="level-meta">
+        <span class="level-author">@${escHtml(l.author||'anonyme')}</span>
+        <span class="level-stars" title="${ratingTxt}">${l.rating?'⭐'+Number(l.rating).toFixed(1):'—'}</span>
+      </div>
+      <div class="level-plays">▶ ${l.plays||0} ${t.plays}</div>
+    </div>
+  </div>`;
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function playLevel(id){window.location.href=`index.html?level=${id}`;}
+
+function onSearch(){
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>loadSection(currentSection),350);
+}
+
+// ── TOAST ─────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── INIT ──────────────────────────────────
+checkAuth();
+loadStats();
+loadSection('new');
+</script>
+</body>
+</html>
