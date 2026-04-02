@@ -1057,7 +1057,11 @@ async function doPublish(){
 
   // Vérif session
   const{data:sess}=await _sb.auth.getSession();
-  if(!sess.session){msgEl.className='pub-msg err';msgEl.textContent=t.needLogin;return;}
+  if(!sess.session){
+  closePublish();
+  window.location.href='login.html?redirect=studio.html';
+  return;
+}
 
   // Vérif titre
   if(!title){msgEl.className='pub-msg err';msgEl.textContent=t.needTitle;return;}
