@@ -103,7 +103,7 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
       <button class="lang-btn" id="btn-en" onclick="setLang('en')">🇬🇧</button>
     </div>
     <span id="nav-user" style="display:none;" class="user-info"></span>
-    <a href="studio.html" class="nav-btn" id="nav-create">✏️ CRÉER</a>
+    <a href="index.html" class="nav-btn" id="nav-create">✏️ CRÉER</a>
     <a href="login.html" class="nav-btn primary" id="nav-login">CONNEXION</a>
     <button class="nav-btn" id="nav-logout" style="display:none;" onclick="doLogout()">DÉCONNEXION</button>
   </div>
@@ -114,7 +114,7 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
   <h1 id="hero-title">⚡ FUNKYLEVELS</h1>
   <p id="hero-sub">Crée des niveaux de platformer fous,<br>partage-les et joue à ceux des autres !</p>
   <div class="hero-btns">
-    <a href="studio.html" class="hero-btn a" id="hero-btn-create">✏️ CRÉER UN NIVEAU</a>
+    <a href="index.html" class="hero-btn a" id="hero-btn-create">✏️ CRÉER UN NIVEAU</a>
     <a href="#levels" class="hero-btn b" id="hero-btn-browse">🎮 PARCOURIR</a>
   </div>
 </div>
@@ -316,7 +316,38 @@ function levelCard(l){
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-function playLevel(id){window.location.href=`index.html?level=${id}`;}
+function playLevel(id){openLevelModal(id);}
+
+// ── Level modal ───────────────────────────
+let _modalLevel=null;
+
+async function openLevelModal(id){
+  const{data,error}=await sb.from('levels').select('*').eq('id',id).single();
+  if(error||!data)return;
+  _modalLevel=data;
+  const t=T[lang];
+  const{data:sess}=await sb.auth.getSession();
+  const uid=sess?.session?.user?.id;
+  const isOwner=uid&&uid===data.user_id;
+
+  document.getElementById('modal-title').textContent=data.title||'Sans titre';
+  document.getElementById('modal-author').textContent='@'+(data.author||'anonyme');
+  document.getElementById('modal-plays').textContent=(data.plays||0)+' '+(lang==='fr'?'parties':'plays');
+  document.getElementById('modal-rating').textContent=data.rating?'⭐'+Number(data.rating).toFixed(1):'—';
+  document.getElementById('modal-edit-btn').style.display=isOwner?'':'none';
+  document.getElementById('level-modal').classList.add('show');
+}
+
+function closeLevelModal(){document.getElementById('level-modal').classList.remove('show');}
+
+function doPlayLevel(){
+  if(!_modalLevel)return;
+  window.location.href=`studio.html?level=${_modalLevel.id}&mode=play`;
+}
+function doEditLevel(){
+  if(!_modalLevel)return;
+  window.location.href=`studio.html?level=${_modalLevel.id}&mode=edit`;
+}
 
 function onSearch(){
   clearTimeout(searchTimer);
@@ -335,5 +366,36 @@ checkAuth();
 loadStats();
 loadSection('new');
 </script>
+<!-- LEVEL MODAL -->
+<style>
+#level-modal{display:none;position:fixed;inset:0;background:#000000bb;z-index:200;align-items:center;justify-content:center;}
+#level-modal.show{display:flex;}
+.lm-box{background:#0f0f1e;border:2px solid #1e1e35;border-radius:6px;padding:28px 24px;width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 0 40px #000000cc;}
+.lm-title{font-size:10px;color:#f0e040;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lm-meta{display:flex;justify-content:space-between;font-size:6px;color:#666;}
+.lm-btns{display:flex;gap:10px;margin-top:4px;}
+.lm-btn{flex:1;font-family:'Press Start 2P',monospace;font-size:7px;padding:12px;border:none;border-radius:3px;cursor:pointer;transition:all .15s;}
+.lm-btn.play{background:#40f090;color:#111;}
+.lm-btn.play:hover{background:#80ffb0;}
+.lm-btn.edit{background:#4090f0;color:#fff;}
+.lm-btn.edit:hover{background:#60b0ff;}
+.lm-btn.cancel{background:#1a1a2a;color:#888;border:1.5px solid #333;}
+.lm-btn.cancel:hover{color:#ccc;}
+</style>
+<div id="level-modal">
+  <div class="lm-box">
+    <div class="lm-title" id="modal-title"></div>
+    <div class="lm-meta">
+      <span id="modal-author"></span>
+      <span id="modal-rating"></span>
+    </div>
+    <div class="lm-meta"><span id="modal-plays"></span></div>
+    <div class="lm-btns">
+      <button class="lm-btn cancel" onclick="closeLevelModal()">✕</button>
+      <button class="lm-btn edit" id="modal-edit-btn" onclick="doEditLevel()" style="display:none;">✏️ ÉDITER</button>
+      <button class="lm-btn play" onclick="doPlayLevel()">▶ JOUER</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
