@@ -1085,6 +1085,48 @@ const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
 const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
 const _sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
+// ── Charger profil joueur (perso + langue) ─
+const CHAR_COLORS={
+  default:{body:'#f6ad55',dark:'#c05621'},
+  ninja:  {body:'#2d3748',dark:'#1a202c'},
+  robot:  {body:'#90cdf4',dark:'#3182ce'},
+  alien:  {body:'#9ae6b4',dark:'#276749'},
+  ghost:  {body:'#e2e8f0',dark:'#a0aec0'},
+  cat:    {body:'#fbd38d',dark:'#c05621'},
+  fire:   {body:'#fc8181',dark:'#c53030'},
+  star:   {body:'#faf089',dark:'#b7791f'},
+  skull:  {body:'#e2e8f0',dark:'#4a5568'},
+  wizard: {body:'#b794f4',dark:'#6b46c1'},
+  knight: {body:'#a0aec0',dark:'#4a5568'},
+  frog:   {body:'#68d391',dark:'#276749'},
+};
+const CHAR_ICONS={
+  default:'🧑',ninja:'🥷',robot:'🤖',alien:'👽',ghost:'👻',
+  cat:'🐱',fire:'🔥',star:'⭐',skull:'💀',wizard:'🧙',knight:'⚔️',frog:'🐸'
+};
+
+(async()=>{
+  const{data:sess}=await _sb.auth.getSession();
+  if(sess.session){
+    const{data:profile}=await _sb.from('profiles').select('character,lang').eq('id',sess.session.user.id).single();
+    if(profile){
+      if(profile.character){
+        localStorage.setItem('fl_char',profile.character);
+        // Apply character colors to game player
+        const c=CHAR_COLORS[profile.character]||CHAR_COLORS.default;
+        PCOL.player=c.body;
+        PCOL.pDark=c.dark;
+      }
+      if(profile.lang){localStorage.setItem('fl_lang',profile.lang);}
+    }
+  }else{
+    // Use local storage fallback
+    const localChar=localStorage.getItem('fl_char')||'default';
+    const c=CHAR_COLORS[localChar]||CHAR_COLORS.default;
+    PCOL.player=c.body;PCOL.pDark=c.dark;
+  }
+})();
+
 // ── Charger niveau depuis URL ?level=id ───
 (async()=>{
   const params=new URLSearchParams(window.location.search);
