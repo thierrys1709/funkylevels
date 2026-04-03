@@ -460,7 +460,19 @@ EC.addEventListener('mouseleave',()=>{rubberBand=null;redraw();});
 function findBlockAt(x,y){const types=['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
 function deleteSelected(){if(!selection.length)return;snapshot();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
 function zoom(d){ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));EC.style.transform=`scale(${ZOOM})`;EC.style.transformOrigin='top left';document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%';}
-function saveLevel(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));a.download='level.json';a.click();status('Sauvegardé.');}
+function saveLevel(){
+  // If logged in → open publish modal
+  // If not → download JSON as before
+  _sb.auth.getSession().then(({data})=>{
+    if(data.session){
+      openPublish();
+    }else{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));
+      a.download='level.json';a.click();status('Sauvegardé.');
+    }
+  });
+}
 function loadLevel(){openLoadModal();}
 
 // ── Load modal ────────────────────────────
@@ -500,6 +512,8 @@ async function doLoadLevel(id,title){
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+  _currentLevelId=id;
+  _currentVisibility=data.visibility||'private';
   redraw();
   closeLoadModal();
   status('Niveau "'+title+'" chargé.');
@@ -517,7 +531,7 @@ function loadFile(e){
   }catch(err){alert('Fichier invalide.');}};
   r.readAsText(f);e.target.value='';
 }
-function clearLevel(){if(!confirm('Vider le niveau ?'))return;snapshot();lv=emptyLevel();selectedIdx=-1;selectedType=null;redraw();status('Vidé.');}
+function clearLevel(){if(!confirm('Vider le niveau ?'))return;snapshot();lv=emptyLevel();selectedIdx=-1;selectedType=null;_currentLevelId=null;_currentVisibility='private';redraw();status('Vidé.');}
 
 // ── Editor draw ──────────────────────────────────────────────────
 const EC_COL={bg:'#0c0c1a',grid:'#12122a',fixed:{b:'#4a5568',t:'#718096',s:'#a0aec0'},trap:{b:'#4a5568',t:'#718096',s:'#a0aec0'},flagA:'#68d391',flagB:'#fc8181',sel:'#f0e040',ghost:'#ffffff18'};
@@ -1160,6 +1174,8 @@ loadPlayerProfile().then(()=>{
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+  _currentLevelId=lid;
+  _currentVisibility=data.visibility||'private';
   redraw();
   // Incrémenter plays si mode=play
   if(mode==='play'){
@@ -1172,23 +1188,71 @@ loadPlayerProfile().then(()=>{
 // ── Lang (sync with rest of site) ─────────
 const _lang=()=>localStorage.getItem('fl_lang')||'fr';
 const _PT={
-  fr:{title:'🚀 PUBLIER LE NIVEAU',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',cancel:'ANNULER',ok:'PUBLIER →',publishing:'PUBLICATION...',needLogin:'Tu dois être connecté pour publier !',needTitle:'Donne un nom à ton niveau !',needBlocks:'Ton niveau est vide !',success:'Niveau publié ! 🎉',errorTxt:'Erreur : '},
-  en:{title:'🚀 PUBLISH LEVEL',nameLbl:'LEVEL NAME',ph:'My funky level...',cancel:'CANCEL',ok:'PUBLISH →',publishing:'PUBLISHING...',needLogin:'You must be logged in to publish!',needTitle:'Give your level a name!',needBlocks:'Your level is empty!',success:'Level published! 🎉',errorTxt:'Error: '}
+  fr:{
+    title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',
+    visLbl:'VISIBILITÉ',
+    hintPrivate:'🔒 Seul toi peux le voir',
+    hintPublic:'🌍 Tout le monde peut jouer',
+    hintCode:'🔑 Accessible uniquement avec le code',
+    cancel:'ANNULER',ok:'💾 SAUVER →',saving:'SAUVEGARDE...',
+    needLogin:'Tu dois être connecté !',
+    needTitle:'Donne un nom à ton niveau !',
+    needBlocks:'Ton niveau est vide !',
+    successNew:'Niveau sauvegardé !',
+    successUpdate:'Niveau mis à jour !',
+    codeMsg:'Code de partage : ',
+    codeCopied:'(copié !)',
+    errorTxt:'Erreur : '
+  },
+  en:{
+    title:'💾 SAVE',nameLbl:'LEVEL NAME',ph:'My funky level...',
+    visLbl:'VISIBILITY',
+    hintPrivate:'🔒 Only you can see it',
+    hintPublic:'🌍 Everyone can play',
+    hintCode:'🔑 Accessible with code only',
+    cancel:'CANCEL',ok:'💾 SAVE →',saving:'SAVING...',
+    needLogin:'You must be logged in!',
+    needTitle:'Give your level a name!',
+    needBlocks:'Your level is empty!',
+    successNew:'Level saved!',
+    successUpdate:'Level updated!',
+    codeMsg:'Share code: ',
+    codeCopied:'(copied!)',
+    errorTxt:'Error: '
+  }
 };
+
+const VIS_HINTS={
+  fr:{private:'🔒 Seul toi peux le voir',public:'🌍 Tout le monde peut jouer',code:'🔑 Accessible uniquement avec le code'},
+  en:{private:'🔒 Only you can see it',public:'🌍 Everyone can play',code:'🔑 Accessible with code only'}
+};
+
+function setVis(v){
+  _currentVisibility=v;
+  document.querySelectorAll('.pub-vis-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('vis-'+v).classList.add('active');
+  const l=_lang();
+  document.getElementById('pub-vis-hint').textContent=VIS_HINTS[l][v];
+}
 
 function _applyPubLang(){
   const t=_PT[_lang()];
   document.getElementById('pub-title-lbl').textContent=t.title;
   document.getElementById('pub-name-lbl').textContent=t.nameLbl;
   document.getElementById('pub-name').placeholder=t.ph;
+  document.getElementById('pub-vis-lbl').textContent=t.visLbl;
   document.getElementById('pub-cancel-btn').textContent=t.cancel;
   document.getElementById('pub-ok-btn').textContent=t.ok;
+  setVis(_currentVisibility);
 }
 
 function openPublish(){
   _applyPubLang();
   document.getElementById('pub-msg').className='pub-msg';
-  document.getElementById('pub-name').value='';
+  // Pre-fill title if level already has one
+  if(_currentLevelId){
+    // Already saved level — show current title if available
+  }
   document.getElementById('publish-modal').classList.add('show');
   document.getElementById('pub-name').focus();
 }
@@ -1214,39 +1278,55 @@ async function doPublish(){
   const totalBlocks=(lv.fixed||[]).length+(lv.trap||[]).length+(lv.slider||[]).length+(lv.mobile||[]).length+(lv.bounce||[]).length+(lv.push||[]).length+(lv.invis||[]).length;
   if(totalBlocks===0){msgEl.className='pub-msg err';msgEl.textContent=t.needBlocks;return;}
 
-  // Publish !
-  okBtn.disabled=true;okBtn.textContent=t.publishing;
+  okBtn.disabled=true;okBtn.textContent=t.saving;
   msgEl.className='pub-msg';
 
   const user=sess.session.user;
   const username=user.user_metadata?.username||user.email.split('@')[0];
 
-  // Génère un code de partage lisible ex: 12345-67890-12345
-  function genCode(){
-    const r=()=>Math.floor(Math.random()*90000+10000);
-    return `${r()}-${r()}-${r()}`;
-  }
-  const shareCode=genCode();
+  let error,shareCode=null;
 
-  const{error}=await _sb.from('levels').insert({
-    user_id:user.id,
-    title:title,
-    author:username,
-    data:lv,
-    plays:0,
-    published:false,
-    share_code:shareCode
-  });
+  if(_currentLevelId){
+    // ── UPDATE niveau existant ──
+    const{error:e}=await _sb.from('levels').update({
+      title:title,
+      data:lv,
+      visibility:_currentVisibility
+    }).eq('id',_currentLevelId).eq('user_id',user.id);
+    error=e;
+  }else{
+    // ── INSERT nouveau niveau ──
+    function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
+    shareCode=genCode();
+    const{data:inserted,error:e}=await _sb.from('levels').insert({
+      user_id:user.id,
+      title:title,
+      author:username,
+      data:lv,
+      plays:0,
+      visibility:_currentVisibility,
+      share_code:shareCode
+    }).select().single();
+    error=e;
+    if(!error&&inserted){_currentLevelId=inserted.id;}
+  }
 
   okBtn.disabled=false;okBtn.textContent=t.ok;
 
-  if(error){msgEl.className='pub-msg err';msgEl.textContent=t.errorTxt+error.message;}
-  else{
-    const codeTxt=lang==='fr'?`✅ Publié ! Code : ${shareCode}`:`✅ Published! Code: ${shareCode}`;
-    msgEl.className='pub-msg ok';
-    msgEl.innerHTML=codeTxt+'<br><span style="font-size:5px;color:#40f090aa;">'+(lang==='fr'?'Copié dans le presse-papier !':'Copied to clipboard!')+'</span>';
-    navigator.clipboard?.writeText(shareCode).catch(()=>{});
-    setTimeout(()=>closePublish(),3500);
+  if(error){
+    msgEl.className='pub-msg err';
+    msgEl.textContent=t.errorTxt+error.message;
+  }else{
+    if(shareCode&&_currentVisibility==='code'){
+      navigator.clipboard?.writeText(shareCode).catch(()=>{});
+      msgEl.className='pub-msg ok';
+      msgEl.innerHTML=t.successNew+'<br>'+t.codeMsg+'<b>'+shareCode+'</b><br><span style="font-size:5px;color:#40f090aa;">'+t.codeCopied+'</span>';
+      setTimeout(()=>closePublish(),4000);
+    }else{
+      msgEl.className='pub-msg ok';
+      msgEl.textContent=_currentLevelId&&!shareCode?t.successUpdate:t.successNew;
+      setTimeout(()=>closePublish(),1800);
+    }
   }
 }
 </script>
