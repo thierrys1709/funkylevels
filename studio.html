@@ -1237,12 +1237,13 @@ function setVis(v){
 
 function _applyPubLang(){
   const t=_PT[_lang()];
-  document.getElementById('pub-title-lbl').textContent=t.title;
-  document.getElementById('pub-name-lbl').textContent=t.nameLbl;
-  document.getElementById('pub-name').placeholder=t.ph;
-  document.getElementById('pub-vis-lbl').textContent=t.visLbl;
-  document.getElementById('pub-cancel-btn').textContent=t.cancel;
-  document.getElementById('pub-ok-btn').textContent=t.ok;
+  const s=(id,val,prop='textContent')=>{const el=document.getElementById(id);if(el)el[prop]=val;};
+  s('pub-title-lbl',t.title);
+  s('pub-name-lbl',t.nameLbl);
+  s('pub-name',t.ph,'placeholder');
+  s('pub-vis-lbl',t.visLbl);
+  s('pub-cancel-btn',t.cancel);
+  s('pub-ok-btn',t.ok);
   setVis(_currentVisibility);
 }
 
