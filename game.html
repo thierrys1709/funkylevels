@@ -410,6 +410,8 @@ async function init(){
 
 // ── Game stubs for startGameFrom compatibility ────────────
 function startGameFrom(sx,sy){
+  // Ensure canvas has correct size
+  if(GC.width<10||GC.height<10)resizeGameCanvas();
   gLv=JSON.parse(JSON.stringify(lv));
   (gLv.trap||[]).forEach(t=>{t.state='idle';t.vy=0;t.y=t.oy;t._carryingPlayer=false;});
   (gLv.slider||[]).forEach(s=>{s.state='idle';s.x=s.ox;s.y=s.oy;s.traveled=0;s.waitTimer=0;});
@@ -426,21 +428,17 @@ function startGameFrom(sx,sy){
   _attempt++;
   updateAttemptDisplay();
   resetTimer();
+  // Cancel any running loop first
+  if(gRafId){cancelAnimationFrame(gRafId);gRafId=null;}
   // Draw level immediately so it's visible
-  gDraw();
-  if(_attempt===1){
-    // F1 lights only on first attempt
-    f1Start(()=>{
-      gRunning=true;
-      gLoopStart();
-      startTimer();
-    });
-  }else{
-    // Direct start on retry
-    gRunning=true;
-    gLoopStart();
-    startTimer();
-  }
+  requestAnimationFrame(()=>{
+    gDraw();
+    if(_attempt===1){
+      f1Start(()=>{gRunning=true;gLoopStart();startTimer();});
+    }else{
+      gRunning=true;gLoopStart();startTimer();
+    }
+  });
 }
 
 function gameRespawn(){
