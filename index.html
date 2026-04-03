@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FunkyLevels — Paramètres</title>
+<title>FunkyLevels</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -12,71 +12,96 @@
 body{background:var(--bg);font-family:'Press Start 2P',monospace;min-height:100vh;color:var(--text);font-size:14px;}
 .bg-grid{position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:32px 32px;opacity:.35;pointer-events:none;}
 
+/* ── NAVBAR ── */
 nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(10px);border-bottom:2px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px;}
-.nav-logo{font-size:16px;color:var(--accent);text-shadow:0 0 15px var(--accent);text-decoration:none;}
-.nav-back{font-family:'Press Start 2P',monospace;font-size:9px;padding:10px 16px;border:1.5px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;text-decoration:none;transition:all .15s;}
-.nav-back:hover{border-color:var(--accent);color:var(--accent);}
+.nav-logo{font-size:16px;color:var(--accent);text-shadow:0 0 15px var(--accent);text-decoration:none;letter-spacing:1px;}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.nav-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:10px 16px;border-radius:3px;cursor:pointer;transition:all .15s;text-decoration:none;border:1.5px solid var(--border);background:transparent;color:var(--muted);}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.nav-btn.primary{background:var(--accent);color:#111;border-color:var(--accent);}
+.nav-btn.primary:hover{background:#fff;}
+.nav-btn.secondary{border-color:var(--accent2);color:var(--accent2);}
+.nav-btn.secondary:hover{background:#a040f015;}
+.lang-btn{font-family:'Press Start 2P',monospace;font-size:8px;padding:7px 10px;border:1.5px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.lang-btn.active{border-color:var(--accent);color:var(--accent);background:#f0e04012;}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent);}
+.user-chip{font-size:9px;color:var(--accent2);padding:8px 12px;border:1.5px solid var(--accent2);border-radius:3px;cursor:pointer;text-decoration:none;}
+.user-chip:hover{background:#a040f015;}
 
-.page{max-width:800px;margin:0 auto;padding:40px 24px 80px;}
-.page-title{font-size:18px;color:var(--accent);margin-bottom:40px;text-align:center;text-shadow:0 0 20px var(--accent);}
+/* ── HERO ── */
+.hero{text-align:center;padding:64px 24px 48px;}
+.hero h1{font-size:clamp(18px,5vw,36px);color:var(--accent);text-shadow:0 0 30px var(--accent);line-height:1.7;margin-bottom:20px;animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{text-shadow:0 0 20px var(--accent)}50%{text-shadow:0 0 40px var(--accent),0 0 80px var(--accent)}}
+.hero p{font-size:11px;color:var(--muted);line-height:2.5;max-width:560px;margin:0 auto 32px;}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.hero-btn{font-family:'Press Start 2P',monospace;font-size:11px;padding:16px 24px;border-radius:3px;cursor:pointer;transition:all .15s;text-decoration:none;border:2px solid;}
+.hero-btn.a{background:var(--accent);color:#111;border-color:var(--accent);}
+.hero-btn.a:hover{background:#fff;transform:translateY(-2px);box-shadow:0 6px 25px #f0e04055;}
+.hero-btn.b{background:transparent;color:var(--accent2);border-color:var(--accent2);}
+.hero-btn.b:hover{background:#a040f015;transform:translateY(-2px);}
 
-/* Section card */
-.section{background:var(--panel);border:1.5px solid var(--border);border-radius:6px;padding:28px;margin-bottom:24px;}
-.section-title{font-size:11px;color:var(--accent2);margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+/* ── STATS ── */
+.stats{display:flex;justify-content:center;max-width:640px;margin:0 auto 48px;border:2px solid var(--border);border-radius:4px;overflow:hidden;}
+.stat{flex:1;padding:20px 8px;text-align:center;border-right:2px solid var(--border);background:var(--panel);}
+.stat:last-child{border-right:none;}
+.stat-val{font-size:22px;color:var(--accent);margin-bottom:10px;}
+.stat-lbl{font-size:8px;color:var(--muted);letter-spacing:1px;}
 
-/* Character picker */
-.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:12px;margin-top:4px;}
-.char-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border:2px solid var(--border);border-radius:5px;cursor:pointer;transition:all .2s;background:var(--panel2);}
-.char-item:hover{border-color:var(--accent2);}
-.char-item.selected{border-color:var(--accent);background:#f0e04015;}
-.char-icon{font-size:28px;}
-.char-name{font-size:6px;color:var(--muted);text-align:center;}
-.char-item.selected .char-name{color:var(--accent);}
+/* ── SEARCH ── */
+.search-wrap{max-width:860px;margin:0 auto 36px;padding:0 24px;display:flex;gap:12px;}
+.search-wrap input{flex:1;background:var(--panel);border:1.5px solid var(--border);border-radius:3px;color:var(--text);font-family:'Press Start 2P',monospace;font-size:10px;padding:14px 16px;outline:none;transition:border-color .2s;}
+.search-wrap input:focus{border-color:var(--accent2);}
+.search-wrap input::placeholder{color:var(--muted);}
+.search-wrap button{font-family:'Press Start 2P',monospace;font-size:9px;padding:14px 18px;background:var(--accent2);border:none;border-radius:3px;color:#fff;cursor:pointer;transition:all .15s;}
+.search-wrap button:hover{background:#b060ff;}
 
-/* Language selector */
-.lang-options{display:flex;gap:12px;flex-wrap:wrap;}
-.lang-option{display:flex;align-items:center;gap:10px;padding:12px 18px;border:2px solid var(--border);border-radius:4px;cursor:pointer;transition:all .2s;background:var(--panel2);}
-.lang-option:hover{border-color:var(--accent2);}
-.lang-option.selected{border-color:var(--accent);background:#f0e04015;}
-.lang-option span{font-size:10px;}
+/* ── TABS ── */
+.stabs{display:flex;max-width:860px;margin:0 auto 24px;padding:0 24px;border-bottom:2px solid var(--border);}
+.stab{font-family:'Press Start 2P',monospace;font-size:9px;padding:14px 18px;background:transparent;border:none;color:var(--muted);cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.stab:hover{color:var(--text);}
+.stab.active{color:var(--accent);border-bottom-color:var(--accent);}
 
-/* Stats table */
-.stats-table{width:100%;border-collapse:collapse;}
-.stats-table th{font-size:8px;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:1px;}
-.stats-table td{font-size:9px;color:var(--text);padding:12px 12px;border-bottom:1px solid var(--border);}
-.stats-table tr:last-child td{border-bottom:none;}
-.stats-table tr:hover td{background:#ffffff05;}
-.stars{color:var(--accent);}
-.no-levels{font-size:10px;color:var(--muted);text-align:center;padding:32px;}
+/* ── GRID ── */
+.levels-grid{max-width:860px;margin:0 auto;padding:0 24px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;}
 
-/* Buttons */
-.btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:13px 20px;border:none;border-radius:3px;cursor:pointer;transition:all .15s;}
-.btn-save{background:var(--accent);color:#111;}
-.btn-save:hover{background:#fff;}
-.btn-save:disabled{opacity:.5;cursor:not-allowed;}
-.btn-danger{background:#f0406022;color:var(--red);border:1.5px solid var(--red);}
-.btn-danger:hover{background:#f0406044;}
+/* ── CARD ── */
+.level-card{background:var(--panel);border:1.5px solid var(--border);border-radius:5px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative;}
+.level-card:hover{border-color:var(--accent2);transform:translateY(-3px);box-shadow:0 8px 30px #a040f022;}
+.level-thumb{height:110px;background:var(--panel2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.level-thumb-bg{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:16px 16px;opacity:.5;}
+.level-thumb-icon{font-size:36px;position:relative;z-index:1;}
+.level-body{padding:16px 14px;}
+.level-title{font-size:10px;color:var(--text);margin-bottom:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.level-meta{display:flex;justify-content:space-between;align-items:center;}
+.level-author{font-size:8px;color:var(--muted);}
+.level-rating{font-size:10px;color:var(--accent);}
+.level-plays{font-size:8px;color:var(--muted);margin-top:8px;}
+.level-badge{position:absolute;top:8px;right:8px;font-size:7px;padding:4px 8px;border-radius:2px;background:var(--accent);color:#111;}
 
-/* Message */
-.msg{font-size:8px;padding:10px 14px;border-radius:3px;display:none;line-height:2;margin-top:12px;}
-.msg.ok{background:#40f09020;border:1px solid var(--green);color:var(--green);display:block;}
-.msg.err{background:#f0406020;border:1px solid var(--red);color:var(--red);display:block;}
+/* ── EMPTY / LOADING ── */
+.empty{text-align:center;padding:60px 20px;color:var(--muted);grid-column:1/-1;}
+.empty .icon{font-size:40px;margin-bottom:16px;}
+.empty p{font-size:10px;line-height:2.5;margin-top:8px;}
+.loading{text-align:center;padding:40px;font-size:10px;color:var(--muted);grid-column:1/-1;}
 
-/* Confirm modal */
-#confirm-modal{display:none;position:fixed;inset:0;background:#000000cc;z-index:300;align-items:center;justify-content:center;}
-#confirm-modal.show{display:flex;}
-.confirm-box{background:var(--panel);border:2px solid var(--red);border-radius:6px;padding:32px 28px;width:380px;display:flex;flex-direction:column;gap:20px;box-shadow:0 0 40px #f0406033;}
-.confirm-box h3{font-size:12px;color:var(--red);text-align:center;}
-.confirm-box p{font-size:9px;color:var(--muted);text-align:center;line-height:2.2;}
-.confirm-row{display:flex;gap:12px;}
-.confirm-btn{flex:1;font-family:'Press Start 2P',monospace;font-size:9px;padding:13px;border:none;border-radius:3px;cursor:pointer;transition:all .15s;}
-.confirm-btn.yes{background:var(--red);color:#fff;}
-.confirm-btn.yes:hover{background:#ff6070;}
-.confirm-btn.no{background:#1a1a2a;color:#888;border:1.5px solid #333;}
-.confirm-btn.no:hover{color:#ccc;}
+/* ── LEVEL MODAL ── */
+#level-modal{display:none;position:fixed;inset:0;background:#000000bb;z-index:200;align-items:center;justify-content:center;}
+#level-modal.show{display:flex;}
+.lm-box{background:var(--panel);border:2px solid var(--border);border-radius:6px;padding:32px 28px;width:380px;display:flex;flex-direction:column;gap:18px;box-shadow:0 0 40px #000000cc;}
+.lm-title{font-size:13px;color:var(--accent);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lm-meta{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);}
+.lm-btns{display:flex;gap:12px;margin-top:6px;}
+.lm-btn{flex:1;font-family:'Press Start 2P',monospace;font-size:9px;padding:14px;border:none;border-radius:3px;cursor:pointer;transition:all .15s;}
+.lm-btn.play{background:var(--green);color:#111;}
+.lm-btn.play:hover{background:#80ffb0;}
+.lm-btn.edit{background:var(--blue);color:#fff;}
+.lm-btn.edit:hover{background:#60b0ff;}
+.lm-btn.cancel{background:#1a1a2a;color:#888;border:1.5px solid #333;}
+.lm-btn.cancel:hover{color:#ccc;}
 
-.spinner{display:inline-block;width:10px;height:10px;border:2px solid #11111166;border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px;}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--panel);border:1.5px solid var(--green);color:var(--green);font-size:9px;padding:14px 22px;border-radius:4px;z-index:999;transition:transform .3s;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -84,339 +109,257 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
 
 <nav>
   <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
-  <a href="index.html" class="nav-back" id="nav-back">← RETOUR</a>
+  <div class="nav-right">
+    <div style="display:flex;gap:6px;">
+      <button class="lang-btn active" id="btn-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">🇬🇧 EN</button>
+    </div>
+    <a href="settings.html" class="user-chip" id="nav-user" style="display:none;">👤 ...</a>
+    <a href="studio.html" class="nav-btn" id="nav-create">✏️ CRÉER</a>
+    <a href="login.html" class="nav-btn primary" id="nav-login">CONNEXION</a>
+    <button class="nav-btn" id="nav-logout" style="display:none;" onclick="doLogout()">DÉCO</button>
+  </div>
 </nav>
 
-<div class="page">
-  <div class="page-title" id="page-title">⚙️ PARAMÈTRES</div>
-
-  <!-- PERSONNAGE -->
-  <div class="section">
-    <div class="section-title" id="char-title">🎮 MON PERSONNAGE</div>
-    <div class="char-grid" id="char-grid"></div>
-    <div id="char-msg" class="msg"></div>
-  </div>
-
-  <!-- LANGUE -->
-  <div class="section">
-    <div class="section-title" id="lang-title">🌍 LANGUE PAR DÉFAUT</div>
-    <div class="lang-options">
-      <div class="lang-option selected" id="lang-fr" onclick="selectLang('fr')">
-        <span>🇫🇷</span><span>FRANÇAIS</span>
-      </div>
-      <div class="lang-option" id="lang-en" onclick="selectLang('en')">
-        <span>🇬🇧</span><span>ENGLISH</span>
-      </div>
-    </div>
-    <div style="margin-top:16px;">
-      <button class="btn btn-save" id="btn-save-lang" onclick="saveLang()">💾 SAUVEGARDER</button>
-    </div>
-    <div id="lang-msg" class="msg"></div>
-  </div>
-
-  <!-- MES STATS -->
-  <div class="section">
-    <div class="section-title" id="stats-title">📊 STATS DE MES NIVEAUX</div>
-    <div id="stats-content"><div class="no-levels" id="stats-loading">Chargement...</div></div>
-  </div>
-
-  <!-- DANGER ZONE -->
-  <div class="section" style="border-color:#f0406044;">
-    <div class="section-title" style="color:var(--red);" id="danger-title">⚠️ ZONE DANGEREUSE</div>
-    <p style="font-size:9px;color:var(--muted);line-height:2.5;margin-bottom:20px;" id="danger-desc">Supprimer ton compte effacera définitivement ton profil et tous tes niveaux. Cette action est irréversible.</p>
-    <button class="btn btn-danger" onclick="openConfirm()" id="btn-delete">🗑 SUPPRIMER MON COMPTE</button>
+<div class="hero">
+  <h1 id="hero-title">⚡ FUNKYLEVELS</h1>
+  <p id="hero-sub">Crée des niveaux de platformer fous,<br>partage-les et joue à ceux des autres !</p>
+  <div class="hero-btns">
+    <a href="studio.html" class="hero-btn a" id="hero-btn-create">✏️ CRÉER UN NIVEAU</a>
+    <a href="#levels" class="hero-btn b" id="hero-btn-browse">🎮 PARCOURIR</a>
   </div>
 </div>
 
-<!-- CONFIRM MODAL -->
-<div id="confirm-modal">
-  <div class="confirm-box">
-    <h3 id="confirm-title">⚠️ CONFIRMATION</h3>
-    <p id="confirm-desc">Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ? Cette action est irréversible !</p>
-    <div class="confirm-row">
-      <button class="confirm-btn no" onclick="closeConfirm()" id="confirm-no">ANNULER</button>
-      <button class="confirm-btn yes" onclick="doDelete()" id="confirm-yes">SUPPRIMER</button>
+<div class="stats">
+  <div class="stat"><div class="stat-val" id="stat-levels">-</div><div class="stat-lbl" id="stat-levels-lbl">NIVEAUX</div></div>
+  <div class="stat"><div class="stat-val" id="stat-plays">-</div><div class="stat-lbl" id="stat-plays-lbl">PARTIES</div></div>
+  <div class="stat"><div class="stat-val" id="stat-ratings">-</div><div class="stat-lbl" id="stat-ratings-lbl">NOTES</div></div>
+</div>
+
+<div class="search-wrap">
+  <input type="text" id="search-input" placeholder="🔍 Rechercher un niveau..." oninput="onSearch()">
+  <button onclick="onSearch()" id="search-btn">CHERCHER</button>
+</div>
+
+<div class="stabs" id="anchor-levels">
+  <button class="stab active" id="stab-new" onclick="switchSection('new')">🆕 <span id="stab-new-txt">NOUVEAUX</span></button>
+  <button class="stab" id="stab-top" onclick="switchSection('top')">🏆 <span id="stab-top-txt">MEILLEURS</span></button>
+  <button class="stab" id="stab-mine" onclick="switchSection('mine')">👤 <span id="stab-mine-txt">MES NIVEAUX</span></button>
+</div>
+
+<div class="levels-grid" id="levels-grid">
+  <div class="loading" id="loading-msg">Chargement...</div>
+</div>
+
+<!-- LEVEL MODAL -->
+<div id="level-modal">
+  <div class="lm-box">
+    <div class="lm-title" id="modal-title"></div>
+    <div class="lm-meta"><span id="modal-author"></span><span id="modal-rating"></span></div>
+    <div class="lm-meta"><span id="modal-plays"></span></div>
+    <div class="lm-btns">
+      <button class="lm-btn cancel" onclick="closeLevelModal()">✕</button>
+      <button class="lm-btn edit" id="modal-edit-btn" onclick="doEditLevel()" style="display:none;">✏️ <span id="modal-edit-txt">ÉDITER</span></button>
+      <button class="lm-btn play" onclick="doPlayLevel()">▶ <span id="modal-play-txt">JOUER</span></button>
     </div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
 const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let CHARACTERS=[];
-
-async function loadManifest(){
-  try{
-    const r=await fetch('characters/manifest.json');
-    CHARACTERS=await r.json();
-  }catch(e){
-    // Fallback si manifest non trouvé
-    CHARACTERS=[
-      {id:'default',icon:'🧑',name:'DEFAULT',file:'characters/default.svg'},
-      {id:'ninja',icon:'🥷',name:'NINJA',file:'characters/ninja.svg'},
-      {id:'robot',icon:'🤖',name:'ROBOT',file:'characters/robot.svg'},
-    ];
-  }
-}
-
 const T={
   fr:{
-    pageTitle:'⚙️ PARAMÈTRES',back:'← RETOUR',
-    charTitle:'🎮 MON PERSONNAGE',
-    langTitle:'🌍 LANGUE PAR DÉFAUT',saveLang:'💾 SAUVEGARDER',
-    statsTitle:'📊 STATS DE MES NIVEAUX',
-    dangerTitle:'⚠️ ZONE DANGEREUSE',
-    dangerDesc:"Supprimer ton compte effacera définitivement ton profil et tous tes niveaux. Cette action est irréversible.",
-    btnDelete:'🗑 SUPPRIMER MON COMPTE',
-    confirmTitle:'⚠️ CONFIRMATION',
-    confirmDesc:"Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ? Cette action est irréversible !",
-    confirmNo:'ANNULER',confirmYes:'SUPPRIMER',
-    statsLoading:'Chargement...',statsEmpty:'Tu n\'as pas encore de niveaux.',
-    thLevel:'NIVEAU',thCode:'CODE',thPlays:'PARTIES',thRating:'NOTE',thStatus:'STATUT',
-    charSaved:'Personnage sauvegardé !',langSaved:'Langue sauvegardée !',
-    noRating:'—',deleteOk:'Compte supprimé. À bientôt !'
+    heroTitle:'⚡ FUNKYLEVELS',heroSub:'Crée des niveaux de platformer fous,\npartage-les et joue à ceux des autres !',
+    btnCreate:'✏️ CRÉER UN NIVEAU',btnBrowse:'🎮 PARCOURIR',
+    statLevels:'NIVEAUX',statPlays:'PARTIES',statRatings:'NOTES',
+    searchPh:'🔍 Rechercher un niveau...',searchBtn:'CHERCHER',
+    stabNew:'NOUVEAUX',stabTop:'MEILLEURS',stabMine:'MES NIVEAUX',
+    navCreate:'✏️ CRÉER',navLogin:'CONNEXION',navLogout:'DÉCO',
+    loading:'Chargement...',
+    emptyNew:'Aucun niveau pour le moment.\nSois le premier à en créer un !',
+    emptyTop:'Aucun niveau noté pour le moment.',
+    emptyMine:'Tu n\'as pas encore créé de niveau.',
+    emptySearch:'Aucun résultat.',
+    notLogged:'Connecte-toi pour voir tes niveaux.',
+    plays:'parties',noRating:'non noté',new:'NOUVEAU',
+    edit:'ÉDITER',play:'JOUER',logoutOk:'Déconnecté !'
   },
   en:{
-    pageTitle:'⚙️ SETTINGS',back:'← BACK',
-    charTitle:'🎮 MY CHARACTER',
-    langTitle:'🌍 DEFAULT LANGUAGE',saveLang:'💾 SAVE',
-    statsTitle:'📊 MY LEVELS STATS',
-    dangerTitle:'⚠️ DANGER ZONE',
-    dangerDesc:'Deleting your account will permanently erase your profile and all your levels. This action is irreversible.',
-    btnDelete:'🗑 DELETE MY ACCOUNT',
-    confirmTitle:'⚠️ CONFIRMATION',
-    confirmDesc:'Are you sure you want to delete your account and all your levels? This action cannot be undone!',
-    confirmNo:'CANCEL',confirmYes:'DELETE',
-    statsLoading:'Loading...',statsEmpty:'You have no levels yet.',
-    thLevel:'LEVEL',thCode:'CODE',thPlays:'PLAYS',thRating:'RATING',thStatus:'STATUS',
-    charSaved:'Character saved!',langSaved:'Language saved!',
-    noRating:'—',deleteOk:'Account deleted. Goodbye!'
+    heroTitle:'⚡ FUNKYLEVELS',heroSub:'Create crazy platformer levels,\nshare them and play others\'!',
+    btnCreate:'✏️ CREATE A LEVEL',btnBrowse:'🎮 BROWSE',
+    statLevels:'LEVELS',statPlays:'GAMES',statRatings:'RATINGS',
+    searchPh:'🔍 Search a level...',searchBtn:'SEARCH',
+    stabNew:'NEW',stabTop:'TOP RATED',stabMine:'MY LEVELS',
+    navCreate:'✏️ CREATE',navLogin:'LOGIN',navLogout:'LOGOUT',
+    loading:'Loading...',
+    emptyNew:'No levels yet.\nBe the first to create one!',
+    emptyTop:'No rated levels yet.',
+    emptyMine:'You haven\'t created any level yet.',
+    emptySearch:'No results.',
+    notLogged:'Log in to see your levels.',
+    plays:'plays',noRating:'not rated',new:'NEW',
+    edit:'EDIT',play:'PLAY',logoutOk:'Logged out!'
   }
 };
 
 let lang=localStorage.getItem('fl_lang')||'fr';
+let currentSection='new';
 let currentUser=null;
-let selectedChar=localStorage.getItem('fl_char')||'default';
-let selectedLang=lang;
+let searchTimer=null;
+let _modalLevel=null;
 
-function applyLang(l){
+function setLang(l){
+  lang=l;localStorage.setItem('fl_lang',l);
+  document.getElementById('btn-fr').classList.toggle('active',l==='fr');
+  document.getElementById('btn-en').classList.toggle('active',l==='en');
   const t=T[l];
-  document.getElementById('page-title').textContent=t.pageTitle;
-  document.getElementById('nav-back').textContent=t.back;
-  document.getElementById('char-title').textContent=t.charTitle;
-  document.getElementById('lang-title').textContent=t.langTitle;
-  document.getElementById('btn-save-lang').textContent=t.saveLang;
-  document.getElementById('stats-title').textContent=t.statsTitle;
-  document.getElementById('danger-title').textContent=t.dangerTitle;
-  document.getElementById('danger-desc').textContent=t.dangerDesc;
-  document.getElementById('btn-delete').textContent=t.btnDelete;
-  document.getElementById('confirm-title').textContent=t.confirmTitle;
-  document.getElementById('confirm-desc').textContent=t.confirmDesc;
-  document.getElementById('confirm-no').textContent=t.confirmNo;
-  document.getElementById('confirm-yes').textContent=t.confirmYes;
-  document.getElementById('stats-loading').textContent=t.statsLoading;
+  document.getElementById('hero-title').textContent=t.heroTitle;
+  document.getElementById('hero-sub').innerHTML=t.heroSub.replace('\n','<br>');
+  document.getElementById('hero-btn-create').textContent=t.btnCreate;
+  document.getElementById('hero-btn-browse').textContent=t.btnBrowse;
+  document.getElementById('stat-levels-lbl').textContent=t.statLevels;
+  document.getElementById('stat-plays-lbl').textContent=t.statPlays;
+  document.getElementById('stat-ratings-lbl').textContent=t.statRatings;
+  document.getElementById('search-input').placeholder=t.searchPh;
+  document.getElementById('search-btn').textContent=t.searchBtn;
+  document.getElementById('stab-new-txt').textContent=t.stabNew;
+  document.getElementById('stab-top-txt').textContent=t.stabTop;
+  document.getElementById('stab-mine-txt').textContent=t.stabMine;
+  document.getElementById('nav-create').textContent=t.navCreate;
+  document.getElementById('nav-login').textContent=t.navLogin;
+  document.getElementById('nav-logout').textContent=t.navLogout;
+  document.getElementById('modal-edit-txt').textContent=t.edit;
+  document.getElementById('modal-play-txt').textContent=t.play;
+  loadSection(currentSection);
 }
 
-function buildCharGrid(){
-  const grid=document.getElementById('char-grid');
-  grid.innerHTML=CHARACTERS.map(c=>`
-    <div class="char-item${selectedChar===c.id?' selected':''}" onclick="selectChar('${c.id}')" id="char-${c.id}">
-      <div class="char-icon">
-        <img src="${c.file}" alt="${c.name}"
-          style="width:32px;height:42px;image-rendering:pixelated;"
-          onerror="this.style.display='none';this.nextSibling.style.display='block';">
-        <span style="display:none;font-size:24px;">${c.icon}</span>
-      </div>
-      <div class="char-name">${c.name}</div>
-    </div>
-  `).join('');
+async function checkAuth(){
+  const{data}=await sb.auth.getSession();
+  if(data.session){
+    currentUser=data.session.user;
+    const username=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
+    document.getElementById('nav-user').textContent='👤 '+username;
+    document.getElementById('nav-user').style.display='';
+    document.getElementById('nav-login').style.display='none';
+    document.getElementById('nav-logout').style.display='';
+    // Load profile lang
+    const{data:profile}=await sb.from('profiles').select('lang').eq('id',currentUser.id).single();
+    if(profile?.lang&&profile.lang!==lang){
+      lang=profile.lang;
+      localStorage.setItem('fl_lang',lang);
+      setLang(lang);
+    }
+  }
 }
 
-function selectChar(id){
-  selectedChar=id;
-  document.querySelectorAll('.char-item').forEach(el=>el.classList.remove('selected'));
-  document.getElementById('char-'+id).classList.add('selected');
-  localStorage.setItem('fl_char',id);
-  const t=T[lang];
-  const msg=document.getElementById('char-msg');
-  msg.className='msg ok';msg.textContent=t.charSaved;
-  setTimeout(()=>msg.className='msg',2000);
-}
-
-function selectLang(l){
-  selectedLang=l;
-  document.getElementById('lang-fr').classList.toggle('selected',l==='fr');
-  document.getElementById('lang-en').classList.toggle('selected',l==='en');
-}
-
-function saveLang(){
-  lang=selectedLang;
-  localStorage.setItem('fl_lang',lang);
-  applyLang(lang);
-  const msg=document.getElementById('lang-msg');
-  msg.className='msg ok';msg.textContent=T[lang].langSaved;
-  setTimeout(()=>msg.className='msg',2000);
+async function doLogout(){
+  await sb.auth.signOut();
+  showToast(T[lang].logoutOk);
+  setTimeout(()=>location.reload(),800);
 }
 
 async function loadStats(){
+  const{count:lc}=await sb.from('levels').select('*',{count:'exact',head:true});
+  const{data:plays}=await sb.from('levels').select('plays');
+  const totalPlays=plays?.reduce((a,b)=>a+(b.plays||0),0)||0;
+  const{count:rc}=await sb.from('ratings').select('*',{count:'exact',head:true});
+  document.getElementById('stat-levels').textContent=lc||0;
+  document.getElementById('stat-plays').textContent=totalPlays;
+  document.getElementById('stat-ratings').textContent=rc||0;
+}
+
+function switchSection(s){
+  currentSection=s;
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('stab-'+s).classList.add('active');
+  loadSection(s);
+}
+
+async function loadSection(s){
+  const grid=document.getElementById('levels-grid');
   const t=T[lang];
-  const content=document.getElementById('stats-content');
-  if(!currentUser){content.innerHTML=`<div class="no-levels">${t.statsEmpty}</div>`;return;}
+  grid.innerHTML=`<div class="loading">${t.loading}</div>`;
+  const q=document.getElementById('search-input').value.trim();
+  let levels=[];
 
-  const{data:levels}=await sb.from('levels').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  if(!levels||!levels.length){content.innerHTML=`<div class="no-levels">${t.statsEmpty}</div>`;return;}
-
-  // Load ratings for each level
-  const ids=levels.map(l=>l.id);
-  const{data:ratings}=await sb.from('ratings').select('*').in('level_id',ids);
-
-  const ratingMap={};
-  if(ratings){
-    ratings.forEach(r=>{
-      if(!ratingMap[r.level_id])ratingMap[r.level_id]=[];
-      ratingMap[r.level_id].push(r.score);
-    });
+  if(s==='new'){
+    let query=sb.from('levels').select('*').eq('visibility','public').order('created_at',{ascending:false}).limit(24);
+    if(q)query=query.ilike('title','%'+q+'%');
+    const{data}=await query;levels=data||[];
+  }else if(s==='top'){
+    let query=sb.from('levels').select('*').eq('visibility','public').order('plays',{ascending:false}).limit(24);
+    if(q)query=query.ilike('title','%'+q+'%');
+    const{data}=await query;levels=data||[];
+  }else if(s==='mine'){
+    if(!currentUser){grid.innerHTML=`<div class="empty"><div class="icon">🔒</div><p>${t.notLogged}</p></div>`;return;}
+    const{data}=await sb.from('levels').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+    levels=data||[];
   }
 
-  content.innerHTML=`<table class="stats-table">
-    <thead><tr>
-      <th>${t.thLevel}</th>
-      <th>${t.thCode}</th>
-      <th>${t.thPlays}</th>
-      <th>${t.thRating}</th>
-      <th>${t.thStatus}</th>
-    </tr></thead>
-    <tbody>
-      ${levels.map(l=>{
-        const scores=ratingMap[l.id]||[];
-        const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
-        const stars=avg?'⭐ '+avg.toFixed(1)+' ('+scores.length+')':t.noRating;
-        const vis=l.visibility||'private';
-        const visColors={private:'#2c5282',public:'#276749',code:'#44337a'};
-        const visLabels_fr={private:'🔒 PRIVÉ',public:'🌍 PUBLIC',code:'🔑 CODE'};
-        const visLabels_en={private:'🔒 PRIVATE',public:'🌍 PUBLIC',code:'🔑 CODE'};
-        const visLabels=lang==='fr'?visLabels_fr:visLabels_en;
-        const visTextColors={private:'#90cdf4',public:'#9ae6b4',code:'#d6bcfa'};
-        const nextVis={private:'public',public:'code',code:'private'};
-        const statusBtn='<button onclick="cycleVisibility(\'' +l.id+ '\')"'+
-          ' style="font-family:Press Start 2P,monospace;font-size:6px;padding:5px 8px;border:none;border-radius:3px;cursor:pointer;background:'+visColors[vis]+';color:'+visTextColors[vis]+';">'+
-          visLabels[vis]+'</button>';
-        const code=l.share_code||'—';
-        const copyBtn=l.share_code?`<span onclick="copyCode('${l.share_code}')" style="cursor:pointer;color:#a040f0;font-size:7px;" title="Copier">📋 ${l.share_code}</span>`:'—';
-        return '<tr>'+
-          '<td>'+esc(l.title||'Sans titre')+'</td>'+
-          '<td>'+copyBtn+'</td>'+
-          '<td>'+(l.plays||0)+'</td>'+
-          '<td class="stars">'+stars+'</td>'+
-          '<td>'+statusBtn+'</td>'+
-          '</tr>';
-      }).join('')}
-    </tbody>
-  </table>`;
-}
-
-async function cycleVisibility(levelId){
-  const{data:lvl}=await sb.from('levels').select('visibility').eq('id',levelId).single();
-  const cur=lvl?.visibility||'private';
-  const next={private:'public',public:'code',code:'private'}[cur];
-  const{error}=await sb.from('levels').update({visibility:next}).eq('id',levelId).eq('user_id',currentUser.id);
-  if(error){alert('Erreur: '+error.message);return;}
-  loadStats();
-}
-
-function copyCode(code){
-  navigator.clipboard?.writeText(code).then(()=>{
-    showToast(lang==='fr'?'Code copié !':'Code copied!');
-  }).catch(()=>alert(code));
-}
-
-function showToast(msg){
-  let t=document.getElementById('settings-toast');
-  if(!t){t=document.createElement('div');t.id='settings-toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#0f0f1e;border:1.5px solid #40f090;color:#40f090;font-family:Press Start 2P,monospace;font-size:8px;padding:12px 20px;border-radius:4px;z-index:999;transition:transform .3s;';document.body.appendChild(t);}
-  t.textContent=msg;t.style.transform='translateX(-50%) translateY(0)';
-  setTimeout(()=>t.style.transform='translateX(-50%) translateY(80px)',2000);
-}
-
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function openConfirm(){document.getElementById('confirm-modal').classList.add('show');}
-function closeConfirm(){document.getElementById('confirm-modal').classList.remove('show');}
-
-async function doDelete(){
-  const btn=document.getElementById('confirm-yes');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
-  // Delete all levels
-  if(currentUser){
-    await sb.from('ratings').delete().eq('user_id',currentUser.id);
-    await sb.from('levels').delete().eq('user_id',currentUser.id);
-    await sb.auth.signOut();
+  if(!levels.length){
+    const msg=q?t.emptySearch:s==='new'?t.emptyNew:s==='top'?t.emptyTop:t.emptyMine;
+    grid.innerHTML=`<div class="empty"><div class="icon">${s==='mine'?'🎮':'🌟'}</div><p>${msg.replace('\n','<br>')}</p></div>`;
+    return;
   }
-  localStorage.removeItem('fl_lang');
-  localStorage.removeItem('fl_char');
-  alert(T[lang].deleteOk);
-  window.location.href='index.html';
+  grid.innerHTML=levels.map(l=>levelCard(l)).join('');
 }
 
-document.getElementById('confirm-modal').addEventListener('click',e=>{if(e.target===document.getElementById('confirm-modal'))closeConfirm();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeConfirm();});
-
-// ── Profile helpers ──────────────────────
-async function loadProfile(){
-  const{data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
-  if(data){
-    if(data.lang){lang=data.lang;selectedLang=lang;localStorage.setItem('fl_lang',lang);}
-    if(data.character){selectedChar=data.character;localStorage.setItem('fl_char',data.character);}
-  }
-}
-
-async function saveProfile(updates){
-  // Upsert profile
-  const{error}=await sb.from('profiles').upsert({id:currentUser.id,...updates},{onConflict:'id'});
-  return error;
-}
-
-// Override selectChar to also save to DB
-const _origSelectChar=selectChar;
-selectChar=async function(id){
-  selectedChar=id;
-  document.querySelectorAll('.char-item').forEach(el=>el.classList.remove('selected'));
-  document.getElementById('char-'+id).classList.add('selected');
-  localStorage.setItem('fl_char',id);
-  await saveProfile({character:id});
+function levelCard(l){
   const t=T[lang];
-  const msg=document.getElementById('char-msg');
-  msg.className='msg ok';msg.textContent=t.charSaved;
-  setTimeout(()=>msg.className='msg',2000);
-};
+  const age=(Date.now()-new Date(l.created_at).getTime())/1000/3600;
+  const isNew=age<48;
+  const icons=['🌟','🎮','🔥','⚡','🌈','🎯','💫','🏆','🧩','🚀'];
+  const icon=icons[Math.abs((l.id||'').charCodeAt(0)||0)%icons.length];
+  const rating=l.rating?'⭐ '+Number(l.rating).toFixed(1):t.noRating;
+  return`<div class="level-card" onclick="openLevelModal('${l.id}')">
+    ${isNew?`<div class="level-badge">${t.new}</div>`:''}
+    <div class="level-thumb"><div class="level-thumb-bg"></div><div class="level-thumb-icon">${icon}</div></div>
+    <div class="level-body">
+      <div class="level-title">${esc(l.title||'Sans titre')}</div>
+      <div class="level-meta">
+        <span class="level-author">@${esc(l.author||'anonyme')}</span>
+        <span class="level-rating">${rating}</span>
+      </div>
+      <div class="level-plays">▶ ${l.plays||0} ${t.plays}</div>
+    </div>
+  </div>`;
+}
 
-// Override saveLang to also save to DB
-const _origSaveLang=saveLang;
-saveLang=async function(){
-  lang=selectedLang;
-  localStorage.setItem('fl_lang',lang);
-  await saveProfile({lang:lang});
-  applyLang(lang);
-  const msg=document.getElementById('lang-msg');
-  msg.className='msg ok';msg.textContent=T[lang].langSaved;
-  setTimeout(()=>msg.className='msg',2000);
-};
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+async function openLevelModal(id){
+  const{data,error}=await sb.from('levels').select('*').eq('id',id).single();
+  if(error||!data)return;
+  _modalLevel=data;
+  const t=T[lang];
+  const isOwner=currentUser&&currentUser.id===data.user_id;
+  document.getElementById('modal-title').textContent=data.title||'Sans titre';
+  document.getElementById('modal-author').textContent='@'+(data.author||'anonyme');
+  document.getElementById('modal-plays').textContent=(data.plays||0)+' '+t.plays;
+  document.getElementById('modal-rating').textContent=data.rating?'⭐ '+Number(data.rating).toFixed(1):t.noRating;
+  document.getElementById('modal-edit-btn').style.display=isOwner?'':'none';
+  document.getElementById('level-modal').classList.add('show');
+}
+function closeLevelModal(){document.getElementById('level-modal').classList.remove('show');}
+function doPlayLevel(){if(!_modalLevel)return;window.location.href=`studio.html?level=${_modalLevel.id}&mode=play`;}
+function doEditLevel(){if(!_modalLevel)return;window.location.href=`studio.html?level=${_modalLevel.id}&mode=edit`;}
+
+document.getElementById('level-modal').addEventListener('click',e=>{if(e.target===document.getElementById('level-modal'))closeLevelModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLevelModal();});
+
+function onSearch(){clearTimeout(searchTimer);searchTimer=setTimeout(()=>loadSection(currentSection),350);}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
 // Init
-(async()=>{
-  const{data}=await sb.auth.getSession();
-  if(!data.session){window.location.href='login.html';return;}
-  currentUser=data.session.user;
-  await loadManifest();
-  await loadProfile();
-  selectedLang=lang;
-  document.getElementById('lang-fr').classList.toggle('selected',lang==='fr');
-  document.getElementById('lang-en').classList.toggle('selected',lang==='en');
-  applyLang(lang);
-  buildCharGrid();
-  loadStats();
-})();
+setLang(lang);
+checkAuth();
+loadStats();
 </script>
 </body>
 </html>
