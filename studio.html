@@ -259,6 +259,9 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
 // ═══════════════════════════════════════════════════════════════
 //  ÉDITEUR
 // ═══════════════════════════════════════════════════════════════
+let _currentLevelId=null;
+let _currentVisibility='private';
+
 const EC = document.getElementById('ecanvas');
 const EX = EC.getContext('2d');
 let EW = EC.width, EH = EC.height;
