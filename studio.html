@@ -1664,6 +1664,13 @@ function gUpdate(now){
       'Temps : '+gElapsed.toFixed(1)+'s':
       'Time: '+gElapsed.toFixed(1)+'s';
     spawnP(gLv.end.x,gLv.end.y-20,PCOL.flagB,30);
+    // Incrémenter completions
+    if(_currentLevelId){
+      _sb.from('levels').select('completions').eq('id',_currentLevelId).single()
+        .then(({data:lvl})=>{
+          if(lvl)_sb.from('levels').update({completions:(lvl.completions||0)+1}).eq('id',_currentLevelId).then(()=>{});
+        });
+    }
     // Si l'auteur termine son propre niveau → marquer author_completed
     if(_currentLevelId){
       _sb.auth.getSession().then(async({data})=>{
