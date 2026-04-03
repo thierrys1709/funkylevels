@@ -370,19 +370,27 @@ async function loadProfile(){
 
 async function saveProfile(updates){
   const username=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
-  const{data:existing}=await sb.from('profiles').select('id').eq('id',currentUser.id).single();
+  
+  // Vérifie si le profil existe
+  const{data:existing, error:fetchErr}=await sb.from('profiles')
+    .select('id').eq('id',currentUser.id).maybeSingle();
+  
+  console.log('existing:', existing, 'fetchErr:', fetchErr);
+  
   let error;
   if(existing){
-    const res=await sb.from('profiles').update({username,...updates}).eq('id',currentUser.id);
+    const res=await sb.from('profiles')
+      .update({username,...updates})
+      .eq('id',currentUser.id);
     error=res.error;
+    console.log('UPDATE result:', res.error);
   }else{
-    const res=await sb.from('profiles').insert({id:currentUser.id,username,lang:'fr',character:'default',...updates});
+    const res=await sb.from('profiles')
+      .insert({id:currentUser.id,username,lang:'fr',character:'default',...updates});
     error=res.error;
+    console.log('INSERT result:', res.error);
   }
-  if(error){
-    console.log('FULL ERROR:', JSON.stringify(error));
-    alert('Erreur: '+error.message+' | Code: '+error.code);
-  }
+  if(error)alert('Erreur: '+error.message+' | '+error.details+' | '+error.hint);
   return error;
 }
 
