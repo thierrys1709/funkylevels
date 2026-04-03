@@ -247,6 +247,13 @@ async function checkAuth(){
     document.getElementById('nav-user').style.display='';
     document.getElementById('nav-login').style.display='none';
     document.getElementById('nav-logout').style.display='';
+    // Load profile lang
+    const{data:profile}=await sb.from('profiles').select('lang').eq('id',currentUser.id).single();
+    if(profile?.lang&&profile.lang!==lang){
+      lang=profile.lang;
+      localStorage.setItem('fl_lang',lang);
+      setLang(lang);
+    }
   }
 }
 
