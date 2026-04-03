@@ -31,7 +31,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 /* ── HUD ── */
 #game-hud { position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:200; display:none; flex-direction:column; align-items:center; gap:4px; pointer-events:none; }
 #game-hud.show { display:flex; }
-#hud-timer { font-family:Orbitron,monospace; font-size:34px; font-weight:900; color:#f0e040; text-shadow:0 0 24px #f0e04088, 0 2px 0 #000; letter-spacing:2px; }
+#hud-timer { font-family:Orbitron,monospace; font-size:34px; font-weight:900; color:#f0e040; text-shadow:0 0 24px #f0e04088, 0 2px 0 #000; letter-spacing:2px; font-variant-numeric:tabular-nums; font-feature-settings:'tnum'; min-width:140px; text-align:center; }
 #hud-best { font-family:Orbitron,monospace; font-size:11px; font-weight:700; color:#8080aa; letter-spacing:1px; }
 
 /* ── OVERLAYS ── */
@@ -80,9 +80,22 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 </div>
 <div class="ov" id="ovWin">
   <h2 id="ov-win-title">ARRIVÉ !</h2>
-  <p id="win-msg"></p>
-  <button onclick="gameRespawn()" id="btn-replay">REJOUER</button>
-  <button onclick="goToIndex()" style="background:#333;color:#aaa;margin-top:-8px;" id="btn-back">ACCUEIL</button>
+
+  <!-- Temps actuel -->
+  <div id="win-time-display" style="font-family:Orbitron,monospace;font-size:36px;font-weight:900;color:#f0e040;text-shadow:0 0 24px #f0e04088;font-variant-numeric:tabular-nums;"></div>
+
+  <!-- Record battu / non battu -->
+  <div id="win-record-msg" style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;text-align:center;min-height:22px;"></div>
+
+  <!-- Meilleur temps -->
+  <div id="win-best-display" style="font-family:Orbitron,monospace;font-size:13px;color:#8080aa;letter-spacing:1px;"></div>
+
+  <!-- Boutons -->
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
+    <button onclick="gameRespawn()" id="btn-replay" style="background:#1a1a3a;color:#90a0f0;border:2px solid #4040aa;">🔄 REJOUER</button>
+    <button onclick="goToEditor()" id="btn-edit-win" style="background:#1a2a1a;color:#60e090;border:2px solid #3a8a3a;display:none;">✏️ ÉDITER</button>
+    <button onclick="goToIndex()" id="btn-back" style="background:#333;color:#aaa;border:2px solid #555;">🏠 ACCUEIL</button>
+  </div>
 </div>
 
 <script>
@@ -128,6 +141,47 @@ let _levelData=null;
 let _attempt=0;
 
 // ── Navigation ────────────────────────────────────────────
+function showWinScreen(ms, prevBest, isNewRecord, l){
+  // Current time
+  const timeEl=document.getElementById('win-time-display');
+  if(timeEl)timeEl.textContent=fmtTimeFull(ms);
+
+  // Record message
+  const recEl=document.getElementById('win-record-msg');
+  if(recEl){
+    if(isNewRecord&&prevBest!==null){
+      const diff=prevBest-Math.round(ms);
+      recEl.style.color='#40f090';
+      recEl.textContent=(l==='fr'?'🏆 NOUVEAU RECORD ! +':'🏆 NEW RECORD! +')+fmtTimeFull(diff);
+    }else if(isNewRecord&&prevBest===null){
+      recEl.style.color='#40f090';
+      recEl.textContent=l==='fr'?'🏆 PREMIER TEMPS ENREGISTRÉ !':'🏆 FIRST TIME RECORDED!';
+    }else{
+      const diff=Math.round(ms)-_bestTime;
+      recEl.style.color='#f06060';
+      const diffStr='+'+fmtTimeFull(diff);
+      recEl.textContent=l==='fr'?(diffStr+' du record'):(diffStr+' from best');
+    }
+  }
+
+  // Best time
+  const bestEl=document.getElementById('win-best-display');
+  if(bestEl){
+    bestEl.textContent=_bestTime!==null
+      ?(l==='fr'?'MEILLEUR : ':'BEST: ')+fmtTimeFull(_bestTime)
+      :'';
+  }
+
+  // Show editor button if owner
+  const editBtn=document.getElementById('btn-edit-win');
+  if(editBtn&&_levelData){
+    _sb.auth.getSession().then(({data:s})=>{
+      if(s.session&&_levelData.user_id===s.session.user.id)
+        editBtn.style.display='';
+    });
+  }
+}
+
 function goToEditor(){
   if(_currentLevelId)window.location.href='studio.html?level='+_currentLevelId+'&mode=edit';
   else window.history.back();
@@ -229,8 +283,9 @@ function updateAttemptDisplay(){
 }
 async function saveTime(ms){
   const{data:sess}=await _sb.auth.getSession();
-  if(!sess.session||!_currentLevelId)return;
-  if(_bestTime!==null&&ms>=_bestTime)return;
+  if(!sess.session||!_currentLevelId)return false;
+  const isNewRecord=(_bestTime===null||ms<_bestTime);
+  if(!isNewRecord)return false;
   const rounded=Math.round(ms);
   await _sb.from('leaderboard').upsert({
     level_id:_currentLevelId,
@@ -239,6 +294,7 @@ async function saveTime(ms){
   },{onConflict:'level_id,user_id'});
   _bestTime=rounded;
   updateBestDisplay();
+  return true;
 }
 
 // ── Init ──────────────────────────────────────────────────
@@ -327,14 +383,21 @@ function startGameFrom(sx,sy){
   _attempt++;
   updateAttemptDisplay();
   resetTimer();
-  // Draw level immediately so it's visible during F1 lights
+  // Draw level immediately so it's visible
   gDraw();
-  // F1 lights then start movement
-  f1Start(()=>{
+  if(_attempt===1){
+    // F1 lights only on first attempt
+    f1Start(()=>{
+      gRunning=true;
+      gLoopStart();
+      startTimer();
+    });
+  }else{
+    // Direct start on retry
     gRunning=true;
     gLoopStart();
     startTimer();
-  });
+  }
 }
 
 function gameRespawn(){
@@ -597,10 +660,11 @@ function gUpdate(now){
     stopTimer();
     const winTime=_currentTimeMs;
     const l=_lang();
-    const wmsg=document.getElementById('win-msg');
-    if(wmsg)wmsg.textContent=(l==='fr'?'Temps : ':'Time: ')+fmtTimeFull(winTime);
     spawnP(gLv.end.x,gLv.end.y-20,PCOL.flagB,30);
-    saveTime(winTime);
+    const prevBest=_bestTime;
+    saveTime(winTime).then(isNewRecord=>{
+      showWinScreen(winTime,prevBest,isNewRecord,l);
+    });
     // Increment completions
     if(_currentLevelId){
       _sb.from('levels').select('completions').eq('id',_currentLevelId).single()
@@ -618,7 +682,7 @@ function gUpdate(now){
         }
       });
     }
-    setTimeout(()=>document.getElementById('ovWin').classList.add('show'),700);
+    setTimeout(()=>document.getElementById('ovWin').classList.add('show'),600);
   }
 
   // ── Camera ────────────────────────────────────────────
