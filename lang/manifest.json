@@ -1,0 +1,4 @@
+[
+  { "id": "fr", "name": "Français",  "flag": "🇫🇷", "file": "lang/fr.json" },
+  { "id": "en", "name": "English",   "flag": "🇬🇧", "file": "lang/en.json" }
+]
