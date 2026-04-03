@@ -248,6 +248,10 @@ async function loadCharacterSprite(charId){
   });
 }
 
+// ── Editor stubs (game.html has no editor canvas) ──
+const EC={style:{pointerEvents:''}};
+let EW=1800;
+
 // ── Level state ───────────────────────────
 let _currentLevelId=null;
 let lv=null;
@@ -318,8 +322,6 @@ function gameRespawn(){
   gParts=[];gBullets=[];
 }
 
-// EH = canvas height used in game
-let EH=640;
 
 // ═══════════════════════════════════════════════════════════════
 //  JEU
@@ -371,7 +373,6 @@ function startGameFrom(sx,sy){
   gCamY=Math.max(0,Math.min(EH-GH(),(sy-36)-GH()*0.25));
   initPlayer(sx,sy);
   document.getElementById('gwrap').classList.add('show');
-  EC.style.pointerEvents='none';
   gLoopStart();
 }
 
