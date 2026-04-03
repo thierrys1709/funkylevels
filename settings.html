@@ -173,8 +173,8 @@ const T={
     confirmTitle:'⚠️ CONFIRMATION',
     confirmDesc:"Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ? Cette action est irréversible !",
     confirmNo:'ANNULER',confirmYes:'SUPPRIMER',
-    statsLoading:'Chargement...',statsEmpty:'Tu n\'as pas encore de niveaux publiés.',
-    thLevel:'NIVEAU',thPlays:'PARTIES',thRating:'NOTE',
+    statsLoading:'Chargement...',statsEmpty:'Tu n\'as pas encore de niveaux.',
+    thLevel:'NIVEAU',thCode:'CODE',thPlays:'PARTIES',thRating:'NOTE',thStatus:'STATUT',
     charSaved:'Personnage sauvegardé !',langSaved:'Langue sauvegardée !',
     noRating:'—',deleteOk:'Compte supprimé. À bientôt !'
   },
@@ -189,8 +189,8 @@ const T={
     confirmTitle:'⚠️ CONFIRMATION',
     confirmDesc:'Are you sure you want to delete your account and all your levels? This action cannot be undone!',
     confirmNo:'CANCEL',confirmYes:'DELETE',
-    statsLoading:'Loading...',statsEmpty:'You have no published levels yet.',
-    thLevel:'LEVEL',thPlays:'PLAYS',thRating:'RATING',
+    statsLoading:'Loading...',statsEmpty:'You have no levels yet.',
+    thLevel:'LEVEL',thCode:'CODE',thPlays:'PLAYS',thRating:'RATING',thStatus:'STATUS',
     charSaved:'Character saved!',langSaved:'Language saved!',
     noRating:'—',deleteOk:'Account deleted. Goodbye!'
   }
@@ -283,22 +283,53 @@ async function loadStats(){
   content.innerHTML=`<table class="stats-table">
     <thead><tr>
       <th>${t.thLevel}</th>
+      <th>${t.thCode}</th>
       <th>${t.thPlays}</th>
       <th>${t.thRating}</th>
+      <th>${t.thStatus}</th>
     </tr></thead>
     <tbody>
       ${levels.map(l=>{
         const scores=ratingMap[l.id]||[];
         const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
         const stars=avg?'⭐ '+avg.toFixed(1)+' ('+scores.length+')':t.noRating;
-        return`<tr>
-          <td>${esc(l.title||'Sans titre')}</td>
-          <td>${l.plays||0}</td>
-          <td class="stars">${stars}</td>
-        </tr>`;
+        const pub=l.published;
+        const statusBtn=`<button onclick="togglePublish('${l.id}',${pub})"
+          style="font-family:'Press Start 2P',monospace;font-size:6px;padding:5px 8px;border:none;border-radius:3px;cursor:pointer;background:${pub?'#276749':'#2c5282'};color:${pub?'#9ae6b4':'#90cdf4'};">
+          ${pub?(lang==='fr'?'✅ PUBLIC':'✅ PUBLIC'):(lang==='fr'?'🔒 PRIVÉ':'🔒 PRIVATE')}
+        </button>`;
+        const code=l.share_code||'—';
+        const copyBtn=l.share_code?`<span onclick="copyCode('${l.share_code}')" style="cursor:pointer;color:#a040f0;font-size:7px;" title="Copier">📋 ${l.share_code}</span>`:'—';
+        return '<tr>'+
+          '<td>'+esc(l.title||'Sans titre')+'</td>'+
+          '<td>'+copyBtn+'</td>'+
+          '<td>'+(l.plays||0)+'</td>'+
+          '<td class="stars">'+stars+'</td>'+
+          '<td>'+statusBtn+'</td>'+
+          '</tr>';
       }).join('')}
     </tbody>
   </table>`;
+}
+
+async function togglePublish(levelId, currentlyPublished){
+  const newStatus=!currentlyPublished;
+  const{error}=await sb.from('levels').update({published:newStatus}).eq('id',levelId).eq('user_id',currentUser.id);
+  if(error){alert('Erreur: '+error.message);return;}
+  loadStats(); // Refresh table
+}
+
+function copyCode(code){
+  navigator.clipboard?.writeText(code).then(()=>{
+    showToast(lang==='fr'?'Code copié !':'Code copied!');
+  }).catch(()=>alert(code));
+}
+
+function showToast(msg){
+  let t=document.getElementById('settings-toast');
+  if(!t){t=document.createElement('div');t.id='settings-toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#0f0f1e;border:1.5px solid #40f090;color:#40f090;font-family:Press Start 2P,monospace;font-size:8px;padding:12px 20px;border-radius:4px;z-index:999;transition:transform .3s;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.transform='translateX(-50%) translateY(0)';
+  setTimeout(()=>t.style.transform='translateX(-50%) translateY(80px)',2000);
 }
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -334,22 +365,8 @@ async function loadProfile(){
 }
 
 async function saveProfile(updates){
-  const username=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
-  // Vérifie si le profil existe déjà
-  const{data:existing}=await sb.from('profiles').select('id').eq('id',currentUser.id).single();
-  let error;
-  if(existing){
-    // Update
-    const res=await sb.from('profiles').update({username,...updates}).eq('id',currentUser.id);
-    error=res.error;
-  }else{
-    // Insert
-    const res=await sb.from('profiles').insert({id:currentUser.id,username,lang:'fr',character:'default',...updates});
-    error=res.error;
-  }
-  if(error){
-    alert('Erreur: '+error.message+' | Code: '+error.code);
-  }
+  // Upsert profile
+  const{error}=await sb.from('profiles').upsert({id:currentUser.id,...updates},{onConflict:'id'});
   return error;
 }
 
