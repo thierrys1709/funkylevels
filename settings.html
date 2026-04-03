@@ -41,13 +41,14 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
 .lang-option span{font-size:10px;}
 
 /* Stats table */
-.stats-table{width:100%;border-collapse:collapse;}
-.stats-table th{font-size:8px;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:1px;}
-.stats-table td{font-size:9px;color:var(--text);padding:12px 12px;border-bottom:1px solid var(--border);}
-.stats-table tr:last-child td{border-bottom:none;}
-.stats-table tr:hover td{background:#ffffff05;}
-.stars{color:var(--accent);}
-.no-levels{font-size:10px;color:var(--muted);text-align:center;padding:32px;}
+.no-levels{font-size:12px;color:var(--muted);text-align:center;padding:32px;font-family:Rajdhani,sans-serif;}
+.levels-list{display:flex;flex-direction:column;gap:10px;}
+.level-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:6px;padding:14px 16px;flex-wrap:wrap;}
+.level-row:hover{border-color:var(--border2);}
+.level-row-main{flex:1;min-width:0;}
+.level-row-title{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.level-row-meta{font-family:Rajdhani,sans-serif;font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.level-row-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;}
 
 /* Buttons */
 .btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:13px 20px;border:none;border-radius:3px;cursor:pointer;transition:all .15s;}
@@ -280,41 +281,43 @@ async function loadStats(){
     });
   }
 
-  el.innerHTML=`<table class="stats-table">
-    <thead><tr>
-      <th>${t.thLevel}</th>
-      <th>${t.thCode}</th>
-      <th>${t.thPlays}</th>
-      <th>${t.thRating}</th>
-      <th>${t.thStatus}</th>
-    </tr></thead>
-    <tbody>
-      ${levels.map(l=>{
-        const scores=ratingMap[l.id]||[];
-        const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
-        const stars=avg?'⭐ '+avg.toFixed(1)+' ('+scores.length+')':t.noRating;
-        const vis=l.visibility||'private';
-        const visColors={private:'#2c5282',public:'#276749',code:'#44337a'};
-        const visLabels_fr={private:'🔒 PRIVÉ',public:'🌍 PUBLIC',code:'🔑 CODE'};
-        const visLabels_en={private:'🔒 PRIVATE',public:'🌍 PUBLIC',code:'🔑 CODE'};
-        const visLabels=lang==='fr'?visLabels_fr:visLabels_en;
-        const visTextColors={private:'#90cdf4',public:'#9ae6b4',code:'#d6bcfa'};
-        const nextVis={private:'public',public:'code',code:'private'};
-        const statusBtn='<button onclick="cycleVisibility(\'' +l.id+ '\')"'+
-          ' style="font-family:Press Start 2P,monospace;font-size:6px;padding:5px 8px;border:none;border-radius:3px;cursor:pointer;background:'+visColors[vis]+';color:'+visTextColors[vis]+';">'+
-          visLabels[vis]+'</button>';
-        const code=l.share_code||'—';
-        const copyBtn=l.share_code?`<span onclick="copyCode('${l.share_code}')" style="cursor:pointer;color:#a040f0;font-size:7px;" title="Copier">📋 ${l.share_code}</span>`:'—';
-        return '<tr>'+
-          '<td>'+esc(l.title||'Sans titre')+'</td>'+
-          '<td>'+copyBtn+'</td>'+
-          '<td>'+(l.plays||0)+'</td>'+
-          '<td class="stars">'+stars+'</td>'+
-          '<td>'+statusBtn+'</td>'+
-          '</tr>';
-      }).join('')}
-    </tbody>
-  </table>`;
+  el.innerHTML='<div class="levels-list">'+
+    levels.map(l=>{
+      const scores=ratingMap[l.id]||[];
+      const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
+      const stars=avg?'⭐ '+avg.toFixed(1)+' ('+scores.length+')':t.noRating;
+      const vis=l.visibility||'private';
+      const visColors={private:'#1a2a4a',public:'#1a3a2a',code:'#2a1a4a'};
+      const visBorderColors={private:'#4060c0',public:'#40a060',code:'#8040c0'};
+      const visTextColors={private:'#90c0f0',public:'#60e090',code:'#c090f0'};
+      const visLabels_fr={private:'🔒 PRIVÉ',public:'🌍 PUBLIC',code:'🔑 CODE'};
+      const visLabels_en={private:'🔒 PRIVATE',public:'🌍 PUBLIC',code:'🔑 CODE'};
+      const visLabels=lang==='fr'?visLabels_fr:visLabels_en;
+      const code=l.share_code?'<span data-code="'+l.share_code+'" onclick="copyCode(this.dataset.code)" style="cursor:pointer;color:#a040f0;font-size:13px;font-family:Rajdhani,sans-serif;font-weight:600;">📋 '+l.share_code+'</span>':'—';
+      return '<div class="level-row">'+
+        '<div class="level-row-main">'+
+          '<div class="level-row-title">'+esc(l.title||'Sans titre')+'</div>'+
+          '<div class="level-row-meta">'+
+            '<span style="color:#666;">'+stars+'</span> · '+
+            '<span style="color:#666;">▶ '+(l.plays||0)+' '+(lang==='fr'?'parties':'plays')+'</span> · '+
+            code+
+          '</div>'+
+        '</div>'+
+        '<div class="level-row-actions">'+
+        '</div>'+
+      '</div>';
+    }).join('')+
+  '</div>'
+}
+
+async function deleteLevel(levelId){
+  const t=T('settings');
+  const msg=lang==='fr'?'Supprimer ce niveau définitivement ?':'Delete this level permanently?';
+  if(!confirm(msg))return;
+  await sb.from('ratings').delete().eq('level_id',levelId);
+  const{error}=await sb.from('levels').delete().eq('id',levelId).eq('user_id',currentUser.id);
+  if(error){alert('Erreur: '+error.message);return;}
+  loadStats();
 }
 
 async function cycleVisibility(levelId){
