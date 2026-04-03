@@ -78,7 +78,6 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
     </div>
 
   </div>
-</div>
   <canvas id="gcanvas" width="900" height="500"></canvas>
 </div>
 
@@ -809,6 +808,136 @@ document.addEventListener('keydown',e=>{
   if(e.code==='Escape')goToIndex();
 });
 document.addEventListener('keyup',e=>gKeys[e.code]=false);
+
+// ── Sound System (Web Audio API) ─────────────────────────
+let _audioCtx=null;
+function getAudioCtx(){
+  if(!_audioCtx)_audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  return _audioCtx;
+}
+
+function playSound(type){
+  try{
+    const ctx=getAudioCtx();
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if(type==='jump'){
+      osc.type='square';
+      osc.frequency.setValueAtTime(220,ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(440,ctx.currentTime+0.08);
+      gain.gain.setValueAtTime(0.15,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.18);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime+0.18);
+    }else if(type==='step'){
+      osc.type='square';
+      osc.frequency.setValueAtTime(110,ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(80,ctx.currentTime+0.04);
+      gain.gain.setValueAtTime(0.06,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.05);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime+0.05);
+    }else if(type==='land'){
+      osc.type='square';
+      osc.frequency.setValueAtTime(160,ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(60,ctx.currentTime+0.06);
+      gain.gain.setValueAtTime(0.12,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.07);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime+0.07);
+    }else if(type==='die'){
+      osc.type='sawtooth';
+      osc.frequency.setValueAtTime(440,ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(55,ctx.currentTime+0.4);
+      gain.gain.setValueAtTime(0.2,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime+0.4);
+    }else if(type==='win'){
+      // Petit jingle de victoire
+      const notes=[523,659,784,1047];
+      notes.forEach((freq,i)=>{
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.type='square';
+        const t=ctx.currentTime+i*0.12;
+        o.frequency.setValueAtTime(freq,t);
+        g.gain.setValueAtTime(0.15,t);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.15);
+        o.start(t);o.stop(t+0.15);
+      });
+    }else if(type==='bounce'){
+      osc.type='sine';
+      osc.frequency.setValueAtTime(300,ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(600,ctx.currentTime+0.1);
+      gain.gain.setValueAtTime(0.18,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.12);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime+0.12);
+    }
+  }catch(e){}
+}
+
+// Hook sounds into game events
+let _wasOnGround=false;
+let _stepTimer=0;
+const _origGUpdate2=gUpdate;
+gUpdate=function(now){
+  const wasGround=gPlayer?.onGround;
+  _origGUpdate2(now);
+  if(!gPlayer||gPlayer.dead)return;
+
+  // Landing sound
+  if(!_wasOnGround&&gPlayer.onGround)playSound('land');
+  _wasOnGround=gPlayer.onGround;
+
+  // Step sound
+  if(gPlayer.onGround){
+    const moving=Math.abs(gPlayer.vx)>1||Math.abs(gPlayer.vy)>1;
+    if(moving){
+      _stepTimer++;
+      if(_stepTimer>=12){playSound('step');_stepTimer=0;}
+    }else{
+      _stepTimer=0;
+    }
+  }
+};
+
+// Hook jump sound
+const _origKeys=gKeys;
+let _jumpSounded=false;
+const _checkJump=setInterval(()=>{
+  if(!gRunning)return;
+  const jump=gKeys['Space']||gKeys['ArrowUp']||gKeys['KeyW'];
+  if(jump&&!_jumpSounded&&gPlayer?.onGround){playSound('jump');_jumpSounded=true;}
+  if(!jump)_jumpSounded=false;
+},16);
+
+// Hook die sound
+const _origKillPlayer=killPlayer;
+killPlayer=function(){
+  _origKillPlayer();
+  if(gPlayer?.dead)playSound('die');
+};
+
+// Hook win sound
+const _origShowWin=showWinScreen;
+showWinScreen=function(ms,prevBest,isNewRecord,l){
+  _origShowWin(ms,prevBest,isNewRecord,l);
+  playSound('win');
+};
+
+// Unlock audio on first interaction
+document.addEventListener('click',()=>{
+  if(_audioCtx&&_audioCtx.state==='suspended')_audioCtx.resume();
+},{once:true});
+document.addEventListener('keydown',()=>{
+  if(!_audioCtx)getAudioCtx();
+  if(_audioCtx&&_audioCtx.state==='suspended')_audioCtx.resume();
+},{once:true});
 
 // ── Start ─────────────────────────────────────────────────
 init();
