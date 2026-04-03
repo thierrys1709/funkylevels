@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FunkyLevels — Nouveau mot de passe</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--bg:#08080f;--panel:#0f0f1e;--border:#1e1e35;--accent:#f0e040;--accent2:#a040f0;--green:#40f090;--red:#f04060;--text:#cccccc;--muted:#444466;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);font-family:'Press Start 2P',monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--text);}
+  .bg-grid{position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:32px 32px;opacity:.35;pointer-events:none;}
+  .container{position:relative;z-index:10;width:100%;max-width:400px;padding:20px;animation:fadeIn .6s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .logo{text-align:center;margin-bottom:32px;}
+  .logo h1{font-size:16px;color:var(--accent);text-shadow:0 0 20px var(--accent);letter-spacing:2px;}
+  .logo p{font-size:6px;color:var(--muted);margin-top:10px;}
+  .card{background:var(--panel);border:2px solid var(--border);border-radius:6px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;box-shadow:0 0 40px #00000099;}
+  .card h2{font-size:9px;color:var(--accent2);text-align:center;}
+  .card p{font-size:6px;color:var(--muted);line-height:2.2;text-align:center;}
+  .field{display:flex;flex-direction:column;gap:8px;}
+  .field label{font-size:6px;color:var(--muted);letter-spacing:2px;}
+  .field input{background:#0a0a18;border:1.5px solid var(--border);border-radius:3px;color:var(--text);font-family:'Press Start 2P',monospace;font-size:8px;padding:12px 14px;outline:none;transition:border-color .2s;width:100%;}
+  .field input:focus{border-color:var(--accent2);}
+  .btn-main{font-family:'Press Start 2P',monospace;font-size:8px;padding:14px;border:none;border-radius:3px;cursor:pointer;background:var(--accent);color:#111;transition:all .15s;}
+  .btn-main:hover{background:#fff;transform:translateY(-1px);}
+  .btn-main:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .msg{font-size:6px;padding:10px 12px;border-radius:3px;display:none;line-height:2.2;text-align:center;}
+  .msg.error{background:#f0406020;border:1px solid var(--red);color:var(--red);display:block;}
+  .msg.success{background:#40f09020;border:1px solid var(--green);color:var(--green);display:block;}
+  .back-link{text-align:center;font-size:6px;color:var(--muted);}
+  .back-link a{color:var(--accent2);text-decoration:none;}
+  .back-link a:hover{color:var(--accent);}
+  .spinner{display:inline-block;width:10px;height:10px;border:2px solid #11111166;border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="container">
+  <div class="logo">
+    <h1>⚡ FUNKYLEVELS</h1>
+    <p id="logo-sub">NOUVEAU MOT DE PASSE</p>
+  </div>
+  <div class="card">
+    <h2 id="card-title">🔑 RÉINITIALISATION</h2>
+    <p id="card-desc">Choisis ton nouveau mot de passe.</p>
+    <div id="main-msg" class="msg"></div>
+    <div id="form-section">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="field">
+          <label id="lbl-pass">NOUVEAU MOT DE PASSE</label>
+          <input type="password" id="new-pass" placeholder="8 caractères minimum" autocomplete="new-password">
+        </div>
+        <div class="field">
+          <label id="lbl-confirm">CONFIRMER</label>
+          <input type="password" id="confirm-pass" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <button class="btn-main" id="submit-btn" onclick="doReset()">VALIDER →</button>
+      </div>
+    </div>
+    <div class="back-link"><a href="login.html" id="back-lnk">← RETOUR À LA CONNEXION</a></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
+const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const lang=localStorage.getItem('fl_lang')||'fr';
+const T={
+  fr:{sub:'NOUVEAU MOT DE PASSE',title:'🔑 RÉINITIALISATION',desc:'Choisis ton nouveau mot de passe.',lblPass:'NOUVEAU MOT DE PASSE',lblConfirm:'CONFIRMER',ph1:'8 caractères minimum',ph2:'••••••••',btn:'VALIDER →',sending:'MISE À JOUR...',errShort:'Mot de passe trop court (8 min).',errMatch:'Les mots de passe ne correspondent pas.',success:'Mot de passe mis à jour ! Redirection...',errNoSession:'Lien invalide ou expiré. Demande un nouveau lien.',back:'← RETOUR À LA CONNEXION'},
+  en:{sub:'NEW PASSWORD',title:'🔑 RESET PASSWORD',desc:'Choose your new password.',lblPass:'NEW PASSWORD',lblConfirm:'CONFIRM',ph1:'8 characters minimum',ph2:'••••••••',btn:'CONFIRM →',sending:'UPDATING...',errShort:'Password too short (8 min).',errMatch:'Passwords do not match.',success:'Password updated! Redirecting...',errNoSession:'Invalid or expired link. Request a new one.',back:'← BACK TO LOGIN'}
+};
+const t=T[lang];
+document.getElementById('logo-sub').textContent=t.sub;
+document.getElementById('card-title').textContent=t.title;
+document.getElementById('card-desc').textContent=t.desc;
+document.getElementById('lbl-pass').textContent=t.lblPass;
+document.getElementById('lbl-confirm').textContent=t.lblConfirm;
+document.getElementById('new-pass').placeholder=t.ph1;
+document.getElementById('confirm-pass').placeholder=t.ph2;
+document.getElementById('submit-btn').textContent=t.btn;
+document.getElementById('back-lnk').textContent=t.back;
+
+// Vérifier qu'on a bien une session de reset
+sb.auth.onAuthStateChange(async(event,session)=>{
+  if(event==='PASSWORD_RECOVERY'){
+    // OK — l'utilisateur peut changer son mot de passe
+  }
+});
+
+async function doReset(){
+  const pass=document.getElementById('new-pass').value;
+  const confirm=document.getElementById('confirm-pass').value;
+  const msgEl=document.getElementById('main-msg');
+  const btn=document.getElementById('submit-btn');
+
+  msgEl.className='msg';
+  if(pass.length<8){msgEl.className='msg error';msgEl.textContent=t.errShort;return;}
+  if(pass!==confirm){msgEl.className='msg error';msgEl.textContent=t.errMatch;return;}
+
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>'+t.sending;
+
+  const{error}=await sb.auth.updateUser({password:pass});
+  btn.disabled=false;btn.textContent=t.btn;
+
+  if(error){msgEl.className='msg error';msgEl.textContent=error.message;}
+  else{
+    msgEl.className='msg success';msgEl.textContent=t.success;
+    document.getElementById('form-section').style.opacity='.4';
+    document.getElementById('form-section').style.pointerEvents='none';
+    setTimeout(()=>window.location.href='login.html',2000);
+  }
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doReset();});
+</script>
+</body>
+</html>
