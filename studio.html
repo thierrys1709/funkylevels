@@ -736,7 +736,7 @@ body {
   <canvas id="gcanvas" width="900" height="500"></canvas>
 </div>
 
-<div class="ov show" id="ovStart"><h2>PLATFORMER STUDIO</h2><p>Dessine ton niveau, puis joue-le !<br><br>Zones gravité : ↑↓←→ disponibles !</p><button onclick="document.getElementById('ovStart').classList.remove('show')">COMMENCER</button></div>
+
 <div class="ov" id="ovDie"><h2>RATÉ</h2><p id="die-msg"></p><button onclick="gameRespawn()">RÉESSAYER</button><button onclick="stopGame()" style="background:#333;color:#aaa;margin-top:-8px;">ÉDITEUR</button></div>
 <div class="ov" id="ovWin"><h2>ARRIVÉ !</h2><p id="win-msg"></p><button onclick="stopGame()">ÉDITEUR</button></div>
 <input type="file" id="fileInput" accept=".json" style="display:none" onchange="loadFile(event)">
@@ -1337,7 +1337,15 @@ let gLv,gPlayer,gParts=[],gCamX=0,gCamY=0,gKeys={};
 let gRafId=null;
 function gLoopStart(){if(gRafId)cancelAnimationFrame(gRafId);gRafId=requestAnimationFrame(gLoop);}
 
-function playLevel(){startGameFrom(lv.start.x,lv.start.y);}
+function playLevel(){
+  if(_currentLevelId){
+    // Niveau sauvegardé → ouvre game.html
+    window.open('game.html?level='+_currentLevelId,'_blank');
+  }else{
+    // Niveau non sauvegardé → joue en inline
+    startGameFrom(lv.start.x,lv.start.y);
+  }
+}
 function testFromCamera(){startGameFrom(Math.max(50,gCamX+GW()*0.3),lv.start.y);}
 
 function toggleFullscreen(){const wrap=document.getElementById('gwrap');if(!document.fullscreenElement){wrap.requestFullscreen?.();document.getElementById('btn-fs').textContent='✕ QUITTER';}else{document.exitFullscreen?.();document.getElementById('btn-fs').textContent='⛶ PLEIN ÉCRAN';}}
@@ -1905,20 +1913,49 @@ async function loadLang(l){
   if(_langCache[l])return _langCache[l];
   try{
     const r=await fetch('lang/'+l+'.json');
+    if(!r.ok)throw new Error('HTTP '+r.status);
     const data=await r.json();
     _langCache[l]=data;
+    console.log('Lang loaded:', l, Object.keys(data));
     return data;
   }catch(e){
-    console.warn('Lang file not found:',l,'— falling back to fr');
+    console.warn('Lang fetch failed for',l,':', e.message);
     if(l!=='fr')return loadLang('fr');
-    return {};
+    // Last resort: return minimal FR strings
+    const fallback={studio:{
+      lblBlocs:'BLOCS',lblPieges:'PIÈGES',lblZones:'ZONES',lblNiveau:'NIVEAU',
+      lblNom:'NOM',lblSave:'SAUVEGARDE',lblParams:'PARAMÈTRES',lblJeu:'JEU',lblProfil:'PROFIL',
+      tFixed:'🟫 FIXE',tInvis:'👁 INVIS',tBounce:'🟡 REBOND',tMobile:'🔵 MOBILE',
+      tPush:'🪨 PUSH',tTrap:'⚠ PIÈGE',tSlider:'➡ GLISSEUR',tGravflip:'🔃 GRAVITÉ',
+      tSpeed:'⚡ VITESSE',tStart:'🟢 DÉPART',tEnd:'🔴 ARRIVÉE',tSelect:'✥ SEL',
+      btnPlay:'▶ JOUER',btnSave:'💾 SAVE',btnPublish:'🚀 PUBLIER',btnLoad:'📂 LOAD',
+      btnClear:'🗑 VIDER',btnProfil:'⚙️ PROFIL',btnAccueil:'🏠 ACCUEIL',grille:'GRILLE',
+      toolPrefix:'OUTIL : ',ready:'Prêt.',
+      toolNames:{fixed:'FIXE',trap:'PIÈGE',slider:'GLISSEUR',invis:'INVISIBLE',
+        bounce:'REBOND',mobile:'MOBILE',push:'POUSSABLE',gravflip:'GRAVITÉ',
+        speed:'VITESSE',start:'DÉPART',end:'ARRIVÉE',select:'SÉLECTION'}
+    },publish:{
+      title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau...',
+      visLbl:'VISIBILITÉ',cancel:'ANNULER',ok:'💾 SAUVER →',saving:'SAUVEGARDE...',
+      needLogin:'Tu dois être connecté !',needTitle:'Donne un nom !',needBlocks:'Niveau vide !',
+      needComplete:"Tu dois d'abord terminer le niveau !",
+      successNew:'Sauvegardé !',successUpdate:'Mis à jour !',
+      codeMsg:'Code : ',codeCopied:'(copié !)',errorTxt:'Erreur : ',
+      hintPrivate:'🔒 Seul toi peux le voir',hintPublic:'🌍 Tout le monde peut jouer',
+      hintCode:'🔑 Accessible avec le code'
+    }};
+    _langCache[l]=fallback;
+    return fallback;
   }
 }
 
 async function applyStudioLang(){
   const l=_lang();
   const data=await loadLang(l);
-  if(!data||!data.studio){return;} // Lang not loaded yet
+  if(!data||!data.studio){
+    console.warn('Lang data missing for:', l, data);
+    return;
+  }
   const t=data.studio||{};
   const pt=data.publish||{};
 
