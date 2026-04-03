@@ -1230,9 +1230,10 @@ const VIS_HINTS={
 function setVis(v){
   _currentVisibility=v;
   document.querySelectorAll('.pub-vis-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('vis-'+v).classList.add('active');
-  const l=_lang();
-  document.getElementById('pub-vis-hint').textContent=VIS_HINTS[l][v];
+  const btn=document.getElementById('vis-'+v);
+  if(btn)btn.classList.add('active');
+  const hint=document.getElementById('pub-vis-hint');
+  if(hint)hint.textContent=VIS_HINTS[_lang()][v]||'';
 }
 
 function _applyPubLang(){
