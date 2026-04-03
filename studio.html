@@ -268,6 +268,8 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
 // ═══════════════════════════════════════════════════════════════
 let _currentLevelId=null;
 let _currentVisibility='private';
+let _authorCompleted=false;
+let _isPublished=false;
 
 const EC = document.getElementById('ecanvas');
 const EX = EC.getContext('2d');
@@ -299,7 +301,54 @@ function toggleSel(type,idx){ const i=selection.findIndex(s=>s.type===type&&s.id
 function isSelected(type,idx){ return !!selection.find(s=>s.type===type&&s.idx===idx); }
 
 let undoStack=[],redoStack=[];
-function snapshot(){undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];}
+function snapshot(){
+  // Si le niveau est publié, proposer de dupliquer avant d'éditer
+  if(_isPublished&&_currentLevelId&&!window._dupWarningShown){
+    window._dupWarningShown=true;
+    const lang=localStorage.getItem('fl_lang')||'fr';
+    const msg=lang==='fr'?
+      '⚠️ Ce niveau est publié. Il sera dupliqué pour créer une nouvelle version privée. Continuer ?':
+      '⚠️ This level is published. It will be duplicated as a new private version. Continue?';
+    if(confirm(msg)){
+      duplicateLevel();
+      return;
+    }else{
+      window._dupWarningShown=false;
+      return;
+    }
+  }
+  undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
+}
+
+async function duplicateLevel(){
+  const{data:sess}=await _sb.auth.getSession();
+  if(!sess.session)return;
+  const user=sess.session.user;
+  function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
+  const newCode=genCode();
+  const{data:inserted,error}=await _sb.from('levels').insert({
+    user_id:user.id,
+    title:(document.getElementById('level-name-input')?.value||'Sans titre')+' (copie)',
+    data:lv,
+    plays:0,
+    visibility:'private',
+    share_code:newCode,
+    author_completed:false,
+    is_published:false
+  }).select().single();
+  if(error){alert('Erreur duplication: '+error.message);window._dupWarningShown=false;return;}
+  _currentLevelId=inserted.id;
+  _currentVisibility='private';
+  _authorCompleted=false;
+  _isPublished=false;
+  window._dupWarningShown=false;
+  const ni=document.getElementById('level-name-input');
+  if(ni)ni.value=inserted.title;
+  history.replaceState(null,'','?level='+inserted.id+'&mode=edit');
+  // Now do the edit
+  undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
+  status(localStorage.getItem('fl_lang')==='fr'?'Niveau dupliqué ! Tu peux maintenant éditer.':'Level duplicated! You can now edit.');
+}
 function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(lv));lv=JSON.parse(undoStack.pop());clearSel();redraw();}
 function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(lv));lv=JSON.parse(redoStack.pop());clearSel();redraw();}
 
@@ -560,6 +609,8 @@ async function doLoadLevel(id,title){
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
   _currentLevelId=id;
   _currentVisibility=data.visibility||'private';
+  _authorCompleted=data.author_completed||false;
+  _isPublished=data.is_published||false;
   const nameInput=document.getElementById('level-name-input');
   if(nameInput)nameInput.value=data.title||'';
   // Met à jour l'URL sans recharger la page
@@ -581,7 +632,12 @@ function loadFile(e){
   }catch(err){alert('Fichier invalide.');}};
   r.readAsText(f);e.target.value='';
 }
-function clearLevel(){if(!confirm('Vider le niveau ?'))return;snapshot();lv=emptyLevel();selectedIdx=-1;selectedType=null;_currentLevelId=null;_currentVisibility='private';
+function clearLevel(){if(!confirm('Vider le niveau ?'))return;
+  // Don't use snapshot() here to avoid duplication warning
+  undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
+  lv=emptyLevel();selectedIdx=-1;selectedType=null;
+  _currentLevelId=null;_currentVisibility='private';
+  _authorCompleted=false;_isPublished=false;window._dupWarningShown=false;
   const ni=document.getElementById('level-name-input');if(ni)ni.value='';
   history.replaceState(null,'','studio.html');
   redraw();status('Vidé.');}
@@ -1035,7 +1091,26 @@ function gUpdate(now){
 
   // ── Win ─────────────────────────────────────────────────
   const ed=Math.hypot(gPlayer.x+11-gLv.end.x,gPlayer.y+16-gLv.end.y);
-  if(ed<40){gWon=true;gRunning=false;document.getElementById('win-msg').textContent=`Temps : ${gElapsed.toFixed(1)}s`;spawnP(gLv.end.x,gLv.end.y-20,PCOL.flagB,30);setTimeout(()=>document.getElementById('ovWin').classList.add('show'),700);}
+  if(ed<40){
+    gWon=true;gRunning=false;
+    document.getElementById('win-msg').textContent=(localStorage.getItem('fl_lang')||'fr')==='fr'?
+      'Temps : '+gElapsed.toFixed(1)+'s':
+      'Time: '+gElapsed.toFixed(1)+'s';
+    spawnP(gLv.end.x,gLv.end.y-20,PCOL.flagB,30);
+    // Si l'auteur termine son propre niveau → marquer author_completed
+    if(_currentLevelId){
+      _sb.auth.getSession().then(async({data})=>{
+        if(!data.session)return;
+        const{data:lvl}=await _sb.from('levels').select('user_id,author_completed').eq('id',_currentLevelId).single();
+        if(lvl&&lvl.user_id===data.session.user.id&&!lvl.author_completed){
+          await _sb.from('levels').update({author_completed:true}).eq('id',_currentLevelId);
+          _authorCompleted=true;
+          status('✅ Niveau terminé ! Tu peux maintenant le publier.');
+        }
+      });
+    }
+    setTimeout(()=>document.getElementById('ovWin').classList.add('show'),700);
+  }
 
   // ── Camera ──────────────────────────────────────────────
   const tx=gPlayer.x-GW()*0.32;gCamX+=(tx-gCamX)*0.1;gCamX=Math.max(0,gCamX);
@@ -1229,6 +1304,8 @@ loadPlayerProfile().then(()=>{
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
   _currentLevelId=lid;
   _currentVisibility=data.visibility||'private';
+  _authorCompleted=data.author_completed||false;
+  _isPublished=data.is_published||false;
   const _ni=document.getElementById('level-name-input');
   if(_ni)_ni.value=data.title||'';
   redraw();
@@ -1335,6 +1412,23 @@ async function doPublish(){
   const totalBlocks=(lv.fixed||[]).length+(lv.trap||[]).length+(lv.slider||[]).length+(lv.mobile||[]).length+(lv.bounce||[]).length+(lv.push||[]).length+(lv.invis||[]).length;
   if(totalBlocks===0){msgEl.className='pub-msg err';msgEl.textContent=t.needBlocks;return;}
 
+  // Vérif que l'auteur a terminé le niveau
+  if(_currentLevelId&&!_authorCompleted){
+    // Vérifie en DB au cas où
+    const{data:lvlCheck}=await _sb.from('levels').select('author_completed,is_published').eq('id',_currentLevelId).single();
+    if(lvlCheck){
+      _authorCompleted=lvlCheck.author_completed||false;
+      _isPublished=lvlCheck.is_published||false;
+    }
+    if(!_authorCompleted){
+      msgEl.className='pub-msg err';
+      msgEl.textContent=_lang()==='fr'?
+        "🎮 Tu dois d'abord terminer le niveau toi-même !":
+        '🎮 You must complete the level yourself first!';
+      return;
+    }
+  }
+
   okBtn.disabled=true;okBtn.textContent=t.saving;
   msgEl.className='pub-msg';
 
@@ -1345,11 +1439,10 @@ async function doPublish(){
 
   if(_currentLevelId){
     // ── UPDATE niveau existant ──
-    const{error:e}=await _sb.from('levels').update({
-      title:title,
-      data:lv,
-      visibility:_currentVisibility
-    }).eq('id',_currentLevelId).eq('user_id',user.id);
+    const updates={title,data:lv,visibility:_currentVisibility};
+    if(_currentVisibility!=='private')updates.is_published=true;
+    const{error:e}=await _sb.from('levels').update(updates).eq('id',_currentLevelId).eq('user_id',user.id);
+    if(!e&&_currentVisibility!=='private')_isPublished=true;
     error=e;
   }else{
     // ── INSERT nouveau niveau ──
@@ -1361,7 +1454,9 @@ async function doPublish(){
       data:lv,
       plays:0,
       visibility:_currentVisibility,
-      share_code:shareCode
+      share_code:shareCode,
+      author_completed:_authorCompleted,
+      is_published:_currentVisibility!=='private'
     }).select().single();
     error=e;
     if(!error&&inserted){
