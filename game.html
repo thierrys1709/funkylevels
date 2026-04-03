@@ -29,7 +29,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 .f1-led.go { background:#111; border-color:#333; box-shadow:none; transition:background .5s, box-shadow .5s; }
 
 /* ── HUD ── */
-#game-hud { position:fixed; top:12px; left:50%; transform:translateX(-50%); z-index:200; display:none; flex-direction:column; align-items:center; gap:4px; pointer-events:none; }
+#game-hud { position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:200; display:none; flex-direction:column; align-items:center; gap:4px; pointer-events:none; }
 #game-hud.show { display:flex; }
 #hud-timer { font-family:Orbitron,monospace; font-size:34px; font-weight:900; color:#f0e040; text-shadow:0 0 24px #f0e04088, 0 2px 0 #000; letter-spacing:2px; }
 #hud-best { font-family:Orbitron,monospace; font-size:11px; font-weight:700; color:#8080aa; letter-spacing:1px; }
@@ -314,7 +314,9 @@ function startGameFrom(sx,sy){
   document.getElementById('gwrap').classList.add('show');
   document.querySelectorAll('.ov').forEach(o=>o.classList.remove('show'));
   resetTimer();
-  // F1 lights then go
+  // Draw level immediately so it's visible during F1 lights
+  gDraw();
+  // F1 lights then start movement
   f1Start(()=>{
     gRunning=true;
     gLoopStart();
