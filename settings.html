@@ -318,14 +318,53 @@ async function doDelete(){
 document.getElementById('confirm-modal').addEventListener('click',e=>{if(e.target===document.getElementById('confirm-modal'))closeConfirm();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeConfirm();});
 
+// ── Profile helpers ──────────────────────
+async function loadProfile(){
+  const{data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
+  if(data){
+    if(data.lang){lang=data.lang;selectedLang=lang;localStorage.setItem('fl_lang',lang);}
+    if(data.character){selectedChar=data.character;localStorage.setItem('fl_char',data.character);}
+  }
+}
+
+async function saveProfile(updates){
+  // Upsert profile
+  const{error}=await sb.from('profiles').upsert({id:currentUser.id,...updates},{onConflict:'id'});
+  return error;
+}
+
+// Override selectChar to also save to DB
+const _origSelectChar=selectChar;
+selectChar=async function(id){
+  selectedChar=id;
+  document.querySelectorAll('.char-item').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('char-'+id).classList.add('selected');
+  localStorage.setItem('fl_char',id);
+  await saveProfile({character:id});
+  const t=T[lang];
+  const msg=document.getElementById('char-msg');
+  msg.className='msg ok';msg.textContent=t.charSaved;
+  setTimeout(()=>msg.className='msg',2000);
+};
+
+// Override saveLang to also save to DB
+const _origSaveLang=saveLang;
+saveLang=async function(){
+  lang=selectedLang;
+  localStorage.setItem('fl_lang',lang);
+  await saveProfile({lang:lang});
+  applyLang(lang);
+  const msg=document.getElementById('lang-msg');
+  msg.className='msg ok';msg.textContent=T[lang].langSaved;
+  setTimeout(()=>msg.className='msg',2000);
+};
+
 // Init
 (async()=>{
   const{data}=await sb.auth.getSession();
   if(!data.session){window.location.href='login.html';return;}
   currentUser=data.session.user;
-  // Sync lang from user metadata if available
-  const userLang=currentUser.user_metadata?.lang;
-  if(userLang)lang=userLang;
+  await loadProfile();
   selectedLang=lang;
   document.getElementById('lang-fr').classList.toggle('selected',lang==='fr');
   document.getElementById('lang-en').classList.toggle('selected',lang==='en');
