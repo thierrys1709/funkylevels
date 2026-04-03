@@ -76,6 +76,9 @@ body {
   flex-wrap: wrap;
   min-height: 58px;
   box-shadow: 0 2px 20px #00000055;
+  overflow: visible;
+  position: relative;
+  z-index: 50;
 }
 
 #topbar h1 {
@@ -241,10 +244,11 @@ body {
   min-width: 140px;
   text-align: center;
   box-shadow: 0 6px 24px #00000099;
+  z-index: 9999 !important;
 }
 
 /* ─── LAYOUT ─── */
-#layout { display: flex; flex: 1; overflow: hidden; }
+#layout { display: flex; flex: 1; overflow: hidden; position: relative; }
 
 /* ─── PANEL ─── */
 #panel {
@@ -962,6 +966,7 @@ window.addEventListener('mouseup',e=>{
 });
 
 EC.addEventListener('mousedown',e=>{
+  if(e.button!==0)return; // Ignorer tout sauf clic gauche
   const{x,y}=canvasPos(e);mousePos={x,y};
   if(currentTool==='start'){snapshot();lv.start={x:snap(x),y:snap(y)};redraw();return;}
   if(currentTool==='end'){snapshot();lv.end={x:snap(x),y:snap(y)};redraw();return;}
@@ -1003,6 +1008,7 @@ window.addEventListener('mousemove',e=>{
 });
 
 window.addEventListener('mouseup',e=>{
+  if(e.button!==0)return; // Ignorer tout sauf clic gauche
   if(dragState){snapshot();dragState=null;EC.style.cursor='crosshair';redraw();return;}
   if(rubberBand){
     const rb=rubberBand;rubberBand=null;
