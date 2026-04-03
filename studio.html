@@ -218,10 +218,10 @@ body {
 #level-name-input::placeholder { color: var(--muted); }
 
 /* ─── TOOLTIP ─── */
-.tool-btn[title]:hover::after,
-.act-btn[title]:hover::after,
-.zoom-btn[title]:hover::after {
-  content: attr(title);
+.tool-btn[data-tip]:hover::after,
+.act-btn[data-tip]:hover::after,
+.zoom-btn[data-tip]:hover::after {
+  content: attr(data-tip);
   position: absolute;
   top: calc(100% + 10px);
   left: 50%;
@@ -532,11 +532,11 @@ body {
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label">BLOCS</span>
     <div class="tb-group">
-      <button class="tool-btn active" id="t-fixed"  onclick="T('fixed')"  title="🟫 FIXE&#10;Sol solide, ne bouge jamais.&#10;Cliquer-glisser pour dessiner.">🟫 FIXE</button>
-      <button class="tool-btn"        id="t-invis"  onclick="T('invis')"  title="👁 INVISIBLE&#10;Bloc solide invisible en jeu.&#10;Cliquer-glisser pour dessiner.">👁 INVIS</button>
-      <button class="tool-btn"        id="t-bounce" onclick="T('bounce')" title="🟡 REBOND&#10;Fait rebondir le joueur.&#10;Cliquer-glisser pour dessiner.">🟡 REBOND</button>
-      <button class="tool-btn"        id="t-mobile" onclick="T('mobile')" title="🔵 MOBILE&#10;Va et vient entre deux points.&#10;Cliquer-glisser pour dessiner.">🔵 MOBILE</button>
-      <button class="tool-btn"        id="t-push"   onclick="T('push')"   title="🪨 POUSSABLE&#10;Le joueur peut pousser ce bloc.&#10;Cliquer-glisser pour dessiner.">🪨 PUSH</button>
+      <button class="tool-btn active" id="t-fixed"  onclick="T('fixed')"  data-tip="🟫 FIXE&#10;Sol solide, ne bouge jamais.&#10;Cliquer-glisser pour dessiner.">🟫 FIXE</button>
+      <button class="tool-btn"        id="t-invis"  onclick="T('invis')"  data-tip="👁 INVISIBLE&#10;Bloc solide invisible en jeu.&#10;Cliquer-glisser pour dessiner.">👁 INVIS</button>
+      <button class="tool-btn"        id="t-bounce" onclick="T('bounce')" data-tip="🟡 REBOND&#10;Fait rebondir le joueur.&#10;Cliquer-glisser pour dessiner.">🟡 REBOND</button>
+      <button class="tool-btn"        id="t-mobile" onclick="T('mobile')" data-tip="🔵 MOBILE&#10;Va et vient entre deux points.&#10;Cliquer-glisser pour dessiner.">🔵 MOBILE</button>
+      <button class="tool-btn"        id="t-push"   onclick="T('push')"   data-tip="🪨 POUSSABLE&#10;Le joueur peut pousser ce bloc.&#10;Cliquer-glisser pour dessiner.">🪨 PUSH</button>
     </div>
   </div>
   <div class="sep"></div>
@@ -545,8 +545,8 @@ body {
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label">PIÈGES</span>
     <div class="tb-group">
-      <button class="tool-btn" id="t-trap"   onclick="T('trap')"   title="⚠ PIÈGE&#10;Tombe quand le joueur approche.&#10;Cliquer-glisser pour dessiner.">⚠ PIÈGE</button>
-      <button class="tool-btn" id="t-slider" onclick="T('slider')" title="➡ GLISSEUR&#10;Se déplace quand le joueur s'approche.&#10;Cliquer-glisser pour dessiner.">➡ GLISSEUR</button>
+      <button class="tool-btn" id="t-trap"   onclick="T('trap')"   data-tip="⚠ PIÈGE&#10;Tombe quand le joueur approche.&#10;Cliquer-glisser pour dessiner.">⚠ PIÈGE</button>
+      <button class="tool-btn" id="t-slider" onclick="T('slider')" data-tip="➡ GLISSEUR&#10;Se déplace quand le joueur s'approche.&#10;Cliquer-glisser pour dessiner.">➡ GLISSEUR</button>
     </div>
   </div>
   <div class="sep"></div>
@@ -555,8 +555,8 @@ body {
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label">ZONES</span>
     <div class="tb-group">
-      <button class="tool-btn" id="t-gravflip" onclick="T('gravflip')" title="🔃 GRAVITÉ&#10;Attire le joueur vers un bord.&#10;Force 0 = apesanteur.&#10;Cliquer-glisser pour dessiner.">🔃 GRAVITÉ</button>
-      <button class="tool-btn" id="t-speed"    onclick="T('speed')"    title="⚡ VITESSE&#10;Modifie la vitesse du joueur.&#10;5 = normal, 1 = lent, 20 = rapide.&#10;Cliquer-glisser pour dessiner.">⚡ VITESSE</button>
+      <button class="tool-btn" id="t-gravflip" onclick="T('gravflip')" data-tip="🔃 GRAVITÉ&#10;Attire le joueur vers un bord.&#10;Force 0 = apesanteur.&#10;Cliquer-glisser pour dessiner.">🔃 GRAVITÉ</button>
+      <button class="tool-btn" id="t-speed"    onclick="T('speed')"    data-tip="⚡ VITESSE&#10;Modifie la vitesse du joueur.&#10;5 = normal, 1 = lent, 20 = rapide.&#10;Cliquer-glisser pour dessiner.">⚡ VITESSE</button>
     </div>
   </div>
   <div class="sep"></div>
@@ -565,9 +565,9 @@ body {
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label">NIVEAU</span>
     <div class="tb-group">
-      <button class="tool-btn" id="t-start"  onclick="T('start')"  title="🟢 DÉPART&#10;Cliquer pour placer le départ.">🟢 DÉPART</button>
-      <button class="tool-btn" id="t-end"    onclick="T('end')"    title="🔴 ARRIVÉE&#10;Cliquer pour placer le but.">🔴 ARRIVÉE</button>
-      <button class="tool-btn" id="t-select" onclick="T('select')" title="✥ SÉLECTION&#10;Cliquer = sélectionner&#10;Glisser = déplacer&#10;Poignées = redimensionner&#10;Suppr = effacer&#10;Ctrl+C/V  Ctrl+Z/Y">✥ SEL</button>
+      <button class="tool-btn" id="t-start"  onclick="T('start')"  data-tip="🟢 DÉPART&#10;Cliquer pour placer le départ.">🟢 DÉPART</button>
+      <button class="tool-btn" id="t-end"    onclick="T('end')"    data-tip="🔴 ARRIVÉE&#10;Cliquer pour placer le but.">🔴 ARRIVÉE</button>
+      <button class="tool-btn" id="t-select" onclick="T('select')" data-tip="✥ SÉLECTION&#10;Cliquer = sélectionner&#10;Glisser = déplacer&#10;Poignées = redimensionner&#10;Suppr = effacer&#10;Ctrl+C/V  Ctrl+Z/Y">✥ SEL</button>
     </div>
   </div>
   <div class="sep"></div>
@@ -585,10 +585,10 @@ body {
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label">SAUVEGARDE</span>
     <div class="tb-group">
-      <button class="act-btn" id="btn-save"    onclick="saveLevel()"  title="💾 SAUVEGARDER"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">💾 SAVE</button>
-      <button class="act-btn" id="btn-publish" onclick="openPublish()" title="🚀 PUBLIER"      style="background:#0d1a2a;border-color:#3a7a9a;color:#40c0f0;">🚀 PUBLIER</button>
-      <button class="act-btn" id="btn-load"    onclick="loadLevel()"  title="📂 MES NIVEAUX"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">📂 LOAD</button>
-      <button class="act-btn" id="btn-clear"   onclick="clearLevel()" title="🗑 NOUVEAU"       style="background:#280d0d;border-color:#7a3a3a;color:#fc8181;">🗑 VIDER</button>
+      <button class="act-btn" id="btn-save"    onclick="saveLevel()"  data-tip="💾 SAUVEGARDER"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">💾 SAVE</button>
+      <button class="act-btn" id="btn-publish" onclick="openPublish()" data-tip="🚀 PUBLIER"      style="background:#0d1a2a;border-color:#3a7a9a;color:#40c0f0;">🚀 PUBLIER</button>
+      <button class="act-btn" id="btn-load"    onclick="loadLevel()"  data-tip="📂 MES NIVEAUX"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">📂 LOAD</button>
+      <button class="act-btn" id="btn-clear"   onclick="clearLevel()" data-tip="🗑 NOUVEAU"       style="background:#280d0d;border-color:#7a3a3a;color:#fc8181;">🗑 VIDER</button>
     </div>
   </div>
   <div class="sep"></div>
@@ -930,6 +930,36 @@ function hitHandle(p,x,y){for(const[k,v]of Object.entries(getHandles(p)))if(Math
 const CURSOR_MAP={nw:'nw-resize',n:'n-resize',ne:'ne-resize',e:'e-resize',se:'se-resize',s:'s-resize',sw:'sw-resize',w:'w-resize'};
 
 function canvasPos(e){const r=EC.getBoundingClientRect();return{x:Math.max(0,Math.min(EW,(e.clientX-r.left)/ZOOM)),y:Math.max(0,Math.min(EH,(e.clientY-r.top)/ZOOM))};}
+
+// ── Right-click pan ───────────────────────
+let _panning=false,_panStart={x:0,y:0},_scrollStart={x:0,y:0};
+
+EC.addEventListener('mousedown',e=>{
+  if(e.button===2){
+    _panning=true;
+    _panStart={x:e.clientX,y:e.clientY};
+    const wrap=document.getElementById('cwrap');
+    _scrollStart={x:wrap.scrollLeft,y:wrap.scrollTop};
+    EC.style.cursor='grabbing';
+    e.preventDefault();
+  }
+});
+
+EC.addEventListener('contextmenu',e=>e.preventDefault());
+
+window.addEventListener('mousemove',e=>{
+  if(!_panning)return;
+  const wrap=document.getElementById('cwrap');
+  wrap.scrollLeft=_scrollStart.x-(e.clientX-_panStart.x);
+  wrap.scrollTop=_scrollStart.y-(e.clientY-_panStart.y);
+});
+
+window.addEventListener('mouseup',e=>{
+  if(e.button===2&&_panning){
+    _panning=false;
+    EC.style.cursor='crosshair';
+  }
+});
 
 EC.addEventListener('mousedown',e=>{
   const{x,y}=canvasPos(e);mousePos={x,y};
