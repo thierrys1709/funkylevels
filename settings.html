@@ -260,6 +260,27 @@ async function saveLang(){
   if(msg){msg.className='msg ok';msg.textContent=(t&&t.langSaved)||'Saved!';setTimeout(()=>msg.className='msg',2000);}
 }
 
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function copyCode(code){
+  navigator.clipboard?.writeText(code).then(()=>{
+    showToast(lang==='fr'?'Code copié !':'Code copied!');
+  }).catch(()=>alert(code));
+}
+
+function showToast(msg){
+  let t=document.getElementById('settings-toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='settings-toast';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--panel);border:1.5px solid var(--green);color:var(--green);font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:12px 20px;border-radius:4px;z-index:999;transition:transform .3s;';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  t.style.transform='translateX(-50%) translateY(0)';
+  setTimeout(()=>t.style.transform='translateX(-50%) translateY(80px)',2500);
+}
+
 async function loadStats(){
   await loadLangData(lang);
   const t=T('settings');
