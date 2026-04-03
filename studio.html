@@ -141,8 +141,15 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
     <span style="font-size:6px;color:#2a2a3a;margin-left:6px">Ctrl+Z/Y</span>
   </div>
   <div class="sep"></div>
+  <div class="tb-group" style="align-items:center;gap:6px;">
+    <span style="font-size:5px;color:#3a3a5a;text-transform:uppercase;letter-spacing:1px;">NIVEAU</span>
+    <input type="text" id="level-name-input" placeholder="Sans titre..."
+      style="font-family:'Press Start 2P',monospace;font-size:7px;background:#0a0a16;border:1.5px solid #1e1e35;color:#f0e040;padding:5px 8px;border-radius:3px;width:160px;outline:none;"
+      oninput="onLevelNameChange()" onfocus="this.style.borderColor='#5050c0'" onblur="this.style.borderColor='#1e1e35'">
+  </div>
+  <div class="sep"></div>
   <div class="tb-group" style="gap:8px;align-items:center;">
-    <span id="current-char-display" style="font-size:14px;cursor:pointer;title='Changer de personnage'" onclick="window.location.href='settings.html'" title="Changer de personnage">🧑</span>
+    <span id="current-char-display" style="font-size:14px;cursor:pointer;" onclick="window.location.href='settings.html'" title="Changer de personnage">🧑</span>
     <a href="settings.html" class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;text-decoration:none;">⚙️ PROFIL</a>
     <a href="index.html" class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d1a0d;border-color:#3a7a3a;color:#68d391;text-decoration:none;">🏠 ACCUEIL</a>
   </div>
@@ -373,6 +380,20 @@ function trapPanelLoad(p){document.getElementById('tr-dist').value=p.trigDist??4
 function showTrapPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-trap').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : PIÈGE';}
 
 function status(s){document.getElementById('statusbar').textContent=s;}
+
+function onLevelNameChange(){
+  // If level is already saved, update title in DB after a short delay
+  clearTimeout(window._nameSaveTimer);
+  if(_currentLevelId){
+    window._nameSaveTimer=setTimeout(async()=>{
+      const title=document.getElementById('level-name-input').value.trim();
+      if(title){
+        await _sb.from('levels').update({title}).eq('id',_currentLevelId);
+        status('Titre mis à jour.');
+      }
+    },1000);
+  }
+}
 function snap(v){return Math.round(v/GRID)*GRID;}
 
 const HS=7;
@@ -464,17 +485,39 @@ function findBlockAt(x,y){const types=['fixed','trap','slider','invis','bounce',
 function deleteSelected(){if(!selection.length)return;snapshot();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
 function zoom(d){ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));EC.style.transform=`scale(${ZOOM})`;EC.style.transformOrigin='top left';document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%';}
 function saveLevel(){
-  // If logged in → open publish modal
-  // If not → download JSON as before
-  _sb.auth.getSession().then(({data})=>{
-    if(data.session){
-      openPublish();
-    }else{
+  _sb.auth.getSession().then(async({data})=>{
+    if(!data.session){
+      // Pas connecté → télécharge JSON
       const a=document.createElement('a');
       a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));
       a.download='level.json';a.click();status('Sauvegardé.');
+      return;
+    }
+    if(_currentLevelId){
+      // Niveau déjà sauvegardé → sauvegarde directe
+      await doQuickSave();
+    }else{
+      // Nouveau niveau → ouvre popup pour donner un nom
+      openPublish();
     }
   });
+}
+
+async function doQuickSave(){
+  const title=document.getElementById('level-name-input').value.trim()||'Sans titre';
+  const{error}=await _sb.from('levels').update({
+    title:title,
+    data:lv,
+    visibility:_currentVisibility
+  }).eq('id',_currentLevelId);
+  if(error){status('Erreur : '+error.message);}
+  else{
+    status('✅ Sauvegardé !');
+    // Flash the save button
+    const btn=document.getElementById('btn-save');
+    if(btn){btn.style.background='#0d280d';btn.style.borderColor='#3a7a3a';btn.style.color='#68d391';
+    setTimeout(()=>{btn.style.background='';btn.style.borderColor='';btn.style.color='';},1500);}
+  }
 }
 function loadLevel(){openLoadModal();}
 
@@ -517,6 +560,10 @@ async function doLoadLevel(id,title){
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
   _currentLevelId=id;
   _currentVisibility=data.visibility||'private';
+  const nameInput=document.getElementById('level-name-input');
+  if(nameInput)nameInput.value=data.title||'';
+  // Met à jour l'URL sans recharger la page
+  history.replaceState(null,'','?level='+id+'&mode=edit');
   redraw();
   closeLoadModal();
   status('Niveau "'+title+'" chargé.');
@@ -534,7 +581,10 @@ function loadFile(e){
   }catch(err){alert('Fichier invalide.');}};
   r.readAsText(f);e.target.value='';
 }
-function clearLevel(){if(!confirm('Vider le niveau ?'))return;snapshot();lv=emptyLevel();selectedIdx=-1;selectedType=null;_currentLevelId=null;_currentVisibility='private';redraw();status('Vidé.');}
+function clearLevel(){if(!confirm('Vider le niveau ?'))return;snapshot();lv=emptyLevel();selectedIdx=-1;selectedType=null;_currentLevelId=null;_currentVisibility='private';
+  const ni=document.getElementById('level-name-input');if(ni)ni.value='';
+  history.replaceState(null,'','studio.html');
+  redraw();status('Vidé.');}
 
 // ── Editor draw ──────────────────────────────────────────────────
 const EC_COL={bg:'#0c0c1a',grid:'#12122a',fixed:{b:'#4a5568',t:'#718096',s:'#a0aec0'},trap:{b:'#4a5568',t:'#718096',s:'#a0aec0'},flagA:'#68d391',flagB:'#fc8181',sel:'#f0e040',ghost:'#ffffff18'};
@@ -1179,6 +1229,8 @@ loadPlayerProfile().then(()=>{
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
   _currentLevelId=lid;
   _currentVisibility=data.visibility||'private';
+  const _ni=document.getElementById('level-name-input');
+  if(_ni)_ni.value=data.title||'';
   redraw();
   // Incrémenter plays si mode=play
   if(mode==='play'){
@@ -1254,12 +1306,12 @@ function _applyPubLang(){
 function openPublish(){
   _applyPubLang();
   document.getElementById('pub-msg').className='pub-msg';
-  // Pre-fill title if level already has one
-  if(_currentLevelId){
-    // Already saved level — show current title if available
-  }
+  // Pre-fill from toolbar name input
+  const ni=document.getElementById('level-name-input');
+  const pubName=document.getElementById('pub-name');
+  if(ni&&pubName&&ni.value)pubName.value=ni.value;
   document.getElementById('publish-modal').classList.add('show');
-  document.getElementById('pub-name').focus();
+  if(pubName)pubName.focus();
 }
 function closePublish(){document.getElementById('publish-modal').classList.remove('show');}
 
@@ -1312,7 +1364,10 @@ async function doPublish(){
       share_code:shareCode
     }).select().single();
     error=e;
-    if(!error&&inserted){_currentLevelId=inserted.id;}
+    if(!error&&inserted){
+      _currentLevelId=inserted.id;
+      history.replaceState(null,'','?level='+inserted.id+'&mode=edit');
+    }
   }
 
   okBtn.disabled=false;okBtn.textContent=t.ok;
@@ -1321,6 +1376,9 @@ async function doPublish(){
     msgEl.className='pub-msg err';
     msgEl.textContent=t.errorTxt+error.message;
   }else{
+    // Update name input in toolbar
+    const ni=document.getElementById('level-name-input');
+    if(ni)ni.value=title;
     if(shareCode&&_currentVisibility==='code'){
       navigator.clipboard?.writeText(shareCode).catch(()=>{});
       msgEl.className='pub-msg ok';
@@ -1328,7 +1386,7 @@ async function doPublish(){
       setTimeout(()=>closePublish(),4000);
     }else{
       msgEl.className='pub-msg ok';
-      msgEl.textContent=_currentLevelId&&!shareCode?t.successUpdate:t.successNew;
+      msgEl.textContent=shareCode?t.successNew:t.successUpdate;
       setTimeout(()=>closePublish(),1800);
     }
   }
