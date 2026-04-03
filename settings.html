@@ -180,6 +180,23 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
       </div>
     </div>
 
+    <!-- Changer pseudo -->
+    <div class="card">
+      <div class="card-title" id="pseudo-title">✏️ CHANGER MON PSEUDO</div>
+      <div class="field">
+        <label id="pseudo-lbl">NOUVEAU PSEUDO</label>
+        <input type="text" id="new-pseudo" maxlength="20" autocomplete="off"
+          style="background:var(--input-bg);border:1.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;padding:10px 14px;outline:none;width:100%;transition:border-color .2s;"
+          oninput="checkPseudoAvail()" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--border2)'">
+      </div>
+      <div id="pseudo-counter" style="font-family:Rajdhani,sans-serif;font-size:13px;font-weight:600;margin-bottom:8px;"></div>
+      <div id="pseudo-avail" style="font-family:Rajdhani,sans-serif;font-size:13px;font-weight:600;min-height:20px;margin-top:4px;"></div>
+      <div style="margin-top:12px;">
+        <button class="btn-primary" id="btn-save-pseudo" onclick="savePseudo()" disabled style="opacity:.5;">💾 <span id="btn-pseudo-txt">SAUVEGARDER</span></button>
+      </div>
+      <div id="pseudo-msg" class="msg" style="margin-top:10px;"></div>
+    </div>
+
     <!-- Danger zone -->
     <div class="card danger-zone">
       <div class="card-title" id="danger-title">⚠️ ZONE DANGEREUSE</div>
@@ -520,6 +537,149 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('pane-'+tab).classList.add('active');
   if(tab==='levels')loadStats();
+  if(tab==='account'){loadAccountInfo();loadPseudoInfo();}
+}
+
+let _pseudoTimer=null;
+let _pseudoInfo=null; // {changes, reset_date}
+const MAX_CHANGES=2;
+const RESET_MONTHS=12;
+
+async function loadPseudoInfo(){
+  const{data}=await sb.from('profiles')
+    .select('pseudo_changes,pseudo_reset_date')
+    .eq('id',currentUser.id).single();
+  if(!data)return;
+
+  // Check if we need to reset (12 months passed)
+  const resetDate=new Date(data.pseudo_reset_date);
+  const now=new Date();
+  const monthsDiff=(now.getFullYear()-resetDate.getFullYear())*12+(now.getMonth()-resetDate.getMonth());
+  
+  if(monthsDiff>=RESET_MONTHS){
+    // Reset counter
+    await sb.from('profiles').update({pseudo_changes:0,pseudo_reset_date:now.toISOString()}).eq('id',currentUser.id);
+    _pseudoInfo={changes:0,reset_date:now};
+  }else{
+    _pseudoInfo={changes:data.pseudo_changes||0,reset_date:resetDate};
+  }
+  updatePseudoCounter();
+}
+
+function updatePseudoCounter(){
+  const el=document.getElementById('pseudo-counter');
+  if(!el||!_pseudoInfo)return;
+  const remaining=MAX_CHANGES-_pseudoInfo.changes;
+  const resetDate=_pseudoInfo.reset_date;
+  const nextReset=new Date(resetDate);
+  nextReset.setMonth(nextReset.getMonth()+RESET_MONTHS);
+  const nextResetStr=nextReset.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
+
+  if(remaining<=0){
+    el.style.color='var(--red)';
+    el.textContent=lang==='fr'
+      ?'🚫 Plus de changements disponibles. Réinitialisation le '+nextResetStr
+      :'🚫 No changes left. Resets on '+nextResetStr;
+    document.getElementById('new-pseudo').disabled=true;
+    document.getElementById('btn-save-pseudo').disabled=true;
+    document.getElementById('btn-save-pseudo').style.opacity='.3';
+  }else if(remaining===1){
+    el.style.color='var(--red)';
+    el.textContent=lang==='fr'
+      ?'⚠️ Il te reste 1 changement (réinit le '+nextResetStr+')'
+      :'⚠️ 1 change remaining (resets on '+nextResetStr+')';
+  }else{
+    el.style.color='var(--green)';
+    el.textContent=lang==='fr'
+      ?'✅ '+remaining+' changements disponibles cette année'
+      :'✅ '+remaining+' changes available this year';
+  }
+}
+
+async function checkPseudoAvail(){
+  if(_pseudoInfo&&_pseudoInfo.changes>=MAX_CHANGES)return;
+  const input=document.getElementById('new-pseudo');
+  const avail=document.getElementById('pseudo-avail');
+  const btn=document.getElementById('btn-save-pseudo');
+  const val=input.value.trim();
+
+  avail.textContent='';
+  btn.disabled=true;
+  btn.style.opacity='.5';
+
+  if(val.length<3){
+    avail.style.color='var(--muted)';
+    avail.textContent=val.length>0?(lang==='fr'?'Minimum 3 caractères':'Minimum 3 characters'):'';
+    return;
+  }
+  if(!/^[a-zA-Z0-9_-]+$/.test(val)){
+    avail.style.color='var(--red)';
+    avail.textContent=lang==='fr'?'Lettres, chiffres, _ et - uniquement':'Letters, numbers, _ and - only';
+    return;
+  }
+
+  clearTimeout(_pseudoTimer);
+  avail.style.color='var(--muted)';
+  avail.textContent=lang==='fr'?'Vérification...':'Checking...';
+
+  _pseudoTimer=setTimeout(async()=>{
+    const{data}=await sb.from('profiles').select('id').eq('username',val).maybeSingle();
+    if(data&&data.id!==currentUser.id){
+      avail.style.color='var(--red)';
+      avail.textContent='❌ '+(lang==='fr'?'Pseudo déjà utilisé':'Username already taken');
+      btn.disabled=true;btn.style.opacity='.5';
+    }else{
+      avail.style.color='var(--green)';
+      avail.textContent='✅ '+(lang==='fr'?'Disponible !':'Available!');
+      btn.disabled=false;btn.style.opacity='1';
+    }
+  },500);
+}
+
+async function savePseudo(){
+  const val=document.getElementById('new-pseudo').value.trim();
+  const msg=document.getElementById('pseudo-msg');
+  const btn=document.getElementById('btn-save-pseudo');
+  if(!val||val.length<3)return;
+  if(!_pseudoInfo||_pseudoInfo.changes>=MAX_CHANGES){
+    msg.className='msg err';
+    msg.textContent=lang==='fr'?'Plus de changements disponibles cette année.':'No changes left this year.';
+    return;
+  }
+
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>'+(lang==='fr'?'SAUVEGARDE...':'SAVING...');
+  msg.className='msg';
+
+  const newChanges=(_pseudoInfo.changes||0)+1;
+  const{error}=await sb.from('profiles').update({
+    username:val,
+    pseudo_changes:newChanges
+  }).eq('id',currentUser.id);
+
+  btn.disabled=false;
+  btn.innerHTML='💾 '+(lang==='fr'?'SAUVEGARDER':'SAVE');
+
+  if(error){
+    if(error.code==='23505'){
+      msg.className='msg err';
+      msg.textContent=lang==='fr'?'❌ Pseudo déjà utilisé !':'❌ Username already taken!';
+    }else{
+      msg.className='msg err';
+      msg.textContent='Erreur: '+error.message;
+    }
+  }else{
+    await sb.auth.updateUser({data:{username:val}});
+    _pseudoInfo.changes=newChanges;
+    msg.className='msg ok';
+    msg.textContent=lang==='fr'?'✅ Pseudo mis à jour !':'✅ Username updated!';
+    document.getElementById('new-pseudo').value='';
+    document.getElementById('pseudo-avail').textContent='';
+    updatePseudoCounter();
+    loadAccountInfo();
+    showToast(lang==='fr'?'Pseudo mis à jour !':'Username updated!');
+    setTimeout(()=>msg.className='msg',3000);
+  }
 }
 
 function loadAccountInfo(){
