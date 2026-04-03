@@ -1221,18 +1221,33 @@ async function doPublish(){
   const user=sess.session.user;
   const username=user.user_metadata?.username||user.email.split('@')[0];
 
+  // Génère un code de partage lisible ex: 12345-67890-12345
+  function genCode(){
+    const r=()=>Math.floor(Math.random()*90000+10000);
+    return `${r()}-${r()}-${r()}`;
+  }
+  const shareCode=genCode();
+
   const{error}=await _sb.from('levels').insert({
     user_id:user.id,
     title:title,
     author:username,
     data:lv,
-    plays:0
+    plays:0,
+    published:false,
+    share_code:shareCode
   });
 
   okBtn.disabled=false;okBtn.textContent=t.ok;
 
   if(error){msgEl.className='pub-msg err';msgEl.textContent=t.errorTxt+error.message;}
-  else{msgEl.className='pub-msg ok';msgEl.textContent=t.success;setTimeout(()=>closePublish(),1800);}
+  else{
+    const codeTxt=lang==='fr'?`✅ Publié ! Code : ${shareCode}`:`✅ Published! Code: ${shareCode}`;
+    msgEl.className='pub-msg ok';
+    msgEl.innerHTML=codeTxt+'<br><span style="font-size:5px;color:#40f090aa;">'+(lang==='fr'?'Copié dans le presse-papier !':'Copied to clipboard!')+'</span>';
+    navigator.clipboard?.writeText(shareCode).catch(()=>{});
+    setTimeout(()=>closePublish(),3500);
+  }
 }
 </script>
 </body>
