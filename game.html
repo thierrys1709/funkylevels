@@ -250,7 +250,8 @@ async function loadCharacterSprite(charId){
 
 // ── Editor stubs (game.html has no editor canvas) ──
 const EC={style:{pointerEvents:''}};
-let EW=1800;
+const EH=640; // Level height (matches editor default)
+const EW=3200; // Level width (matches editor default)
 
 // ── Level state ───────────────────────────
 let _currentLevelId=null;
