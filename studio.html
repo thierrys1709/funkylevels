@@ -24,6 +24,7 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
 .grid-sel{font-family:'Press Start 2P',monospace;font-size:6px;background:#0a0a16;border:1.5px solid #333;color:#ccc;padding:4px;border-radius:2px;}
 .zoom-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:4px 9px;border:1.5px solid #333;border-radius:2px;cursor:pointer;background:#14142a;color:#aaa;}
 .zoom-btn:hover{color:#fff;border-color:#555;}
+.tb-label{font-size:6px;color:#3a3a5a;text-transform:uppercase;letter-spacing:1px;}
 #layout{display:flex;flex:1;overflow:hidden;}
 #panel{width:190px;flex-shrink:0;background:#12121e;border-right:2px solid #1e1e30;overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;gap:8px;}
 #panel h2{font-size:8px;color:#444;border-bottom:1px solid #1a1a2e;padding-bottom:5px;}
@@ -87,72 +88,110 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
 <body>
 
 <div id="topbar">
+
+  <!-- ══ LOGO ══ -->
   <h1>✦ STUDIO</h1>
   <div class="sep"></div>
-  <div style="display:flex;flex-direction:column;gap:3px;">
-    <span style="font-size:5px;color:#3a3a5a;text-transform:uppercase;letter-spacing:1px;">BLOCS</span>
+
+  <!-- ══ BLOCS ══ -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span class="tb-label">BLOCS</span>
     <div class="tb-group">
-      <button class="tool-btn active" id="t-fixed" onclick="T('fixed')" title="🟫 FIXE&#10;Sol solide, ne bouge jamais.&#10;Cliquer-glisser pour dessiner.">🟫 FIXE</button>
-      <button class="tool-btn" id="t-trap" onclick="T('trap')" title="⚠ PIÈGE&#10;Tombe quand le joueur approche.&#10;Cliquer-glisser pour dessiner.">⚠ PIÈGE</button>
-      <button class="tool-btn" id="t-slider" onclick="T('slider')" title="➡ GLISSEUR&#10;Se déplace dans une direction&#10;quand le joueur s'approche.&#10;Cliquer-glisser pour dessiner.">➡ GLISSEUR</button>
-      <button class="tool-btn" id="t-invis" onclick="T('invis')" title="👁 INVISIBLE&#10;Bloc solide mais invisible en jeu.&#10;Seul l'éditeur le montre.&#10;Cliquer-glisser pour dessiner.">👁 INVIS</button>
-      <button class="tool-btn" id="t-bounce" onclick="T('bounce')" title="🟡 REBOND&#10;Fait rebondir le joueur.&#10;Cliquer-glisser pour dessiner.">🟡 REBOND</button>
-      <button class="tool-btn" id="t-mobile" onclick="T('mobile')" title="🔵 MOBILE&#10;Va et vient entre deux points.&#10;Cliquer-glisser pour dessiner.">🔵 MOBILE</button>
-      <button class="tool-btn" id="t-push" onclick="T('push')" title="🪨 POUSSABLE&#10;Le joueur peut pousser ce bloc.&#10;Cliquer-glisser pour dessiner.">🪨 PUSH</button>
+      <button class="tool-btn active" id="t-fixed"  onclick="T('fixed')"  title="🟫 FIXE&#10;Sol solide, ne bouge jamais.&#10;Cliquer-glisser pour dessiner.">🟫 FIXE</button>
+      <button class="tool-btn"        id="t-invis"  onclick="T('invis')"  title="👁 INVISIBLE&#10;Bloc solide invisible en jeu.&#10;Cliquer-glisser pour dessiner.">👁 INVIS</button>
+      <button class="tool-btn"        id="t-bounce" onclick="T('bounce')" title="🟡 REBOND&#10;Fait rebondir le joueur.&#10;Cliquer-glisser pour dessiner.">🟡 REBOND</button>
+      <button class="tool-btn"        id="t-mobile" onclick="T('mobile')" title="🔵 MOBILE&#10;Va et vient entre deux points.&#10;Cliquer-glisser pour dessiner.">🔵 MOBILE</button>
+      <button class="tool-btn"        id="t-push"   onclick="T('push')"   title="🪨 POUSSABLE&#10;Le joueur peut pousser ce bloc.&#10;Cliquer-glisser pour dessiner.">🪨 PUSH</button>
     </div>
   </div>
   <div class="sep"></div>
-  <div style="display:flex;flex-direction:column;gap:3px;">
-    <span style="font-size:5px;color:#3a3a5a;text-transform:uppercase;letter-spacing:1px;">ZONES</span>
+
+  <!-- ══ BLOCS PIÈGE ══ -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span class="tb-label">PIÈGES</span>
     <div class="tb-group">
-      <button class="tool-btn" id="t-gravflip" onclick="T('gravflip')" title="🔃 ZONE GRAVITÉ&#10;Attire le joueur vers un bord.&#10;4 directions disponibles.&#10;Force 0 = apesanteur.&#10;Cliquer-glisser pour dessiner.">🔃 GRAVITÉ</button>
-      <button class="tool-btn" id="t-speed" onclick="T('speed')" title="⚡ ZONE VITESSE&#10;Modifie la vitesse du joueur.&#10;5 = normal, 1 = lent, 20 = rapide.&#10;Cliquer-glisser pour dessiner.">⚡ VITESSE</button>
+      <button class="tool-btn" id="t-trap"   onclick="T('trap')"   title="⚠ PIÈGE&#10;Tombe quand le joueur approche.&#10;Cliquer-glisser pour dessiner.">⚠ PIÈGE</button>
+      <button class="tool-btn" id="t-slider" onclick="T('slider')" title="➡ GLISSEUR&#10;Se déplace quand le joueur s'approche.&#10;Cliquer-glisser pour dessiner.">➡ GLISSEUR</button>
     </div>
   </div>
   <div class="sep"></div>
-  <div style="display:flex;flex-direction:column;gap:3px;">
-    <span style="font-size:5px;color:#3a3a5a;text-transform:uppercase;letter-spacing:1px;">NIVEAU</span>
+
+  <!-- ══ ZONES ══ -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span class="tb-label">ZONES</span>
     <div class="tb-group">
-      <button class="tool-btn" id="t-start" onclick="T('start')" title="🟢 DÉPART&#10;Cliquer pour placer le départ.">🟢 DÉPART</button>
-      <button class="tool-btn" id="t-end" onclick="T('end')" title="🔴 ARRIVÉE&#10;Cliquer pour placer le but.">🔴 ARRIVÉE</button>
+      <button class="tool-btn" id="t-gravflip" onclick="T('gravflip')" title="🔃 GRAVITÉ&#10;Attire le joueur vers un bord.&#10;Force 0 = apesanteur.&#10;Cliquer-glisser pour dessiner.">🔃 GRAVITÉ</button>
+      <button class="tool-btn" id="t-speed"    onclick="T('speed')"    title="⚡ VITESSE&#10;Modifie la vitesse du joueur.&#10;5 = normal, 1 = lent, 20 = rapide.&#10;Cliquer-glisser pour dessiner.">⚡ VITESSE</button>
     </div>
   </div>
   <div class="sep"></div>
-  <div class="tb-group">
-    <button class="tool-btn" id="t-select" onclick="T('select')" title="✥ SÉLECTION&#10;Cliquer = sélectionner&#10;Glisser = déplacer&#10;Poignées = redimensionner&#10;Suppr = effacer&#10;Ctrl+C/V  Ctrl+Z/Y">✥ SEL</button>
+
+  <!-- ══ NIVEAU ══ -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span class="tb-label">NIVEAU</span>
+    <div class="tb-group">
+      <button class="tool-btn" id="t-start"  onclick="T('start')"  title="🟢 DÉPART&#10;Cliquer pour placer le départ.">🟢 DÉPART</button>
+      <button class="tool-btn" id="t-end"    onclick="T('end')"    title="🔴 ARRIVÉE&#10;Cliquer pour placer le but.">🔴 ARRIVÉE</button>
+      <button class="tool-btn" id="t-select" onclick="T('select')" title="✥ SÉLECTION&#10;Cliquer = sélectionner&#10;Glisser = déplacer&#10;Poignées = redimensionner&#10;Suppr = effacer&#10;Ctrl+C/V  Ctrl+Z/Y">✥ SEL</button>
+    </div>
   </div>
   <div class="sep"></div>
-  <div class="tb-group">
-    <button class="act-btn" id="btn-play" onclick="playLevel()" title="▶ JOUER">▶ JOUER</button>
-    <button class="act-btn" id="btn-save" onclick="saveLevel()" title="💾 SAVE">💾 SAVE</button>
-    <button class="act-btn" id="btn-load" onclick="loadLevel()" title="📂 LOAD">📂 LOAD</button>
-    <button class="act-btn" id="btn-clear" onclick="clearLevel()" title="🗑 VIDER">🗑 VIDER</button>
-    <button class="act-btn" id="btn-publish" onclick="openPublish()" title="🚀 PUBLIER" style="background:#0d1a2a;border-color:#3a7a9a;color:#40c0f0;">🚀 PUBLIER</button>
-  </div>
-  <div class="sep"></div>
-  <div class="tb-group" style="gap:5px;align-items:center;">
-    <span style="font-size:6px;color:#444">GRILLE</span>
-    <select class="grid-sel" id="gridSel" onchange="GRID=+this.value;redraw()">
-      <option value="8">8px</option><option value="16" selected>16px</option><option value="32">32px</option>
-    </select>
-    <button class="zoom-btn" onclick="zoom(-0.25)">−</button>
-    <span id="zoomLbl" style="font-size:6px;color:#555;min-width:30px;text-align:center">100%</span>
-    <button class="zoom-btn" onclick="zoom(+0.25)">+</button>
-    <span style="font-size:6px;color:#2a2a3a;margin-left:6px">Ctrl+Z/Y</span>
-  </div>
-  <div class="sep"></div>
-  <div class="tb-group" style="align-items:center;gap:6px;">
-    <span style="font-size:5px;color:#3a3a5a;text-transform:uppercase;letter-spacing:1px;">NIVEAU</span>
+
+  <!-- ══ NOM DU NIVEAU ══ -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span class="tb-label">NOM</span>
     <input type="text" id="level-name-input" placeholder="Sans titre..."
-      style="font-family:'Press Start 2P',monospace;font-size:7px;background:#0a0a16;border:1.5px solid #1e1e35;color:#f0e040;padding:5px 8px;border-radius:3px;width:160px;outline:none;"
+      style="font-family:'Press Start 2P',monospace;font-size:8px;background:#0a0a16;border:1.5px solid #1e1e35;color:#f0e040;padding:6px 10px;border-radius:3px;width:170px;outline:none;"
       oninput="onLevelNameChange()" onfocus="this.style.borderColor='#5050c0'" onblur="this.style.borderColor='#1e1e35'">
   </div>
   <div class="sep"></div>
-  <div class="tb-group" style="gap:8px;align-items:center;">
-    <span id="current-char-display" style="font-size:14px;cursor:pointer;" onclick="window.location.href='settings.html'" title="Changer de personnage">🧑</span>
-    <a href="settings.html" class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;text-decoration:none;">⚙️ PROFIL</a>
-    <a href="index.html" class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d1a0d;border-color:#3a7a3a;color:#68d391;text-decoration:none;">🏠 ACCUEIL</a>
+
+  <!-- ══ SAUVEGARDE ══ -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span class="tb-label">SAUVEGARDE</span>
+    <div class="tb-group">
+      <button class="act-btn" id="btn-save"    onclick="saveLevel()"  title="💾 SAUVEGARDER"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">💾 SAVE</button>
+      <button class="act-btn" id="btn-publish" onclick="openPublish()" title="🚀 PUBLIER"      style="background:#0d1a2a;border-color:#3a7a9a;color:#40c0f0;">🚀 PUBLIER</button>
+      <button class="act-btn" id="btn-load"    onclick="loadLevel()"  title="📂 MES NIVEAUX"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">📂 LOAD</button>
+      <button class="act-btn" id="btn-clear"   onclick="clearLevel()" title="🗑 NOUVEAU"       style="background:#280d0d;border-color:#7a3a3a;color:#fc8181;">🗑 VIDER</button>
+    </div>
   </div>
+  <div class="sep"></div>
+
+  <!-- ══ PARAMÈTRES ══ -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span class="tb-label">PARAMÈTRES</span>
+    <div class="tb-group" style="gap:5px;align-items:center;">
+      <span style="font-size:6px;color:#555;">GRILLE</span>
+      <select class="grid-sel" id="gridSel" onchange="GRID=+this.value;redraw()">
+        <option value="8">8px</option><option value="16" selected>16px</option><option value="32">32px</option>
+      </select>
+      <button class="zoom-btn" onclick="zoom(-0.25)">−</button>
+      <span id="zoomLbl" style="font-size:6px;color:#555;min-width:30px;text-align:center">100%</span>
+      <button class="zoom-btn" onclick="zoom(+0.25)">+</button>
+    </div>
+  </div>
+  <div class="sep"></div>
+
+  <!-- ══ JEUX ══ -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span class="tb-label">JEU</span>
+    <div class="tb-group">
+      <button class="act-btn" id="btn-play" onclick="playLevel()" style="background:#0d280d;border-color:#3a7a3a;color:#68d391;">▶ JOUER</button>
+    </div>
+  </div>
+  <div class="sep"></div>
+
+  <!-- ══ PROFIL ══ -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span class="tb-label">PROFIL</span>
+    <div class="tb-group" style="gap:6px;align-items:center;">
+      <span id="current-char-display" style="font-size:16px;cursor:pointer;" onclick="window.location.href='settings.html'" title="Changer de personnage">🧑</span>
+      <a href="settings.html" class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;text-decoration:none;">⚙️ PROFIL</a>
+      <a href="index.html"    class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d1a0d;border-color:#3a7a3a;color:#68d391;text-decoration:none;">🏠 ACCUEIL</a>
+    </div>
+  </div>
+
 </div>
 
 <div id="layout">
