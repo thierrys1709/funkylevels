@@ -198,21 +198,22 @@ let selectedLang=lang;
 async function applyLang(l){
   await loadLangData(l);
   const t=T('settings');
-  if(!t.pageTitle)return; // Not loaded yet
-  document.getElementById('page-title').textContent=t.pageTitle;
-  document.getElementById('nav-back').textContent=t.back;
-  document.getElementById('char-title').textContent=t.charTitle;
-  document.getElementById('lang-title').textContent=t.langTitle;
-  document.getElementById('btn-save-lang').textContent=t.saveLang;
-  document.getElementById('stats-title').textContent=t.statsTitle;
-  document.getElementById('danger-title').textContent=t.dangerTitle;
-  document.getElementById('danger-desc').textContent=t.dangerDesc;
-  document.getElementById('btn-delete').textContent=t.btnDelete;
-  document.getElementById('confirm-title').textContent=t.confirmTitle;
-  document.getElementById('confirm-desc').textContent=t.confirmDesc;
-  document.getElementById('confirm-no').textContent=t.confirmNo;
-  document.getElementById('confirm-yes').textContent=t.confirmYes;
-  document.getElementById('stats-loading').textContent=t.statsLoading;
+  if(!t||!t.pageTitle)return;
+  const s=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.textContent=val;};
+  s('page-title',t.pageTitle);
+  s('nav-back',t.back);
+  s('char-title',t.charTitle);
+  s('lang-title',t.langTitle);
+  s('btn-save-lang',t.saveLang);
+  s('stats-title',t.statsTitle);
+  s('danger-title',t.dangerTitle);
+  s('danger-desc',t.dangerDesc);
+  s('btn-delete',t.btnDelete);
+  s('confirm-title',t.confirmTitle);
+  s('confirm-desc',t.confirmDesc);
+  s('confirm-no',t.confirmNo);
+  s('confirm-yes',t.confirmYes);
+  s('stats-loading',t.statsLoading);
 }
 
 function buildCharGrid(){
@@ -247,13 +248,15 @@ function selectLang(l){
   document.getElementById('lang-en').classList.toggle('selected',l==='en');
 }
 
-function saveLang(){
+async function saveLang(){
   lang=selectedLang;
   localStorage.setItem('fl_lang',lang);
-  applyLang(lang);
+  await saveProfile({lang:lang});
+  await loadLangData(lang);
+  await applyLang(lang);
   const msg=document.getElementById('lang-msg');
-  msg.className='msg ok';msg.textContent=T[lang].langSaved;
-  setTimeout(()=>msg.className='msg',2000);
+  const t=T('settings');
+  if(msg){msg.className='msg ok';msg.textContent=(t&&t.langSaved)||'Saved!';setTimeout(()=>msg.className='msg',2000);}
 }
 
 async function loadStats(){
@@ -352,7 +355,7 @@ async function doDelete(){
   }
   localStorage.removeItem('fl_lang');
   localStorage.removeItem('fl_char');
-  alert(T[lang].deleteOk);
+  alert(T('settings').deleteOk);
   window.location.href='index.html';
 }
 
@@ -369,28 +372,8 @@ async function loadProfile(){
 }
 
 async function saveProfile(updates){
-  const username=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
-  
-  // Vérifie si le profil existe
-  const{data:existing, error:fetchErr}=await sb.from('profiles')
-    .select('id').eq('id',currentUser.id).maybeSingle();
-  
-  console.log('existing:', existing, 'fetchErr:', fetchErr);
-  
-  let error;
-  if(existing){
-    const res=await sb.from('profiles')
-      .update({username,...updates})
-      .eq('id',currentUser.id);
-    error=res.error;
-    console.log('UPDATE result:', res.error);
-  }else{
-    const res=await sb.from('profiles')
-      .insert({id:currentUser.id,username,lang:'fr',character:'default',...updates});
-    error=res.error;
-    console.log('INSERT result:', res.error);
-  }
-  if(error)alert('Erreur: '+error.message+' | '+error.details+' | '+error.hint);
+  // Upsert profile
+  const{error}=await sb.from('profiles').upsert({id:currentUser.id,...updates},{onConflict:'id'});
   return error;
 }
 
@@ -416,7 +399,7 @@ saveLang=async function(){
   await saveProfile({lang:lang});
   applyLang(lang);
   const msg=document.getElementById('lang-msg');
-  msg.className='msg ok';msg.textContent=T[lang].langSaved;
+  msg.className='msg ok';msg.textContent=T('settings').langSaved;
   setTimeout(()=>msg.className='msg',2000);
 };
 
