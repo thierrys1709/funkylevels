@@ -288,6 +288,22 @@ async function applyLang(l){
   if(!t||!t.pageTitle)return;
   const s=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.textContent=val;};
   s('page-title',t.pageTitle);
+  // Tabs
+  s('tab-general',t.tabGeneral||'⚙️ GÉNÉRAL');
+  s('tab-levels',t.tabLevels||'🎮 NIVEAUX');
+  s('tab-account',t.tabAccount||'👤 COMPTE');
+  // Account tab
+  s('pseudo-title',t.pseudoTitle);
+  s('pseudo-lbl',t.pseudoLbl);
+  s('btn-save-pseudo',t.pseudoSave);
+  s('account-info-title',t.accountInfoTitle);
+  s('danger-title',t.dangerTitle);
+  s('danger-desc',t.dangerDesc);
+  s('btn-delete',t.btnDelete);
+  s('confirm-title',t.confirmTitle);
+  s('confirm-desc',t.confirmDesc);
+  s('confirm-no',t.confirmNo);
+  s('confirm-yes',t.confirmYes);
   s('nav-back',t.back);
   s('char-title',t.charTitle);
   s('lang-title',t.langTitle);
