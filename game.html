@@ -11,7 +11,21 @@
 body { background:#06060e; font-family:'Press Start 2P',monospace; display:flex; flex-direction:column; height:100vh; overflow:hidden; color:#ccc; }
 #gwrap { display:none; position:fixed; inset:0; background:#06060e; z-index:90; flex-direction:column; align-items:center; justify-content:center; }
 #gwrap.show { display: flex; }
-#gwrap:fullscreen { background: #06060e; }
+/* ── F1 Start Lights ── */
+#f1-lights{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:500;display:none;flex-direction:column;align-items:center;gap:12px;pointer-events:none;}
+#f1-lights.show{display:flex;}
+.f1-panel{background:#111;border:3px solid #333;border-radius:8px;padding:14px 20px;display:flex;gap:14px;align-items:center;box-shadow:0 0 40px #000000cc;}
+.f1-led{width:32px;height:32px;border-radius:50%;background:#1a0000;border:2px solid #330000;transition:all .15s;}
+.f1-led.on{background:#cc0000;border-color:#ff0000;box-shadow:0 0 20px #ff0000,0 0 40px #ff000088;}
+.f1-led.go{background:#111;border-color:#333;box-shadow:none;transition:background .4s,box-shadow .4s;}
+
+/* ── HUD Timer ── */
+#game-hud{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:200;display:none;flex-direction:column;align-items:center;gap:6px;pointer-events:none;}
+#game-hud.show{display:flex;}
+#hud-timer{font-family:Orbitron,monospace;font-size:32px;font-weight:900;color:#f0e040;text-shadow:0 0 20px #f0e04088,0 2px 0 #000;letter-spacing:2px;}
+#hud-best{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#a0a0cc;letter-spacing:1px;}
+
+#gwrap:fullscreen { #gwrap:fullscreen { background: #06060e; }
 
 #gtopbar {
   display: flex;
@@ -216,6 +230,21 @@ body { background:#06060e; font-family:'Press Start 2P',monospace; display:flex;
   </div>
   <canvas id="gcanvas" width="900" height="500"></canvas>
 </div>
+<!-- F1 Lights -->
+<div id="f1-lights">
+  <div class="f1-panel">
+    <div class="f1-led" id="led0"></div>
+    <div class="f1-led" id="led1"></div>
+    <div class="f1-led" id="led2"></div>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="game-hud">
+  <div id="hud-timer">0.000</div>
+  <div id="hud-best" id="hud-best"></div>
+</div>
+
 <div class="ov" id="ovDie"><h2>RATÉ</h2><p id="die-msg"></p><button onclick="gameRespawn()">RÉESSAYER</button><button onclick="stopGame()" style="background:#333;color:#aaa;margin-top:-8px;">ÉDITEUR</button></div>
 <div class="ov" id="ovWin"><h2>ARRIVÉ !</h2><p id="win-msg"></p><button onclick="stopGame()">ÉDITEUR</button></div>
 
@@ -256,6 +285,11 @@ const EW=3200; // Level width (matches editor default)
 // ── Level state ───────────────────────────
 let _currentLevelId=null;
 let lv=null;
+let _bestTime=null;
+let _gameStartTime=0;
+let _gameRunning=false;
+let _currentTimeMs=0;
+let _timerRaf=null;
 
 // ── Load level from URL ───────────────────
 async function init(){
@@ -297,6 +331,16 @@ async function init(){
   }
   _currentLevelId=lid;
   lv=levelData.data;
+  // Show editor button only if owner
+  const{data:sess2}=await _sb.auth.getSession();
+  const isOwner=sess2.session&&levelData.user_id===sess2.session.user.id;
+  document.querySelectorAll('#gtopbar button').forEach(btn=>{
+    if((btn.getAttribute('onclick')||'').includes('stopGame')){
+      btn.style.display=isOwner?'':'none';
+    }
+  });
+  // Load best time
+  await loadBestTime();
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
@@ -306,11 +350,107 @@ async function init(){
   startGameFrom(lv.start.x,lv.start.y);
 }
 
+// ── Timer ────────────────────────────────
+function startTimer(){
+  _gameStartTime=performance.now();
+  _gameRunning=true;
+  _timerRaf=requestAnimationFrame(updateTimer);
+}
+function stopTimer(){
+  _gameRunning=false;
+  if(_timerRaf)cancelAnimationFrame(_timerRaf);
+}
+function updateTimer(){
+  if(!_gameRunning)return;
+  _currentTimeMs=performance.now()-_gameStartTime;
+  const el=document.getElementById('hud-timer');
+  if(el)el.textContent=formatTime(_currentTimeMs);
+  _timerRaf=requestAnimationFrame(updateTimer);
+}
+function formatTime(ms){
+  const s=Math.floor(ms/1000);
+  const cs=Math.floor((ms%1000)/10);
+  const ms3=Math.floor(ms%10);
+  return s+'.'+String(Math.floor(ms/10)%100).padStart(2,'0')+String(Math.floor(ms)%10);
+}
+function formatTimeFull(ms){
+  const min=Math.floor(ms/60000);
+  const s=Math.floor((ms%60000)/1000);
+  const cs=Math.floor((ms%1000)/10);
+  return (min>0?min+'m ':'')+s+'.'+String(cs).padStart(2,'0')+'s';
+}
+
+// ── F1 Start Sequence ─────────────────────
+function f1Start(callback){
+  const lights=document.getElementById('f1-lights');
+  lights.classList.add('show');
+  const leds=[0,1,2].map(i=>document.getElementById('led'+i));
+  let step=0;
+  // Light up one by one: 0ms, 700ms, 1400ms
+  function lightUp(){
+    if(step<3){
+      leds[step].classList.add('on');
+      step++;
+      setTimeout(lightUp,700);
+    }else{
+      // All on — wait 800ms then go
+      setTimeout(()=>{
+        leds.forEach(l=>{l.classList.remove('on');l.classList.add('go');});
+        setTimeout(()=>{
+          lights.classList.remove('show');
+          leds.forEach(l=>l.classList.remove('go'));
+          callback();
+        },400);
+      },800);
+    }
+  }
+  setTimeout(lightUp,300);
+}
+
+// ── Leaderboard ───────────────────────────
+async function loadBestTime(){
+  if(!_currentLevelId)return;
+  const{data:sess}=await _sb.auth.getSession();
+  if(!sess.session)return;
+  const{data}=await _sb.from('leaderboard')
+    .select('time_ms')
+    .eq('level_id',_currentLevelId)
+    .eq('user_id',sess.session.user.id)
+    .order('time_ms',{ascending:true})
+    .limit(1)
+    .maybeSingle();
+  _bestTime=data?data.time_ms:null;
+  updateBestDisplay();
+}
+function updateBestDisplay(){
+  const el=document.getElementById('hud-best');
+  if(!el)return;
+  const l=_lang();
+  el.textContent=_bestTime!==null?
+    (l==='fr'?'MEILLEUR : ':'BEST: ')+formatTimeFull(_bestTime):
+    (l==='fr'?'PREMIER ESSAI !':'FIRST ATTEMPT!');
+}
+async function saveTime(ms){
+  const{data:sess}=await _sb.auth.getSession();
+  if(!sess.session||!_currentLevelId)return;
+  // Only save if it's better than current best
+  if(_bestTime!==null&&ms>=_bestTime)return;
+  await _sb.from('leaderboard').upsert({
+    level_id:_currentLevelId,
+    user_id:sess.session.user.id,
+    time_ms:Math.round(ms)
+  },{onConflict:'level_id,user_id',ignoreDuplicates:false});
+  _bestTime=Math.round(ms);
+  updateBestDisplay();
+}
+
 function stopGame(){
+  stopTimer();
   gRunning=false;gWon=false;
-  // Go back to previous page or index
+  _gameRunning=false;
+  document.getElementById('game-hud').classList.remove('show');
   const ref=document.referrer;
-  if(ref)window.history.back();
+  if(ref&&!ref.includes('game.html'))window.history.back();
   else window.location.href='index.html';
 }
 
@@ -321,6 +461,14 @@ function gameRespawn(){
   initPlayer(gLv.start.x,gLv.start.y);
   gCamX=Math.max(0,gLv.start.x-GW()*0.32);
   gParts=[];gBullets=[];
+  stopTimer();
+  _currentTimeMs=0;
+  document.getElementById('hud-timer').textContent='0.00';
+  gRunning=false;
+  f1Start(()=>{
+    gLoopStart();
+    startTimer();
+  });
 }
 
 
@@ -340,7 +488,7 @@ let gRafId=null;
 function gLoopStart(){if(gRafId)cancelAnimationFrame(gRafId);gRafId=requestAnimationFrame(gLoop);}
 
 function playLevel(){startGameFrom(lv.start.x,lv.start.y);}
-function testFromCamera(){startGameFrom(Math.max(50,gCamX+GW()*0.3),lv.start.y);}
+
 
 function toggleFullscreen(){const wrap=document.getElementById('gwrap');if(!document.fullscreenElement){wrap.requestFullscreen?.();document.getElementById('btn-fs').textContent='✕ QUITTER';}else{document.exitFullscreen?.();document.getElementById('btn-fs').textContent='⛶ PLEIN ÉCRAN';}}
 document.addEventListener('fullscreenchange',()=>{resizeGameCanvas();if(!document.fullscreenElement)document.getElementById('btn-fs').textContent='⛶ PLEIN ÉCRAN';});
@@ -665,6 +813,16 @@ function gUpdate(now){
       'Temps : '+gElapsed.toFixed(1)+'s':
       'Time: '+gElapsed.toFixed(1)+'s';
     spawnP(gLv.end.x,gLv.end.y-20,PCOL.flagB,30);
+    // Stop timer + save time
+    stopTimer();
+    const winTime=_currentTimeMs;
+    // Update win overlay with time
+    const l=_lang();
+    const timeStr=formatTimeFull(winTime);
+    const wmsg=document.getElementById('win-msg');
+    if(wmsg)wmsg.textContent=(l==='fr'?'Temps : ':'Time: ')+timeStr;
+    // Save to leaderboard
+    saveTime(winTime);
     // Incrémenter completions
     if(_currentLevelId){
       _sb.from('levels').select('completions').eq('id',_currentLevelId).single()
