@@ -1850,21 +1850,21 @@ async function loadPlayerProfile(){
   await loadCharacterSprite(charId);
 }
 
-loadPlayerProfile().then(()=>{
-  // Update character icon display in topbar
-  fetch('characters/manifest.json')
-    .then(r=>r.json())
-    .then(manifest=>{
-      const c=manifest.find(m=>m.id===_charId);
-      if(c){
-        const el=document.getElementById('current-char-display');
-        if(el)el.textContent=c.icon;
-      }
-    }).catch(()=>{});
-});
-
-// Apply language after all scripts loaded
-applyStudioLang();
+// Initialize: load profile + lang together
+(async()=>{
+  await loadPlayerProfile();
+  // Update character icon
+  try{
+    const manifest=await fetch('characters/manifest.json').then(r=>r.json());
+    const c=manifest.find(m=>m.id===_charId);
+    if(c){
+      const el=document.getElementById('current-char-display');
+      if(el)el.textContent=c.icon;
+    }
+  }catch(e){}
+  // Apply language AFTER lang file is loaded
+  await applyStudioLang();
+})();
 
 // ── Charger niveau depuis URL ?level=id ───
 (async()=>{
