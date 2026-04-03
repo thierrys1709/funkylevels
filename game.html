@@ -29,7 +29,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 .f1-led.go { background:#111; border-color:#333; box-shadow:none; transition:background .5s, box-shadow .5s; }
 
 /* ── HUD ── */
-#game-hud { position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:200; display:none; flex-direction:column; align-items:center; gap:4px; pointer-events:none; }
+#game-hud { position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:200; display:none; flex-direction:column; align-items:center; gap:0; pointer-events:none; width:90%; max-width:900px; }
 #game-hud.show { display:flex; }
 #hud-timer { font-family:Orbitron,monospace; font-size:34px; font-weight:900; color:#f0e040; text-shadow:0 0 24px #f0e04088, 0 2px 0 #000; letter-spacing:2px; font-variant-numeric:tabular-nums; font-feature-settings:'tnum'; min-width:140px; text-align:center; }
 #hud-best { font-family:Orbitron,monospace; font-size:11px; font-weight:700; color:#8080aa; letter-spacing:1px; }
@@ -66,9 +66,28 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 
 <!-- HUD -->
 <div id="game-hud">
-  <div id="hud-timer">0.00</div>
-  <div id="hud-attempt" style="font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#6060aa;letter-spacing:1px;"></div>
-  <div id="hud-best"></div>
+  <div id="hud-row" style="display:flex;align-items:flex-start;justify-content:center;gap:32px;width:100%;max-width:900px;">
+
+    <!-- Meilleur temps global (gauche) -->
+    <div style="display:flex;flex-direction:column;align-items:center;min-width:140px;">
+      <div id="hud-global-lbl" style="font-family:Rajdhani,sans-serif;font-size:10px;font-weight:700;color:#6060aa;letter-spacing:2px;text-transform:uppercase;">RECORD</div>
+      <div id="hud-global-time" style="font-family:Orbitron,monospace;font-size:18px;font-weight:700;color:#c0a0ff;font-variant-numeric:tabular-nums;">—</div>
+      <div id="hud-global-user" style="font-family:Rajdhani,sans-serif;font-size:11px;color:#6060aa;letter-spacing:1px;"></div>
+    </div>
+
+    <!-- Chrono central -->
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <div id="hud-timer">0.00</div>
+      <div id="hud-attempt" style="font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700;color:#5050aa;letter-spacing:1px;margin-top:2px;"></div>
+    </div>
+
+    <!-- Mon meilleur temps (droite) -->
+    <div style="display:flex;flex-direction:column;align-items:center;min-width:140px;">
+      <div id="hud-personal-lbl" style="font-family:Rajdhani,sans-serif;font-size:10px;font-weight:700;color:#6060aa;letter-spacing:2px;text-transform:uppercase;">MON RECORD</div>
+      <div id="hud-best" style="font-family:Orbitron,monospace;font-size:18px;font-weight:700;color:#f0e040;font-variant-numeric:tabular-nums;">—</div>
+    </div>
+
+  </div>
 </div>
 
 <!-- Overlays -->
@@ -168,7 +187,7 @@ function showWinScreen(ms, prevBest, isNewRecord, l){
   const bestEl=document.getElementById('win-best-display');
   if(bestEl){
     bestEl.textContent=_bestTime!==null
-      ?(l==='fr'?'MEILLEUR : ':'BEST: ')+fmtTimeFull(_bestTime)
+      ?(l==='fr'?'MON RECORD : ':'MY BEST: ')+fmtTimeFull(_bestTime)
       :'';
   }
 
@@ -256,23 +275,47 @@ function f1Start(callback){
 // ── Leaderboard ───────────────────────────────────────────
 async function loadBestTime(){
   if(!_currentLevelId)return;
+  const l=_lang();
+
+  // Personal best
   const{data:sess}=await _sb.auth.getSession();
-  if(!sess.session)return;
-  const{data}=await _sb.from('leaderboard')
-    .select('time_ms').eq('level_id',_currentLevelId)
-    .eq('user_id',sess.session.user.id)
+  if(sess.session){
+    const{data:personal}=await _sb.from('leaderboard')
+      .select('time_ms').eq('level_id',_currentLevelId)
+      .eq('user_id',sess.session.user.id)
+      .order('time_ms',{ascending:true}).limit(1).maybeSingle();
+    _bestTime=personal?personal.time_ms:null;
+  }
+
+  // Global record (best time + username)
+  const{data:global}=await _sb.from('leaderboard')
+    .select('time_ms, user_id')
+    .eq('level_id',_currentLevelId)
     .order('time_ms',{ascending:true}).limit(1).maybeSingle();
-  _bestTime=data?data.time_ms:null;
+
+  if(global){
+    // Get username
+    const{data:profile}=await _sb.from('profiles')
+      .select('username').eq('id',global.user_id).single();
+    const username=profile?.username||'???';
+    const el_time=document.getElementById('hud-global-time');
+    const el_user=document.getElementById('hud-global-user');
+    if(el_time)el_time.textContent=fmtTimeFull(global.time_ms);
+    if(el_user)el_user.textContent='@'+username;
+  }
+
+  // Labels
+  const lblG=document.getElementById('hud-global-lbl');
+  const lblP=document.getElementById('hud-personal-lbl');
+  if(lblG)lblG.textContent=l==='fr'?'RECORD MONDIAL':'WORLD RECORD';
+  if(lblP)lblP.textContent=l==='fr'?'MON RECORD':'MY BEST';
+
   updateBestDisplay();
 }
 function updateBestDisplay(){
   const el=document.getElementById('hud-best');
   if(!el)return;
-  const l=_lang();
-  const bestTxt=_bestTime!==null
-    ?(l==='fr'?'MEILLEUR : ':'BEST: ')+fmtTimeFull(_bestTime)
-    :'';
-  el.textContent=bestTxt;
+  el.textContent=_bestTime!==null?fmtTimeFull(_bestTime):'—';
 }
 
 function updateAttemptDisplay(){
