@@ -562,6 +562,8 @@ async function doLoadLevel(id,title){
   _currentVisibility=data.visibility||'private';
   const nameInput=document.getElementById('level-name-input');
   if(nameInput)nameInput.value=data.title||'';
+  // Met à jour l'URL sans recharger la page
+  history.replaceState(null,'','?level='+id+'&mode=edit');
   redraw();
   closeLoadModal();
   status('Niveau "'+title+'" chargé.');
@@ -581,6 +583,7 @@ function loadFile(e){
 }
 function clearLevel(){if(!confirm('Vider le niveau ?'))return;snapshot();lv=emptyLevel();selectedIdx=-1;selectedType=null;_currentLevelId=null;_currentVisibility='private';
   const ni=document.getElementById('level-name-input');if(ni)ni.value='';
+  history.replaceState(null,'','studio.html');
   redraw();status('Vidé.');}
 
 // ── Editor draw ──────────────────────────────────────────────────
@@ -1361,7 +1364,10 @@ async function doPublish(){
       share_code:shareCode
     }).select().single();
     error=e;
-    if(!error&&inserted){_currentLevelId=inserted.id;}
+    if(!error&&inserted){
+      _currentLevelId=inserted.id;
+      history.replaceState(null,'','?level='+inserted.id+'&mode=edit');
+    }
   }
 
   okBtn.disabled=false;okBtn.textContent=t.ok;
