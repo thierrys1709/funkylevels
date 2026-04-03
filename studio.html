@@ -6,14 +6,29 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex-direction:column;height:100vh;overflow:hidden;color:#ccc;user-select:none;}
+body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex-direction:column;height:100vh;overflow:hidden;color:#e0e0e0;user-select:none;}
+body.light{background:#f0f0f8;color:#111;}
+body.light #topbar{background:#e0e0ee;border-color:#c0c0d0;}
+body.light #panel{background:#e8e8f8;border-color:#c0c0d0;}
+body.light #cwrap{background:#d8d8f0;}
+body.light .tool-btn{background:#d0d0e8;border-color:#b0b0c8;color:#333;}
+body.light .tool-btn.active{background:#8080cc;border-color:#6060aa;color:#fff;}
+body.light .act-btn{filter:brightness(1.3);}
+body.light .grid-sel{background:#d0d0e8;border-color:#b0b0c8;color:#333;}
+body.light .zoom-btn{background:#d0d0e8;color:#333;}
+body.light #panel h2{color:#555;}
+body.light .pinfo{background:#d8d8f0;border-color:#c0c0d0;color:#444;}
+body.light .prow label{color:#444;}
+body.light .prow select,.prow input[type=number]{background:#d8d8f0;border-color:#c0c0d0;color:#222;}
+body.light #statusbar{color:#555;}
+body.light .tb-label{color:#6060aa;}
 #topbar{display:flex;align-items:center;gap:5px;padding:7px 12px;background:#12121e;border-bottom:2px solid #1e1e30;flex-shrink:0;flex-wrap:wrap;}
 #topbar h1{font-size:9px;color:#f0e040;margin-right:6px;}
 .sep{width:2px;height:28px;background:#1e1e30;margin:0 3px;flex-shrink:0;}
 .tb-group{display:flex;gap:4px;align-items:center;}
 .tool-btn,.act-btn,.zoom-btn{position:relative;}
 .tool-btn[title]:hover::after,.act-btn[title]:hover::after,.zoom-btn[title]:hover::after{content:attr(title);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#08081a;border:1px solid #4040a0;color:#ccc;font-size:6px;line-height:1.9;padding:5px 8px;border-radius:3px;white-space:pre;pointer-events:none;z-index:999;min-width:130px;text-align:center;box-shadow:0 4px 20px #00000099;}
-.tool-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:7px 10px;border:1.5px solid #2a2a4a;border-radius:3px;cursor:pointer;background:#14142a;color:#888;white-space:nowrap;transition:all .12s;}
+.tool-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:7px 10px;border:1.5px solid #2a2a4a;border-radius:3px;cursor:pointer;background:#14142a;color:#bbbbd0;white-space:nowrap;transition:all .12s;}
 .tool-btn:hover{border-color:#5050a0;color:#fff;background:#1e1e36;}
 .tool-btn.active{background:#20204a;border-color:#5050c0;color:#f0e040;}
 .act-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:7px 10px;border:1.5px solid #333;border-radius:3px;cursor:pointer;white-space:nowrap;}
@@ -24,7 +39,7 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
 .grid-sel{font-family:'Press Start 2P',monospace;font-size:6px;background:#0a0a16;border:1.5px solid #333;color:#ccc;padding:4px;border-radius:2px;}
 .zoom-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:4px 9px;border:1.5px solid #333;border-radius:2px;cursor:pointer;background:#14142a;color:#aaa;}
 .zoom-btn:hover{color:#fff;border-color:#555;}
-.tb-label{font-size:6px;color:#3a3a5a;text-transform:uppercase;letter-spacing:1px;}
+.tb-label{font-size:6px;color:#8888bb;text-transform:uppercase;letter-spacing:1px;font-weight:bold;}
 #layout{display:flex;flex:1;overflow:hidden;}
 #panel{width:190px;flex-shrink:0;background:#12121e;border-right:2px solid #1e1e30;overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;gap:8px;}
 #panel h2{font-size:8px;color:#444;border-bottom:1px solid #1a1a2e;padding-bottom:5px;}
@@ -189,6 +204,7 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
       <span id="current-char-display" style="font-size:16px;cursor:pointer;" onclick="window.location.href='settings.html'" title="Changer de personnage">🧑</span>
       <a href="settings.html" class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;text-decoration:none;">⚙️ PROFIL</a>
       <a href="index.html"    class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d1a0d;border-color:#3a7a3a;color:#68d391;text-decoration:none;">🏠 ACCUEIL</a>
+      <button onclick="toggleTheme()" id="theme-btn" style="font-family:'Press Start 2P',monospace;font-size:8px;padding:6px 10px;border:1.5px solid #444;border-radius:3px;background:#14142a;color:#bbb;cursor:pointer;" title="Thème clair/sombre">🌙</button>
     </div>
   </div>
 
@@ -341,22 +357,25 @@ function isSelected(type,idx){ return !!selection.find(s=>s.type===type&&s.idx==
 
 let undoStack=[],redoStack=[];
 function snapshot(){
-  // Si le niveau est publié, proposer de dupliquer avant d'éditer
-  if(_isPublished&&_currentLevelId&&!window._dupWarningShown){
-    window._dupWarningShown=true;
+  undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
+}
+
+// Appeler cette fonction uniquement quand les blocs changent vraiment (pas la sélection)
+function snapshotWithDupCheck(){
+  if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
     const lang=localStorage.getItem('fl_lang')||'fr';
     const msg=lang==='fr'?
-      '⚠️ Ce niveau est publié. Il sera dupliqué pour créer une nouvelle version privée. Continuer ?':
-      '⚠️ This level is published. It will be duplicated as a new private version. Continue?';
+      '⚠️ Ce niveau est publié.\n\nIl sera dupliqué en version privée pour te permettre de modifier.\n\nContinuer ?':
+      '⚠️ This level is published.\n\nIt will be duplicated as a private version so you can edit.\n\nContinue?';
     if(confirm(msg)){
       duplicateLevel();
       return;
     }else{
-      window._dupWarningShown=false;
+      // L'utilisateur refuse → on ne modifie pas
       return;
     }
   }
-  undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
+  snapshot();
 }
 
 async function duplicateLevel(){
@@ -380,6 +399,7 @@ async function duplicateLevel(){
   _currentVisibility='private';
   _authorCompleted=false;
   _isPublished=false;
+  window._dupConfirmed=true;
   window._dupWarningShown=false;
   const ni=document.getElementById('level-name-input');
   if(ni)ni.value=inserted.title;
@@ -544,7 +564,7 @@ window.addEventListener('mouseup',e=>{
   const{x,y}=canvasPos(e);
   const rx=Math.min(startPt.x,snap(x)),ry=Math.min(startPt.y,snap(y)),rw=Math.abs(snap(x)-startPt.x),rh=Math.abs(snap(y)-startPt.y);
   if(rw<GRID&&rh<GRID){startPt=null;return;}
-  snapshot();
+  snapshotWithDupCheck();
   const W=rw,H=Math.max(GRID,rh);let newType=null;
   if(currentTool==='fixed'){lv.fixed.push({x:rx,y:ry,w:W,h:H});newType='fixed';}
   else if(currentTool==='slider'){const v=slPanelValues();lv.slider.push({x:rx,y:ry,w:W,h:H,ox:rx,oy:ry,dir:v.dir,trigDist:v.trigDist,speed:v.speed,maxDist:v.maxDist,returns:v.returns,retDelay:v.retDelay,loop:v.loop,state:'idle',traveled:0,waitTimer:0});newType='slider';}
@@ -570,7 +590,7 @@ window.addEventListener('mouseup',e=>{
 EC.addEventListener('mouseleave',()=>{rubberBand=null;redraw();});
 
 function findBlockAt(x,y){const types=['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
-function deleteSelected(){if(!selection.length)return;snapshot();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
+function deleteSelected(){if(!selection.length)return;snapshotWithDupCheck();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
 function zoom(d){ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));EC.style.transform=`scale(${ZOOM})`;EC.style.transformOrigin='top left';document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%';}
 function saveLevel(){
   _sb.auth.getSession().then(async({data})=>{
@@ -688,6 +708,15 @@ function eFlag(x,y,col,lbl){EX.fillStyle='#888';EX.fillRect(x+12,y-48,3,48);EX.f
 function eSelection(p){EX.strokeStyle=EC_COL.sel+'cc';EX.lineWidth=1.5;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);for(const[,v]of Object.entries(getHandles(p))){EX.fillStyle=EC_COL.bg;EX.fillRect(v.x-HS,v.y-HS,HS*2,HS*2);EX.strokeStyle=EC_COL.sel;EX.lineWidth=1.5;EX.strokeRect(v.x-HS,v.y-HS,HS*2,HS*2);}}
 
 const GF_COLS={u:{bg:'#6020c0',stroke:'#a040f0',light:'#c060ff',arrow:'↑'},d:{bg:'#206040',stroke:'#40f090',light:'#60ffa0',arrow:'↓'},l:{bg:'#204060',stroke:'#4090f0',light:'#60c0ff',arrow:'←'},r:{bg:'#602020',stroke:'#f04040',light:'#ff8060',arrow:'→'}};
+
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light');
+  document.getElementById('theme-btn').textContent=isLight?'☀️':'🌙';
+  localStorage.setItem('fl_theme',isLight?'light':'dark');
+  redraw();
+}
+// Restore theme on load
+(()=>{if(localStorage.getItem('fl_theme')==='light'){document.body.classList.add('light');setTimeout(()=>{const b=document.getElementById('theme-btn');if(b)b.textContent='☀️';},100);}})();
 
 function redraw(){
   EX.clearRect(0,0,EW,EH);EX.fillStyle=EC_COL.bg;EX.fillRect(0,0,EW,EH);
