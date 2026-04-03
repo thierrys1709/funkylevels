@@ -145,20 +145,21 @@ const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
 const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const CHARACTERS=[
-  {id:'default',icon:'🧑',name:'DEFAULT'},
-  {id:'ninja',icon:'🥷',name:'NINJA'},
-  {id:'robot',icon:'🤖',name:'ROBOT'},
-  {id:'alien',icon:'👽',name:'ALIEN'},
-  {id:'ghost',icon:'👻',name:'GHOST'},
-  {id:'cat',icon:'🐱',name:'CAT'},
-  {id:'fire',icon:'🔥',name:'FIRE'},
-  {id:'star',icon:'⭐',name:'STAR'},
-  {id:'skull',icon:'💀',name:'SKULL'},
-  {id:'wizard',icon:'🧙',name:'WIZARD'},
-  {id:'knight',icon:'⚔️',name:'KNIGHT'},
-  {id:'frog',icon:'🐸',name:'FROG'},
-];
+let CHARACTERS=[];
+
+async function loadManifest(){
+  try{
+    const r=await fetch('characters/manifest.json');
+    CHARACTERS=await r.json();
+  }catch(e){
+    // Fallback si manifest non trouvé
+    CHARACTERS=[
+      {id:'default',icon:'🧑',name:'DEFAULT',file:'characters/default.svg'},
+      {id:'ninja',icon:'🥷',name:'NINJA',file:'characters/ninja.svg'},
+      {id:'robot',icon:'🤖',name:'ROBOT',file:'characters/robot.svg'},
+    ];
+  }
+}
 
 const T={
   fr:{
@@ -222,7 +223,12 @@ function buildCharGrid(){
   const grid=document.getElementById('char-grid');
   grid.innerHTML=CHARACTERS.map(c=>`
     <div class="char-item${selectedChar===c.id?' selected':''}" onclick="selectChar('${c.id}')" id="char-${c.id}">
-      <div class="char-icon">${c.icon}</div>
+      <div class="char-icon">
+        <img src="${c.file}" alt="${c.name}"
+          style="width:32px;height:42px;image-rendering:pixelated;"
+          onerror="this.style.display='none';this.nextSibling.style.display='block';">
+        <span style="display:none;font-size:24px;">${c.icon}</span>
+      </div>
       <div class="char-name">${c.name}</div>
     </div>
   `).join('');
@@ -328,12 +334,8 @@ async function loadProfile(){
 }
 
 async function saveProfile(updates){
-  const username=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
-  const{error}=await sb.from('profiles').upsert({id:currentUser.id,username,...updates},{onConflict:'id'});
-  if(error){
-    console.error('Profile save error:', error);
-    alert('Erreur: '+error.message+' | Code: '+error.code);
-  }
+  // Upsert profile
+  const{error}=await sb.from('profiles').upsert({id:currentUser.id,...updates},{onConflict:'id'});
   return error;
 }
 
@@ -368,6 +370,7 @@ saveLang=async function(){
   const{data}=await sb.auth.getSession();
   if(!data.session){window.location.href='login.html';return;}
   currentUser=data.session.user;
+  await loadManifest();
   await loadProfile();
   selectedLang=lang;
   document.getElementById('lang-fr').classList.toggle('selected',lang==='fr');
