@@ -27,7 +27,7 @@ body.light .tb-label{color:#6060aa;}
 .sep{width:2px;height:28px;background:#1e1e30;margin:0 3px;flex-shrink:0;}
 .tb-group{display:flex;gap:4px;align-items:center;}
 .tool-btn,.act-btn,.zoom-btn{position:relative;}
-.tool-btn[title]:hover::after,.act-btn[title]:hover::after,.zoom-btn[title]:hover::after{content:attr(title);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#08081a;border:1px solid #4040a0;color:#ccc;font-size:6px;line-height:1.9;padding:5px 8px;border-radius:3px;white-space:pre;pointer-events:none;z-index:999;min-width:130px;text-align:center;box-shadow:0 4px 20px #00000099;}
+.tool-btn[title]:hover::after,.act-btn[title]:hover::after,.zoom-btn[title]:hover::after{content:attr(title);position:absolute;top:calc(100% + 8px);bottom:auto;left:50%;transform:translateX(-50%);background:#08081a;border:1px solid #4040a0;color:#ccc;font-size:6px;line-height:1.9;padding:5px 8px;border-radius:3px;white-space:pre;pointer-events:none;z-index:999;min-width:130px;text-align:center;box-shadow:0 4px 20px #00000099;}
 .tool-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:7px 10px;border:1.5px solid #2a2a4a;border-radius:3px;cursor:pointer;background:#14142a;color:#bbbbd0;white-space:nowrap;transition:all .12s;}
 .tool-btn:hover{border-color:#5050a0;color:#fff;background:#1e1e36;}
 .tool-btn.active{background:#20204a;border-color:#5050c0;color:#f0e040;}
@@ -591,7 +591,33 @@ EC.addEventListener('mouseleave',()=>{rubberBand=null;redraw();});
 
 function findBlockAt(x,y){const types=['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
 function deleteSelected(){if(!selection.length)return;snapshotWithDupCheck();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
-function zoom(d){ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));EC.style.transform=`scale(${ZOOM})`;EC.style.transformOrigin='top left';document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%';}
+function zoom(d,cx,cy){
+  const prevZoom=ZOOM;
+  ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));
+  if(cx!==undefined&&cy!==undefined){
+    // Zoom centré sur la position de la souris
+    const wrap=document.getElementById('cwrap');
+    const scrollX=wrap.scrollLeft,scrollY=wrap.scrollTop;
+    const ratio=ZOOM/prevZoom;
+    wrap.scrollLeft=cx*ratio-(cx-scrollX);
+    wrap.scrollTop=cy*ratio-(cy-scrollY);
+  }
+  EC.style.transform='scale('+ZOOM+')';
+  EC.style.transformOrigin='top left';
+  document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%';
+}
+
+// Zoom avec molette souris centré sur curseur
+document.getElementById('cwrap').addEventListener('wheel',e=>{
+  e.preventDefault();
+  const wrap=document.getElementById('cwrap');
+  const rect=wrap.getBoundingClientRect();
+  // Position de la souris dans le canvas (avant zoom)
+  const mx=(e.clientX-rect.left+wrap.scrollLeft);
+  const my=(e.clientY-rect.top+wrap.scrollTop);
+  const d=e.deltaY<0?0.15:-0.15;
+  zoom(d,mx,my);
+},{passive:false});
 function saveLevel(){
   _sb.auth.getSession().then(async({data})=>{
     if(!data.session){
