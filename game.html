@@ -410,7 +410,6 @@ async function init(){
 
 // ── Game stubs for startGameFrom compatibility ────────────
 function startGameFrom(sx,sy){
-  resizeGameCanvas();
   gLv=JSON.parse(JSON.stringify(lv));
   (gLv.trap||[]).forEach(t=>{t.state='idle';t.vy=0;t.y=t.oy;t._carryingPlayer=false;});
   (gLv.slider||[]).forEach(s=>{s.state='idle';s.x=s.ox;s.y=s.oy;s.traveled=0;s.waitTimer=0;});
@@ -485,30 +484,25 @@ document.addEventListener('fullscreenchange',()=>{
 });
 
 function resizeGameCanvas(){
-  const wrap=document.getElementById('gwrap');
-  const bar=document.getElementById('gtopbar');
-  const hud=document.getElementById('game-hud');
-  if(!wrap)return;
-  const availW=window.innerWidth;
-  const usedH=(bar?.offsetHeight||48)+(hud?.offsetHeight||80);
-  const availH=window.innerHeight-usedH;
-  // Enforce 16:9 — fit inside available space
+  const HUD_H=90; // fixed HUD height estimate
+  const BAR_H=48; // fixed topbar height
+  const RESERVED=HUD_H+BAR_H+4;
+  const vw=window.innerWidth;
+  const vh=window.innerHeight-RESERVED;
+  // 16:9 fit
   let w,h;
-  if(availW/availH > 16/9){
-    // Too wide — constrain by height
-    h=availH;
-    w=h*(16/9);
-  }else{
-    // Too tall — constrain by width
-    w=availW;
-    h=w/(16/9);
-  }
-  GC.width=Math.round(w);
-  GC.height=Math.round(h);
-  GC.style.width=GC.width+'px';
-  GC.style.height=GC.height+'px';
+  if(vw/vh>16/9){h=vh;w=Math.round(h*(16/9));}
+  else{w=vw;h=Math.round(w/(16/9));}
+  w=Math.max(320,w);h=Math.max(180,h);
+  if(GC.width===w&&GC.height===h)return; // No change needed
+  GC.width=w;GC.height=h;
+  GC.style.width=w+'px';GC.style.height=h+'px';
 }
-window.addEventListener('resize',resizeGameCanvas);
+let _resizeTimer=null;
+window.addEventListener('resize',()=>{
+  clearTimeout(_resizeTimer);
+  _resizeTimer=setTimeout(resizeGameCanvas,100);
+});
 
 function initPlayer(x,y){
   gPlayer={x,y:y-36,w:22,h:32,vx:0,vy:0,onGround:false,facing:1,wF:0,wT:0,dead:false,dT:0,sq:1,gravDir:'d',angle:0,targetAngle:0};
