@@ -328,7 +328,8 @@ async function loadProfile(){
 }
 
 async function saveProfile(updates){
-  const{error}=await sb.from('profiles').upsert({id:currentUser.id,...updates},{onConflict:'id'});
+  const username=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
+  const{error}=await sb.from('profiles').upsert({id:currentUser.id,username,...updates},{onConflict:'id'});
   if(error){
     console.error('Profile save error:', error);
     alert('Erreur: '+error.message+' | Code: '+error.code);
