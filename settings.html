@@ -462,7 +462,7 @@ async function loadStats(){
 
     // Events
     card.querySelector('.lcf-vis-btn').onclick=()=>cycleVisibility(l.id,card);
-    card.querySelector('.lcf-play').onclick=()=>{window.location.href='studio.html?level='+l.id+'&mode=play';};
+    card.querySelector('.lcf-play').onclick=()=>{window.location.href='game.html?level='+l.id;};
     card.querySelector('.lcf-edit').onclick=()=>{window.location.href='studio.html?level='+l.id+'&mode=edit';};
     card.querySelector('.lcf-dup').onclick=()=>duplicateLevelSettings(l);
     card.querySelector('.lcf-del').onclick=()=>deleteLevel(l.id);
