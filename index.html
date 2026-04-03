@@ -288,11 +288,11 @@ async function loadSection(s){
   let levels=[];
 
   if(s==='new'){
-    let query=sb.from('levels').select('*').order('created_at',{ascending:false}).limit(24);
+    let query=sb.from('levels').select('*').eq('published',true).order('created_at',{ascending:false}).limit(24);
     if(q)query=query.ilike('title','%'+q+'%');
     const{data}=await query;levels=data||[];
   }else if(s==='top'){
-    let query=sb.from('levels').select('*').order('plays',{ascending:false}).limit(24);
+    let query=sb.from('levels').select('*').eq('published',true).order('plays',{ascending:false}).limit(24);
     if(q)query=query.ilike('title','%'+q+'%');
     const{data}=await query;levels=data||[];
   }else if(s==='mine'){
