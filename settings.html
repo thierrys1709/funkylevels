@@ -265,7 +265,7 @@ async function loadStats(){
   const content=document.getElementById('stats-content');
   if(!currentUser){content.innerHTML=`<div class="no-levels">${t.statsEmpty}</div>`;return;}
 
-  const{data:levels}=await sb.from('levels').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  const{data:levels}=await sb.from('levels').select('*, profiles(username)').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   if(!levels||!levels.length){content.innerHTML=`<div class="no-levels">${t.statsEmpty}</div>`;return;}
 
   // Load ratings for each level
@@ -293,11 +293,16 @@ async function loadStats(){
         const scores=ratingMap[l.id]||[];
         const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
         const stars=avg?'⭐ '+avg.toFixed(1)+' ('+scores.length+')':t.noRating;
-        const pub=l.published;
-        const statusBtn=`<button onclick="togglePublish('${l.id}',${pub})"
-          style="font-family:'Press Start 2P',monospace;font-size:6px;padding:5px 8px;border:none;border-radius:3px;cursor:pointer;background:${pub?'#276749':'#2c5282'};color:${pub?'#9ae6b4':'#90cdf4'};">
-          ${pub?(lang==='fr'?'✅ PUBLIC':'✅ PUBLIC'):(lang==='fr'?'🔒 PRIVÉ':'🔒 PRIVATE')}
-        </button>`;
+        const vis=l.visibility||'private';
+        const visColors={private:'#2c5282',public:'#276749',code:'#44337a'};
+        const visLabels_fr={private:'🔒 PRIVÉ',public:'🌍 PUBLIC',code:'🔑 CODE'};
+        const visLabels_en={private:'🔒 PRIVATE',public:'🌍 PUBLIC',code:'🔑 CODE'};
+        const visLabels=lang==='fr'?visLabels_fr:visLabels_en;
+        const visTextColors={private:'#90cdf4',public:'#9ae6b4',code:'#d6bcfa'};
+        const nextVis={private:'public',public:'code',code:'private'};
+        const statusBtn='<button onclick="cycleVisibility(\'' +l.id+ '\')"'+
+          ' style="font-family:Press Start 2P,monospace;font-size:6px;padding:5px 8px;border:none;border-radius:3px;cursor:pointer;background:'+visColors[vis]+';color:'+visTextColors[vis]+';">'+
+          visLabels[vis]+'</button>';
         const code=l.share_code||'—';
         const copyBtn=l.share_code?`<span onclick="copyCode('${l.share_code}')" style="cursor:pointer;color:#a040f0;font-size:7px;" title="Copier">📋 ${l.share_code}</span>`:'—';
         return '<tr>'+
@@ -312,11 +317,13 @@ async function loadStats(){
   </table>`;
 }
 
-async function togglePublish(levelId, currentlyPublished){
-  const newStatus=!currentlyPublished;
-  const{error}=await sb.from('levels').update({published:newStatus}).eq('id',levelId).eq('user_id',currentUser.id);
+async function cycleVisibility(levelId){
+  const{data:lvl}=await sb.from('levels').select('visibility').eq('id',levelId).single();
+  const cur=lvl?.visibility||'private';
+  const next={private:'public',public:'code',code:'private'}[cur];
+  const{error}=await sb.from('levels').update({visibility:next}).eq('id',levelId).eq('user_id',currentUser.id);
   if(error){alert('Erreur: '+error.message);return;}
-  loadStats(); // Refresh table
+  loadStats();
 }
 
 function copyCode(code){
