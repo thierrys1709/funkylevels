@@ -10,7 +10,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-direction:column; height:100vh; overflow:hidden; color:#ccc; }
 
-#gwrap { display:none; position:fixed; inset:0; background:#06060e; z-index:90; flex-direction:column; align-items:center; justify-content:center; }
+#gwrap { display:none; position:fixed; inset:0; background:#06060e; z-index:90; flex-direction:column; align-items:center; justify-content:flex-start; }
 #gwrap.show { display:flex; }
 #gwrap:fullscreen { background:#06060e; }
 
@@ -18,7 +18,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 .gtop-btn { font-family:Rajdhani,sans-serif; font-weight:700; font-size:13px; padding:7px 16px; border-radius:4px; cursor:pointer; transition:all .15s; }
 .gtop-btn:hover { filter:brightness(1.3); transform:translateY(-1px); }
 
-#gcanvas { border:2px solid #1e1e40; border-radius:6px; max-width:100%; max-height:calc(100vh - 60px); }
+#gcanvas { border:2px solid #1e1e40; border-radius:6px; max-width:100%; flex:1; min-height:0; }
 
 /* ── F1 Start Lights ── */
 #f1-lights { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:500; display:none; flex-direction:column; align-items:center; gap:12px; pointer-events:none; }
@@ -29,7 +29,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 .f1-led.go { background:#111; border-color:#333; box-shadow:none; transition:background .5s, box-shadow .5s; }
 
 /* ── HUD ── */
-#game-hud { position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:200; display:none; flex-direction:column; align-items:center; gap:0; pointer-events:none; width:90%; max-width:900px; }
+#game-hud { display:flex; flex-direction:column; align-items:center; gap:0; pointer-events:none; width:90%; max-width:900px; padding:6px 0; }
 #game-hud.show { display:flex; }
 #hud-timer { font-family:Orbitron,monospace; font-size:34px; font-weight:900; color:#f0e040; text-shadow:0 0 24px #f0e04088, 0 2px 0 #000; letter-spacing:2px; font-variant-numeric:tabular-nums; font-feature-settings:'tnum'; min-width:140px; text-align:center; }
 #hud-best { font-family:Orbitron,monospace; font-size:11px; font-weight:700; color:#8080aa; letter-spacing:1px; }
@@ -52,17 +52,6 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <button class="gtop-btn" id="btn-fs" onclick="toggleFullscreen()" style="background:#1a1a0d;border:1.5px solid #7a7a3a;color:#f0e040;">⛶ PLEIN ÉCRAN</button>
   </div>
-  <canvas id="gcanvas" width="900" height="500"></canvas>
-</div>
-
-<!-- F1 Lights -->
-<div id="f1-lights">
-  <div class="f1-panel">
-    <div class="f1-led" id="led0"></div>
-    <div class="f1-led" id="led1"></div>
-    <div class="f1-led" id="led2"></div>
-  </div>
-</div>
 
 <!-- HUD -->
 <div id="game-hud">
@@ -89,6 +78,18 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 
   </div>
 </div>
+  <canvas id="gcanvas" width="900" height="500"></canvas>
+</div>
+
+<!-- F1 Lights -->
+<div id="f1-lights">
+  <div class="f1-panel">
+    <div class="f1-led" id="led0"></div>
+    <div class="f1-led" id="led1"></div>
+    <div class="f1-led" id="led2"></div>
+  </div>
+</div>
+
 
 <!-- Overlays -->
 <div class="ov" id="ovDie">
@@ -401,7 +402,7 @@ async function init(){
   _attempt=0;
 
   // Show HUD
-  document.getElementById('game-hud').classList.add('show');
+  
 
   // Start
   startGameFrom(lv.start.x,lv.start.y);
@@ -483,10 +484,13 @@ document.addEventListener('fullscreenchange',()=>{
 });
 
 function resizeGameCanvas(){
-  const wrap=document.getElementById('gwrap'),bar=document.getElementById('gtopbar');
+  const wrap=document.getElementById('gwrap');
+  const bar=document.getElementById('gtopbar');
+  const hud=document.getElementById('game-hud');
   if(!wrap)return;
   const availW=wrap.clientWidth||window.innerWidth;
-  const availH=(wrap.clientHeight||window.innerHeight)-(bar?.offsetHeight||50)-20;
+  const usedH=(bar?.offsetHeight||50)+(hud?.offsetHeight||80)+8;
+  const availH=(wrap.clientHeight||window.innerHeight)-usedH;
   let w=Math.min(availW-20,availH*(16/9)),h=w/(16/9);
   GC.width=Math.max(400,Math.round(w));
   GC.height=Math.max(250,Math.round(h));
