@@ -54,6 +54,13 @@
   .back-link a:hover{color:var(--accent);}
   .spinner{display:inline-block;width:10px;height:10px;border:2px solid #11111166;border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px;}
   @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Reset modal ── */
+#reset-modal{display:none;position:fixed;inset:0;background:#000000bb;z-index:300;align-items:center;justify-content:center;}
+#reset-modal.show{display:flex;}
+.reset-box{background:var(--panel);border:2px solid var(--border);border-radius:6px;padding:28px 24px;width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 0 40px #000000cc;}
+.reset-box h3{font-size:8px;color:var(--accent2);text-align:center;}
+.reset-box p{font-size:6px;color:var(--muted);line-height:2.2;text-align:center;}
 </style>
 </head>
 <body>
@@ -81,6 +88,7 @@ for(let i=0;i<20;i++){const p=document.createElement('div');p.className='pixel';
       <div id="msg-login" class="msg"></div>
       <div class="field"><label id="lbl-login-email">Email</label><input type="email" id="login-email" placeholder="ton@email.com" autocomplete="email"></div>
       <div class="field"><label id="lbl-login-pass">Mot de passe</label><input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"></div>
+      <div style="text-align:right;"><button onclick="openReset()" style="font-family:'Press Start 2P',monospace;font-size:5px;background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 0;" id="forgot-btn">Mot de passe oublié ?</button></div>
       <button class="btn-main" id="btn-login" onclick="doLogin()">JOUER →</button>
       <div class="sep" id="sep-login">OU</div>
       <button class="btn-google" onclick="doGoogle()">
@@ -102,7 +110,7 @@ for(let i=0;i<20;i++){const p=document.createElement('div');p.className='pixel';
       </button>
     </div>
   </div>
-  <div class="back-link"><a href="studio.html" id="back-link-txt">← RETOUR AU JEU</a></div>
+  <div class="back-link"><a href="index.html" id="back-link-txt">← RETOUR AU JEU</a></div>
 </div>
 <script>
 const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
@@ -169,7 +177,7 @@ async function doLogin(){
   const{error}=await sb.auth.signInWithPassword({email,password:pass});
   setLoading('btn-login',false);
   if(error){showMsg('msg-login','error',error.message.includes('Invalid')?t.errCreds:error.message);}
-  else{showMsg('msg-login','success',t.okLogin);setTimeout(()=>window.location.href='studio.html',1200);}
+  else{showMsg('msg-login','success',t.okLogin);setTimeout(()=>window.location.href='index.html',1200);}
 }
 
 async function doSignup(){
@@ -187,7 +195,7 @@ async function doSignup(){
 }
 
 async function doGoogle(){
-  const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/studio.html'}});
+  const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/index.html'}});
   if(error)alert(error.message);
 }
 
@@ -196,6 +204,69 @@ document.addEventListener('keydown',e=>{
 });
 
 sb.auth.getSession().then(({data})=>{if(data.session)window.location.href='index.html';});
+</script>
+<!-- RESET MODAL -->
+<div id="reset-modal">
+  <div class="reset-box">
+    <h3 id="reset-title">🔑 MOT DE PASSE OUBLIÉ</h3>
+    <p id="reset-desc">Entre ton email et on t'envoie un lien pour réinitialiser ton mot de passe.</p>
+    <div id="reset-msg" class="msg"></div>
+    <div class="field">
+      <label id="reset-email-lbl">EMAIL</label>
+      <input type="email" id="reset-email" placeholder="ton@email.com" autocomplete="email">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-main" style="flex:0 0 auto;background:#1a1a2a;color:#888;border:1.5px solid #333;padding:12px;" onclick="closeReset()" id="reset-cancel">ANNULER</button>
+      <button class="btn-main" style="flex:1;" onclick="doReset()" id="reset-ok-btn">ENVOYER →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Reset password ────────────────────────
+const _RT={
+  fr:{title:'🔑 MOT DE PASSE OUBLIÉ',desc:'Entre ton email et on t'envoie un lien pour réinitialiser ton mot de passe.',lbl:'EMAIL',cancel:'ANNULER',ok:'ENVOYER →',sending:'ENVOI...',success:'Email envoyé ! Vérifie ta boîte mail.',errEmpty:'Entre ton email !',forgot:'Mot de passe oublié ?'},
+  en:{title:'🔑 FORGOT PASSWORD',desc:'Enter your email and we'll send you a link to reset your password.',lbl:'EMAIL',cancel:'CANCEL',ok:'SEND →',sending:'SENDING...',success:'Email sent! Check your inbox.',errEmpty:'Enter your email!',forgot:'Forgot password?'}
+};
+
+function openReset(){
+  const t=_RT[lang];
+  document.getElementById('reset-title').textContent=t.title;
+  document.getElementById('reset-desc').textContent=t.desc;
+  document.getElementById('reset-email-lbl').textContent=t.lbl;
+  document.getElementById('reset-cancel').textContent=t.cancel;
+  document.getElementById('reset-ok-btn').textContent=t.ok;
+  document.getElementById('reset-email').value='';
+  document.getElementById('reset-msg').className='msg';
+  document.getElementById('reset-modal').classList.add('show');
+  document.getElementById('reset-email').focus();
+}
+function closeReset(){document.getElementById('reset-modal').classList.remove('show');}
+
+async function doReset(){
+  const t=_RT[lang];
+  const email=document.getElementById('reset-email').value.trim();
+  const msgEl=document.getElementById('reset-msg');
+  const btn=document.getElementById('reset-ok-btn');
+  if(!email){msgEl.className='msg error';msgEl.textContent=t.errEmpty;return;}
+  btn.disabled=true;btn.textContent=t.sending;
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/reset.html'});
+  btn.disabled=false;btn.textContent=t.ok;
+  if(error){msgEl.className='msg error';msgEl.textContent=error.message;}
+  else{msgEl.className='msg success';msgEl.textContent=t.success;setTimeout(()=>closeReset(),2500);}
+}
+
+// Mise à jour du texte "mot de passe oublié" selon la langue
+const _origSetLang=setLang;
+// Patch setLang to also update forgot btn
+const _prevSetLang=setLang;
+window.addEventListener('load',()=>{
+  const orig=setLang;
+  // Already called, just update forgot btn
+  document.getElementById('forgot-btn').textContent=_RT[lang].forgot;
+});
+
+document.getElementById('reset-modal').addEventListener('click',e=>{if(e.target===document.getElementById('reset-modal'))closeReset();});
 </script>
 </body>
 </html>
