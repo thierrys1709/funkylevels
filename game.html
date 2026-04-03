@@ -14,7 +14,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 #gwrap.show { display:flex; }
 #gwrap:fullscreen { background:#06060e; }
 
-#gtopbar { display:flex; align-items:center; gap:12px; padding:8px 16px; flex-shrink:0; }
+#gtopbar { display:flex; align-items:center; gap:12px; padding:8px 16px; flex-shrink:0; width:100%; justify-content:flex-end; }
 .gtop-btn { font-family:Rajdhani,sans-serif; font-weight:700; font-size:13px; padding:7px 16px; border-radius:4px; cursor:pointer; transition:all .15s; }
 .gtop-btn:hover { filter:brightness(1.3); transform:translateY(-1px); }
 
@@ -111,7 +111,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 
   <!-- Boutons -->
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
-    <button onclick="gameRespawn()" id="btn-replay" style="background:#1a1a3a;color:#90a0f0;border:2px solid #4040aa;">🔄 REJOUER</button>
+    <button onclick="gameRespawn()" id="btn-replay" style="background:#1a1a3a;color:#90a0f0;border:2px solid #4040aa;font-size:13px;padding:14px 24px;">🔄 RECOMMENCER</button>
     <button onclick="goToEditor()" id="btn-edit-win" style="background:#1a2a1a;color:#60e090;border:2px solid #3a8a3a;display:none;">✏️ ÉDITER</button>
     <button onclick="goToIndex()" id="btn-back" style="background:#333;color:#aaa;border:2px solid #555;">🏠 ACCUEIL</button>
   </div>
@@ -363,7 +363,7 @@ async function init(){
   s('ov-die-title',t.ovDie);
   s('ov-win-title',t.ovWin);
   s('btn-retry',t.ovDieBtn);
-  s('btn-replay',t.ovWinBtn);
+  s('btn-replay',l==='fr'?'🔄 RECOMMENCER':'🔄 RESTART');
   s('btn-editor',t.gEditor);
   s('btn-fs',t.gFullscreen);
   if(t.ovDieEdit){s('btn-quit',t.ovDieEdit);}
