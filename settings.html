@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FunkyLevels — Paramètres</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#08080f;--panel:#0f0f1e;--panel2:#12122a;--border:#1e1e35;--accent:#f0e040;--accent2:#a040f0;--green:#40f090;--red:#f04060;--blue:#4090f0;--text:#dddddd;--muted:#666688;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);font-family:'Press Start 2P',monospace;min-height:100vh;color:var(--text);font-size:14px;}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:32px 32px;opacity:.35;pointer-events:none;}
+
+nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(10px);border-bottom:2px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.nav-logo{font-size:16px;color:var(--accent);text-shadow:0 0 15px var(--accent);text-decoration:none;}
+.nav-back{font-family:'Press Start 2P',monospace;font-size:9px;padding:10px 16px;border:1.5px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;text-decoration:none;transition:all .15s;}
+.nav-back:hover{border-color:var(--accent);color:var(--accent);}
+
+.page{max-width:800px;margin:0 auto;padding:40px 24px 80px;}
+.page-title{font-size:18px;color:var(--accent);margin-bottom:40px;text-align:center;text-shadow:0 0 20px var(--accent);}
+
+/* Section card */
+.section{background:var(--panel);border:1.5px solid var(--border);border-radius:6px;padding:28px;margin-bottom:24px;}
+.section-title{font-size:11px;color:var(--accent2);margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+
+/* Character picker */
+.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:12px;margin-top:4px;}
+.char-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border:2px solid var(--border);border-radius:5px;cursor:pointer;transition:all .2s;background:var(--panel2);}
+.char-item:hover{border-color:var(--accent2);}
+.char-item.selected{border-color:var(--accent);background:#f0e04015;}
+.char-icon{font-size:28px;}
+.char-name{font-size:6px;color:var(--muted);text-align:center;}
+.char-item.selected .char-name{color:var(--accent);}
+
+/* Language selector */
+.lang-options{display:flex;gap:12px;flex-wrap:wrap;}
+.lang-option{display:flex;align-items:center;gap:10px;padding:12px 18px;border:2px solid var(--border);border-radius:4px;cursor:pointer;transition:all .2s;background:var(--panel2);}
+.lang-option:hover{border-color:var(--accent2);}
+.lang-option.selected{border-color:var(--accent);background:#f0e04015;}
+.lang-option span{font-size:10px;}
+
+/* Stats table */
+.stats-table{width:100%;border-collapse:collapse;}
+.stats-table th{font-size:8px;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:1px;}
+.stats-table td{font-size:9px;color:var(--text);padding:12px 12px;border-bottom:1px solid var(--border);}
+.stats-table tr:last-child td{border-bottom:none;}
+.stats-table tr:hover td{background:#ffffff05;}
+.stars{color:var(--accent);}
+.no-levels{font-size:10px;color:var(--muted);text-align:center;padding:32px;}
+
+/* Buttons */
+.btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:13px 20px;border:none;border-radius:3px;cursor:pointer;transition:all .15s;}
+.btn-save{background:var(--accent);color:#111;}
+.btn-save:hover{background:#fff;}
+.btn-save:disabled{opacity:.5;cursor:not-allowed;}
+.btn-danger{background:#f0406022;color:var(--red);border:1.5px solid var(--red);}
+.btn-danger:hover{background:#f0406044;}
+
+/* Message */
+.msg{font-size:8px;padding:10px 14px;border-radius:3px;display:none;line-height:2;margin-top:12px;}
+.msg.ok{background:#40f09020;border:1px solid var(--green);color:var(--green);display:block;}
+.msg.err{background:#f0406020;border:1px solid var(--red);color:var(--red);display:block;}
+
+/* Confirm modal */
+#confirm-modal{display:none;position:fixed;inset:0;background:#000000cc;z-index:300;align-items:center;justify-content:center;}
+#confirm-modal.show{display:flex;}
+.confirm-box{background:var(--panel);border:2px solid var(--red);border-radius:6px;padding:32px 28px;width:380px;display:flex;flex-direction:column;gap:20px;box-shadow:0 0 40px #f0406033;}
+.confirm-box h3{font-size:12px;color:var(--red);text-align:center;}
+.confirm-box p{font-size:9px;color:var(--muted);text-align:center;line-height:2.2;}
+.confirm-row{display:flex;gap:12px;}
+.confirm-btn{flex:1;font-family:'Press Start 2P',monospace;font-size:9px;padding:13px;border:none;border-radius:3px;cursor:pointer;transition:all .15s;}
+.confirm-btn.yes{background:var(--red);color:#fff;}
+.confirm-btn.yes:hover{background:#ff6070;}
+.confirm-btn.no{background:#1a1a2a;color:#888;border:1.5px solid #333;}
+.confirm-btn.no:hover{color:#ccc;}
+
+.spinner{display:inline-block;width:10px;height:10px;border:2px solid #11111166;border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
+  <a href="index.html" class="nav-back" id="nav-back">← RETOUR</a>
+</nav>
+
+<div class="page">
+  <div class="page-title" id="page-title">⚙️ PARAMÈTRES</div>
+
+  <!-- PERSONNAGE -->
+  <div class="section">
+    <div class="section-title" id="char-title">🎮 MON PERSONNAGE</div>
+    <div class="char-grid" id="char-grid"></div>
+    <div id="char-msg" class="msg"></div>
+  </div>
+
+  <!-- LANGUE -->
+  <div class="section">
+    <div class="section-title" id="lang-title">🌍 LANGUE PAR DÉFAUT</div>
+    <div class="lang-options">
+      <div class="lang-option selected" id="lang-fr" onclick="selectLang('fr')">
+        <span>🇫🇷</span><span>FRANÇAIS</span>
+      </div>
+      <div class="lang-option" id="lang-en" onclick="selectLang('en')">
+        <span>🇬🇧</span><span>ENGLISH</span>
+      </div>
+    </div>
+    <div style="margin-top:16px;">
+      <button class="btn btn-save" id="btn-save-lang" onclick="saveLang()">💾 SAUVEGARDER</button>
+    </div>
+    <div id="lang-msg" class="msg"></div>
+  </div>
+
+  <!-- MES STATS -->
+  <div class="section">
+    <div class="section-title" id="stats-title">📊 STATS DE MES NIVEAUX</div>
+    <div id="stats-content"><div class="no-levels" id="stats-loading">Chargement...</div></div>
+  </div>
+
+  <!-- DANGER ZONE -->
+  <div class="section" style="border-color:#f0406044;">
+    <div class="section-title" style="color:var(--red);" id="danger-title">⚠️ ZONE DANGEREUSE</div>
+    <p style="font-size:9px;color:var(--muted);line-height:2.5;margin-bottom:20px;" id="danger-desc">Supprimer ton compte effacera définitivement ton profil et tous tes niveaux. Cette action est irréversible.</p>
+    <button class="btn btn-danger" onclick="openConfirm()" id="btn-delete">🗑 SUPPRIMER MON COMPTE</button>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div id="confirm-modal">
+  <div class="confirm-box">
+    <h3 id="confirm-title">⚠️ CONFIRMATION</h3>
+    <p id="confirm-desc">Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ? Cette action est irréversible !</p>
+    <div class="confirm-row">
+      <button class="confirm-btn no" onclick="closeConfirm()" id="confirm-no">ANNULER</button>
+      <button class="confirm-btn yes" onclick="doDelete()" id="confirm-yes">SUPPRIMER</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
+const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const CHARACTERS=[
+  {id:'default',icon:'🧑',name:'DEFAULT'},
+  {id:'ninja',icon:'🥷',name:'NINJA'},
+  {id:'robot',icon:'🤖',name:'ROBOT'},
+  {id:'alien',icon:'👽',name:'ALIEN'},
+  {id:'ghost',icon:'👻',name:'GHOST'},
+  {id:'cat',icon:'🐱',name:'CAT'},
+  {id:'fire',icon:'🔥',name:'FIRE'},
+  {id:'star',icon:'⭐',name:'STAR'},
+  {id:'skull',icon:'💀',name:'SKULL'},
+  {id:'wizard',icon:'🧙',name:'WIZARD'},
+  {id:'knight',icon:'⚔️',name:'KNIGHT'},
+  {id:'frog',icon:'🐸',name:'FROG'},
+];
+
+const T={
+  fr:{
+    pageTitle:'⚙️ PARAMÈTRES',back:'← RETOUR',
+    charTitle:'🎮 MON PERSONNAGE',
+    langTitle:'🌍 LANGUE PAR DÉFAUT',saveLang:'💾 SAUVEGARDER',
+    statsTitle:'📊 STATS DE MES NIVEAUX',
+    dangerTitle:'⚠️ ZONE DANGEREUSE',
+    dangerDesc:"Supprimer ton compte effacera définitivement ton profil et tous tes niveaux. Cette action est irréversible.",
+    btnDelete:'🗑 SUPPRIMER MON COMPTE',
+    confirmTitle:'⚠️ CONFIRMATION',
+    confirmDesc:"Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ? Cette action est irréversible !",
+    confirmNo:'ANNULER',confirmYes:'SUPPRIMER',
+    statsLoading:'Chargement...',statsEmpty:'Tu n\'as pas encore de niveaux publiés.',
+    thLevel:'NIVEAU',thPlays:'PARTIES',thRating:'NOTE',
+    charSaved:'Personnage sauvegardé !',langSaved:'Langue sauvegardée !',
+    noRating:'—',deleteOk:'Compte supprimé. À bientôt !'
+  },
+  en:{
+    pageTitle:'⚙️ SETTINGS',back:'← BACK',
+    charTitle:'🎮 MY CHARACTER',
+    langTitle:'🌍 DEFAULT LANGUAGE',saveLang:'💾 SAVE',
+    statsTitle:'📊 MY LEVELS STATS',
+    dangerTitle:'⚠️ DANGER ZONE',
+    dangerDesc:'Deleting your account will permanently erase your profile and all your levels. This action is irreversible.',
+    btnDelete:'🗑 DELETE MY ACCOUNT',
+    confirmTitle:'⚠️ CONFIRMATION',
+    confirmDesc:'Are you sure you want to delete your account and all your levels? This action cannot be undone!',
+    confirmNo:'CANCEL',confirmYes:'DELETE',
+    statsLoading:'Loading...',statsEmpty:'You have no published levels yet.',
+    thLevel:'LEVEL',thPlays:'PLAYS',thRating:'RATING',
+    charSaved:'Character saved!',langSaved:'Language saved!',
+    noRating:'—',deleteOk:'Account deleted. Goodbye!'
+  }
+};
+
+let lang=localStorage.getItem('fl_lang')||'fr';
+let currentUser=null;
+let selectedChar=localStorage.getItem('fl_char')||'default';
+let selectedLang=lang;
+
+function applyLang(l){
+  const t=T[l];
+  document.getElementById('page-title').textContent=t.pageTitle;
+  document.getElementById('nav-back').textContent=t.back;
+  document.getElementById('char-title').textContent=t.charTitle;
+  document.getElementById('lang-title').textContent=t.langTitle;
+  document.getElementById('btn-save-lang').textContent=t.saveLang;
+  document.getElementById('stats-title').textContent=t.statsTitle;
+  document.getElementById('danger-title').textContent=t.dangerTitle;
+  document.getElementById('danger-desc').textContent=t.dangerDesc;
+  document.getElementById('btn-delete').textContent=t.btnDelete;
+  document.getElementById('confirm-title').textContent=t.confirmTitle;
+  document.getElementById('confirm-desc').textContent=t.confirmDesc;
+  document.getElementById('confirm-no').textContent=t.confirmNo;
+  document.getElementById('confirm-yes').textContent=t.confirmYes;
+  document.getElementById('stats-loading').textContent=t.statsLoading;
+}
+
+function buildCharGrid(){
+  const grid=document.getElementById('char-grid');
+  grid.innerHTML=CHARACTERS.map(c=>`
+    <div class="char-item${selectedChar===c.id?' selected':''}" onclick="selectChar('${c.id}')" id="char-${c.id}">
+      <div class="char-icon">${c.icon}</div>
+      <div class="char-name">${c.name}</div>
+    </div>
+  `).join('');
+}
+
+function selectChar(id){
+  selectedChar=id;
+  document.querySelectorAll('.char-item').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('char-'+id).classList.add('selected');
+  localStorage.setItem('fl_char',id);
+  const t=T[lang];
+  const msg=document.getElementById('char-msg');
+  msg.className='msg ok';msg.textContent=t.charSaved;
+  setTimeout(()=>msg.className='msg',2000);
+}
+
+function selectLang(l){
+  selectedLang=l;
+  document.getElementById('lang-fr').classList.toggle('selected',l==='fr');
+  document.getElementById('lang-en').classList.toggle('selected',l==='en');
+}
+
+function saveLang(){
+  lang=selectedLang;
+  localStorage.setItem('fl_lang',lang);
+  applyLang(lang);
+  const msg=document.getElementById('lang-msg');
+  msg.className='msg ok';msg.textContent=T[lang].langSaved;
+  setTimeout(()=>msg.className='msg',2000);
+}
+
+async function loadStats(){
+  const t=T[lang];
+  const content=document.getElementById('stats-content');
+  if(!currentUser){content.innerHTML=`<div class="no-levels">${t.statsEmpty}</div>`;return;}
+
+  const{data:levels}=await sb.from('levels').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  if(!levels||!levels.length){content.innerHTML=`<div class="no-levels">${t.statsEmpty}</div>`;return;}
+
+  // Load ratings for each level
+  const ids=levels.map(l=>l.id);
+  const{data:ratings}=await sb.from('ratings').select('*').in('level_id',ids);
+
+  const ratingMap={};
+  if(ratings){
+    ratings.forEach(r=>{
+      if(!ratingMap[r.level_id])ratingMap[r.level_id]=[];
+      ratingMap[r.level_id].push(r.score);
+    });
+  }
+
+  content.innerHTML=`<table class="stats-table">
+    <thead><tr>
+      <th>${t.thLevel}</th>
+      <th>${t.thPlays}</th>
+      <th>${t.thRating}</th>
+    </tr></thead>
+    <tbody>
+      ${levels.map(l=>{
+        const scores=ratingMap[l.id]||[];
+        const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
+        const stars=avg?'⭐ '+avg.toFixed(1)+' ('+scores.length+')':t.noRating;
+        return`<tr>
+          <td>${esc(l.title||'Sans titre')}</td>
+          <td>${l.plays||0}</td>
+          <td class="stars">${stars}</td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>`;
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function openConfirm(){document.getElementById('confirm-modal').classList.add('show');}
+function closeConfirm(){document.getElementById('confirm-modal').classList.remove('show');}
+
+async function doDelete(){
+  const btn=document.getElementById('confirm-yes');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
+  // Delete all levels
+  if(currentUser){
+    await sb.from('ratings').delete().eq('user_id',currentUser.id);
+    await sb.from('levels').delete().eq('user_id',currentUser.id);
+    await sb.auth.signOut();
+  }
+  localStorage.removeItem('fl_lang');
+  localStorage.removeItem('fl_char');
+  alert(T[lang].deleteOk);
+  window.location.href='index.html';
+}
+
+document.getElementById('confirm-modal').addEventListener('click',e=>{if(e.target===document.getElementById('confirm-modal'))closeConfirm();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeConfirm();});
+
+// Init
+(async()=>{
+  const{data}=await sb.auth.getSession();
+  if(!data.session){window.location.href='login.html';return;}
+  currentUser=data.session.user;
+  // Sync lang from user metadata if available
+  const userLang=currentUser.user_metadata?.lang;
+  if(userLang)lang=userLang;
+  selectedLang=lang;
+  document.getElementById('lang-fr').classList.toggle('selected',lang==='fr');
+  document.getElementById('lang-en').classList.toggle('selected',lang==='en');
+  applyLang(lang);
+  buildCharGrid();
+  loadStats();
+})();
+</script>
+</body>
+</html>
