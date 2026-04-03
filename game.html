@@ -12,7 +12,8 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 
 #gwrap { display:none; position:fixed; inset:0; background:#06060e; z-index:90; flex-direction:column; align-items:center; justify-content:flex-start; }
 #gwrap.show { display:flex; }
-#gwrap:fullscreen { background:#06060e; }
+#gwrap:fullscreen { background:#06060e; display:flex; flex-direction:column; width:100vw; height:100vh; }
+#gwrap:-webkit-full-screen { background:#06060e; display:flex; flex-direction:column; width:100vw; height:100vh; }
 
 #gtopbar { display:flex; align-items:center; gap:12px; padding:8px 16px; flex-shrink:0; width:100%; justify-content:flex-end; }
 .gtop-btn { font-family:Rajdhani,sans-serif; font-weight:700; font-size:13px; padding:7px 16px; border-radius:4px; cursor:pointer; transition:all .15s; }
@@ -448,7 +449,8 @@ function gameRespawn(){
   document.getElementById('ovDie').classList.remove('show');
   document.getElementById('ovWin').classList.remove('show');
   gDeadPending=false;
-  startGameFrom(gLv.start.x,gLv.start.y);
+  // Short pause before restarting
+  setTimeout(()=>startGameFrom(gLv.start.x,gLv.start.y), 800);
 }
 
 // ══════════════════════════════════════════════════════════
