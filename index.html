@@ -346,7 +346,7 @@ async function openLevelModal(id){
   document.getElementById('level-modal').classList.add('show');
 }
 function closeLevelModal(){document.getElementById('level-modal').classList.remove('show');}
-function doPlayLevel(){if(!_modalLevel)return;window.location.href=`studio.html?level=${_modalLevel.id}&mode=play`;}
+function doPlayLevel(){if(!_modalLevel)return;window.location.href='game.html?level='+_modalLevel.id;}
 function doEditLevel(){if(!_modalLevel)return;window.location.href=`studio.html?level=${_modalLevel.id}&mode=edit`;}
 
 document.getElementById('level-modal').addEventListener('click',e=>{if(e.target===document.getElementById('level-modal'))closeLevelModal();});
