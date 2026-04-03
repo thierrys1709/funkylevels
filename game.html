@@ -67,6 +67,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 <!-- HUD -->
 <div id="game-hud">
   <div id="hud-timer">0.00</div>
+  <div id="hud-attempt" style="font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#6060aa;letter-spacing:1px;"></div>
   <div id="hud-best"></div>
 </div>
 
@@ -124,6 +125,7 @@ let _timerRunning=false;
 let _currentTimeMs=0;
 let _timerRaf=null;
 let _levelData=null;
+let _attempt=0;
 
 // ── Navigation ────────────────────────────────────────────
 function goToEditor(){
@@ -213,9 +215,17 @@ function updateBestDisplay(){
   const el=document.getElementById('hud-best');
   if(!el)return;
   const l=_lang();
-  el.textContent=_bestTime!==null
+  const bestTxt=_bestTime!==null
     ?(l==='fr'?'MEILLEUR : ':'BEST: ')+fmtTimeFull(_bestTime)
-    :(l==='fr'?'PREMIER ESSAI !':'FIRST ATTEMPT!');
+    :'';
+  el.textContent=bestTxt;
+}
+
+function updateAttemptDisplay(){
+  const el=document.getElementById('hud-attempt');
+  if(!el)return;
+  const l=_lang();
+  el.textContent=(l==='fr'?'TENTATIVE : ':'ATTEMPT: ')+_attempt;
 }
 async function saveTime(ms){
   const{data:sess}=await _sb.auth.getSession();
@@ -289,6 +299,7 @@ async function init(){
 
   // Load best time
   await loadBestTime();
+  _attempt=0;
 
   // Show HUD
   document.getElementById('game-hud').classList.add('show');
@@ -313,6 +324,8 @@ function startGameFrom(sx,sy){
   initPlayer(sx,sy);
   document.getElementById('gwrap').classList.add('show');
   document.querySelectorAll('.ov').forEach(o=>o.classList.remove('show'));
+  _attempt++;
+  updateAttemptDisplay();
   resetTimer();
   // Draw level immediately so it's visible during F1 lights
   gDraw();
