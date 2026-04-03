@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 45" width="22" height="45">
+  <!-- Legs (thin) -->
+  <rect x="5" y="34" width="4" height="11" fill="#276749"/>
+  <rect x="13" y="34" width="4" height="11" fill="#276749"/>
+  <!-- Feet -->
+  <rect x="3" y="41" width="8" height="4" fill="#2f855a"/>
+  <rect x="11" y="41" width="8" height="4" fill="#2f855a"/>
+  <!-- Body (slim) -->
+  <rect x="4" y="18" width="14" height="16" fill="#276749"/>
+  <rect x="5" y="17" width="12" height="16" fill="#48bb78"/>
+  <!-- Arms (long thin) -->
+  <rect x="0" y="18" width="5" height="3" fill="#276749"/>
+  <rect x="17" y="18" width="5" height="3" fill="#276749"/>
+  <rect x="-1" y="17" width="3" height="12" fill="#48bb78"/>
+  <rect x="20" y="17" width="3" height="12" fill="#48bb78"/>
+  <!-- Long fingers -->
+  <rect x="-2" y="27" width="2" height="5" fill="#48bb78"/>
+  <rect x="0" y="28" width="2" height="4" fill="#48bb78"/>
+  <rect x="20" y="27" width="2" height="5" fill="#48bb78"/>
+  <rect x="22" y="28" width="2" height="4" fill="#48bb78"/>
+  <!-- Head (big oval) -->
+  <ellipse cx="11" cy="9" rx="10" ry="10" fill="#276749"/>
+  <ellipse cx="11" cy="9" rx="9" ry="9" fill="#68d391"/>
+  <!-- Eyes (huge) -->
+  <ellipse cx="7" cy="8" rx="4" ry="5" fill="#1a202c"/>
+  <ellipse cx="15" cy="8" rx="4" ry="5" fill="#1a202c"/>
+  <ellipse cx="6" cy="7" rx="2" ry="2.5" fill="#9ae6b4"/>
+  <ellipse cx="14" cy="7" rx="2" ry="2.5" fill="#9ae6b4"/>
+  <ellipse cx="6" cy="7" rx="1" ry="1" fill="#1a202c"/>
+  <ellipse cx="14" cy="7" rx="1" ry="1" fill="#1a202c"/>
+  <!-- Mouth (tiny) -->
+  <rect x="8" y="15" width="6" height="2" fill="#276749"/>
+  <!-- Antenna -->
+  <rect x="7" y="0" width="2" height="4" fill="#276749"/>
+  <rect x="13" y="0" width="2" height="4" fill="#276749"/>
+  <circle cx="8" cy="1" r="2" fill="#fc8181"/>
+  <circle cx="14" cy="1" r="2" fill="#fc8181"/>
+</svg>

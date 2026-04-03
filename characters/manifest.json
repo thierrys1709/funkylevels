@@ -1,0 +1,8 @@
+[
+  {"id": "default", "name": "DEFAULT",  "icon": "🧑", "file": "characters/default.svg"},
+  {"id": "ninja",   "name": "NINJA",    "icon": "🥷", "file": "characters/ninja.svg"},
+  {"id": "robot",   "name": "ROBOT",    "icon": "🤖", "file": "characters/robot.svg"},
+  {"id": "alien",   "name": "ALIEN",    "icon": "👽", "file": "characters/alien.svg"},
+  {"id": "ghost",   "name": "GHOST",    "icon": "👻", "file": "characters/ghost.svg"},
+  {"id": "knight",  "name": "KNIGHT",   "icon": "⚔️", "file": "characters/knight.svg"}
+]
