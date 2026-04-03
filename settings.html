@@ -100,13 +100,8 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
   <!-- LANGUE -->
   <div class="section">
     <div class="section-title" id="lang-title">🌍 LANGUE PAR DÉFAUT</div>
-    <div class="lang-options">
-      <div class="lang-option selected" id="lang-fr" onclick="selectLang('fr')">
-        <span>🇫🇷</span><span>FRANÇAIS</span>
-      </div>
-      <div class="lang-option" id="lang-en" onclick="selectLang('en')">
-        <span>🇬🇧</span><span>ENGLISH</span>
-      </div>
+    <div class="lang-options" id="lang-options">
+      <!-- Populated dynamically from lang/manifest.json -->
     </div>
     <div style="margin-top:16px;">
       <button class="btn btn-save" id="btn-save-lang" onclick="saveLang()">💾 SAUVEGARDER</button>
@@ -161,48 +156,49 @@ async function loadManifest(){
   }
 }
 
-const T={
-  fr:{
-    pageTitle:'⚙️ PARAMÈTRES',back:'← RETOUR',
-    charTitle:'🎮 MON PERSONNAGE',
-    langTitle:'🌍 LANGUE PAR DÉFAUT',saveLang:'💾 SAUVEGARDER',
-    statsTitle:'📊 STATS DE MES NIVEAUX',
-    dangerTitle:'⚠️ ZONE DANGEREUSE',
-    dangerDesc:"Supprimer ton compte effacera définitivement ton profil et tous tes niveaux. Cette action est irréversible.",
-    btnDelete:'🗑 SUPPRIMER MON COMPTE',
-    confirmTitle:'⚠️ CONFIRMATION',
-    confirmDesc:"Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ? Cette action est irréversible !",
-    confirmNo:'ANNULER',confirmYes:'SUPPRIMER',
-    statsLoading:'Chargement...',statsEmpty:'Tu n\'as pas encore de niveaux.',
-    thLevel:'NIVEAU',thCode:'CODE',thPlays:'PARTIES',thRating:'NOTE',thStatus:'STATUT',
-    charSaved:'Personnage sauvegardé !',langSaved:'Langue sauvegardée !',
-    noRating:'—',deleteOk:'Compte supprimé. À bientôt !'
-  },
-  en:{
-    pageTitle:'⚙️ SETTINGS',back:'← BACK',
-    charTitle:'🎮 MY CHARACTER',
-    langTitle:'🌍 DEFAULT LANGUAGE',saveLang:'💾 SAVE',
-    statsTitle:'📊 MY LEVELS STATS',
-    dangerTitle:'⚠️ DANGER ZONE',
-    dangerDesc:'Deleting your account will permanently erase your profile and all your levels. This action is irreversible.',
-    btnDelete:'🗑 DELETE MY ACCOUNT',
-    confirmTitle:'⚠️ CONFIRMATION',
-    confirmDesc:'Are you sure you want to delete your account and all your levels? This action cannot be undone!',
-    confirmNo:'CANCEL',confirmYes:'DELETE',
-    statsLoading:'Loading...',statsEmpty:'You have no levels yet.',
-    thLevel:'LEVEL',thCode:'CODE',thPlays:'PLAYS',thRating:'RATING',thStatus:'STATUS',
-    charSaved:'Character saved!',langSaved:'Language saved!',
-    noRating:'—',deleteOk:'Account deleted. Goodbye!'
-  }
-};
-
+let _langData={};
 let lang=localStorage.getItem('fl_lang')||'fr';
+
+async function loadLangData(l){
+  if(_langData[l])return _langData[l];
+  try{
+    const r=await fetch('lang/'+l+'.json');
+    _langData[l]=await r.json();
+    return _langData[l];
+  }catch(e){
+    if(l!=='fr')return loadLangData('fr');
+    return {};
+  }
+}
+
+function T(section){
+  return (_langData[lang]||{})[section]||{};
+}
+
+// Load available languages for the selector
+async function loadLangOptions(){
+  try{
+    const manifest=await fetch('lang/manifest.json').then(r=>r.json());
+    const container=document.getElementById('lang-options');
+    if(!container)return;
+    container.innerHTML=manifest.map(m=>`
+      <div class="lang-option${lang===m.id?' selected':''}" id="lang-${m.id}" onclick="selectLang('${m.id}')">
+        <span style="font-size:20px;">${m.flag}</span>
+        <span>${m.name.toUpperCase()}</span>
+      </div>
+    `).join('');
+  }catch(e){}
+}
+
+localStorage.getItem('fl_lang')||'fr';
 let currentUser=null;
 let selectedChar=localStorage.getItem('fl_char')||'default';
 let selectedLang=lang;
 
-function applyLang(l){
-  const t=T[l];
+async function applyLang(l){
+  await loadLangData(l);
+  const t=T('settings');
+  if(!t.pageTitle)return; // Not loaded yet
   document.getElementById('page-title').textContent=t.pageTitle;
   document.getElementById('nav-back').textContent=t.back;
   document.getElementById('char-title').textContent=t.charTitle;
@@ -408,7 +404,10 @@ saveLang=async function(){
   const{data}=await sb.auth.getSession();
   if(!data.session){window.location.href='login.html';return;}
   currentUser=data.session.user;
+  await loadLangData(lang);
+  await loadLangData(lang==='fr'?'en':'fr'); // preload other lang
   await loadManifest();
+  await loadLangOptions();
   await loadProfile();
   selectedLang=lang;
   document.getElementById('lang-fr').classList.toggle('selected',lang==='fr');
