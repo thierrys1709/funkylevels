@@ -140,6 +140,12 @@ body{background:#0a0a16;font-family:'Press Start 2P',monospace;display:flex;flex
     <button class="zoom-btn" onclick="zoom(+0.25)">+</button>
     <span style="font-size:6px;color:#2a2a3a;margin-left:6px">Ctrl+Z/Y</span>
   </div>
+  <div class="sep"></div>
+  <div class="tb-group" style="gap:8px;align-items:center;">
+    <span id="current-char-display" style="font-size:14px;cursor:pointer;title='Changer de personnage'" onclick="window.location.href='settings.html'" title="Changer de personnage">🧑</span>
+    <a href="settings.html" class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;text-decoration:none;">⚙️ PROFIL</a>
+    <a href="index.html" class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d1a0d;border-color:#3a7a3a;color:#68d391;text-decoration:none;">🏠 ACCUEIL</a>
+  </div>
 </div>
 
 <div id="layout">
@@ -976,12 +982,24 @@ function gDrawPlayer(){
   const{x:px,y:py,w:pw,h:ph,facing:f,wF:wf,sq,onGround,angle}=gPlayer;
   const cx=px+pw/2,cy=py+ph/2;
   GX.save();
-  GX.translate(cx,cy);GX.rotate((angle||0)*Math.PI/180);GX.scale(1,sq);GX.translate(-cx,-cy);
-  const ls=onGround?(wf?3:-3):0;
-  GX.fillStyle=PCOL.pDark;GX.fillRect(px+3,py+ph-10,7,10+(ls>0?ls:0));GX.fillRect(px+pw-10,py+ph-10,7,10+(ls<0?-ls:0));
-  GX.fillStyle=PCOL.pDark;GX.fillRect(px-1,py-1,pw+2,ph-10);GX.fillStyle=PCOL.player;GX.fillRect(px,py,pw,ph-10);
-  const hx=px-1,hy=py-13,hw=pw+2,hh=14;GX.fillStyle=PCOL.pDark;GX.fillRect(hx,hy,hw,hh);GX.fillStyle=PCOL.player;GX.fillRect(hx+1,hy+1,hw-2,hh-2);
-  const eo=f>0?pw-9:2;GX.fillStyle='#fff';GX.fillRect(hx+2+eo,hy+3,5,5);GX.fillStyle='#222';GX.fillRect(hx+2+eo+(f>0?2:1),hy+5,2,2);
+  GX.translate(cx,cy);
+  GX.rotate((angle||0)*Math.PI/180);
+  GX.scale(f>0?1:-1,sq); // flip horizontally based on facing
+  GX.translate(-cx,-cy);
+
+  if(_charSprite&&_charSprite.complete&&_charSprite.naturalWidth>0){
+    // Draw external sprite
+    const spriteH=ph+13; // include head height
+    const spriteW=pw;
+    GX.drawImage(_charSprite,px,py-13,spriteW,spriteH);
+  }else{
+    // Fallback: draw default procedural player
+    const ls=onGround?(wf?3:-3):0;
+    GX.fillStyle=PCOL.pDark;GX.fillRect(px+3,py+ph-10,7,10+(ls>0?ls:0));GX.fillRect(px+pw-10,py+ph-10,7,10+(ls<0?-ls:0));
+    GX.fillStyle=PCOL.pDark;GX.fillRect(px-1,py-1,pw+2,ph-10);GX.fillStyle=PCOL.player;GX.fillRect(px,py,pw,ph-10);
+    const hx=px-1,hy=py-13,hw=pw+2,hh=14;GX.fillStyle=PCOL.pDark;GX.fillRect(hx,hy,hw,hh);GX.fillStyle=PCOL.player;GX.fillRect(hx+1,hy+1,hw-2,hh-2);
+    const eo=f>0?pw-9:2;GX.fillStyle='#fff';GX.fillRect(hx+2+eo,hy+3,5,5);GX.fillStyle='#222';GX.fillRect(hx+2+eo+(f>0?2:1),hy+5,2,2);
+  }
   GX.restore();
 }
 
@@ -1085,47 +1103,49 @@ const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
 const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
 const _sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-// ── Charger profil joueur (perso + langue) ─
-const CHAR_COLORS={
-  default:{body:'#f6ad55',dark:'#c05621'},
-  ninja:  {body:'#2d3748',dark:'#1a202c'},
-  robot:  {body:'#90cdf4',dark:'#3182ce'},
-  alien:  {body:'#9ae6b4',dark:'#276749'},
-  ghost:  {body:'#e2e8f0',dark:'#a0aec0'},
-  cat:    {body:'#fbd38d',dark:'#c05621'},
-  fire:   {body:'#fc8181',dark:'#c53030'},
-  star:   {body:'#faf089',dark:'#b7791f'},
-  skull:  {body:'#e2e8f0',dark:'#4a5568'},
-  wizard: {body:'#b794f4',dark:'#6b46c1'},
-  knight: {body:'#a0aec0',dark:'#4a5568'},
-  frog:   {body:'#68d391',dark:'#276749'},
-};
-const CHAR_ICONS={
-  default:'🧑',ninja:'🥷',robot:'🤖',alien:'👽',ghost:'👻',
-  cat:'🐱',fire:'🔥',star:'⭐',skull:'💀',wizard:'🧙',knight:'⚔️',frog:'🐸'
-};
+// ── Système de personnages externes ────────
+let _charSprite=null; // Image loaded from SVG file
+let _charId='default';
 
-(async()=>{
-  const{data:sess}=await _sb.auth.getSession();
-  if(sess.session){
-    const{data:profile}=await _sb.from('profiles').select('character,lang').eq('id',sess.session.user.id).single();
-    if(profile){
-      if(profile.character){
-        localStorage.setItem('fl_char',profile.character);
-        // Apply character colors to game player
-        const c=CHAR_COLORS[profile.character]||CHAR_COLORS.default;
-        PCOL.player=c.body;
-        PCOL.pDark=c.dark;
+async function loadCharacterSprite(charId){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{_charSprite=img;resolve(img);};
+    img.onerror=()=>{_charSprite=null;resolve(null);};
+    img.src=`characters/${charId}.svg`;
+  });
+}
+
+async function loadPlayerProfile(){
+  let charId='default';
+  try{
+    const{data:sess}=await _sb.auth.getSession();
+    if(sess.session){
+      const{data:profile}=await _sb.from('profiles').select('character,lang').eq('id',sess.session.user.id).single();
+      if(profile){
+        if(profile.character)charId=profile.character;
+        if(profile.lang)localStorage.setItem('fl_lang',profile.lang);
       }
-      if(profile.lang){localStorage.setItem('fl_lang',profile.lang);}
+    }else{
+      charId=localStorage.getItem('fl_char')||'default';
     }
-  }else{
-    // Use local storage fallback
-    const localChar=localStorage.getItem('fl_char')||'default';
-    const c=CHAR_COLORS[localChar]||CHAR_COLORS.default;
-    PCOL.player=c.body;PCOL.pDark=c.dark;
-  }
-})();
+  }catch(e){charId=localStorage.getItem('fl_char')||'default';}
+  _charId=charId;
+  await loadCharacterSprite(charId);
+}
+
+loadPlayerProfile().then(()=>{
+  // Update character icon display in topbar
+  fetch('characters/manifest.json')
+    .then(r=>r.json())
+    .then(manifest=>{
+      const c=manifest.find(m=>m.id===_charId);
+      if(c){
+        const el=document.getElementById('current-char-display');
+        if(el)el.textContent=c.icon;
+      }
+    }).catch(()=>{});
+});
 
 // ── Charger niveau depuis URL ?level=id ───
 (async()=>{
