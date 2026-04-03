@@ -235,7 +235,7 @@ function selectChar(id){
   document.querySelectorAll('.char-item').forEach(el=>el.classList.remove('selected'));
   document.getElementById('char-'+id).classList.add('selected');
   localStorage.setItem('fl_char',id);
-  const t=T[lang];
+  const t=T('settings');
   const msg=document.getElementById('char-msg');
   msg.className='msg ok';msg.textContent=t.charSaved;
   setTimeout(()=>msg.className='msg',2000);
@@ -257,12 +257,13 @@ function saveLang(){
 }
 
 async function loadStats(){
-  const t=T[lang];
-  const content=document.getElementById('stats-content');
-  if(!currentUser){content.innerHTML=`<div class="no-levels">${t.statsEmpty}</div>`;return;}
+  await loadLangData(lang);
+  const t=T('settings');
+  const el=document.getElementById('stats-content');
+  if(!currentUser){el.innerHTML='<div class="no-levels">'+(t.statsEmpty||'...')+'</div>';return;}
 
-  const{data:levels}=await sb.from('levels').select('*, profiles(username)').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  if(!levels||!levels.length){content.innerHTML=`<div class="no-levels">${t.statsEmpty}</div>`;return;}
+  const{data:levels}=await sb.from('levels').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  if(!levels||!levels.length){el.innerHTML='<div class="no-levels">'+(t.statsEmpty||'...')+'</div>';return;}
 
   // Load ratings for each level
   const ids=levels.map(l=>l.id);
@@ -276,7 +277,7 @@ async function loadStats(){
     });
   }
 
-  content.innerHTML=`<table class="stats-table">
+  el.innerHTML=`<table class="stats-table">
     <thead><tr>
       <th>${t.thLevel}</th>
       <th>${t.thCode}</th>
@@ -381,7 +382,7 @@ selectChar=async function(id){
   document.getElementById('char-'+id).classList.add('selected');
   localStorage.setItem('fl_char',id);
   await saveProfile({character:id});
-  const t=T[lang];
+  const t=T('settings');
   const msg=document.getElementById('char-msg');
   msg.className='msg ok';msg.textContent=t.charSaved;
   setTimeout(()=>msg.className='msg',2000);
