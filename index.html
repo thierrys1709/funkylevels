@@ -288,16 +288,16 @@ async function loadSection(s){
   let levels=[];
 
   if(s==='new'){
-    let query=sb.from('levels').select('*').eq('visibility','public').order('created_at',{ascending:false}).limit(24);
+    let query=sb.from('levels').select('*, profiles(username)').eq('visibility','public').order('created_at',{ascending:false}).limit(24);
     if(q)query=query.ilike('title','%'+q+'%');
     const{data}=await query;levels=data||[];
   }else if(s==='top'){
-    let query=sb.from('levels').select('*').eq('visibility','public').order('plays',{ascending:false}).limit(24);
+    let query=sb.from('levels').select('*, profiles(username)').eq('visibility','public').order('plays',{ascending:false}).limit(24);
     if(q)query=query.ilike('title','%'+q+'%');
     const{data}=await query;levels=data||[];
   }else if(s==='mine'){
     if(!currentUser){grid.innerHTML=`<div class="empty"><div class="icon">🔒</div><p>${t.notLogged}</p></div>`;return;}
-    const{data}=await sb.from('levels').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+    const{data}=await sb.from('levels').select('*, profiles(username)').eq('user_id',currentUser.id).order('created_at',{ascending:false});
     levels=data||[];
   }
 
@@ -322,7 +322,7 @@ function levelCard(l){
     <div class="level-body">
       <div class="level-title">${esc(l.title||'Sans titre')}</div>
       <div class="level-meta">
-        <span class="level-author">@${esc(l.author||'anonyme')}</span>
+        <span class="level-author">@${esc(l.profiles?.username||'anonyme')}</span>
         <span class="level-rating">${rating}</span>
       </div>
       <div class="level-plays">▶ ${l.plays||0} ${t.plays}</div>
@@ -339,7 +339,7 @@ async function openLevelModal(id){
   const t=T[lang];
   const isOwner=currentUser&&currentUser.id===data.user_id;
   document.getElementById('modal-title').textContent=data.title||'Sans titre';
-  document.getElementById('modal-author').textContent='@'+(data.author||'anonyme');
+  document.getElementById('modal-author').textContent='@'+(data.profiles?.username||'anonyme');
   document.getElementById('modal-plays').textContent=(data.plays||0)+' '+t.plays;
   document.getElementById('modal-rating').textContent=data.rating?'⭐ '+Number(data.rating).toFixed(1):t.noRating;
   document.getElementById('modal-edit-btn').style.display=isOwner?'':'none';
