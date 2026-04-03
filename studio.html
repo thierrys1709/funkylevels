@@ -534,7 +534,7 @@ body {
 
   <!-- ══ BLOCS ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
-    <span class="tb-label">BLOCS</span>
+    <span class="tb-label" data-lbl="lblBlocs">BLOCS</span>
     <div class="tb-group">
       <button class="tool-btn active" id="t-fixed"  onclick="T('fixed')"  data-tip="🟫 FIXE&#10;Sol solide, ne bouge jamais.&#10;Cliquer-glisser pour dessiner.">🟫 FIXE</button>
       <button class="tool-btn"        id="t-invis"  onclick="T('invis')"  data-tip="👁 INVISIBLE&#10;Bloc solide invisible en jeu.&#10;Cliquer-glisser pour dessiner.">👁 INVIS</button>
@@ -547,7 +547,7 @@ body {
 
   <!-- ══ BLOCS PIÈGE ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
-    <span class="tb-label">PIÈGES</span>
+    <span class="tb-label" data-lbl="lblPieges">PIÈGES</span>
     <div class="tb-group">
       <button class="tool-btn" id="t-trap"   onclick="T('trap')"   data-tip="⚠ PIÈGE&#10;Tombe quand le joueur approche.&#10;Cliquer-glisser pour dessiner.">⚠ PIÈGE</button>
       <button class="tool-btn" id="t-slider" onclick="T('slider')" data-tip="➡ GLISSEUR&#10;Se déplace quand le joueur s'approche.&#10;Cliquer-glisser pour dessiner.">➡ GLISSEUR</button>
@@ -557,7 +557,7 @@ body {
 
   <!-- ══ ZONES ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
-    <span class="tb-label">ZONES</span>
+    <span class="tb-label" data-lbl="lblZones">ZONES</span>
     <div class="tb-group">
       <button class="tool-btn" id="t-gravflip" onclick="T('gravflip')" data-tip="🔃 GRAVITÉ&#10;Attire le joueur vers un bord.&#10;Force 0 = apesanteur.&#10;Cliquer-glisser pour dessiner.">🔃 GRAVITÉ</button>
       <button class="tool-btn" id="t-speed"    onclick="T('speed')"    data-tip="⚡ VITESSE&#10;Modifie la vitesse du joueur.&#10;5 = normal, 1 = lent, 20 = rapide.&#10;Cliquer-glisser pour dessiner.">⚡ VITESSE</button>
@@ -567,7 +567,7 @@ body {
 
   <!-- ══ NIVEAU ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
-    <span class="tb-label">NIVEAU</span>
+    <span class="tb-label" data-lbl="lblNiveau">NIVEAU</span>
     <div class="tb-group">
       <button class="tool-btn" id="t-start"  onclick="T('start')"  data-tip="🟢 DÉPART&#10;Cliquer pour placer le départ.">🟢 DÉPART</button>
       <button class="tool-btn" id="t-end"    onclick="T('end')"    data-tip="🔴 ARRIVÉE&#10;Cliquer pour placer le but.">🔴 ARRIVÉE</button>
@@ -578,7 +578,7 @@ body {
 
   <!-- ══ NOM DU NIVEAU ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
-    <span class="tb-label">NOM</span>
+    <span class="tb-label" data-lbl="lblNom">NOM</span>
     <input type="text" id="level-name-input" placeholder="Sans titre..."
       style="font-family:'Press Start 2P',monospace;font-size:8px;background:#0a0a16;border:1.5px solid #1e1e35;color:#f0e040;padding:6px 10px;border-radius:3px;width:170px;outline:none;"
       oninput="onLevelNameChange()" onfocus="this.style.borderColor='#5050c0'" onblur="this.style.borderColor='#1e1e35'">
@@ -587,7 +587,7 @@ body {
 
   <!-- ══ SAUVEGARDE ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
-    <span class="tb-label">SAUVEGARDE</span>
+    <span class="tb-label" data-lbl="lblSave">SAUVEGARDE</span>
     <div class="tb-group">
       <button class="act-btn" id="btn-save"    onclick="saveLevel()"  data-tip="💾 SAUVEGARDER"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">💾 SAVE</button>
       <button class="act-btn" id="btn-publish" onclick="openPublish()" data-tip="🚀 PUBLIER"      style="background:#0d1a2a;border-color:#3a7a9a;color:#40c0f0;">🚀 PUBLIER</button>
@@ -599,7 +599,7 @@ body {
 
   <!-- ══ PARAMÈTRES ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
-    <span class="tb-label">PARAMÈTRES</span>
+    <span class="tb-label" data-lbl="lblParams">PARAMÈTRES</span>
     <div class="tb-group" style="gap:5px;align-items:center;">
       <span style="font-size:6px;color:#555;">GRILLE</span>
       <select class="grid-sel" id="gridSel" onchange="GRID=+this.value;redraw()">
@@ -614,7 +614,7 @@ body {
 
   <!-- ══ JEUX ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
-    <span class="tb-label">JEU</span>
+    <span class="tb-label" data-lbl="lblJeu">JEU</span>
     <div class="tb-group">
       <button class="act-btn" id="btn-play" onclick="playLevel()" style="background:#0d280d;border-color:#3a7a3a;color:#68d391;">▶ JOUER</button>
     </div>
@@ -623,12 +623,13 @@ body {
 
   <!-- ══ PROFIL ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
-    <span class="tb-label">PROFIL</span>
+    <span class="tb-label" data-lbl="lblProfil">PROFIL</span>
     <div class="tb-group" style="gap:6px;align-items:center;">
       <span id="current-char-display" style="font-size:16px;cursor:pointer;" onclick="window.location.href='settings.html'" title="Changer de personnage">🧑</span>
       <a href="settings.html" class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;text-decoration:none;">⚙️ PROFIL</a>
       <a href="index.html"    class="act-btn" style="font-size:6px;padding:6px 10px;background:#0d1a0d;border-color:#3a7a3a;color:#68d391;text-decoration:none;">🏠 ACCUEIL</a>
-      <button onclick="toggleTheme()" id="theme-btn" style="font-family:'Press Start 2P',monospace;font-size:8px;padding:6px 10px;border:1.5px solid #444;border-radius:3px;background:#14142a;color:#bbb;cursor:pointer;" title="Thème clair/sombre">🌙</button>
+      <button onclick="toggleTheme()" id="theme-btn" style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;padding:5px 10px;border:1.5px solid var(--border2);border-radius:4px;background:var(--tool-bg);color:var(--text2);cursor:pointer;" data-tip="Thème clair/sombre">🌙</button>
+      <button onclick="cycleLang()" id="studio-lang-btn" style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;padding:5px 10px;border:1.5px solid var(--border2);border-radius:4px;background:var(--tool-bg);color:var(--text2);cursor:pointer;">🇫🇷 FR</button>
     </div>
   </div>
 
@@ -638,7 +639,7 @@ body {
   <div id="panel">
     <h2 id="ptitle">OUTIL : FIXE</h2>
 
-    <div id="s-fixed" class="psec show"><div class="pinfo">Sol solide.<br>Cliquer-glisser<br>pour dessiner.</div></div>
+    <div id="s-fixed" class="psec show"><div class="pinfo" data-info="pInfoFixed">Sol solide.<br>Cliquer-glisser<br>pour dessiner.</div></div>
 
     <div id="s-trap" class="psec">
       <div class="pinfo">Tombe quand le joueur<br>s'approche. Cliquer-glisser.</div>
@@ -666,7 +667,7 @@ body {
       <div class="prow"><label>FORCE (1 - 10)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="bo-force" min="1" max="10" step="0.5" value="2" oninput="bounceParamChanged()"><span class="pval" id="bo-force-v">2</span></div></div>
     </div>
 
-    <div id="s-invis" class="psec"><div class="pinfo">Bloc solide invisible en jeu.</div></div>
+    <div id="s-invis" class="psec"><div class="pinfo" data-info="pInfoInvis">Bloc solide invisible en jeu.</div></div>
 
     <div id="s-mobile" class="psec">
       <div class="pinfo">Va et vient automatiquement.</div>
@@ -676,13 +677,13 @@ body {
     </div>
 
     <div id="s-push" class="psec">
-      <div class="pinfo">Bloc poussable. Tombe si<br>rien ne le soutient.</div>
+      <div class="pinfo" data-info="pInfoPush">Bloc poussable. Tombe si<br>rien ne le soutient.</div>
       <div class="prow"><label>FRICTION</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="pu-fric" min="0.5" max="0.99" step="0.01" value="0.8" oninput="document.getElementById('pu-fric-v').textContent=this.value"><span class="pval" id="pu-fric-v">0.8</span></div></div>
     </div>
 
-    <div id="s-start" class="psec"><div class="pinfo">Cliquer pour placer<br>le point de départ.</div></div>
-    <div id="s-end" class="psec"><div class="pinfo">Cliquer pour placer<br>l'arrivée.</div></div>
-    <div id="s-select" class="psec"><div class="pinfo">Cliquer = sélect.<br>Glisser = déplacer.<br>Poignées = redim.<br><br>Suppr = effacer.<br>Ctrl+C/V = copier.<br>Ctrl+Z/Y = undo/redo.</div></div>
+    <div id="s-start" class="psec"><div class="pinfo" data-info="pInfoStart">Cliquer pour placer<br>le point de départ.</div></div>
+    <div id="s-end" class="psec"><div class="pinfo" data-info="pInfoEnd">Cliquer pour placer<br>l'arrivée.</div></div>
+    <div id="s-select" class="psec"><div class="pinfo" data-info="pInfoSelect">Cliquer = sélect.<br>Glisser = déplacer.<br>Poignées = redim.<br><br>Suppr = effacer.<br>Ctrl+C/V = copier.<br>Ctrl+Z/Y = undo/redo.</div></div>
 
     <!-- ═══ GRAVITÉ PANEL ═══ -->
     <div id="s-gravflip" class="psec">
@@ -749,6 +750,10 @@ let _currentLevelId=null;
 let _currentVisibility='private';
 let _authorCompleted=false;
 let _isPublished=false;
+// Lang helper available globally from start
+const _lang=()=>localStorage.getItem('fl_lang')||'fr';
+// STUDIO_T declared here so it's available in both scripts
+var STUDIO_T={fr:{},en:{}};
 
 const EC = document.getElementById('ecanvas');
 const EX = EC.getContext('2d');
@@ -849,7 +854,11 @@ function T(t){
   document.getElementById('t-'+t)?.classList.add('active');
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-'+t)?.classList.add('show');
-  document.getElementById('ptitle').textContent='OUTIL : '+(TOOL_NAMES[t]||t.toUpperCase());
+  const l=_lang();
+  const names=STUDIO_T[l]?.toolNames||null;
+  const name=names?names[t]:(TOOL_NAMES[t]||t.toUpperCase());
+  const prefix=STUDIO_T[l]?.toolPrefix||'OUTIL : ';
+  document.getElementById('ptitle').textContent=prefix+name;
   trapReturnUI();redraw();
 }
 
@@ -1198,7 +1207,15 @@ function toggleTheme(){
   redraw();
 }
 // Restore theme on load
-(()=>{if(localStorage.getItem('fl_theme')==='light'){document.body.classList.add('light');setTimeout(()=>{const b=document.getElementById('theme-btn');if(b)b.textContent='☀️';},100);}})();
+(()=>{
+  if(localStorage.getItem('fl_theme')==='light'){
+    document.body.classList.add('light');
+    setTimeout(()=>{const b=document.getElementById('theme-btn');if(b)b.textContent='☀️';},100);
+  }
+  // Set lang button
+  const lb=document.getElementById('studio-lang-btn');
+  if(lb)lb.textContent=_lang()==='fr'?'🇫🇷 FR':'🇬🇧 EN';
+})();
 
 function redraw(){
   EX.clearRect(0,0,EW,EH);EX.fillStyle=EC_COL.bg;EX.fillRect(0,0,EW,EH);
@@ -1839,6 +1856,9 @@ loadPlayerProfile().then(()=>{
     }).catch(()=>{});
 });
 
+// Apply language after all scripts loaded
+applyStudioLang();
+
 // ── Charger niveau depuis URL ?level=id ───
 (async()=>{
   const params=new URLSearchParams(window.location.search);
@@ -1868,7 +1888,234 @@ loadPlayerProfile().then(()=>{
 })();
 
 // ── Lang (sync with rest of site) ─────────
-const _lang=()=>localStorage.getItem('fl_lang')||'fr';
+// _lang() is defined in the main script block above
+
+// ── Language system — loads from /lang/*.json ──
+// STUDIO_T is declared in the main script block above
+let _langCache={};
+
+async function loadLang(l){
+  if(_langCache[l])return _langCache[l];
+  try{
+    const r=await fetch('lang/'+l+'.json');
+    const data=await r.json();
+    _langCache[l]=data;
+    return data;
+  }catch(e){
+    console.warn('Lang file not found:',l,'— falling back to fr');
+    if(l!=='fr')return loadLang('fr');
+    return {};
+  }
+}
+
+async function applyStudioLang(){
+  const l=_lang();
+  const data=await loadLang(l);
+  if(!data||!data.studio){return;} // Lang not loaded yet
+  const t=data.studio||{};
+  const pt=data.publish||{};
+
+  // Update lang button
+  const lb=document.getElementById('studio-lang-btn');
+  if(lb){
+    try{
+      const manifest=await fetch('lang/manifest.json').then(r=>r.json());
+      const entry=manifest.find(m=>m.id===l);
+      if(entry&&lb)lb.textContent=entry.flag+' '+entry.id.toUpperCase();
+    }catch(e){}
+  }
+
+  const s=(id,val,attr='textContent')=>{const el=document.getElementById(id);if(el&&val)el[attr]=val;};
+  const dp=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.setAttribute('data-tip',val);};
+
+  // Section labels
+  document.querySelectorAll('[data-lbl]').forEach(el=>{
+    const key=el.getAttribute('data-lbl');
+    if(t[key])el.textContent=t[key];
+  });
+
+  // Tool buttons + tooltips
+  ['fixed','invis','bounce','mobile','push','trap','slider','gravflip','speed','start','end','select'].forEach(id=>{
+    const btn=document.getElementById('t-'+id);
+    if(!btn)return;
+    const tKey='t'+id.charAt(0).toUpperCase()+id.slice(1);
+    const tipKey='tip'+id.charAt(0).toUpperCase()+id.slice(1);
+    if(t[tKey])btn.textContent=t[tKey];
+    if(t[tipKey])btn.setAttribute('data-tip',t[tipKey]);
+  });
+
+  // Action buttons
+  s('btn-play',t.btnPlay);       dp('btn-play',t.tipPlay);
+  s('btn-save',t.btnSave);       dp('btn-save',t.tipSave);
+  s('btn-publish',t.btnPublish); dp('btn-publish',t.tipPublish);
+  s('btn-load',t.btnLoad);       dp('btn-load',t.tipLoad);
+  s('btn-clear',t.btnClear);     dp('btn-clear',t.tipClear);
+
+  // Nav links
+  const profil=document.querySelector('a[href="settings.html"].act-btn');
+  if(profil&&t.btnProfil)profil.textContent=t.btnProfil;
+  const accueil=document.querySelector('a[href="index.html"].act-btn');
+  if(accueil&&t.btnAccueil)accueil.textContent=t.btnAccueil;
+
+  // Grid label
+  document.querySelectorAll('.tb-group span').forEach(el=>{
+    if(el.textContent==='GRILLE'||el.textContent==='GRID'||el.textContent===t.grille)
+      if(t.grille)el.textContent=t.grille;
+  });
+
+  // Panel tool title
+  if(currentTool&&t.toolNames){
+    const name=t.toolNames[currentTool]||currentTool.toUpperCase();
+    s('ptitle',(t.toolPrefix||'TOOL: ')+name);
+  }
+
+  // Pinfo elements
+  document.querySelectorAll('[data-info]').forEach(el=>{
+    const key=el.getAttribute('data-info');
+    if(t&&t[key])el.innerHTML=t[key].replace(/\n/g,'<br>');
+  });
+
+  // Overlays
+  const q=(sel,prop,val)=>{const el=document.querySelector(sel);if(el&&val)el[prop]=val;};
+  q('#ovStart h2','textContent',t.ovStart);
+  q('#ovStart p','innerHTML',t&&t.ovStartSub?t.ovStartSub.replace(/\n/g,'<br>'):null);
+  q('#ovStart button','textContent',t.ovStartBtn);
+  q('#ovDie h2','textContent',t.ovDie);
+  q('#ovWin h2','textContent',t.ovWin);
+  q('#ovWin button','textContent',t.ovWinBtn);
+  document.querySelectorAll('#ovDie button').forEach((btn,i)=>{
+    if(i===0&&t.ovDieBtn)btn.textContent=t.ovDieBtn;
+    if(i===1&&t.ovDieEdit)btn.textContent=t.ovDieEdit;
+  });
+
+  // Game topbar
+  document.querySelectorAll('#gtopbar button').forEach(btn=>{
+    const oc=btn.getAttribute('onclick')||'';
+    if(oc.includes('stopGame')&&t.gEditor)btn.textContent=t.gEditor;
+    if(oc.includes('testFromCamera')&&t.gHere)btn.textContent=t.gHere;
+    if(btn.id==='btn-fs'&&t.gFullscreen)btn.textContent=t.gFullscreen;
+  });
+
+  // Status bar
+  s('statusbar',t.ready);
+
+  // Publish modal texts
+  s('pub-title-lbl',pt.title);
+  s('pub-name-lbl',pt.nameLbl);
+  const pn=document.getElementById('pub-name');
+  if(pn&&pt.ph)pn.placeholder=pt.ph;
+  s('pub-vis-lbl',pt.visLbl);
+  s('pub-cancel-btn',pt.cancel);
+  s('pub-ok-btn',pt.ok);
+
+  // Store for use in JS
+  STUDIO_T[l]=t;
+  STUDIO_T._pub=pt;
+}
+
+function cycleLang(){
+  // Load manifest to get next lang
+  fetch('lang/manifest.json').then(r=>r.json()).then(manifest=>{
+    const ids=manifest.map(m=>m.id);
+    const cur=_lang();
+    const next=ids[(ids.indexOf(cur)+1)%ids.length];
+    localStorage.setItem('fl_lang',next);
+    applyStudioLang();
+  }).catch(()=>{
+    const next=_lang()==='fr'?'en':'fr';
+    localStorage.setItem('fl_lang',next);
+    applyStudioLang();
+  });
+}
+
+
+
+function applyStudioLang(){
+  const l=_lang(), t=STUDIO_T[l];
+  const s=(id,val,attr='textContent')=>{const el=document.getElementById(id);if(el)el[attr]=val;};
+  const dp=(id,val)=>{const el=document.getElementById(id);if(el)el.setAttribute('data-tip',val);};
+
+  // Section labels
+  document.querySelectorAll('[data-lbl]').forEach(el=>{
+    const key=el.getAttribute('data-lbl');
+    if(t[key])el.textContent=t[key];
+  });
+
+  // Tool buttons text + tooltips
+  s('t-fixed',t.tFixed);   dp('t-fixed',t.tipFixed);
+  s('t-invis',t.tInvis);   dp('t-invis',t.tipInvis);
+  s('t-bounce',t.tBounce); dp('t-bounce',t.tipBounce);
+  s('t-mobile',t.tMobile); dp('t-mobile',t.tipMobile);
+  s('t-push',t.tPush);     dp('t-push',t.tipPush);
+  s('t-trap',t.tTrap);     dp('t-trap',t.tipTrap);
+  s('t-slider',t.tSlider); dp('t-slider',t.tipSlider);
+  s('t-gravflip',t.tGravflip); dp('t-gravflip',t.tipGravflip);
+  s('t-speed',t.tSpeed);   dp('t-speed',t.tipSpeed);
+  s('t-start',t.tStart);   dp('t-start',t.tipStart);
+  s('t-end',t.tEnd);       dp('t-end',t.tipEnd);
+  s('t-select',t.tSelect); dp('t-select',t.tipSelect);
+
+  // Action buttons
+  s('btn-play',t.btnPlay);       dp('btn-play',t.tipPlay);
+  s('btn-save',t.btnSave);       dp('btn-save',t.tipSave);
+  s('btn-publish',t.btnPublish); dp('btn-publish',t.tipPublish);
+  s('btn-load',t.btnLoad);       dp('btn-load',t.tipLoad);
+  s('btn-clear',t.btnClear);     dp('btn-clear',t.tipClear);
+
+  // Nav links
+  const profil=document.querySelector('a[href="settings.html"].act-btn');
+  if(profil)profil.textContent=t.btnProfil;
+  const accueil=document.querySelector('a[href="index.html"].act-btn');
+  if(accueil)accueil.textContent=t.btnAccueil;
+
+  // Grille label
+  document.querySelectorAll('.tb-group span').forEach(el=>{
+    if(el.textContent==='GRILLE'||el.textContent==='GRID')el.textContent=t.grille;
+  });
+
+  // Panel tool title
+  if(currentTool){
+    const name=(t.toolNames&&t.toolNames[currentTool])||currentTool.toUpperCase();
+    s('ptitle',t.toolPrefix+name);
+  }
+
+  // Overlay texts
+  const ovStartH=document.querySelector('#ovStart h2');
+  const ovStartP=document.querySelector('#ovStart p');
+  const ovStartBtn=document.querySelector('#ovStart button');
+  if(ovStartH)ovStartH.textContent=t.ovStart;
+  if(ovStartP&&t.ovStartSub)ovStartP.innerHTML=t.ovStartSub.replace(/\n/g,'<br>');
+  if(ovStartBtn)ovStartBtn.textContent=t.ovStartBtn;
+
+  const ovDieH=document.querySelector('#ovDie h2');
+  if(ovDieH)ovDieH.textContent=t.ovDie;
+  document.querySelectorAll('#ovDie button').forEach((btn,i)=>{
+    btn.textContent=i===0?t.ovDieBtn:t.ovDieEdit;
+  });
+
+  const ovWinH=document.querySelector('#ovWin h2');
+  if(ovWinH)ovWinH.textContent=t.ovWin;
+  const ovWinBtn=document.querySelector('#ovWin button');
+  if(ovWinBtn)ovWinBtn.textContent=t.ovWinBtn;
+
+  // Game topbar buttons
+  document.querySelectorAll('#gtopbar button, #gtopbar a').forEach(btn=>{
+    if(btn.onclick&&btn.onclick.toString().includes('stopGame'))btn.textContent=t.gEditor;
+    if(btn.onclick&&btn.onclick.toString().includes('testFromCamera'))btn.textContent=t.gHere;
+    if(btn.id==='btn-fs')btn.textContent=t.gFullscreen;
+  });
+
+  // Status bar
+  s('statusbar',t.ready);
+
+  // Panel pinfos
+  const pinfos=document.querySelectorAll('.pinfo');
+  // We use data-info attribute to identify which pinfo
+  document.querySelectorAll('[data-info]').forEach(el=>{
+    const key=el.getAttribute('data-info');
+    if(t[key])el.innerHTML=t[key].replace(/\n/g,'<br>');
+  });
+}
 const _PT={
   fr:{
     title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',
@@ -1919,8 +2166,8 @@ function setVis(v){
 }
 
 function _applyPubLang(){
-  const t=_PT[_lang()];
-  const s=(id,val,prop='textContent')=>{const el=document.getElementById(id);if(el)el[prop]=val;};
+  const t=STUDIO_T._pub||_PT[_lang()];
+  const s=(id,val,prop='textContent')=>{const el=document.getElementById(id);if(el&&val)el[prop]=val;};
   s('pub-title-lbl',t.title);
   s('pub-name-lbl',t.nameLbl);
   s('pub-name',t.ph,'placeholder');
@@ -1946,7 +2193,7 @@ document.getElementById('publish-modal').addEventListener('click',e=>{if(e.targe
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closePublish();if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();});
 
 async function doPublish(){
-  const t=_PT[_lang()];
+  const t=STUDIO_T._pub||_PT[_lang()];
   const title=document.getElementById('pub-name').value.trim();
   const msgEl=document.getElementById('pub-msg');
   const okBtn=document.getElementById('pub-ok-btn');
