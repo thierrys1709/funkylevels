@@ -369,8 +369,20 @@ async function loadProfile(){
 }
 
 async function saveProfile(updates){
-  // Upsert profile
-  const{error}=await sb.from('profiles').upsert({id:currentUser.id,...updates},{onConflict:'id'});
+  const username=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
+  const{data:existing}=await sb.from('profiles').select('id').eq('id',currentUser.id).single();
+  let error;
+  if(existing){
+    const res=await sb.from('profiles').update({username,...updates}).eq('id',currentUser.id);
+    error=res.error;
+  }else{
+    const res=await sb.from('profiles').insert({id:currentUser.id,username,lang:'fr',character:'default',...updates});
+    error=res.error;
+  }
+  if(error){
+    console.log('FULL ERROR:', JSON.stringify(error));
+    alert('Erreur: '+error.message+' | Code: '+error.code);
+  }
   return error;
 }
 
