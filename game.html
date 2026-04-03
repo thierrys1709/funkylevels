@@ -747,18 +747,54 @@ function gPlatform(p){const x=Math.round(p.x),y=Math.round(p.y),w=Math.round(p.w
 function gFlag(pos,col,lbl){GX.fillStyle='#888';GX.fillRect(pos.x+12,pos.y-50,3,50);GX.fillStyle=col;GX.beginPath();GX.moveTo(pos.x+15,pos.y-50);GX.lineTo(pos.x+36,pos.y-38);GX.lineTo(pos.x+15,pos.y-26);GX.closePath();GX.fill();}
 
 function gDrawPlayer(){
-  const{x:px,y:py,w:pw,h:ph,facing:f,wF:wf,sq,onGround,angle}=gPlayer;
+  const{x:px,y:py,w:pw,h:ph,facing:f,wF:wf,sq,onGround,angle,vy}=gPlayer;
   const cx=px+pw/2,cy=py+ph/2;
+  const jumping=!onGround&&(vy||0)<0;
+  const falling=!onGround&&(vy||0)>2;
   GX.save();
   GX.translate(cx,cy);GX.rotate((angle||0)*Math.PI/180);GX.scale(f>0?1:-1,sq);GX.translate(-cx,-cy);
   if(_charSprite&&_charSprite.complete&&_charSprite.naturalWidth>0){
     GX.drawImage(_charSprite,px,py-13,pw,ph+13);
   }else{
+    // Legs
     const ls=onGround?(wf?3:-3):0;
-    GX.fillStyle=PCOL.pDark;GX.fillRect(px+3,py+ph-10,7,10+(ls>0?ls:0));GX.fillRect(px+pw-10,py+ph-10,7,10+(ls<0?-ls:0));
-    GX.fillStyle=PCOL.pDark;GX.fillRect(px-1,py-1,pw+2,ph-10);GX.fillStyle=PCOL.player;GX.fillRect(px,py,pw,ph-10);
-    const hx=px-1,hy=py-13,hw=pw+2,hh=14;GX.fillStyle=PCOL.pDark;GX.fillRect(hx,hy,hw,hh);GX.fillStyle=PCOL.player;GX.fillRect(hx+1,hy+1,hw-2,hh-2);
-    const eo=f>0?pw-9:2;GX.fillStyle='#fff';GX.fillRect(hx+2+eo,hy+3,5,5);GX.fillStyle='#222';GX.fillRect(hx+2+eo+(f>0?2:1),hy+5,2,2);
+    GX.fillStyle=PCOL.pDark;
+    GX.fillRect(px+3,py+ph-10,7,10+(ls>0?ls:0));
+    GX.fillRect(px+pw-10,py+ph-10,7,10+(ls<0?-ls:0));
+    // Body
+    GX.fillStyle=PCOL.pDark;GX.fillRect(px-1,py-1,pw+2,ph-10);
+    GX.fillStyle=PCOL.player;GX.fillRect(px,py,pw,ph-10);
+    // Arms
+    if(jumping){
+      // Arms up
+      GX.fillStyle=PCOL.pDark;
+      GX.fillRect(px-5,py-2,5,8); // left arm up
+      GX.fillRect(px+pw,py-2,5,8); // right arm up
+    }else if(falling){
+      // Arms out wide
+      GX.fillStyle=PCOL.pDark;
+      GX.fillRect(px-6,py+4,6,5); // left arm out
+      GX.fillRect(px+pw,py+4,6,5); // right arm out
+    }else if(onGround&&Math.abs(gPlayer.vx||0)>0.5){
+      // Running: swing arms
+      const swing=wf?4:-4;
+      GX.fillStyle=PCOL.pDark;
+      GX.fillRect(px-4,py+4+swing,4,7);
+      GX.fillRect(px+pw,py+4-swing,4,7);
+    }else{
+      // Idle: arms down
+      GX.fillStyle=PCOL.pDark;
+      GX.fillRect(px-4,py+6,4,8);
+      GX.fillRect(px+pw,py+6,4,8);
+    }
+    // Head
+    const hx=px-1,hy=py-13,hw=pw+2,hh=14;
+    GX.fillStyle=PCOL.pDark;GX.fillRect(hx,hy,hw,hh);
+    GX.fillStyle=PCOL.player;GX.fillRect(hx+1,hy+1,hw-2,hh-2);
+    // Eye
+    const eo=pw-9;
+    GX.fillStyle='#fff';GX.fillRect(hx+2+eo,hy+3,5,5);
+    GX.fillStyle='#222';GX.fillRect(hx+2+eo+2,hy+5,2,2);
   }
   GX.restore();
 }
@@ -944,6 +980,7 @@ document.addEventListener('keydown',()=>{
 },{once:true});
 
 // ── Start ─────────────────────────────────────────────────
+resizeGameCanvas(); // Size canvas immediately on load
 init();
 </script>
 </body>
