@@ -110,9 +110,9 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
     <div id="lang-msg" class="msg"></div>
   </div>
 
-  <!-- MES STATS -->
+  <!-- MES NIVEAUX -->
   <div class="section">
-    <div class="section-title" id="stats-title">📊 STATS DE MES NIVEAUX</div>
+    <div class="section-title" id="stats-title">🎮 MES NIVEAUX</div>
     <div id="stats-content"><div class="no-levels" id="stats-loading">Chargement...</div></div>
   </div>
 
@@ -264,63 +264,116 @@ async function loadStats(){
   await loadLangData(lang);
   const t=T('settings');
   const el=document.getElementById('stats-content');
-  if(!currentUser){el.innerHTML='<div class="no-levels">'+(t.statsEmpty||'...')+'</div>';return;}
-
-  const{data:levels}=await sb.from('levels').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  if(!levels||!levels.length){el.innerHTML='<div class="no-levels">'+(t.statsEmpty||'...')+'</div>';return;}
-
-  // Load ratings for each level
-  const ids=levels.map(l=>l.id);
-  const{data:ratings}=await sb.from('ratings').select('*').in('level_id',ids);
-
-  const ratingMap={};
-  if(ratings){
-    ratings.forEach(r=>{
-      if(!ratingMap[r.level_id])ratingMap[r.level_id]=[];
-      ratingMap[r.level_id].push(r.score);
-    });
+  if(!currentUser){
+    el.innerHTML='<div class="no-levels">'+(t.notLogged||'...')+'</div>';
+    return;
   }
 
-  el.innerHTML='<div class="levels-list">'+
-    levels.map(l=>{
-      const scores=ratingMap[l.id]||[];
-      const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
-      const stars=avg?'⭐ '+avg.toFixed(1)+' ('+scores.length+')':t.noRating;
-      const vis=l.visibility||'private';
-      const visColors={private:'#1a2a4a',public:'#1a3a2a',code:'#2a1a4a'};
-      const visBorderColors={private:'#4060c0',public:'#40a060',code:'#8040c0'};
-      const visTextColors={private:'#90c0f0',public:'#60e090',code:'#c090f0'};
-      const visLabels_fr={private:'🔒 PRIVÉ',public:'🌍 PUBLIC',code:'🔑 CODE'};
-      const visLabels_en={private:'🔒 PRIVATE',public:'🌍 PUBLIC',code:'🔑 CODE'};
-      const visLabels=lang==='fr'?visLabels_fr:visLabels_en;
-      const code=l.share_code?'<span data-code="'+l.share_code+'" onclick="copyCode(this.dataset.code)" style="cursor:pointer;color:#a040f0;font-size:13px;font-family:Rajdhani,sans-serif;font-weight:600;">📋 '+l.share_code+'</span>':'—';
-      return '<div class="level-row">'+
-        '<div class="level-row-main">'+
-          '<div class="level-row-title">'+esc(l.title||'Sans titre')+'</div>'+
-          '<div class="level-row-meta">'+
-            '<span style="color:#666;">'+stars+'</span> · '+
-            '<span style="color:#666;">▶ '+(l.plays||0)+' '+(lang==='fr'?'parties':'plays')+'</span> · '+
-            code+
-          '</div>'+
-        '</div>'+
-        '<div class="level-row-actions">'+
-        '</div>'+
+  // Fetch levels
+  const{data:levels,error}=await sb
+    .from('levels')
+    .select('*')
+    .eq('user_id',currentUser.id)
+    .order('created_at',{ascending:false});
+
+  if(error||!levels||!levels.length){
+    el.innerHTML='<div class="no-levels">'+(t.statsEmpty||'Aucun niveau.')+'</div>';
+    return;
+  }
+
+  // Fetch ratings for all levels
+  const ids=levels.map(l=>l.id);
+  const{data:ratings}=await sb.from('ratings').select('*').in('level_id',ids);
+  const ratingMap={};
+  if(ratings){ratings.forEach(r=>{if(!ratingMap[r.level_id])ratingMap[r.level_id]=[];ratingMap[r.level_id].push(r.score);});}
+
+  // Build cards using DOM (no quoting issues)
+  const wrapper=document.createElement('div');
+  wrapper.className='levels-list';
+
+  levels.forEach(l=>{
+    const scores=ratingMap[l.id]||[];
+    const avg=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length):null;
+    const vis=l.visibility||'private';
+    const visColors={private:'#1a2a4a',public:'#1a3a2a',code:'#2a1a4a'};
+    const visBorderColors={private:'#4060c0',public:'#40a060',code:'#8040c0'};
+    const visTextColors={private:'#90c0f0',public:'#60e090',code:'#c090f0'};
+    const visLabels_fr={private:'🔒 PRIVÉ',public:'🌍 PUBLIC',code:'🔑 CODE'};
+    const visLabels_en={private:'🔒 PRIVATE',public:'🌍 PUBLIC',code:'🔑 CODE'};
+    const visLabel=(lang==='fr'?visLabels_fr:visLabels_en)[vis];
+
+    // Format date
+    const date=new Date(l.created_at);
+    const dateStr=date.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
+
+    // Last played (we don't have this field yet, show created_at)
+    const starsHtml=avg?'⭐ '+avg.toFixed(1)+' <span style="color:var(--muted);">('+scores.length+')</span>':'<span style="color:var(--muted);">—</span>';
+    const shareCodeHtml=l.share_code
+      ?'<span class="copy-code-chip">📋 '+l.share_code+'</span>'
+      :'';
+
+    const card=document.createElement('div');
+    card.className='level-card-full';
+    card.innerHTML=
+      // Header row
+      '<div class="lcf-header">'+
+        '<div class="lcf-title">'+esc(l.title||'Sans titre')+'</div>'+
+        '<div class="lcf-vis-btn" style="border-color:'+visBorderColors[vis]+';background:'+visColors[vis]+';color:'+visTextColors[vis]+';">'+visLabel+'</div>'+
+      '</div>'+
+      // Stats row
+      '<div class="lcf-stats">'+
+        '<div class="lcf-stat"><span class="lcf-stat-val">'+starsHtml+'</span><span class="lcf-stat-lbl">'+(lang==='fr'?'NOTE':'RATING')+'</span></div>'+
+        '<div class="lcf-stat"><span class="lcf-stat-val">'+( l.plays||0)+'</span><span class="lcf-stat-lbl">'+(lang==='fr'?'PARTIES':'PLAYS')+'</span></div>'+
+        '<div class="lcf-stat"><span class="lcf-stat-val">'+(l.completions||0)+'</span><span class="lcf-stat-lbl">'+(lang==='fr'?'TERMINÉES':'COMPLETED')+'</span></div>'+
+        '<div class="lcf-stat"><span class="lcf-stat-val" style="font-size:10px;">'+dateStr+'</span><span class="lcf-stat-lbl">'+(lang==='fr'?'CRÉÉ LE':'CREATED')+'</span></div>'+
+      '</div>'+
+      // Code row
+      (l.share_code?'<div class="lcf-code">'+shareCodeHtml+'</div>':'')+
+      // Actions row
+      '<div class="lcf-actions">'+
+        '<button class="lcf-btn lcf-play">▶ '+(lang==='fr'?'JOUER':'PLAY')+'</button>'+
+        '<button class="lcf-btn lcf-edit">✏️ '+(lang==='fr'?'ÉDITER':'EDIT')+'</button>'+
+        '<button class="lcf-btn lcf-dup">⧉ '+(lang==='fr'?'DUPLIQUER':'DUPLICATE')+'</button>'+
+        '<button class="lcf-btn lcf-del">🗑 '+(lang==='fr'?'SUPPRIMER':'DELETE')+'</button>'+
       '</div>';
-    }).join('')+
-  '</div>'
+
+    // Events
+    card.querySelector('.lcf-vis-btn').onclick=()=>cycleVisibility(l.id,card);
+    card.querySelector('.lcf-play').onclick=()=>{window.location.href='studio.html?level='+l.id+'&mode=play';};
+    card.querySelector('.lcf-edit').onclick=()=>{window.location.href='studio.html?level='+l.id+'&mode=edit';};
+    card.querySelector('.lcf-dup').onclick=()=>duplicateLevelSettings(l);
+    card.querySelector('.lcf-del').onclick=()=>deleteLevel(l.id);
+    const cc=card.querySelector('.copy-code-chip');
+    if(cc)cc.onclick=()=>copyCode(l.share_code);
+
+    wrapper.appendChild(card);
+  });
+
+  el.innerHTML='';
+  el.appendChild(wrapper);
 }
 
-async function deleteLevel(levelId){
-  const t=T('settings');
-  const msg=lang==='fr'?'Supprimer ce niveau définitivement ?':'Delete this level permanently?';
+async function duplicateLevelSettings(l){
+  const msg=lang==='fr'?'Dupliquer ce niveau ?':'Duplicate this level?';
   if(!confirm(msg))return;
-  await sb.from('ratings').delete().eq('level_id',levelId);
-  const{error}=await sb.from('levels').delete().eq('id',levelId).eq('user_id',currentUser.id);
+  function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
+  const{error}=await sb.from('levels').insert({
+    user_id:currentUser.id,
+    title:(l.title||'Sans titre')+' (copie)',
+    data:l.data,
+    plays:0,
+    completions:0,
+    visibility:'private',
+    share_code:genCode(),
+    author_completed:false,
+    is_published:false
+  });
   if(error){alert('Erreur: '+error.message);return;}
+  showToast(lang==='fr'?'Niveau dupliqué !':'Level duplicated!');
   loadStats();
 }
 
-async function cycleVisibility(levelId){
+async function cycleVisibility(levelId, card){
   const{data:lvl}=await sb.from('levels').select('visibility').eq('id',levelId).single();
   const cur=lvl?.visibility||'private';
   const next={private:'public',public:'code',code:'private'}[cur];
@@ -329,43 +382,7 @@ async function cycleVisibility(levelId){
   loadStats();
 }
 
-function copyCode(code){
-  navigator.clipboard?.writeText(code).then(()=>{
-    showToast(lang==='fr'?'Code copié !':'Code copied!');
-  }).catch(()=>alert(code));
-}
 
-function showToast(msg){
-  let t=document.getElementById('settings-toast');
-  if(!t){t=document.createElement('div');t.id='settings-toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#0f0f1e;border:1.5px solid #40f090;color:#40f090;font-family:Press Start 2P,monospace;font-size:8px;padding:12px 20px;border-radius:4px;z-index:999;transition:transform .3s;';document.body.appendChild(t);}
-  t.textContent=msg;t.style.transform='translateX(-50%) translateY(0)';
-  setTimeout(()=>t.style.transform='translateX(-50%) translateY(80px)',2000);
-}
-
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function openConfirm(){document.getElementById('confirm-modal').classList.add('show');}
-function closeConfirm(){document.getElementById('confirm-modal').classList.remove('show');}
-
-async function doDelete(){
-  const btn=document.getElementById('confirm-yes');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
-  // Delete all levels
-  if(currentUser){
-    await sb.from('ratings').delete().eq('user_id',currentUser.id);
-    await sb.from('levels').delete().eq('user_id',currentUser.id);
-    await sb.auth.signOut();
-  }
-  localStorage.removeItem('fl_lang');
-  localStorage.removeItem('fl_char');
-  alert(T('settings').deleteOk);
-  window.location.href='index.html';
-}
-
-document.getElementById('confirm-modal').addEventListener('click',e=>{if(e.target===document.getElementById('confirm-modal'))closeConfirm();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeConfirm();});
-
-// ── Profile helpers ──────────────────────
 async function loadProfile(){
   const{data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
   if(data){
