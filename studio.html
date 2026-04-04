@@ -2008,7 +2008,18 @@ async function loadLang(l){
     const r=await fetch('lang/'+l+'.json');
     if(r.ok){
       const data=await r.json();
-      _langCache[l]=data;
+      if(data&&data.studio){
+        // Merge: file data overrides embedded, but embedded fills gaps
+        const base=_EMBEDDED_LANG[l]||_EMBEDDED_LANG.fr;
+        _langCache[l]={
+          studio:Object.assign({},base.studio,data.studio),
+          publish:Object.assign({},base.publish,data.publish||{}),
+          home:data.home||{},
+          login:data.login||{},
+          settings:data.settings||{}
+        };
+        if(typeof applyStudioLang==='function')applyStudioLang();
+      }
     }
   }catch(e){}
   return _langCache[l];
@@ -2041,7 +2052,7 @@ async function applyStudioLang(){
   // Section labels
   document.querySelectorAll('[data-lbl]').forEach(el=>{
     const key=el.getAttribute('data-lbl');
-    if(t[key])el.textContent=t[key];
+    if(t[key]&&t[key].length>0)el.textContent=t[key];
   });
 
   // Tool buttons + tooltips
@@ -2148,7 +2159,7 @@ function applyStudioLang(){
   // Section labels
   document.querySelectorAll('[data-lbl]').forEach(el=>{
     const key=el.getAttribute('data-lbl');
-    if(t[key])el.textContent=t[key];
+    if(t[key]&&t[key].length>0)el.textContent=t[key];
   });
 
   // Tool buttons text + tooltips
