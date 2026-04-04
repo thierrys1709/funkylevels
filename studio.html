@@ -496,6 +496,17 @@ body {
 .load-item-vis.public { background:#1a3a2a; color:#60e090; border:1px solid #40a060; }
 .load-item-vis.code { background:#2a1a4a; color:#c090f0; border:1px solid #8040c0; }
 .load-empty { font-family:Rajdhani,sans-serif; font-size:14px; color:#6060aa; text-align:center; padding:40px; }
+.load-table { width:100%; border-collapse:collapse; }
+.load-table thead tr { background:#12122a; border-bottom:2px solid #2a2a55; }
+.load-table th { font-family:Rajdhani,sans-serif; font-size:10px; font-weight:700; color:#6060aa; letter-spacing:2px; text-transform:uppercase; padding:10px 22px; text-align:left; }
+.load-row { cursor:pointer; border-bottom:1px solid #1a1a35; transition:background .1s; }
+.load-row:last-child { border-bottom:none; }
+.load-row:hover { background:#16163a; }
+.load-col-name { font-family:'Orbitron',monospace; font-size:11px; font-weight:700; color:#e8e8ff; padding:14px 22px; max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.load-col-date { padding:14px 22px; white-space:nowrap; }
+.load-date { font-family:Rajdhani,sans-serif; font-size:13px; font-weight:700; color:#c0c0ee; display:block; }
+.load-time { font-family:Rajdhani,sans-serif; font-size:11px; color:#6060aa; }
+.load-col-vis { padding:14px 22px; }
 
 </style>
 </head>
@@ -699,7 +710,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:23:11</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:30:17</div>
 </div>
 
 
@@ -1129,7 +1140,7 @@ async function openLoadModal(){
     return;
   }
 
-  const{data,error}=await _sb.from('levels').select('*').eq('user_id',sess.session.user.id).order('created_at',{ascending:false});
+  const{data,error}=await _sb.from('levels').select('id,title,visibility,created_at,updated_at,plays,completions').eq('user_id',sess.session.user.id).order('updated_at',{ascending:false,nullsFirst:false});
   if(error||!data||data.length===0){
     list.innerHTML='<div style="font-size:7px;color:#666;text-align:center;padding:20px;">Aucun niveau sauvegardé.</div>';
     return;
@@ -1155,26 +1166,31 @@ function renderLoadItems(data){
     list.innerHTML='<div class="load-empty">'+(l==='fr'?'Aucun niveau trouvé.':'No levels found.')+'</div>';
     return;
   }
-  list.innerHTML='';
+  const VIS={
+    private:{label:l==='fr'?'Privé':'Private',cls:'private'},
+    public:{label:'Public',cls:'public'},
+    code:{label:'Code',cls:'code'}
+  };
+  // Table
+  let html='<table class="load-table"><thead><tr>'+
+    '<th>'+(l==='fr'?'NOM':'NAME')+'</th>'+
+    '<th>'+(l==='fr'?'DERNIÈRE MODIF.':'LAST MODIFIED')+'</th>'+
+    '<th>'+(l==='fr'?'ÉTAT':'STATUS')+'</th>'+
+  '</tr></thead><tbody>';
   data.forEach(lvl=>{
-    const date=new Date(lvl.created_at).toLocaleDateString(l==='fr'?'fr-FR':'en-GB');
-    const vis=lvl.visibility||'private';
-    const visLabel={private:l==='fr'?'🔒 Privé':'🔒 Private',public:'🌍 Public',code:'🔑 Code'}[vis];
-    const div=document.createElement('div');
-    div.className='load-item';
-    div.innerHTML=
-      '<div class="load-item-info">'+
-        '<div class="load-item-title">'+(lvl.title||'Sans titre')+'</div>'+
-        '<div class="load-item-meta">'+
-          '<span>📅 '+date+'</span>'+
-          '<span>▶ '+(lvl.plays||0)+' '+(l==='fr'?'parties':'plays')+'</span>'+
-          (lvl.completions?'<span>✓ '+lvl.completions+'</span>':'')+
-        '</div>'+
-      '</div>'+
-      '<div class="load-item-vis '+vis+'">'+visLabel+'</div>';
-    div.onclick=()=>doLoadLevel(lvl.id, lvl.title||'Sans titre');
-    list.appendChild(div);
+    const ts=lvl.updated_at||lvl.created_at;
+    const d=new Date(ts);
+    const dateStr=d.toLocaleDateString(l==='fr'?'fr-FR':'en-GB');
+    const timeStr=d.toLocaleTimeString(l==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'});
+    const vis=VIS[lvl.visibility||'private'];
+    html+=`<tr class="load-row" onclick="doLoadLevel('${lvl.id}','${(lvl.title||'Sans titre').replace(/'/g,"\'")}')">
+      <td class="load-col-name">${lvl.title||'Sans titre'}</td>
+      <td class="load-col-date"><span class="load-date">${dateStr}</span><span class="load-time">${timeStr}</span></td>
+      <td class="load-col-vis"><span class="load-item-vis ${vis.cls}">${vis.label}</span></td>
+    </tr>`;
   });
+  html+='</tbody></table>';
+  list.innerHTML=html;
 }
 
 function filterLoadList(q){
