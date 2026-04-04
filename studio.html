@@ -679,7 +679,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 07:42:56</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 07:50:04</div>
 </div>
 
 
@@ -1031,7 +1031,9 @@ document.getElementById('cwrap').addEventListener('wheel',e=>{
   zoom(d,mx,my);
 },{passive:false});
 function saveLevel(){
+  console.log('[Save] saveLevel called, _currentLevelId:', _currentLevelId);
   _sb.auth.getSession().then(async({data})=>{
+    console.log('[Save] session:', !!data.session);
     if(!data.session){
       // Pas connecté → télécharge JSON
       const a=document.createElement('a');
@@ -1051,11 +1053,13 @@ function saveLevel(){
 
 async function doQuickSave(){
   const title=document.getElementById('level-name-input').value.trim()||'Sans titre';
-  const{error}=await _sb.from('levels').update({
+  console.log('[Save] doQuickSave, id:', _currentLevelId, 'title:', title, 'blocks:', (lv.fixed||[]).length);
+  const{data,error}=await _sb.from('levels').update({
     title:title,
     data:lv,
     visibility:_currentVisibility
-  }).eq('id',_currentLevelId);
+  }).eq('id',_currentLevelId).select();
+  console.log('[Save] result:', data, 'error:', error);
   if(error){status('Erreur : '+error.message);}
   else{
     status('✅ Sauvegardé !');
@@ -1285,6 +1289,8 @@ function playLevel(){
   // Always save current level state to sessionStorage (includes unsaved changes)
   sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id', _currentLevelId||'');
+  const titleEl=document.getElementById('level-name-input');
+  sessionStorage.setItem('fl_preview_title', titleEl?titleEl.value:'');
   if(_currentLevelId){
     // Pass level ID so game can show leaderboard, but use preview data
     window.location.href='game.html?preview=1&level='+_currentLevelId+'&from=studio';
@@ -1393,8 +1399,18 @@ async function loadPlayerProfile(){
       if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
       if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
       if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+      // Restore level ID and title
+      const savedId=sessionStorage.getItem('fl_preview_id');
+      if(savedId){
+        _currentLevelId=savedId;
+        history.replaceState(null,'','?level='+savedId+'&mode=edit');
+      }
+      // Restore title in input
+      const ni=document.getElementById('level-name-input');
+      const savedTitle=sessionStorage.getItem('fl_preview_title');
+      if(ni&&savedTitle)ni.value=savedTitle;
       redraw();
-      status('Niveau restauré depuis la prévisualisation.');
+      status('Niveau restauré. Les modifications non sauvegardées sont bien là.');
     }catch(e){}
   }
 })();
