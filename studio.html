@@ -429,8 +429,8 @@ body {
 #load-modal { display:none; position:fixed; inset:0; background:#000000bb; z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
 #load-modal.show { display:flex; }
 .load-box {
-  background: var(--bg2);
-  border: 2px solid var(--border2);
+  background: #0d0d1e;
+  border: 2px solid #2a2a55;
   border-radius: 10px;
   padding: 0;
   width: min(700px, 92vw);
@@ -445,14 +445,15 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 18px 22px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #1e1e40;
   flex-shrink: 0;
+  background: #12122a;
 }
 .load-header h3 {
   font-family: 'Orbitron', monospace;
   font-size: 13px;
   font-weight: 700;
-  color: var(--accent2);
+  color: #7060f0;
   letter-spacing: 1px;
   margin: 0;
 }
@@ -461,20 +462,20 @@ body {
   font-size: 12px;
   font-weight: 700;
   width: 32px; height: 32px;
-  background: var(--bg3);
-  border: 1.5px solid var(--border2);
+  background: #12122a;
+  border: 1.5px solid #2a2a55;
   border-radius: 50%;
-  color: var(--text2);
+  color: #a0a0cc;
   cursor: pointer;
   transition: all .15s;
   display: flex; align-items: center; justify-content: center;
 }
-.load-close:hover { color: var(--red); border-color: var(--red); background: #2a1a1a; }
-.load-search-wrap { padding: 14px 22px 10px; flex-shrink: 0; border-bottom: 1px solid var(--border); }
-#load-list { overflow-y: auto; display: flex; flex-direction: column; gap: 0; flex: 1; padding: 8px 0; }
+.load-close:hover { color: #f04060; border-color: #f04060; background: #2a1a1a; }
+.load-search-wrap { padding: 14px 22px 10px; flex-shrink: 0; border-bottom: 1px solid #1e1e40; background: #0d0d1e; }
+#load-list { overflow-y: auto; display: flex; flex-direction: column; gap: 0; flex: 1; padding: 8px 0; background: #0d0d1e; }
 #load-list::-webkit-scrollbar { width: 5px; }
-#load-list::-webkit-scrollbar-track { background: var(--bg2); }
-#load-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+#load-list::-webkit-scrollbar-track { background: #0d0d1e; }
+#load-list::-webkit-scrollbar-thumb { background: #2a2a55; border-radius: 3px; }
 .load-item {
   display: flex;
   align-items: center;
@@ -482,19 +483,19 @@ body {
   padding: 14px 22px;
   cursor: pointer;
   transition: background .12s;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #1e1e40;
 }
 .load-item:last-child { border-bottom: none; }
-.load-item:hover { background: var(--tool-hover); }
+.load-item:hover { background: #1a1a38; }
 .load-item-info { flex: 1; min-width: 0; }
-.load-item-title { font-family:'Orbitron',monospace; font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.load-item-meta { font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--text2); display:flex; gap:14px; flex-wrap:wrap; }
+.load-item-title { font-family:'Orbitron',monospace; font-size:12px; font-weight:700; color:#e8e8ff; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.load-item-meta { font-family:'Rajdhani',sans-serif; font-size:13px; color:#8080aa; display:flex; gap:16px; flex-wrap:wrap; }
 .load-item-meta span { display:flex; align-items:center; gap:4px; }
-.load-item-vis { font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; flex-shrink:0; }
+.load-item-vis { font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; flex-shrink:0; letter-spacing:.5px; }
 .load-item-vis.private { background:#1a2a4a; color:#90c0f0; border:1px solid #4060c0; }
 .load-item-vis.public { background:#1a3a2a; color:#60e090; border:1px solid #40a060; }
 .load-item-vis.code { background:#2a1a4a; color:#c090f0; border:1px solid #8040c0; }
-.load-empty { font-family:Rajdhani,sans-serif; font-size:14px; color:var(--muted); text-align:center; padding:40px; }
+.load-empty { font-family:Rajdhani,sans-serif; font-size:14px; color:#6060aa; text-align:center; padding:40px; }
 
 </style>
 </head>
@@ -698,7 +699,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:21:05</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:23:11</div>
 </div>
 
 
