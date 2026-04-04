@@ -710,7 +710,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:48:28</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 17:37:05</div>
 </div>
 
 
@@ -1132,26 +1132,25 @@ async function openLoadModal(){
   const modal=document.getElementById('load-modal');
   const list=document.getElementById('load-list');
   modal.classList.add('show');
-  list.innerHTML='<div style="font-size:7px;color:#666;text-align:center;padding:20px;">Chargement...</div>';
+  list.innerHTML='<div class="load-empty">Chargement...</div>';
 
   const{data:sess}=await _sb.auth.getSession();
   if(!sess.session){
-    list.innerHTML='<div style="font-size:7px;color:#f04060;text-align:center;padding:20px;">Connecte-toi pour voir tes niveaux.</div>';
+    list.innerHTML='<div class="load-empty">Connecte-toi pour voir tes niveaux.</div>';
     return;
   }
 
-  const{data,error}=await _sb.from('levels').select('id,title,visibility,created_at,updated_at,plays,completions').eq('user_id',sess.session.user.id).order('updated_at',{ascending:false});
-  if(error||!data||data.length===0){
-    list.innerHTML='<div style="font-size:7px;color:#666;text-align:center;padding:20px;">Aucun niveau sauvegardé.</div>';
-    return;
-  }
+  const{data,error}=await _sb.from('levels')
+    .select('id,title,visibility,created_at,updated_at,plays,completions')
+    .eq('user_id',sess.session.user.id)
+    .order('updated_at',{ascending:false});
 
-  list.innerHTML=data.map(l=>`
-    <div class="load-item" onclick="doLoadLevel('${l.id}','${(l.title||'Sans titre').replace(/'/g,'\'')}')">
-      <div class="load-item-title">${l.title||'Sans titre'}</div>
-      <div class="load-item-meta">${new Date(l.created_at).toLocaleDateString()} · ▶ ${l.plays||0}</div>
-    </div>
-  `).join('');
+  if(error){list.innerHTML='<div class="load-empty">Erreur: '+error.message+'</div>';return;}
+  if(!data||!data.length){list.innerHTML='<div class="load-empty">Aucun niveau sauvegardé.</div>';return;}
+
+  window._loadData=data;
+  renderLoadItems(data);
+  setTimeout(()=>{const s=document.getElementById('load-search');if(s){s.value='';s.focus();}},50);
 }
 
 function closeLoadModal(){
