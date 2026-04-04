@@ -382,13 +382,7 @@ async function init(){
     _edBtn.style.display='';
     _edBtn.onclick=()=>{
       sessionStorage.setItem('fl_from_game','1');
-      // Redirect explicitly instead of history.back() to avoid cache issues
-      const lid=sessionStorage.getItem('fl_preview_id');
-      if(lid){
-        window.location.href='studio.html?level='+lid+'&mode=edit&restore=1';
-      }else{
-        window.location.href='studio.html?restore=1';
-      }
+      window.location.href='studio.html';
     };
   }
 
