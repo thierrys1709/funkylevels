@@ -710,7 +710,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:30:17</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:35:05</div>
 </div>
 
 
@@ -1140,7 +1140,7 @@ async function openLoadModal(){
     return;
   }
 
-  const{data,error}=await _sb.from('levels').select('id,title,visibility,created_at,updated_at,plays,completions').eq('user_id',sess.session.user.id).order('updated_at',{ascending:false,nullsFirst:false});
+  const{data,error}=await _sb.from('levels').select('id,title,visibility,created_at,updated_at,plays,completions').eq('user_id',sess.session.user.id).order('updated_at',{ascending:false});
   if(error||!data||data.length===0){
     list.innerHTML='<div style="font-size:7px;color:#666;text-align:center;padding:20px;">Aucun niveau sauvegardé.</div>';
     return;
