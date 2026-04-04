@@ -724,7 +724,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 05:30:56</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 05:44:36</div>
 </div>
 
 <div id="gwrap">
@@ -2061,11 +2061,15 @@ async function loadLang(l){
 
 async function applyStudioLang(){
   const l=_lang();
+  console.log('[ApplyLang] Language:', l, '| Cache:', !!_langCache[l], '| Keys:', _langCache[l]?Object.keys(_langCache[l]):[]);
   const data=await loadLang(l);
+  console.log('[ApplyLang] Data received:', !!data, '| Has studio:', !!(data&&data.studio));
   if(!data||!data.studio){
-    console.warn('Lang data missing for:', l, data);
+    console.warn('[ApplyLang] MISSING studio section! data=', data);
     return;
   }
+  const studioKeys=Object.keys(data.studio);
+  console.log('[ApplyLang] Studio keys count:', studioKeys.length, '| Has tFixed:', !!data.studio.tFixed);
   const t=data.studio||{};
   const pt=data.publish||{};
 
@@ -2440,4 +2444,3 @@ async function doPublish(){
 </script>
 </body>
 </html>
-
