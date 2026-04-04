@@ -679,7 +679,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 07:50:04</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 10:54:44</div>
 </div>
 
 
@@ -1388,10 +1388,10 @@ async function loadPlayerProfile(){
 // ── Restaurer niveau preview depuis sessionStorage ────
 (()=>{
   const wasPreview=sessionStorage.getItem('fl_preview_level');
-  // Check if we came from game (referrer may be empty on Vercel due to same-origin)
-  const fromGame=document.referrer.includes('game.html')||sessionStorage.getItem('fl_from_game')==='1';
+  const params0=new URLSearchParams(window.location.search);
+  const isRestore=params0.get('restore')==='1'||sessionStorage.getItem('fl_from_game')==='1';
   sessionStorage.removeItem('fl_from_game');
-  if(wasPreview&&!window.location.search.includes('level=')){
+  if(wasPreview&&isRestore){
     try{
       const saved=JSON.parse(wasPreview);
       snapshot();
@@ -1410,7 +1410,12 @@ async function loadPlayerProfile(){
       const savedTitle=sessionStorage.getItem('fl_preview_title');
       if(ni&&savedTitle)ni.value=savedTitle;
       redraw();
-      status('Niveau restauré. Les modifications non sauvegardées sont bien là.');
+      // Clean URL
+      if(params0.get('restore')){
+        const cleanUrl=_currentLevelId?'?level='+_currentLevelId+'&mode=edit':'studio.html';
+        history.replaceState(null,'',cleanUrl);
+      }
+      status('✅ Niveau restauré avec les dernières modifications.');
     }catch(e){}
   }
 })();
