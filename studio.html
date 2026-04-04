@@ -1909,45 +1909,111 @@ async function loadPlayerProfile(){
 // STUDIO_T is declared in the main script block above
 let _langCache={};
 
+// ── Embedded translations (always available) ─────────────
+const _EMBEDDED_LANG={
+  fr:{studio:{
+    lblBlocs:'BLOCS',lblPieges:'PIÈGES',lblZones:'ZONES',lblNiveau:'NIVEAU',
+    lblNom:'NOM',lblSave:'SAUVEGARDE',lblParams:'PARAMÈTRES',lblJeu:'JEU',lblProfil:'PROFIL',
+    grille:'GRILLE',toolPrefix:'OUTIL : ',
+    tFixed:'🟫 FIXE',tInvis:'👁 INVIS',tBounce:'🟡 REBOND',tMobile:'🔵 MOBILE',
+    tPush:'🪨 PUSH',tTrap:'⚠ PIÈGE',tSlider:'➡ GLISSEUR',tGravflip:'🔃 GRAVITÉ',
+    tSpeed:'⚡ VITESSE',tStart:'🟢 DÉPART',tEnd:'🔴 ARRIVÉE',tSelect:'✥ SEL',
+    btnPlay:'▶ JOUER',btnSave:'💾 SAVE',btnPublish:'🚀 PUBLIER',
+    btnLoad:'📂 LOAD',btnClear:'🗑 VIDER',btnProfil:'⚙️ PROFIL',btnAccueil:'🏠 ACCUEIL',
+    tipFixed:'🟫 FIXE\nSol solide.\nClic gauche pour dessiner.',
+    tipInvis:'👁 INVISIBLE\nBloc solide invisible en jeu.',
+    tipBounce:'🟡 REBOND\nFait rebondir le joueur.',
+    tipMobile:'🔵 MOBILE\nVa et vient automatiquement.',
+    tipPush:'🪨 POUSSABLE\nLe joueur peut pousser ce bloc.',
+    tipTrap:'⚠ PIÈGE\nTombe quand le joueur approche.',
+    tipSlider:'➡ GLISSEUR\nSe déplace quand le joueur approche.',
+    tipGravflip:'🔃 GRAVITÉ\nAttire le joueur vers un bord.',
+    tipSpeed:'⚡ VITESSE\n5=normal, 1=lent, 20=rapide.',
+    tipStart:'🟢 DÉPART\nClic pour placer le départ.',
+    tipEnd:'🔴 ARRIVÉE\nClic pour placer l\'arrivée.',
+    tipSelect:'✥ SEL\nClic=sélect | Glisser=déplacer\nSuppr=effacer | Ctrl+C/V Z/Y',
+    tipPlay:'▶ JOUER\nTeste ton niveau.',
+    tipSave:'💾 SAVE\nSauvegarde en base de données.',
+    tipPublish:'🚀 PUBLIER\nChoix de la visibilité.',
+    tipLoad:'📂 LOAD\nCharge un de tes niveaux.',
+    tipClear:'🗑 VIDER\nNouveau niveau vide.',
+    ready:'Prêt. | Clic droit = naviguer | Molette = zoom',
+    ovStart:'PLATFORMER STUDIO',ovStartSub:'Dessine ton niveau, puis joue-le !',
+    ovStartBtn:'COMMENCER',ovDie:'RATÉ',ovDieBtn:'RÉESSAYER',ovDieEdit:'ÉDITEUR',
+    ovWin:'ARRIVÉ !',ovWinBtn:'ÉDITEUR',ovWinTime:'Temps : ',
+    gEditor:'◀ ÉDITEUR',gFullscreen:'⛶ PLEIN ÉCRAN',
+    toolNames:{fixed:'FIXE',trap:'PIÈGE',slider:'GLISSEUR',invis:'INVISIBLE',
+      bounce:'REBOND',mobile:'MOBILE',push:'POUSSABLE',gravflip:'GRAVITÉ',
+      speed:'VITESSE',start:'DÉPART',end:'ARRIVÉE',select:'SÉLECTION'}
+  },publish:{
+    title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',
+    visLbl:'VISIBILITÉ',cancel:'ANNULER',ok:'💾 SAUVER →',saving:'SAUVEGARDE...',
+    needLogin:'Tu dois être connecté !',needTitle:'Donne un nom à ton niveau !',
+    needBlocks:'Ton niveau est vide !',
+    needComplete:"🎮 Tu dois d\'abord terminer le niveau !",
+    successNew:'Niveau sauvegardé !',successUpdate:'Niveau mis à jour !',
+    codeMsg:'Code : ',codeCopied:'(copié !)',errorTxt:'Erreur : ',
+    hintPrivate:'🔒 Seul toi peux le voir',
+    hintPublic:'🌍 Tout le monde peut jouer',
+    hintCode:'🔑 Accessible avec le code'
+  }},
+  en:{studio:{
+    lblBlocs:'BLOCKS',lblPieges:'TRAPS',lblZones:'ZONES',lblNiveau:'LEVEL',
+    lblNom:'NAME',lblSave:'SAVE',lblParams:'SETTINGS',lblJeu:'GAME',lblProfil:'PROFILE',
+    grille:'GRID',toolPrefix:'TOOL: ',
+    tFixed:'🟫 FIXED',tInvis:'👁 INVIS',tBounce:'🟡 BOUNCE',tMobile:'🔵 MOBILE',
+    tPush:'🪨 PUSH',tTrap:'⚠ TRAP',tSlider:'➡ SLIDER',tGravflip:'🔃 GRAVITY',
+    tSpeed:'⚡ SPEED',tStart:'🟢 START',tEnd:'🔴 END',tSelect:'✥ SEL',
+    btnPlay:'▶ PLAY',btnSave:'💾 SAVE',btnPublish:'🚀 PUBLISH',
+    btnLoad:'📂 LOAD',btnClear:'🗑 CLEAR',btnProfil:'⚙️ PROFILE',btnAccueil:'🏠 HOME',
+    tipFixed:'🟫 FIXED\nSolid floor.',tipInvis:'👁 INVISIBLE\nInvisible in game.',
+    tipBounce:'🟡 BOUNCE\nBounces the player.',tipMobile:'🔵 MOBILE\nGoes back and forth.',
+    tipPush:'🪨 PUSHABLE\nPlayer can push this block.',
+    tipTrap:'⚠ TRAP\nFalls when player approaches.',
+    tipSlider:'➡ SLIDER\nSlides when player approaches.',
+    tipGravflip:'🔃 GRAVITY\nAttracts player to an edge.',
+    tipSpeed:'⚡ SPEED\n5=normal, 1=slow, 20=fast.',
+    tipStart:'🟢 START\nClick to place start.',tipEnd:'🔴 END\nClick to place goal.',
+    tipSelect:'✥ SEL\nClick=select | Drag=move\nDel=delete | Ctrl+C/V Z/Y',
+    tipPlay:'▶ PLAY\nTest your level.',tipSave:'💾 SAVE\nSave to database.',
+    tipPublish:'🚀 PUBLISH\nChoose visibility.',
+    tipLoad:'📂 LOAD\nLoad one of your levels.',tipClear:'🗑 CLEAR\nNew empty level.',
+    ready:'Ready. | Right click = navigate | Scroll = zoom',
+    ovStart:'PLATFORMER STUDIO',ovStartSub:'Build your level, then play it!',
+    ovStartBtn:'START',ovDie:'FAILED',ovDieBtn:'RETRY',ovDieEdit:'EDITOR',
+    ovWin:'FINISHED!',ovWinBtn:'EDITOR',ovWinTime:'Time: ',
+    gEditor:'◀ EDITOR',gFullscreen:'⛶ FULLSCREEN',
+    toolNames:{fixed:'FIXED',trap:'TRAP',slider:'SLIDER',invis:'INVISIBLE',
+      bounce:'BOUNCE',mobile:'MOBILE',push:'PUSHABLE',gravflip:'GRAVITY',
+      speed:'SPEED',start:'START',end:'END',select:'SELECTION'}
+  },publish:{
+    title:'💾 SAVE',nameLbl:'LEVEL NAME',ph:'My funky level...',
+    visLbl:'VISIBILITY',cancel:'CANCEL',ok:'💾 SAVE →',saving:'SAVING...',
+    needLogin:'You must be logged in!',needTitle:'Give your level a name!',
+    needBlocks:'Your level is empty!',needComplete:'🎮 Complete the level first!',
+    successNew:'Level saved!',successUpdate:'Level updated!',
+    codeMsg:'Code: ',codeCopied:'(copied!)',errorTxt:'Error: ',
+    hintPrivate:'🔒 Only you can see it',hintPublic:'🌍 Everyone can play',
+    hintCode:'🔑 Accessible with code only'
+  }}
+};
+
 async function loadLang(l){
   if(_langCache[l])return _langCache[l];
+  // Use embedded as base
+  const base=_EMBEDDED_LANG[l]||_EMBEDDED_LANG.fr;
+  _langCache[l]=base;
+  // Try to load file to override (optional enhancement)
   try{
     const r=await fetch('lang/'+l+'.json');
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const data=await r.json();
-    _langCache[l]=data;
-    console.log('Lang loaded:', l, Object.keys(data));
-    return data;
-  }catch(e){
-    console.warn('Lang fetch failed for',l,':', e.message);
-    if(l!=='fr')return loadLang('fr');
-    // Last resort: return minimal FR strings
-    const fallback={studio:{
-      lblBlocs:'BLOCS',lblPieges:'PIÈGES',lblZones:'ZONES',lblNiveau:'NIVEAU',
-      lblNom:'NOM',lblSave:'SAUVEGARDE',lblParams:'PARAMÈTRES',lblJeu:'JEU',lblProfil:'PROFIL',
-      tFixed:'🟫 FIXE',tInvis:'👁 INVIS',tBounce:'🟡 REBOND',tMobile:'🔵 MOBILE',
-      tPush:'🪨 PUSH',tTrap:'⚠ PIÈGE',tSlider:'➡ GLISSEUR',tGravflip:'🔃 GRAVITÉ',
-      tSpeed:'⚡ VITESSE',tStart:'🟢 DÉPART',tEnd:'🔴 ARRIVÉE',tSelect:'✥ SEL',
-      btnPlay:'▶ JOUER',btnSave:'💾 SAVE',btnPublish:'🚀 PUBLIER',btnLoad:'📂 LOAD',
-      btnClear:'🗑 VIDER',btnProfil:'⚙️ PROFIL',btnAccueil:'🏠 ACCUEIL',grille:'GRILLE',
-      toolPrefix:'OUTIL : ',ready:'Prêt.',
-      toolNames:{fixed:'FIXE',trap:'PIÈGE',slider:'GLISSEUR',invis:'INVISIBLE',
-        bounce:'REBOND',mobile:'MOBILE',push:'POUSSABLE',gravflip:'GRAVITÉ',
-        speed:'VITESSE',start:'DÉPART',end:'ARRIVÉE',select:'SÉLECTION'}
-    },publish:{
-      title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau...',
-      visLbl:'VISIBILITÉ',cancel:'ANNULER',ok:'💾 SAUVER →',saving:'SAUVEGARDE...',
-      needLogin:'Tu dois être connecté !',needTitle:'Donne un nom !',needBlocks:'Niveau vide !',
-      needComplete:"Tu dois d'abord terminer le niveau !",
-      successNew:'Sauvegardé !',successUpdate:'Mis à jour !',
-      codeMsg:'Code : ',codeCopied:'(copié !)',errorTxt:'Erreur : ',
-      hintPrivate:'🔒 Seul toi peux le voir',hintPublic:'🌍 Tout le monde peut jouer',
-      hintCode:'🔑 Accessible avec le code'
-    }};
-    _langCache[l]=fallback;
-    return fallback;
-  }
+    if(r.ok){
+      const data=await r.json();
+      _langCache[l]=data;
+    }
+  }catch(e){}
+  return _langCache[l];
 }
+
 
 async function applyStudioLang(){
   const l=_lang();
