@@ -373,18 +373,40 @@ async function init(){
   // Level
   const params=new URLSearchParams(window.location.search);
   const lid=params.get('level');
-  if(!lid){
-    document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Orbitron,monospace;font-size:14px;color:#f04060;">Aucun niveau spécifié.</div>';
-    return;
+  const preview=params.get('preview')==='1';
+  const fromStudio=params.get('from')==='studio';
+
+  // Show "back to studio" button if coming from studio
+  const _edBtn=document.getElementById('btn-editor');
+  if(fromStudio&&_edBtn){
+    _edBtn.style.display='';
+    _edBtn.onclick=()=>{window.history.back();};
   }
-  const{data:levelData,error}=await _sb.from('levels').select('*').eq('id',lid).single();
-  if(error||!levelData){
-    document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Orbitron,monospace;font-size:14px;color:#f04060;">Niveau introuvable.</div>';
-    return;
+
+  if(preview){
+    // Load from sessionStorage (unsaved level test)
+    const raw=sessionStorage.getItem('fl_preview_level');
+    if(!raw){
+      document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Orbitron,monospace;font-size:14px;color:#f04060;">Aucun niveau en prévisualisation.</div>';
+      return;
+    }
+    lv=JSON.parse(raw);
+    _currentLevelId=null;
+    _levelData=null;
+  }else{
+    if(!lid){
+      document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Orbitron,monospace;font-size:14px;color:#f04060;">Aucun niveau spécifié.</div>';
+      return;
+    }
+    const{data:levelData,error}=await _sb.from('levels').select('*').eq('id',lid).single();
+    if(error||!levelData){
+      document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Orbitron,monospace;font-size:14px;color:#f04060;">Niveau introuvable.</div>';
+      return;
+    }
+    _currentLevelId=lid;
+    _levelData=levelData;
+    lv=levelData.data;
   }
-  _currentLevelId=lid;
-  _levelData=levelData;
-  lv=levelData.data;
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
@@ -394,11 +416,13 @@ async function init(){
   const edBtn=document.getElementById('btn-editor');
   if(edBtn)edBtn.style.display=isOwner?'':'none';
 
-  // Increment plays
-  _sb.from('levels').update({plays:(levelData.plays||0)+1}).eq('id',lid).then(()=>{});
+  // Increment plays only for saved levels
+  if(_currentLevelId&&_levelData){
+    _sb.from('levels').update({plays:(_levelData.plays||0)+1}).eq('id',_currentLevelId).then(()=>{});
+  }
 
-  // Load best time
-  await loadBestTime();
+  // Load best time only for saved levels
+  if(_currentLevelId)await loadBestTime();
   _attempt=0;
 
   // Show HUD
