@@ -679,7 +679,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:05:19</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:07:51</div>
 </div>
 
 
@@ -1083,6 +1083,11 @@ async function doQuickSave(){
   else{
     status('✅ Sauvegardé !');
     showSaveToast('✅ SAUVEGARDÉ !');
+    // Also update sessionStorage so game.html gets the latest version
+    sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
+    if(_currentLevelId)sessionStorage.setItem('fl_preview_id', _currentLevelId);
+    const _t=document.getElementById('level-name-input');
+    if(_t)sessionStorage.setItem('fl_preview_title', _t.value);
     // Flash the save button
     const btn=document.getElementById('btn-save');
     if(btn){btn.style.background='#0d280d';btn.style.borderColor='#3a7a3a';btn.style.color='#68d391';
