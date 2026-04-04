@@ -1271,22 +1271,24 @@ function redraw(){
 
 
 document.addEventListener('keydown',e=>{
-  gKeys[e.code]=true;
-  const inGame=document.getElementById('gwrap').classList.contains('show');
-  if(['Space','ArrowUp','ArrowLeft','ArrowRight','ArrowDown'].includes(e.code)&&inGame)e.preventDefault();
-  if(e.code==='Escape')stopGame();
-  if(!inGame){
-    if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
-    if(e.ctrlKey&&e.code==='KeyZ'){e.preventDefault();undo();}
-    else if(e.ctrlKey&&e.code==='KeyY'){e.preventDefault();redo();}
-    else if(e.ctrlKey&&e.code==='KeyC')copySelected();
-    else if(e.ctrlKey&&e.code==='KeyV')pasteClip();
-    else if(e.code==='Delete'&&selection.length)deleteSelected();
-  }
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.ctrlKey&&e.code==='KeyZ'){e.preventDefault();undo();}
+  else if(e.ctrlKey&&e.code==='KeyY'){e.preventDefault();redo();}
+  else if(e.ctrlKey&&e.code==='KeyC')copySelected();
+  else if(e.ctrlKey&&e.code==='KeyV')pasteClip();
+  else if(e.code==='Delete'&&selection.length)deleteSelected();
 });
-document.addEventListener('keyup',e=>gKeys[e.code]=false);
 
 redraw();
+
+function playLevel(){
+  if(_currentLevelId){
+    window.location.href='game.html?level='+_currentLevelId+'&from=studio';
+  }else{
+    sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
+    window.location.href='game.html?preview=1&from=studio';
+  }
+}
 </script>
 <!-- LOAD MODAL -->
 <div id="load-modal">
