@@ -411,10 +411,7 @@ async function init(){
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
 
-  // Show editor button only if owner
-  const isOwner=sess.session&&levelData.user_id===sess.session.user.id;
-  const edBtn=document.getElementById('btn-editor');
-  if(edBtn)edBtn.style.display=isOwner?'':'none';
+
 
   // Increment plays only for saved levels
   if(_currentLevelId&&_levelData){
