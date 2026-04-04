@@ -1999,29 +1999,53 @@ const _EMBEDDED_LANG={
 };
 
 async function loadLang(l){
-  if(_langCache[l])return _langCache[l];
+  console.log('[Lang] loadLang called for:', l);
+  if(_langCache[l]){
+    console.log('[Lang] Cache hit for:', l, '— keys:', Object.keys(_langCache[l]));
+    return _langCache[l];
+  }
   // Use embedded as base
   const base=_EMBEDDED_LANG[l]||_EMBEDDED_LANG.fr;
   _langCache[l]=base;
-  // Try to load file to override (optional enhancement)
+  console.log('[Lang] Using embedded base for:', l);
+
+  // Try to load file to override
+  const url='lang/'+l+'.json';
+  console.log('[Lang] Fetching:', url);
   try{
-    const r=await fetch('lang/'+l+'.json');
+    const r=await fetch(url);
+    console.log('[Lang] Fetch response:', r.status, r.statusText, 'ok:', r.ok);
     if(r.ok){
-      const data=await r.json();
+      const text=await r.text();
+      console.log('[Lang] Raw text (first 100 chars):', text.substring(0,100));
+      let data;
+      try{
+        data=JSON.parse(text);
+        console.log('[Lang] JSON parsed OK — sections:', Object.keys(data));
+      }catch(jsonErr){
+        console.error('[Lang] JSON parse failed:', jsonErr.message);
+        return _langCache[l];
+      }
       if(data&&data.studio){
-        // Merge: file data overrides embedded, but embedded fills gaps
-        const base=_EMBEDDED_LANG[l]||_EMBEDDED_LANG.fr;
+        const base2=_EMBEDDED_LANG[l]||_EMBEDDED_LANG.fr;
         _langCache[l]={
-          studio:Object.assign({},base.studio,data.studio),
-          publish:Object.assign({},base.publish,data.publish||{}),
+          studio:Object.assign({},base2.studio,data.studio),
+          publish:Object.assign({},base2.publish,data.publish||{}),
           home:data.home||{},
           login:data.login||{},
           settings:data.settings||{}
         };
+        console.log('[Lang] Merged file+embedded for:', l, '— studio keys:', Object.keys(_langCache[l].studio).length);
         if(typeof applyStudioLang==='function')applyStudioLang();
+      }else{
+        console.warn('[Lang] File loaded but missing .studio section — using embedded');
       }
+    }else{
+      console.warn('[Lang] File not found ('+r.status+') — using embedded translations');
     }
-  }catch(e){}
+  }catch(e){
+    console.error('[Lang] Fetch error:', e.message, '— using embedded translations');
+  }
   return _langCache[l];
 }
 
