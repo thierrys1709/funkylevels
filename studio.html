@@ -426,56 +426,75 @@ body {
 .pub-vis-btn.active { border-color: var(--accent2); color: var(--accent); background: var(--tool-active); }
 
 /* ─── LOAD MODAL ─── */
-#load-modal { display:none; position:fixed; inset:0; background:#000000bb; z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
-#load-modal.show { display: flex; }
+#load-modal { display:none; position:fixed; inset:0; background:#000000bb; z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
+#load-modal.show { display:flex; }
 .load-box {
   background: var(--bg2);
   border: 2px solid var(--border2);
-  border-radius: 8px;
-  padding: 24px;
-  width: 400px;
+  border-radius: 10px;
+  padding: 0;
+  width: min(700px, 92vw);
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  box-shadow: 0 0 60px #00000099;
+  box-shadow: 0 0 80px #00000099, 0 0 30px #7060f022;
+  overflow: hidden;
 }
-.load-box h3 {
+.load-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.load-header h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: 1px;
+  margin: 0;
+}
+.load-close {
   font-family: 'Orbitron', monospace;
   font-size: 12px;
   font-weight: 700;
-  color: #90a0f0;
-  text-align: center;
-  letter-spacing: 1px;
-}
-#load-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-#load-list::-webkit-scrollbar { width: 4px; }
-#load-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-.load-item {
-  background: var(--bg3);
-  border: 1.5px solid var(--border);
-  border-radius: 4px;
-  padding: 12px 14px;
-  cursor: pointer;
-  transition: all .15s;
-}
-.load-item:hover { border-color: var(--accent2); background: var(--tool-hover); transform: translateX(2px); }
-.load-item-title { font-family:'Orbitron',monospace; font-size:10px; font-weight:700; color:var(--text); margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.load-item-meta  { font-family:'Rajdhani',sans-serif; font-size:11px; color:var(--muted); }
-.load-close {
-  font-family: 'Orbitron', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 10px;
+  width: 32px; height: 32px;
   background: var(--bg3);
   border: 1.5px solid var(--border2);
-  border-radius: 4px;
+  border-radius: 50%;
   color: var(--text2);
   cursor: pointer;
   transition: all .15s;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
 }
-.load-close:hover { color: var(--text); border-color: var(--red); }
+.load-close:hover { color: var(--red); border-color: var(--red); background: #2a1a1a; }
+.load-search-wrap { padding: 14px 22px 10px; flex-shrink: 0; border-bottom: 1px solid var(--border); }
+#load-list { overflow-y: auto; display: flex; flex-direction: column; gap: 0; flex: 1; padding: 8px 0; }
+#load-list::-webkit-scrollbar { width: 5px; }
+#load-list::-webkit-scrollbar-track { background: var(--bg2); }
+#load-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+.load-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  cursor: pointer;
+  transition: background .12s;
+  border-bottom: 1px solid var(--border);
+}
+.load-item:last-child { border-bottom: none; }
+.load-item:hover { background: var(--tool-hover); }
+.load-item-info { flex: 1; min-width: 0; }
+.load-item-title { font-family:'Orbitron',monospace; font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.load-item-meta { font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--text2); display:flex; gap:14px; flex-wrap:wrap; }
+.load-item-meta span { display:flex; align-items:center; gap:4px; }
+.load-item-vis { font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; flex-shrink:0; }
+.load-item-vis.private { background:#1a2a4a; color:#90c0f0; border:1px solid #4060c0; }
+.load-item-vis.public { background:#1a3a2a; color:#60e090; border:1px solid #40a060; }
+.load-item-vis.code { background:#2a1a4a; color:#c090f0; border:1px solid #8040c0; }
+.load-empty { font-family:Rajdhani,sans-serif; font-size:14px; color:var(--muted); text-align:center; padding:40px; }
 
 </style>
 </head>
@@ -679,7 +698,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:07:51</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:21:05</div>
 </div>
 
 
@@ -1123,7 +1142,47 @@ async function openLoadModal(){
   `).join('');
 }
 
-function closeLoadModal(){document.getElementById('load-modal').classList.remove('show');}
+function closeLoadModal(){
+  document.getElementById('load-modal').classList.remove('show');
+  const s=document.getElementById('load-search');if(s)s.value='';
+}
+
+function renderLoadItems(data){
+  const list=document.getElementById('load-list');
+  const l=_lang();
+  if(!data||!data.length){
+    list.innerHTML='<div class="load-empty">'+(l==='fr'?'Aucun niveau trouvé.':'No levels found.')+'</div>';
+    return;
+  }
+  list.innerHTML='';
+  data.forEach(lvl=>{
+    const date=new Date(lvl.created_at).toLocaleDateString(l==='fr'?'fr-FR':'en-GB');
+    const vis=lvl.visibility||'private';
+    const visLabel={private:l==='fr'?'🔒 Privé':'🔒 Private',public:'🌍 Public',code:'🔑 Code'}[vis];
+    const div=document.createElement('div');
+    div.className='load-item';
+    div.innerHTML=
+      '<div class="load-item-info">'+
+        '<div class="load-item-title">'+(lvl.title||'Sans titre')+'</div>'+
+        '<div class="load-item-meta">'+
+          '<span>📅 '+date+'</span>'+
+          '<span>▶ '+(lvl.plays||0)+' '+(l==='fr'?'parties':'plays')+'</span>'+
+          (lvl.completions?'<span>✓ '+lvl.completions+'</span>':'')+
+        '</div>'+
+      '</div>'+
+      '<div class="load-item-vis '+vis+'">'+visLabel+'</div>';
+    div.onclick=()=>doLoadLevel(lvl.id, lvl.title||'Sans titre');
+    list.appendChild(div);
+  });
+}
+
+function filterLoadList(q){
+  if(!window._loadData)return;
+  const filtered=q.trim()
+    ?window._loadData.filter(l=>(l.title||'').toLowerCase().includes(q.toLowerCase()))
+    :window._loadData;
+  renderLoadItems(filtered);
+}
 
 async function doLoadLevel(id,title){
   const{data,error}=await _sb.from('levels').select('*').eq('id',id).single();
@@ -1141,6 +1200,10 @@ async function doLoadLevel(id,title){
   if(nameInput)nameInput.value=data.title||'';
   // Met à jour l'URL sans recharger la page
   history.replaceState(null,'','?level='+id+'&mode=edit');
+  // Update sessionStorage so game.html gets this version
+  sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
+  sessionStorage.setItem('fl_preview_id', id);
+  sessionStorage.setItem('fl_preview_title', data.title||'');
   redraw();
   closeLoadModal();
   status('Niveau "'+title+'" chargé.');
@@ -1327,9 +1390,18 @@ function playLevel(){
 <!-- LOAD MODAL -->
 <div id="load-modal">
   <div class="load-box">
-    <h3>📂 MES NIVEAUX</h3>
+    <div class="load-header">
+      <h3>📂 MES NIVEAUX</h3>
+      <button class="load-close" onclick="closeLoadModal()">✕</button>
+    </div>
+    <div class="load-search-wrap">
+      <input type="text" id="load-search" placeholder="🔍 Rechercher..." 
+        oninput="filterLoadList(this.value)"
+        style="width:100%;font-family:Rajdhani,sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:9px 14px;border-radius:5px;outline:none;"
+        onfocus="this.style.borderColor='var(--accent2)'" 
+        onblur="this.style.borderColor='var(--border2)'">
+    </div>
     <div id="load-list"></div>
-    <button class="load-close" onclick="closeLoadModal()">✕ FERMER</button>
   </div>
 </div>
 
