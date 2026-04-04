@@ -679,7 +679,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 10:58:18</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 11:02:07</div>
 </div>
 
 
@@ -1385,53 +1385,42 @@ async function loadPlayerProfile(){
   }
 })();
 
-// ── Restaurer niveau preview depuis sessionStorage ────
-(()=>{
-  const wasPreview=sessionStorage.getItem('fl_preview_level');
-  const params0=new URLSearchParams(window.location.search);
-  const isRestore=params0.get('restore')==='1'||sessionStorage.getItem('fl_from_game')==='1';
-  sessionStorage.removeItem('fl_from_game');
-  if(wasPreview&&isRestore){
-    try{
-      const saved=JSON.parse(wasPreview);
-      snapshot();
-      lv=saved;
-      if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
-      if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
-      if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-      // Restore level ID and title
-      const savedId=sessionStorage.getItem('fl_preview_id');
-      if(savedId){
-        _currentLevelId=savedId;
-        history.replaceState(null,'','?level='+savedId+'&mode=edit');
-      }
-      // Restore title in input
-      const ni=document.getElementById('level-name-input');
-      const savedTitle=sessionStorage.getItem('fl_preview_title');
-      if(ni&&savedTitle)ni.value=savedTitle;
-      redraw();
-      // Clean URL
-      if(params0.get('restore')){
-        const cleanUrl=_currentLevelId?'?level='+_currentLevelId+'&mode=edit':'studio.html';
-        history.replaceState(null,'',cleanUrl);
-      }
-      status('✅ Niveau restauré avec les dernières modifications.');
-    }catch(e){}
-  }
-})();
-
-// ── Charger niveau depuis URL ?level=id ───
+// ── Chargement du niveau ─────────────────────────────────
 (async()=>{
   const params=new URLSearchParams(window.location.search);
   const lid=params.get('level');
-  const mode=params.get('mode');
-  const isRestore2=params.get('restore')==='1';
-  // Skip URL load if we're restoring from sessionStorage
-  if(isRestore2&&sessionStorage.getItem('fl_preview_level')){
-    console.log('[URL] Skipping URL load — using sessionStorage restore');
-    return;
+  const fromGame=sessionStorage.getItem('fl_from_game')==='1';
+
+  if(fromGame){
+    // ── Retour depuis game.html → toujours utiliser sessionStorage ──
+    sessionStorage.removeItem('fl_from_game');
+    const raw=sessionStorage.getItem('fl_preview_level');
+    if(raw){
+      try{
+        const saved=JSON.parse(raw);
+        lv=saved;
+        if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
+        if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
+        if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+        // Restore ID and title
+        const savedId=sessionStorage.getItem('fl_preview_id');
+        const savedTitle=sessionStorage.getItem('fl_preview_title');
+        if(savedId){
+          _currentLevelId=savedId;
+          history.replaceState(null,'','?level='+savedId+'&mode=edit');
+        }
+        const ni=document.getElementById('level-name-input');
+        if(ni&&savedTitle)ni.value=savedTitle;
+        redraw();
+        status('✅ Niveau restauré avec les dernières modifications.');
+        return;
+      }catch(e){console.error('Restore error:',e);}
+    }
   }
+
+  // ── Charger depuis URL ?level=id (DB) ──
   if(!lid)return;
+  const mode=params.get('mode');
   const{data,error}=await _sb.from('levels').select('*').eq('id',lid).single();
   if(error||!data){alert('Niveau introuvable.');return;}
   snapshot();
@@ -1446,14 +1435,12 @@ async function loadPlayerProfile(){
   const _ni=document.getElementById('level-name-input');
   if(_ni)_ni.value=data.title||'';
   redraw();
-  // Incrémenter plays si mode=play
   if(mode==='play'){
     await _sb.from('levels').update({plays:(data.plays||0)+1}).eq('id',lid);
     setTimeout(()=>playLevel(),300);
   }
   status('Niveau "'+data.title+'" chargé.');
 })();
-
 // ── Lang (sync with rest of site) ─────────
 // _lang() is defined in the main script block above
 
