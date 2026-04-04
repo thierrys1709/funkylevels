@@ -679,7 +679,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 07:36:36</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 07:42:56</div>
 </div>
 
 
@@ -1282,10 +1282,13 @@ document.addEventListener('keydown',e=>{
 redraw();
 
 function playLevel(){
+  // Always save current level state to sessionStorage (includes unsaved changes)
+  sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
+  sessionStorage.setItem('fl_preview_id', _currentLevelId||'');
   if(_currentLevelId){
-    window.location.href='game.html?level='+_currentLevelId+'&from=studio';
+    // Pass level ID so game can show leaderboard, but use preview data
+    window.location.href='game.html?preview=1&level='+_currentLevelId+'&from=studio';
   }else{
-    sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
     window.location.href='game.html?preview=1&from=studio';
   }
 }
