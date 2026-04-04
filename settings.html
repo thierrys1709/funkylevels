@@ -65,28 +65,31 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .msg.err{background:#f0406018;border:1px solid var(--red);color:var(--red);display:block;}
 
 /* LEVELS TABLE */
-.levels-list{display:flex;flex-direction:column;gap:12px;}
-.level-card-full{background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s;}
-.level-card-full:hover{border-color:var(--border2);}
-.lcf-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.lcf-title{font-family:Orbitron,monospace;font-size:12px;font-weight:700;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.lcf-vis-btn{font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 14px;border:2px solid;border-radius:4px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
-.lcf-vis-btn:hover{filter:brightness(1.3);}
-.lcf-stats{display:flex;gap:0;border:1px solid var(--border);border-radius:5px;overflow:hidden;}
-.lcf-stat{flex:1;padding:12px 8px;text-align:center;border-right:1px solid var(--border);background:var(--bg2);}
-.lcf-stat:last-child{border-right:none;}
-.lcf-stat-val{display:block;font-family:Orbitron,monospace;font-size:13px;color:var(--accent);margin-bottom:4px;}
-.lcf-stat-lbl{display:block;font-family:Rajdhani,sans-serif;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;}
-.lcf-code{font-family:Rajdhani,sans-serif;font-size:13px;color:var(--muted);}
-.copy-code-chip{cursor:pointer;color:var(--accent2);font-weight:700;transition:color .15s;}
-.copy-code-chip:hover{color:#a080ff;}
-.lcf-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.lcf-btn{font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:9px 16px;border:2px solid var(--border2);border-radius:5px;cursor:pointer;background:var(--bg2);color:var(--text2);transition:all .15s;flex:1;min-width:80px;text-align:center;}
-.lcf-btn:hover{transform:translateY(-1px);filter:brightness(1.3);}
-.lcf-play{border-color:#3a8a3a!important;background:#1a3a1a!important;color:#60e090!important;}
-.lcf-edit{border-color:#3a6aaa!important;background:#1a2a4a!important;color:#90b0f0!important;}
-.lcf-dup{border-color:#7a5a3a!important;background:#2a1a0a!important;color:#f0b060!important;}
-.lcf-del{border-color:#aa3030!important;background:#2a1a1a!important;color:#f06060!important;}
+.levels-table{width:100%;border-collapse:collapse;}
+.levels-table thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
+.levels-table th{font-family:Rajdhani,sans-serif;font-size:10px;font-weight:700;color:#6060aa;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;text-align:left;white-space:nowrap;}
+.lvl-row{cursor:pointer;border-bottom:1px solid #1a1a35;transition:background .1s;position:relative;}
+.lvl-row:last-child{border-bottom:none;}
+.lvl-row:hover{background:#16163a;}
+.lvl-row td{padding:0;}
+.lvl-row-main{display:flex;align-items:center;gap:0;padding:14px 16px;}
+.lvl-col-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lvl-col-date{font-family:Rajdhani,sans-serif;font-size:12px;color:#a0a0cc;white-space:nowrap;padding:0 20px;width:160px;}
+.lvl-col-stats{font-family:Rajdhani,sans-serif;font-size:12px;color:#8080aa;white-space:nowrap;padding:0 20px;width:120px;}
+.lvl-col-vis{width:100px;padding:0 16px;}
+.lvl-vis-badge{font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;cursor:pointer;}
+.lvl-vis-badge.private{background:#1a2a4a;color:#90c0f0;border:1px solid #4060c0;}
+.lvl-vis-badge.public{background:#1a3a2a;color:#60e090;border:1px solid #40a060;}
+.lvl-vis-badge.code{background:#2a1a4a;color:#c090f0;border:1px solid #8040c0;}
+.lvl-actions{display:none;gap:6px;flex-shrink:0;margin-left:12px;}
+.lvl-row:hover .lvl-actions{display:flex;}
+.lvl-row-main{flex-wrap:nowrap;}
+.lvl-act-btn{font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:4px;cursor:pointer;border:1.5px solid;transition:all .12s;letter-spacing:.5px;}
+.lvl-act-btn:hover{filter:brightness(1.3);transform:translateY(-1px);}
+.lvl-act-play{background:#0d280d;border-color:#3a8a3a;color:#60e090;}
+.lvl-act-edit{background:#0d0d28;border-color:#4040aa;color:#90a0f0;}
+.lvl-act-dup{background:#1a1a0d;border-color:#7a7a3a;color:#e0d060;}
+.lvl-act-del{background:#280d0d;border-color:#aa3030;color:#f06060;}
 .no-levels{font-family:Rajdhani,sans-serif;font-size:14px;font-weight:600;color:var(--muted);text-align:center;padding:40px;}
 
 /* ACCOUNT */
@@ -410,70 +413,68 @@ async function loadStats(){
   const ratingMap={};
   if(ratings){ratings.forEach(r=>{if(!ratingMap[r.level_id])ratingMap[r.level_id]=[];ratingMap[r.level_id].push(r.score);});}
 
-  // Build cards using DOM (no quoting issues)
-  const wrapper=document.createElement('div');
-  wrapper.className='levels-list';
+  // Build table
+  const table=document.createElement('table');
+  table.className='levels-table';
+  const thead=document.createElement('thead');
+  thead.innerHTML='<tr>'+
+    '<th>'+(lang==='fr'?'NOM':'NAME')+'</th>'+
+    '<th>'+(lang==='fr'?'DERNIÈRE MODIF.':'LAST MODIFIED')+'</th>'+
+    '<th>'+(lang==='fr'?'PARTIES / FINS':'PLAYS / ENDS')+'</th>'+
+    '<th>'+(lang==='fr'?'ÉTAT':'STATUS')+'</th>'+
+  '</tr>';
+  table.appendChild(thead);
+  const tbody=document.createElement('tbody');
 
   levels.forEach(l=>{
-    const scores=ratingMap[l.id]||[];
-    const avg=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length):null;
     const vis=l.visibility||'private';
-    const visColors={private:'#1a2a4a',public:'#1a3a2a',code:'#2a1a4a'};
-    const visBorderColors={private:'#4060c0',public:'#40a060',code:'#8040c0'};
-    const visTextColors={private:'#90c0f0',public:'#60e090',code:'#c090f0'};
-    const visLabels_fr={private:'🔒 PRIVÉ',public:'🌍 PUBLIC',code:'🔑 CODE'};
-    const visLabels_en={private:'🔒 PRIVATE',public:'🌍 PUBLIC',code:'🔑 CODE'};
-    const visLabel=(lang==='fr'?visLabels_fr:visLabels_en)[vis];
+    const visLabels={
+      fr:{private:'🔒 Privé',public:'🌍 Public',code:'🔑 Code'},
+      en:{private:'🔒 Private',public:'🌍 Public',code:'🔑 Code'}
+    };
+    const visLabel=(visLabels[lang]||visLabels.fr)[vis];
+    const ts=l.updated_at||l.created_at;
+    const d=new Date(ts);
+    const dateStr=d.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
+    const timeStr=d.toLocaleTimeString(lang==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'});
 
-    // Format date
-    const date=new Date(l.created_at);
-    const dateStr=date.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
+    const tr=document.createElement('tr');
+    tr.className='lvl-row';
 
-    // Last played (we don't have this field yet, show created_at)
-    const starsHtml=avg?'⭐ '+avg.toFixed(1)+' <span style="color:var(--muted);">('+scores.length+')</span>':'<span style="color:var(--muted);">—</span>';
-    const shareCodeHtml=l.share_code
-      ?'<span class="copy-code-chip">📋 '+l.share_code+'</span>'
-      :'';
+    const td=document.createElement('td');
+    td.colSpan=4;
 
-    const card=document.createElement('div');
-    card.className='level-card-full';
-    card.innerHTML=
-      // Header row
-      '<div class="lcf-header">'+
-        '<div class="lcf-title">'+esc(l.title||'Sans titre')+'</div>'+
-        '<div class="lcf-vis-btn" style="border-color:'+visBorderColors[vis]+';background:'+visColors[vis]+';color:'+visTextColors[vis]+';">'+visLabel+'</div>'+
-      '</div>'+
-      // Stats row
-      '<div class="lcf-stats">'+
-        '<div class="lcf-stat"><span class="lcf-stat-val">'+starsHtml+'</span><span class="lcf-stat-lbl">'+(lang==='fr'?'NOTE':'RATING')+'</span></div>'+
-        '<div class="lcf-stat"><span class="lcf-stat-val">'+( l.plays||0)+'</span><span class="lcf-stat-lbl">'+(lang==='fr'?'PARTIES':'PLAYS')+'</span></div>'+
-        '<div class="lcf-stat"><span class="lcf-stat-val">'+(l.completions||0)+'</span><span class="lcf-stat-lbl">'+(lang==='fr'?'TERMINÉES':'COMPLETED')+'</span></div>'+
-        '<div class="lcf-stat"><span class="lcf-stat-val" style="font-size:10px;">'+dateStr+'</span><span class="lcf-stat-lbl">'+(lang==='fr'?'CRÉÉ LE':'CREATED')+'</span></div>'+
-      '</div>'+
-      // Code row
-      (l.share_code?'<div class="lcf-code">'+shareCodeHtml+'</div>':'')+
-      // Actions row
-      '<div class="lcf-actions">'+
-        '<button class="lcf-btn lcf-play">▶ '+(lang==='fr'?'JOUER':'PLAY')+'</button>'+
-        '<button class="lcf-btn lcf-edit">✏️ '+(lang==='fr'?'ÉDITER':'EDIT')+'</button>'+
-        '<button class="lcf-btn lcf-dup">⧉ '+(lang==='fr'?'DUPLIQUER':'DUPLICATE')+'</button>'+
-        '<button class="lcf-btn lcf-del">🗑 '+(lang==='fr'?'SUPPRIMER':'DELETE')+'</button>'+
+    // Main row
+    const main=document.createElement('div');
+    main.className='lvl-row-main';
+    main.innerHTML=
+      '<div class="lvl-col-name">'+esc(l.title||'Sans titre')+'</div>'+
+      '<div class="lvl-col-date">'+dateStr+' <span style="color:#6060aa;">'+timeStr+'</span></div>'+
+      '<div class="lvl-col-stats">▶ '+(l.plays||0)+' · ✓ '+(l.completions||0)+'</div>'+
+      '<div class="lvl-col-vis"><span class="lvl-vis-badge '+vis+'">'+visLabel+'</span></div>'+
+      '<div class="lvl-actions">'+
+        '<button class="lvl-act-btn lvl-act-play">▶ '+(lang==='fr'?'JOUER':'PLAY')+'</button>'+
+        '<button class="lvl-act-btn lvl-act-edit">✏️ '+(lang==='fr'?'ÉDITER':'EDIT')+'</button>'+
+        '<button class="lvl-act-btn lvl-act-dup">⧉ '+(lang==='fr'?'DUPLIQUER':'DUPLICATE')+'</button>'+
+        '<button class="lvl-act-btn lvl-act-del">🗑 '+(lang==='fr'?'SUPPRIMER':'DELETE')+'</button>'+
       '</div>';
 
-    // Events
-    card.querySelector('.lcf-vis-btn').onclick=()=>cycleVisibility(l.id,card);
-    card.querySelector('.lcf-play').onclick=()=>{window.location.href='game.html?level='+l.id;};
-    card.querySelector('.lcf-edit').onclick=()=>{window.location.href='studio.html?level='+l.id+'&mode=edit';};
-    card.querySelector('.lcf-dup').onclick=()=>duplicateLevelSettings(l);
-    card.querySelector('.lcf-del').onclick=()=>deleteLevel(l.id);
-    const cc=card.querySelector('.copy-code-chip');
-    if(cc)cc.onclick=()=>copyCode(l.share_code);
+    td.appendChild(main);
+    tr.appendChild(td);
 
-    wrapper.appendChild(card);
+    // Vis badge click
+    main.querySelector('.lvl-vis-badge').onclick=(e)=>{e.stopPropagation();cycleVisibility(l.id,main.querySelector('.lvl-vis-badge'),l);};
+    main.querySelector('.lvl-act-play').onclick=(e)=>{e.stopPropagation();window.location.href='game.html?level='+l.id;};
+    main.querySelector('.lvl-act-edit').onclick=(e)=>{e.stopPropagation();window.location.href='studio.html?level='+l.id+'&mode=edit';};
+    main.querySelector('.lvl-act-dup').onclick=(e)=>{e.stopPropagation();duplicateLevelSettings(l);};
+    main.querySelector('.lvl-act-del').onclick=(e)=>{e.stopPropagation();deleteLevelSettings(l.id,l.title,tr);};
+
+    tbody.appendChild(tr);
   });
 
+  table.appendChild(tbody);
   el.innerHTML='';
-  el.appendChild(wrapper);
+  el.appendChild(table);
 }
 
 async function duplicateLevelSettings(l){
