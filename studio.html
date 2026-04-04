@@ -1376,6 +1376,24 @@ async function loadPlayerProfile(){
   }
 })();
 
+// ── Restaurer niveau preview depuis sessionStorage ────
+(()=>{
+  const wasPreview=sessionStorage.getItem('fl_preview_level');
+  const fromGame=document.referrer.includes('game.html');
+  if(wasPreview&&fromGame&&!window.location.search.includes('level=')){
+    try{
+      const saved=JSON.parse(wasPreview);
+      snapshot();
+      lv=saved;
+      if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
+      if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
+      if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+      redraw();
+      status('Niveau restauré depuis la prévisualisation.');
+    }catch(e){}
+  }
+})();
+
 // ── Charger niveau depuis URL ?level=id ───
 (async()=>{
   const params=new URLSearchParams(window.location.search);
