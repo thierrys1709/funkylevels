@@ -387,14 +387,15 @@ async function init(){
   }
 
   if(preview){
-    // Load from sessionStorage (unsaved level test)
+    // Load from sessionStorage (current editor state — may have unsaved changes)
     const raw=sessionStorage.getItem('fl_preview_level');
     if(!raw){
       document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Orbitron,monospace;font-size:14px;color:#f04060;">Aucun niveau en prévisualisation.</div>';
       return;
     }
     lv=JSON.parse(raw);
-    _currentLevelId=null;
+    // Keep level ID for leaderboard if available, but don't increment plays
+    _currentLevelId=lid||sessionStorage.getItem('fl_preview_id')||null;
     _levelData=null;
   }else{
     if(!lid){
