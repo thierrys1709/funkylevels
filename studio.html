@@ -679,7 +679,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 10:54:44</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 10:58:18</div>
 </div>
 
 
@@ -1424,7 +1424,13 @@ async function loadPlayerProfile(){
 (async()=>{
   const params=new URLSearchParams(window.location.search);
   const lid=params.get('level');
-  const mode=params.get('mode'); // 'play' or 'edit'
+  const mode=params.get('mode');
+  const isRestore2=params.get('restore')==='1';
+  // Skip URL load if we're restoring from sessionStorage
+  if(isRestore2&&sessionStorage.getItem('fl_preview_level')){
+    console.log('[URL] Skipping URL load — using sessionStorage restore');
+    return;
+  }
   if(!lid)return;
   const{data,error}=await _sb.from('levels').select('*').eq('id',lid).single();
   if(error||!data){alert('Niveau introuvable.');return;}
