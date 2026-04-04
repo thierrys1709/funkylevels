@@ -380,7 +380,10 @@ async function init(){
   const _edBtn=document.getElementById('btn-editor');
   if(fromStudio&&_edBtn){
     _edBtn.style.display='';
-    _edBtn.onclick=()=>{window.history.back();};
+    _edBtn.onclick=()=>{
+      sessionStorage.setItem('fl_from_game','1');
+      window.history.back();
+    };
   }
 
   if(preview){
