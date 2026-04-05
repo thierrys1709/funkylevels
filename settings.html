@@ -367,6 +367,7 @@ async function saveLang(){
 }
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtMs(ms){if(!ms&&ms!==0)return'—';return(ms/1000).toFixed(2)+'s';}
 
 function copyCode(code){
   navigator.clipboard?.writeText(code).then(()=>{
@@ -420,8 +421,10 @@ async function loadStats(){
   const thead=document.createElement('thead');
   thead.innerHTML='<tr>'+
     '<th>'+(lang==='fr'?'NOM':'NAME')+'</th>'+
-    '<th>'+(lang==='fr'?'DERNIÈRE MODIF.':'LAST MODIFIED')+'</th>'+
+    '<th>'+(lang==='fr'?'MODIFIÉ':'MODIFIED')+'</th>'+
     '<th>'+(lang==='fr'?'PARTIES / FINS':'PLAYS / ENDS')+'</th>'+
+    '<th>'+(lang==='fr'?'RECORD':'WORLD BEST')+'</th>'+
+    '<th>'+(lang==='fr'?'MON RECORD':'MY BEST')+'</th>'+
     '<th>'+(lang==='fr'?'ÉTAT':'STATUS')+'</th>'+
     '<th>'+(lang==='fr'?'ACTIONS':'ACTIONS')+'</th>'+
   '</tr>';
@@ -442,10 +445,13 @@ async function loadStats(){
 
     const tr=document.createElement('tr');
     tr.className='lvl-row';
+    tr.setAttribute('data-level-id', l.id);
     tr.innerHTML=
       '<td class="lvl-td-name">'+esc(l.title||'Sans titre')+'</td>'+
       '<td class="lvl-td-date">'+dateStr+' <span style="color:#6060aa;">'+timeStr+'</span></td>'+
       '<td class="lvl-td-stats">▶ '+(l.plays||0)+' &nbsp;✓ '+(l.completions||0)+'</td>'+
+      '<td class="lvl-td-record" style="font-family:Orbitron,monospace;font-size:10px;color:#c0a0ff;padding:14px 16px;white-space:nowrap;">—</td>'+
+      '<td class="lvl-td-myrecord" style="font-family:Orbitron,monospace;font-size:10px;color:#f0e040;padding:14px 16px;white-space:nowrap;">—</td>'+
       '<td class="lvl-td-vis"><span class="lvl-vis-badge '+vis+'">'+visLabel+'</span></td>'+
       '<td class="lvl-td-actions"><div class="lvl-actions">'+
         '<button class="lvl-act-btn lvl-act-play" title="'+(lang==='fr'?'Jouer':'Play')+'">▶</button>'+
@@ -466,6 +472,37 @@ async function loadStats(){
   table.appendChild(tbody);
   el.innerHTML='';
   el.appendChild(table);
+
+  // Fetch leaderboard for all levels
+  if(levels.length){
+    const ids=levels.map(l=>l.id);
+    // World records
+    const{data:records}=await sb.from('leaderboard')
+      .select('level_id,time_ms')
+      .in('level_id',ids)
+      .order('time_ms',{ascending:true});
+    const worldBests={};
+    if(records)records.forEach(r=>{if(!worldBests[r.level_id])worldBests[r.level_id]=r.time_ms;});
+
+    // My bests
+    const{data:mine}=await sb.from('leaderboard')
+      .select('level_id,time_ms')
+      .in('level_id',ids)
+      .eq('user_id',currentUser.id)
+      .order('time_ms',{ascending:true});
+    const myBests={};
+    if(mine)mine.forEach(r=>{if(!myBests[r.level_id])myBests[r.level_id]=r.time_ms;});
+
+    // Update cells
+    levels.forEach(l=>{
+      const tr=document.querySelector(`tr[data-level-id="${l.id}"]`);
+      if(!tr)return;
+      const wr=tr.querySelector('.lvl-td-record');
+      const my=tr.querySelector('.lvl-td-myrecord');
+      if(wr)wr.textContent=worldBests[l.id]?fmtMs(worldBests[l.id]):'—';
+      if(my)my.textContent=myBests[l.id]?fmtMs(myBests[l.id]):'—';
+    });
+  }
 }
 
 async function duplicateLevelSettings(l){
