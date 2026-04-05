@@ -133,7 +133,7 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
 <div class="stats">
   <div class="stat"><div class="stat-val" id="stat-levels">-</div><div class="stat-lbl" id="stat-levels-lbl">NIVEAUX</div></div>
   <div class="stat"><div class="stat-val" id="stat-plays">-</div><div class="stat-lbl" id="stat-plays-lbl">PARTIES</div></div>
-  <div class="stat"><div class="stat-val" id="stat-ratings">-</div><div class="stat-lbl" id="stat-ratings-lbl">NOTES</div></div>
+  
 </div>
 
 <div class="search-wrap">
@@ -225,7 +225,6 @@ function setLang(l){
   document.getElementById('hero-btn-browse').textContent=t.btnBrowse;
   document.getElementById('stat-levels-lbl').textContent=t.statLevels;
   document.getElementById('stat-plays-lbl').textContent=t.statPlays;
-  document.getElementById('stat-ratings-lbl').textContent=t.statRatings;
   document.getElementById('search-input').placeholder=t.searchPh;
   document.getElementById('search-btn').textContent=t.searchBtn;
   document.getElementById('stab-new-txt').textContent=t.stabNew;
@@ -276,7 +275,6 @@ async function loadStats(){
   const{count:rc}=await sb.from('ratings').select('*',{count:'exact',head:true});
   document.getElementById('stat-levels').textContent=lc||0;
   document.getElementById('stat-plays').textContent=totalPlays;
-  document.getElementById('stat-ratings').textContent=rc||0;
 }
 
 function switchSection(s){
