@@ -229,9 +229,11 @@ function showMsg(id,type,text){const el=document.getElementById(id);el.className
 function clearMsg(id){document.getElementById(id).className='msg';}
 
 function setLoading(btnId,loading){
-  const btn=document.getElementById(btnId);const t=T[lang];
+  const btn=document.getElementById(btnId);
+  const t=T[lang]||T['fr'];
+  if(!btn)return;
   if(loading){btn.disabled=true;btn.innerHTML='<span class="spinner"></span>'+(lang==='fr'?'CHARGEMENT...':'LOADING...');}
-  else{btn.disabled=false;btn.textContent=btnId==='btn-login'?t.btnLogin:t.btnSignup;}
+  else{btn.disabled=false;btn.textContent=btnId==='btn-login'?(t.btnLogin||'CONNEXION'):(t.btnSignup||'CRÉER MON COMPTE →');}
 }
 
 async function doLogin(){
