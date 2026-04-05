@@ -115,7 +115,7 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
       <button class="lang-btn" id="btn-en" onclick="setLang('en')">🇬🇧 EN</button>
     </div>
     <a href="settings.html" class="user-chip" id="nav-user" style="display:none;">👤 ...</a>
-    <a href="studio.html" class="nav-btn" id="nav-create">✏️ CRÉER</a>
+    <a href="studio.html" class="nav-btn" id="nav-create" style="display:none;">✏️ CRÉER</a>
     <a href="login.html" class="nav-btn primary" id="nav-login">CONNEXION</a>
     <button class="nav-btn" id="nav-logout" style="display:none;" onclick="doLogout()">DÉCO</button>
   </div>
@@ -125,7 +125,7 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
   <h1 id="hero-title">⚡ FUNKYLEVELS</h1>
   <p id="hero-sub">Crée des niveaux de platformer fous,<br>partage-les et joue à ceux des autres !</p>
   <div class="hero-btns">
-    <a href="studio.html" class="hero-btn a" id="hero-btn-create">✏️ CRÉER UN NIVEAU</a>
+    <a href="studio.html" class="hero-btn a" id="hero-btn-create" style="display:none;">✏️ CRÉER UN NIVEAU</a>
     <a href="#levels" class="hero-btn b" id="hero-btn-browse">🎮 PARCOURIR</a>
   </div>
 </div>
@@ -220,7 +220,8 @@ function setLang(l){
   const t=T[l];
   document.getElementById('hero-title').textContent=t.heroTitle;
   document.getElementById('hero-sub').innerHTML=t.heroSub.replace('\n','<br>');
-  document.getElementById('hero-btn-create').textContent=t.btnCreate;
+  const hbc=document.getElementById('hero-btn-create');
+  if(hbc){const d=hbc.style.display;hbc.textContent=t.btnCreate;hbc.style.display=d;}
   document.getElementById('hero-btn-browse').textContent=t.btnBrowse;
   document.getElementById('stat-levels-lbl').textContent=t.statLevels;
   document.getElementById('stat-plays-lbl').textContent=t.statPlays;
@@ -231,6 +232,8 @@ function setLang(l){
   document.getElementById('stab-top-txt').textContent=t.stabTop;
   document.getElementById('stab-mine-txt').textContent=t.stabMine;
   document.getElementById('nav-create').textContent=t.navCreate;
+  // Preserve display state (textContent doesn't remove style but keep safe)
+  if(!currentUser) document.getElementById('nav-create').style.display='none';
   document.getElementById('nav-login').textContent=t.navLogin;
   document.getElementById('nav-logout').textContent=t.navLogout;
   document.getElementById('modal-edit-txt').textContent=t.edit;
@@ -247,6 +250,9 @@ async function checkAuth(){
     document.getElementById('nav-user').style.display='';
     document.getElementById('nav-login').style.display='none';
     document.getElementById('nav-logout').style.display='';
+    document.getElementById('nav-create').style.display='';
+    const hbc=document.getElementById('hero-btn-create');
+    if(hbc)hbc.style.display='';
     // Load profile lang
     const{data:profile}=await sb.from('profiles').select('lang').eq('id',currentUser.id).single();
     if(profile?.lang&&profile.lang!==lang){
