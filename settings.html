@@ -469,8 +469,6 @@ async function loadStats(){
 }
 
 async function duplicateLevelSettings(l){
-  const msg=lang==='fr'?'Dupliquer ce niveau ?':'Duplicate this level?';
-  if(!confirm(msg))return;
   function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
   const{error}=await sb.from('levels').insert({
     user_id:currentUser.id,
