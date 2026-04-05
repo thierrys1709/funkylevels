@@ -206,7 +206,20 @@ function showWinScreen(ms, prevBest, isNewRecord, l){
 
 async function publishFromGame(){
   if(!_currentLevelId)return;
-  window.location.href='settings.html#levels';
+  const{data:sess}=await _sb.auth.getSession();
+  if(!sess.session)return;
+  const btn=document.getElementById('btn-publish-win');
+  if(btn){btn.textContent='⏳...';btn.disabled=true;}
+  const{error}=await _sb.from('levels')
+    .update({visibility:'public',is_published:true})
+    .eq('id',_currentLevelId)
+    .eq('user_id',sess.session.user.id);
+  if(error){
+    if(btn){btn.textContent='🚀 PUBLIER';btn.disabled=false;}
+    alert('Erreur: '+error.message);
+    return;
+  }
+  window.location.href='index.html';
 }
 
 function goToEditor(){
@@ -773,10 +786,8 @@ function gUpdate(now){
         }
         // Show publish button if level is private
         const pubBtn=document.getElementById('btn-publish-win');
-        console.log('[Win] visibility:', lvl.visibility, 'author_completed:', lvl.author_completed, 'pubBtn:', !!pubBtn);
         if(pubBtn&&lvl.visibility==='private'){
           pubBtn.style.display='';
-          console.log('[Win] PUBLISH BUTTON SHOWN');
         }
       });
     }
