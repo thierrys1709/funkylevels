@@ -864,6 +864,32 @@ function showAccountDeleteConfirm(){
   _confirmCallback=async()=>{await doDelete();};
 }
 
+async function doDelete(){
+  if(!currentUser)return;
+  const uid=currentUser.id;
+  const l=lang||'fr';
+  try{
+    // 1. Delete leaderboard entries
+    await sb.from('leaderboard').delete().eq('user_id',uid);
+    // 2. Delete ratings
+    await sb.from('ratings').delete().eq('user_id',uid);
+    // 3. Delete levels
+    await sb.from('levels').delete().eq('user_id',uid);
+    // 4. Delete profile
+    await sb.from('profiles').delete().eq('id',uid);
+    // 5. Delete auth account
+    const{error}=await sb.rpc('delete_user');
+    if(error){
+      // Fallback: sign out even if RPC fails
+      console.warn('delete_user RPC error:', error.message);
+    }
+    await sb.auth.signOut();
+    window.location.href='index.html';
+  }catch(e){
+    alert((l==='fr'?'Erreur lors de la suppression : ':'Error during deletion: ')+e.message);
+  }
+}
+
 async function deleteLevelSettings(id, title, tr){
   const msg=(lang==='fr')
     ?('Supprimer "'+title+'" ? Cette action est irreversible.')
