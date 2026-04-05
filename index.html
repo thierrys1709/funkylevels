@@ -269,10 +269,13 @@ async function doLogout(){
 }
 
 async function loadStats(){
-  const{count:lc}=await sb.from('levels').select('*',{count:'exact',head:true});
-  const{data:plays}=await sb.from('levels').select('plays');
-  const totalPlays=plays?.reduce((a,b)=>a+(b.plays||0),0)||0;
-  const{count:rc}=await sb.from('ratings').select('*',{count:'exact',head:true});
+  const{count:lc}=await sb.from('levels')
+    .select('*',{count:'exact',head:true})
+    .eq('visibility','public');
+  const{data:playsData}=await sb.from('levels')
+    .select('plays')
+    .eq('visibility','public');
+  const totalPlays=playsData?.reduce((a,b)=>a+(b.plays||0),0)||0;
   document.getElementById('stat-levels').textContent=lc||0;
   document.getElementById('stat-plays').textContent=totalPlays;
 }
