@@ -720,6 +720,18 @@ function loadAccountInfo(){
   loadStats();
 })();
 
+async function deleteLevelSettings(id, title, tr){
+  const msg=(lang==='fr')
+    ?('Supprimer "'+title+'" ? Cette action est irreversible.')
+    :('Delete "'+title+'" ? This cannot be undone.');
+  if(!confirm(msg))return;
+  const{error}=await sb.from('levels').delete().eq('id',id).eq('user_id',currentUser.id);
+  if(error){alert((lang==='fr'?'Erreur : ':'Error: ')+error.message);return;}
+  tr.style.transition='opacity .3s';
+  tr.style.opacity='0';
+  setTimeout(()=>tr.remove(),300);
+}
+
 </script>
 </body>
 </html>
