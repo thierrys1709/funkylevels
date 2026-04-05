@@ -724,10 +724,11 @@ async function checkPseudoAvail(){
   avail.textContent=lang==='fr'?'Vérification...':'Checking...';
 
   _pseudoTimer=setTimeout(async()=>{
-    const{data}=await sb.from('profiles').select('id').eq('username',val).maybeSingle();
-    if(data&&data.id!==currentUser.id){
+    const{data}=await sb.from('profiles').select('id').ilike('username',val).maybeSingle();
+    const taken=data&&data.id!==currentUser.id;
+    if(taken){
       avail.style.color='var(--red)';
-      avail.textContent='❌ '+(lang==='fr'?'Pseudo déjà utilisé':'Username already taken');
+      avail.textContent='❌ '+(lang==='fr'?'Pseudo déjà utilisé !':'Username already taken!');
       btn.disabled=true;btn.style.opacity='.5';
     }else{
       avail.style.color='var(--green)';
@@ -753,6 +754,14 @@ async function savePseudo(){
   msg.className='msg';
 
   const newChanges=(_pseudoInfo.changes||0)+1;
+  // Double-check availability before saving
+  const{data:taken}=await sb.from('profiles').select('id').ilike('username',val).maybeSingle();
+  if(taken&&taken.id!==currentUser.id){
+    btn.disabled=false;btn.innerHTML='💾 '+(lang==='fr'?'SAUVEGARDER':'SAVE');
+    msg.className='msg err';
+    msg.textContent=lang==='fr'?'❌ Pseudo déjà utilisé !':'❌ Username already taken!';
+    return;
+  }
   const{error}=await sb.from('profiles').update({
     username:val,
     pseudo_changes:newChanges
