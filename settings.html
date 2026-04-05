@@ -19,7 +19,7 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .nav-back:hover{border-color:var(--accent);color:var(--accent);}
 
 /* PAGE */
-.page{max-width:860px;margin:0 auto;padding:32px 24px 80px;}
+.page{max-width:1100px;margin:0 auto;padding:32px 24px 80px;}
 .page-title{font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:var(--accent);margin-bottom:32px;text-align:center;text-shadow:0 0 20px var(--accent)44;}
 
 /* TABS */
@@ -65,7 +65,8 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .msg.err{background:#f0406018;border:1px solid var(--red);color:var(--red);display:block;}
 
 /* LEVELS TABLE */
-.levels-table{width:100%;border-collapse:collapse;}
+.levels-table{width:100%;border-collapse:collapse;min-width:800px;}
+.stats-table-wrap{overflow-x:auto;width:100%;}
 .levels-table thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
 .levels-table th{font-family:Rajdhani,sans-serif;font-size:10px;font-weight:700;color:#6060aa;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;text-align:left;white-space:nowrap;}
 .lvl-row{cursor:pointer;border-bottom:1px solid #1a1a35;transition:background .1s;}
@@ -470,8 +471,11 @@ async function loadStats(){
   });
 
   table.appendChild(tbody);
+  const wrap=document.createElement('div');
+  wrap.className='stats-table-wrap';
+  wrap.appendChild(table);
   el.innerHTML='';
-  el.appendChild(table);
+  el.appendChild(wrap);
 
   // Fetch leaderboard for all levels
   if(levels.length){
