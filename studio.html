@@ -710,7 +710,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v05/04 06:02:41</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v05/04 07:16:17</div>
 </div>
 
 
@@ -1542,8 +1542,23 @@ async function loadPlayerProfile(){
   // ── Charger depuis URL ?level=id (DB) ──
   if(!lid)return;
   const mode=params.get('mode');
+
+  // Check auth first
+  const{data:sess}=await _sb.auth.getSession();
+  if(!sess.session){
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 CONNEXION REQUISE</div><a href="login.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">SE CONNECTER</a></div>`;
+    return;
+  }
+
   const{data,error}=await _sb.from('levels').select('*').eq('id',lid).single();
   if(error||!data){alert('Niveau introuvable.');return;}
+
+  // Check ownership
+  if(data.user_id!==sess.session.user.id){
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 CONNEXION REQUISE</div><a href="login.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">SE CONNECTER</a></div>`;
+    return;
+  }
+
   snapshot();
   lv=data.data;
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
