@@ -193,35 +193,20 @@ function showWinScreen(ms, prevBest, isNewRecord, l){
       :'';
   }
 
-  // Show editor + publish buttons if owner
+  // Show editor button if owner (publish handled separately above)
   const editBtn=document.getElementById('btn-edit-win');
-  const pubBtn=document.getElementById('btn-publish-win');
-  if(_levelData||_currentLevelId){
+  if(_currentLevelId){
     _sb.auth.getSession().then(async({data:s})=>{
       if(!s.session)return;
-      // Check ownership - use _levelData or fetch
-      let lvlData=_levelData;
-      if(!lvlData&&_currentLevelId){
-        const{data}=await _sb.from('levels').select('user_id,author_completed,visibility,plays').eq('id',_currentLevelId).single();
-        lvlData=data;
-      }
-      if(!lvlData||lvlData.user_id!==s.session.user.id)return;
-      // Show editor button
-      if(editBtn)editBtn.style.display='';
-      // Always fetch fresh data to get latest author_completed
-      const{data:fresh}=await _sb.from('levels').select('author_completed,visibility').eq('id',_currentLevelId).single();
-      if(pubBtn&&fresh&&fresh.author_completed&&fresh.visibility==='private'){
-        pubBtn.style.display='';
-      }
+      const lvlData=_levelData||(await _sb.from('levels').select('user_id').eq('id',_currentLevelId).single()).data;
+      if(lvlData&&lvlData.user_id===s.session.user.id&&editBtn)editBtn.style.display='';
     });
   }
 }
 
 async function publishFromGame(){
   if(!_currentLevelId)return;
-  const l=document.documentElement.lang||'fr';
-  // Redirect to settings or open a simple visibility modal
-  window.location.href='settings.html';
+  window.location.href='settings.html#levels';
 }
 
 function goToEditor(){
@@ -775,16 +760,29 @@ function gUpdate(now){
         });
     }
     // Mark author_completed if owner
-    if(_levelData){
-      _sb.auth.getSession().then(({data:s})=>{
+    if(_currentLevelId){
+      _sb.auth.getSession().then(async({data:s})=>{
         if(!s.session)return;
-        if(_levelData.user_id===s.session.user.id&&!_levelData.author_completed){
-          _sb.from('levels').update({author_completed:true}).eq('id',_currentLevelId);
-          _levelData.author_completed=true;
+        const uid=s.session.user.id;
+        // Fetch level to check ownership
+        const{data:lvl}=await _sb.from('levels').select('user_id,author_completed,visibility').eq('id',_currentLevelId).single();
+        if(!lvl||lvl.user_id!==uid)return;
+        if(!lvl.author_completed){
+          await _sb.from('levels').update({author_completed:true}).eq('id',_currentLevelId);
+          if(_levelData)_levelData.author_completed=true;
+        }
+        // Show publish button if level is private
+        const pubBtn=document.getElementById('btn-publish-win');
+        console.log('[Win] visibility:', lvl.visibility, 'author_completed:', lvl.author_completed, 'pubBtn:', !!pubBtn);
+        if(pubBtn&&lvl.visibility==='private'){
+          pubBtn.style.display='';
+          console.log('[Win] PUBLISH BUTTON SHOWN');
         }
       });
     }
-    setTimeout(()=>document.getElementById('ovWin').classList.add('show'),600);
+    setTimeout(()=>{
+      document.getElementById('ovWin').classList.add('show');
+    },600);
   }
 
   // ── Camera ────────────────────────────────────────────
