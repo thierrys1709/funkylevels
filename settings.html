@@ -486,13 +486,67 @@ async function duplicateLevelSettings(l){
   loadStats();
 }
 
-async function cycleVisibility(levelId, card){
-  const{data:lvl}=await sb.from('levels').select('visibility').eq('id',levelId).single();
-  const cur=lvl?.visibility||'private';
-  const next={private:'public',public:'code',code:'private'}[cur];
-  const{error}=await sb.from('levels').update({visibility:next}).eq('id',levelId).eq('user_id',currentUser.id);
-  if(error){alert('Erreur: '+error.message);return;}
-  loadStats();
+async function cycleVisibility(levelId, badge, lvlData){
+  const cur=lvlData.visibility||'private';
+  const plays=lvlData.plays||0;
+  const completed=lvlData.author_completed||false;
+  const l=lang||'fr';
+
+  // Determine allowed transitions
+  let next=null;
+  let errorMsg=null;
+
+  if(cur==='private'){
+    // PRIVÉ → PUBLIC or CODE : need author_completed
+    if(!completed){
+      errorMsg=l==='fr'
+        ?'Tu dois d\'abord terminer ce niveau pour le publier !'
+        :'You must complete this level before publishing!';
+    }else{
+      next='public';
+    }
+  }else if(cur==='public'){
+    // PUBLIC → CODE : always allowed in settings
+    next='code';
+  }else if(cur==='code'){
+    // CODE → PRIVÉ : only if plays=0
+    if(plays>0){
+      const pp=(plays>1?'s':'');
+      errorMsg=l==='fr'
+        ?('Ce niveau a ete joue ('+plays+' partie'+pp+'). Il faut faire une copie pour le modifier.')
+        :('This level has been played ('+plays+' game'+pp+'). You must duplicate it to modify.');
+    }else{
+      next='private';
+    }
+  }
+
+  if(errorMsg){
+    showConfirm(errorMsg, null, {title:'⚠️ '+(l==='fr'?'IMPOSSIBLE':'NOT ALLOWED'), okOnly:true});
+    return;
+  }
+
+  if(!next)return;
+
+  // If going from public/code → private but plays>0 (blocked above for code)
+  // If going private→public, reset author_completed to false to require re-completion after edits
+  const updates={visibility:next};
+
+  const{error}=await sb.from('levels').update(updates).eq('id',levelId).eq('user_id',currentUser.id);
+  if(error){alert((l==='fr'?'Erreur: ':'Error: ')+error.message);return;}
+
+  // Update local data
+  lvlData.visibility=next;
+
+  // Update badge in place
+  const visLabels={
+    fr:{private:'🔒 Privé',public:'🌍 Public',code:'🔑 Code'},
+    en:{private:'🔒 Private',public:'🌍 Public',code:'🔑 Code'}
+  };
+  const visClass={private:'private',public:'public',code:'code'};
+  if(badge){
+    badge.textContent=(visLabels[l]||visLabels.fr)[next];
+    badge.className='lvl-vis-badge '+visClass[next];
+  }
 }
 
 
@@ -720,12 +774,26 @@ function loadAccountInfo(){
 
 let _confirmCallback=null;
 
-function showConfirm(msg, onOk){
+function showConfirm(msg, onOk, opts){
   const modal=document.getElementById('confirm-modal');
   const desc=document.getElementById('confirm-desc');
   const title=document.getElementById('confirm-title');
+  const yesBtn=document.getElementById('confirm-yes');
+  const noBtn=document.getElementById('confirm-no');
+  const l=lang||'fr';
   if(desc)desc.textContent=msg;
-  if(title)title.textContent='🗑 SUPPRIMER';
+  if(opts&&opts.title){
+    if(title)title.textContent=opts.title;
+  }else{
+    if(title)title.textContent='🗑 '+(l==='fr'?'SUPPRIMER':'DELETE');
+  }
+  if(opts&&opts.okOnly){
+    if(yesBtn)yesBtn.style.display='none';
+    if(noBtn)noBtn.textContent='OK';
+  }else{
+    if(yesBtn)yesBtn.style.display='';
+    if(noBtn)noBtn.textContent=l==='fr'?'ANNULER':'CANCEL';
+  }
   modal.classList.add('show');
   _confirmCallback=onOk;
 }
@@ -736,6 +804,12 @@ function confirmOk(){
 }
 function confirmCancel(){
   document.getElementById('confirm-modal').classList.remove('show');
+  // Restore buttons to default state
+  const yesBtn=document.getElementById('confirm-yes');
+  const noBtn=document.getElementById('confirm-no');
+  const l=lang||'fr';
+  if(yesBtn)yesBtn.style.display='';
+  if(noBtn)noBtn.textContent=l==='fr'?'ANNULER':'CANCEL';
   _confirmCallback=null;
 }
 function showAccountDeleteConfirm(){
