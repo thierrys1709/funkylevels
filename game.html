@@ -114,6 +114,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
     <button onclick="gameRespawn()" id="btn-replay" style="background:#1a1a3a;color:#90a0f0;border:2px solid #4040aa;font-size:13px;padding:14px 24px;">🔄 RECOMMENCER</button>
     <button onclick="goToEditor()" id="btn-edit-win" style="background:#1a2a1a;color:#60e090;border:2px solid #3a8a3a;display:none;">✏️ ÉDITER</button>
+    <button onclick="publishFromGame()" id="btn-publish-win" style="background:#0a1e2a;color:#40c0f0;border:2px solid #308090;display:none;">🚀 PUBLIER</button>
     <button onclick="goToIndex()" id="btn-back" style="background:#333;color:#aaa;border:2px solid #555;">🏠 ACCUEIL</button>
   </div>
 </div>
@@ -192,14 +193,34 @@ function showWinScreen(ms, prevBest, isNewRecord, l){
       :'';
   }
 
-  // Show editor button if owner
+  // Show editor + publish buttons if owner
   const editBtn=document.getElementById('btn-edit-win');
-  if(editBtn&&_levelData){
-    _sb.auth.getSession().then(({data:s})=>{
-      if(s.session&&_levelData.user_id===s.session.user.id)
-        editBtn.style.display='';
+  const pubBtn=document.getElementById('btn-publish-win');
+  if(_levelData||_currentLevelId){
+    _sb.auth.getSession().then(async({data:s})=>{
+      if(!s.session)return;
+      // Check ownership - use _levelData or fetch
+      let lvlData=_levelData;
+      if(!lvlData&&_currentLevelId){
+        const{data}=await _sb.from('levels').select('user_id,author_completed,visibility,plays').eq('id',_currentLevelId).single();
+        lvlData=data;
+      }
+      if(!lvlData||lvlData.user_id!==s.session.user.id)return;
+      // Show editor button
+      if(editBtn)editBtn.style.display='';
+      // Show publish button if author_completed and level is private
+      if(pubBtn&&lvlData.author_completed&&lvlData.visibility==='private'){
+        pubBtn.style.display='';
+      }
     });
   }
+}
+
+async function publishFromGame(){
+  if(!_currentLevelId)return;
+  const l=document.documentElement.lang||'fr';
+  // Redirect to settings or open a simple visibility modal
+  window.location.href='settings.html';
 }
 
 function goToEditor(){
