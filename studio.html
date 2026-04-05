@@ -710,7 +710,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v04/04 17:37:05</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v05/04 06:02:41</div>
 </div>
 
 
@@ -769,6 +769,14 @@ function snapshot(){
 
 // Appeler cette fonction uniquement quand les blocs changent vraiment (pas la sélection)
 function snapshotWithDupCheck(){
+  // Reset author_completed when level is modified
+  if(_currentLevelId&&!window._authorCompletedReset){
+    window._authorCompletedReset=true;
+    _sb.from('levels').update({author_completed:false}).eq('id',_currentLevelId).then(()=>{
+      _authorCompleted=false;
+      console.log('[Studio] author_completed reset after modification');
+    });
+  }
   if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
     const lang=localStorage.getItem('fl_lang')||'fr';
     const msg=lang==='fr'?
@@ -1545,6 +1553,7 @@ async function loadPlayerProfile(){
   _currentVisibility=data.visibility||'private';
   _authorCompleted=data.author_completed||false;
   _isPublished=data.is_published||false;
+  window._authorCompletedReset=false; // Allow reset on next modification
   const _ni=document.getElementById('level-name-input');
   if(_ni)_ni.value=data.title||'';
   redraw();
