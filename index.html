@@ -314,6 +314,45 @@ async function loadSection(s){
     return;
   }
   grid.innerHTML=levels.map(l=>levelCard(l)).join('');
+
+  // Fetch leaderboard data for displayed levels
+  if(levels.length){
+    const ids=levels.map(l=>l.id);
+    // World records
+    const{data:records}=await sb.from('leaderboard')
+      .select('level_id, time_ms, user_id')
+      .in('level_id', ids)
+      .order('time_ms',{ascending:true});
+
+    // My best times (if logged in)
+    let myBests={};
+    if(currentUser){
+      const{data:mine}=await sb.from('leaderboard')
+        .select('level_id, time_ms')
+        .in('level_id', ids)
+        .eq('user_id', currentUser.id);
+      if(mine)mine.forEach(r=>{ if(!myBests[r.level_id]||r.time_ms<myBests[r.level_id]) myBests[r.level_id]=r.time_ms; });
+    }
+
+    // World records per level (lowest time)
+    const worldBests={};
+    if(records)records.forEach(r=>{ if(!worldBests[r.level_id]) worldBests[r.level_id]=r.time_ms; });
+
+    // Update cards
+    levels.forEach(l=>{
+      const card=document.querySelector(`.level-card[data-id="${l.id}"]`);
+      if(!card)return;
+      const wr=worldBests[l.id];
+      const my=myBests[l.id];
+      const timeEl=card.querySelector('.level-times');
+      if(timeEl){
+        let html='';
+        if(wr)html+=`<span title="Record mondial">🏆 ${fmtMs(wr)}</span>`;
+        if(my)html+=`<span title="Mon record">⭐ ${fmtMs(my)}</span>`;
+        timeEl.innerHTML=html;
+      }
+    });
+  }
 }
 
 function levelCard(l){
@@ -323,16 +362,16 @@ function levelCard(l){
   const icons=['🌟','🎮','🔥','⚡','🌈','🎯','💫','🏆','🧩','🚀'];
   const icon=icons[Math.abs((l.id||'').charCodeAt(0)||0)%icons.length];
   const rating=l.rating?'⭐ '+Number(l.rating).toFixed(1):t.noRating;
-  return`<div class="level-card" onclick="openLevelModal('${l.id}')">
+  return`<div class="level-card" data-id="${l.id}" onclick="openLevelModal('${l.id}')">
     ${isNew?`<div class="level-badge">${t.new}</div>`:''}
     <div class="level-thumb"><div class="level-thumb-bg"></div><div class="level-thumb-icon">${icon}</div></div>
     <div class="level-body">
       <div class="level-title">${esc(l.title||'Sans titre')}</div>
       <div class="level-meta">
         <span class="level-author">@${esc(l.profiles?.username||'anonyme')}</span>
-        <span class="level-rating">${rating}</span>
       </div>
       <div class="level-plays">▶ ${l.plays||0} ${t.plays}</div>
+      <div class="level-times" style="display:flex;gap:10px;font-family:Orbitron,monospace;font-size:9px;color:#a0a0cc;margin-top:4px;"></div>
     </div>
   </div>`;
 }
