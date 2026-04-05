@@ -208,8 +208,9 @@ function showWinScreen(ms, prevBest, isNewRecord, l){
       if(!lvlData||lvlData.user_id!==s.session.user.id)return;
       // Show editor button
       if(editBtn)editBtn.style.display='';
-      // Show publish button if author_completed and level is private
-      if(pubBtn&&lvlData.author_completed&&lvlData.visibility==='private'){
+      // Always fetch fresh data to get latest author_completed
+      const{data:fresh}=await _sb.from('levels').select('author_completed,visibility').eq('id',_currentLevelId).single();
+      if(pubBtn&&fresh&&fresh.author_completed&&fresh.visibility==='private'){
         pubBtn.style.display='';
       }
     });
@@ -349,6 +350,9 @@ function updateAttemptDisplay(){
 async function saveTime(ms){
   const{data:sess}=await _sb.auth.getSession();
   if(!sess.session||!_currentLevelId)return false;
+  // Only save score if level is published (public or code)
+  const{data:lvl}=await _sb.from('levels').select('visibility').eq('id',_currentLevelId).single();
+  if(!lvl||lvl.visibility==='private')return false;
   const isNewRecord=(_bestTime===null||ms<_bestTime);
   if(!isNewRecord)return false;
   const rounded=Math.round(ms);
