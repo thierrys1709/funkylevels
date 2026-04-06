@@ -278,20 +278,14 @@ async function checkAuth(){
   });
 }
 
-async function doLogout(){
-  try{await sb.auth.signOut();}catch(e){console.warn('signOut error:',e);}
-  // Clear session manually
+function doLogout(){
+  // Clear Supabase session from localStorage directly (signOut can hang)
+  Object.keys(localStorage).forEach(k=>{
+    if(k.startsWith('sb-')||k.includes('supabase'))localStorage.removeItem(k);
+  });
   currentUser=null;
-  // Update UI immediately
-  document.getElementById('nav-user').style.display='none';
-  document.getElementById('nav-login').style.display='';
-  document.getElementById('nav-logout').style.display='none';
-  document.getElementById('nav-create').style.display='none';
-  const hbc=document.getElementById('hero-btn-create');
-  if(hbc)hbc.style.display='none';
   showToast((T[lang]||T['fr']).logoutOk);
-  // Reload to clear state
-  setTimeout(()=>window.location.href='index.html',800);
+  setTimeout(()=>window.location.href='index.html',600);
 }
 
 async function loadStats(){
