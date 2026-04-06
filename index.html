@@ -170,7 +170,10 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
 <script>
 const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
 const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+  realtime:{enabled:false},
+  global:{headers:{'X-Client-Info':'funkylevels'}}
+});
 
 const T={
   fr:{
@@ -316,10 +319,8 @@ async function loadSection(s){
   let levels=[];
 
   if(s==='new'){
-    console.log('[Load] building query...');
     let query=sb.from('levels').select('id,title,plays,completions,created_at,visibility').eq('visibility','public').order('created_at',{ascending:false}).limit(24);
     if(q)query=query.ilike('title','%'+q+'%');
-    console.log('[Load] sending query...');
     const{data,error}=await query;
     console.log('[Load] new levels:', data?.length, 'error:', error?.message);
     levels=data||[];
