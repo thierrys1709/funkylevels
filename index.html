@@ -421,22 +421,20 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 setLang(lang);
 loadStats();
 
-// Auth — await to ensure session is applied before anything else
-(async()=>{
-  await checkAuth();
-  // Also listen for future auth changes
-  sb.auth.onAuthStateChange(async(event,session)=>{
-    if(session&&!currentUser){
-      applySession(session.user);
-      const{data:profile}=await sb.from('profiles').select('lang').eq('id',session.user.id).single();
-      if(profile?.lang&&profile.lang!==lang){
-        lang=profile.lang;localStorage.setItem('fl_lang',lang);setLang(lang);
-      }
-    }else if(!session){
-      currentUser=null;
+// Auth
+sb.auth.onAuthStateChange(async(event,session)=>{
+  console.log('[Auth] event:', event, 'session:', !!session);
+  if(session){
+    applySession(session.user);
+    const{data:profile}=await sb.from('profiles').select('lang').eq('id',session.user.id).single();
+    if(profile?.lang&&profile.lang!==lang){
+      lang=profile.lang;localStorage.setItem('fl_lang',lang);setLang(lang);
     }
-  });
-})();
+    if(event==='SIGNED_IN')loadSection(currentSection);
+  }else{
+    currentUser=null;
+  }
+});
 </script>
 </body>
 </html>
