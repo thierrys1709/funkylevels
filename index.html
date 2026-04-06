@@ -309,7 +309,8 @@ function switchSection(s){
 
 async function loadSection(s){
   const grid=document.getElementById('levels-grid');
-  const t=T[lang];
+  const t=T[lang]||T['fr'];
+  console.log('[loadSection] s:', s, 'lang:', lang, 't:', !!t);
   grid.innerHTML=`<div class="loading">${t.loading}</div>`;
   const q=document.getElementById('search-input').value.trim();
   let levels=[];
@@ -317,7 +318,9 @@ async function loadSection(s){
   if(s==='new'){
     let query=sb.from('levels').select('*, profiles(username)').eq('visibility','public').order('created_at',{ascending:false}).limit(24);
     if(q)query=query.ilike('title','%'+q+'%');
-    const{data}=await query;levels=data||[];
+    const{data,error}=await query;
+    console.log('[Load] new levels:', data?.length, 'error:', error?.message);
+    levels=data||[];
   }else if(s==='top'){
     let query=sb.from('levels').select('*, profiles(username)').eq('visibility','public').order('plays',{ascending:false}).limit(24);
     if(q)query=query.ilike('title','%'+q+'%');
