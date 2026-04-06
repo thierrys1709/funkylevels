@@ -310,28 +310,40 @@ function switchSection(s){
   loadSection(s);
 }
 
+async function sbFetch(path){
+  const r=await fetch('https://cpmbkwrnchfutmrcmbfn.supabase.co/rest/v1/'+path,{
+    headers:{
+      'apikey':'sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca',
+      'Authorization':'Bearer sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca'
+    }
+  });
+  return r.ok?r.json():[];
+}
+
 async function loadSection(s){
   const grid=document.getElementById('levels-grid');
   const t=T[lang]||T['fr'];
-  console.log('[loadSection] s:', s, 'lang:', lang, 't:', !!t);
   grid.innerHTML=`<div class="loading">${t.loading}</div>`;
   const q=document.getElementById('search-input').value.trim();
   let levels=[];
 
   if(s==='new'){
-    let query=sb.from('levels').select('id,title,plays,completions,created_at,visibility').eq('visibility','public').order('created_at',{ascending:false}).limit(24);
-    if(q)query=query.ilike('title','%'+q+'%');
-    const{data,error}=await query;
-    console.log('[Load] new levels:', data?.length, 'error:', error?.message);
-    levels=data||[];
+    let url='levels?select=id,title,plays,completions,created_at,visibility&visibility=eq.public&order=created_at.desc&limit=24';
+    if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
+    levels=await sbFetch(url);
   }else if(s==='top'){
-    let query=sb.from('levels').select('*, profiles(username)').eq('visibility','public').order('plays',{ascending:false}).limit(24);
-    if(q)query=query.ilike('title','%'+q+'%');
-    const{data}=await query;levels=data||[];
+    let url='levels?select=id,title,plays,completions,created_at,visibility&visibility=eq.public&order=plays.desc&limit=24';
+    if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
+    levels=await sbFetch(url);
   }else if(s==='mine'){
     if(!currentUser){grid.innerHTML=`<div class="empty"><div class="icon">🔒</div><p>${t.notLogged}</p></div>`;return;}
-    const{data}=await sb.from('levels').select('*, profiles(username)').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-    levels=data||[];
+    const sess=await sb.auth.getSession();
+    const token=sess.data.session?.access_token;
+    if(!token){grid.innerHTML=`<div class="empty"><div class="icon">🔒</div><p>${t.notLogged}</p></div>`;return;}
+    const r=await fetch('https://cpmbkwrnchfutmrcmbfn.supabase.co/rest/v1/levels?select=id,title,plays,completions,created_at,visibility&user_id=eq.'+currentUser.id+'&order=created_at.desc',{
+      headers:{'apikey':'sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca','Authorization':'Bearer '+token}
+    });
+    levels=r.ok?await r.json():[];
   }
 
   if(!levels.length){
