@@ -419,8 +419,24 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // Init
 setLang(lang);
-checkAuth();
 loadStats();
+
+// Auth — use onAuthStateChange as primary (handles all cases including post-redirect)
+sb.auth.onAuthStateChange(async(event, session)=>{
+  if(session){
+    applySession(session.user);
+    const{data:profile}=await sb.from('profiles').select('lang').eq('id',session.user.id).single();
+    if(profile?.lang&&profile.lang!==lang){
+      lang=profile.lang;localStorage.setItem('fl_lang',lang);setLang(lang);
+    }
+    if(event==='SIGNED_IN') loadSection(currentSection);
+  }else{
+    currentUser=null;
+  }
+});
+
+// Also check immediately in case session already exists
+checkAuth();
 </script>
 </body>
 </html>
