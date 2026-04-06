@@ -247,17 +247,8 @@ async function doLogin(){
   if(error){showMsg('msg-login','error',error.message.includes('Invalid')?t.errCreds:error.message);}
   else{
     showMsg('msg-login','success',t.okLogin);
-    // Wait for session to be fully established before redirecting
-    sb.auth.onAuthStateChange(async(event,session)=>{
-      if(event==='SIGNED_IN'&&session){
-        const pendingUsername=localStorage.getItem('fl_pending_username');
-        if(pendingUsername){
-          localStorage.removeItem('fl_pending_username');
-          await sb.from('profiles').update({username:pendingUsername}).eq('id',session.user.id);
-        }
-        window.location.href='index.html';
-      }
-    });
+    // Simple: just redirect immediately, session is set by Supabase client
+    window.location.href='index.html';
   }
 }
 
