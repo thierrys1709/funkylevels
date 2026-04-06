@@ -279,8 +279,10 @@ async function checkAuth(){
 }
 
 async function doLogout(){
-  await sb.auth.signOut();
+  try{await sb.auth.signOut();}catch(e){console.warn('signOut error:',e);}
+  // Clear session manually
   currentUser=null;
+  // Update UI immediately
   document.getElementById('nav-user').style.display='none';
   document.getElementById('nav-login').style.display='';
   document.getElementById('nav-logout').style.display='none';
@@ -288,7 +290,8 @@ async function doLogout(){
   const hbc=document.getElementById('hero-btn-create');
   if(hbc)hbc.style.display='none';
   showToast((T[lang]||T['fr']).logoutOk);
-  setTimeout(()=>location.reload(),800);
+  // Reload to clear state
+  setTimeout(()=>window.location.href='index.html',800);
 }
 
 async function loadStats(){
