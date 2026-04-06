@@ -240,26 +240,41 @@ function setLang(l){
   loadSection(currentSection);
 }
 
+function applySession(user){
+  if(!user)return;
+  currentUser=user;
+  const username=user.user_metadata?.username||user.email.split('@')[0];
+  document.getElementById('nav-user').textContent='👤 '+username;
+  document.getElementById('nav-user').style.display='';
+  document.getElementById('nav-login').style.display='none';
+  document.getElementById('nav-logout').style.display='';
+  document.getElementById('nav-create').style.display='';
+  const hbc=document.getElementById('hero-btn-create');
+  if(hbc)hbc.style.display='';
+}
+
 async function checkAuth(){
+  // First try getSession
   const{data}=await sb.auth.getSession();
   if(data.session){
-    currentUser=data.session.user;
-    const username=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
-    document.getElementById('nav-user').textContent='👤 '+username;
-    document.getElementById('nav-user').style.display='';
-    document.getElementById('nav-login').style.display='none';
-    document.getElementById('nav-logout').style.display='';
-    document.getElementById('nav-create').style.display='';
-    const hbc=document.getElementById('hero-btn-create');
-    if(hbc)hbc.style.display='';
+    applySession(data.session.user);
     // Load profile lang
-    const{data:profile}=await sb.from('profiles').select('lang').eq('id',currentUser.id).single();
+    const{data:profile}=await sb.from('profiles').select('lang').eq('id',data.session.user.id).single();
     if(profile?.lang&&profile.lang!==lang){
-      lang=profile.lang;
-      localStorage.setItem('fl_lang',lang);
-      setLang(lang);
+      lang=profile.lang;localStorage.setItem('fl_lang',lang);setLang(lang);
     }
+    return;
   }
+  // Fallback: listen for auth state change (handles redirect from email confirmation)
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(session&&!currentUser){
+      applySession(session.user);
+      const{data:profile}=await sb.from('profiles').select('lang').eq('id',session.user.id).single();
+      if(profile?.lang&&profile.lang!==lang){
+        lang=profile.lang;localStorage.setItem('fl_lang',lang);setLang(lang);
+      }
+    }
+  });
 }
 
 async function doLogout(){
