@@ -207,7 +207,8 @@ const T={
   }
 };
 
-let lang=localStorage.getItem('fl_lang')||'fr';
+let _rawLang=localStorage.getItem('fl_lang')||'fr';
+let lang=(_rawLang==='fr'||_rawLang==='en')?_rawLang:'fr';
 let currentSection='new';
 let currentUser=null;
 let searchTimer=null;
@@ -217,7 +218,7 @@ function setLang(l){
   lang=l;localStorage.setItem('fl_lang',l);
   document.getElementById('btn-fr').classList.toggle('active',l==='fr');
   document.getElementById('btn-en').classList.toggle('active',l==='en');
-  const t=T[l];
+  const t=T[l]||T['fr'];
   document.getElementById('hero-title').textContent=t.heroTitle;
   document.getElementById('hero-sub').innerHTML=t.heroSub.replace('\n','<br>');
   const hbc=document.getElementById('hero-btn-create');
