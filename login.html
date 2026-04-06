@@ -268,10 +268,8 @@ async function doSignup(){
   setLoading('btn-signup',true);
   const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{username:pseudo}}});
   if(error){setLoading('btn-signup',false);showMsg('msg-signup','error',error.message);return;}
-  // Save username to profiles (trigger creates profile, we update username)
-  if(data?.user){
-    await sb.from('profiles').upsert({id:data.user.id,username:pseudo},{onConflict:'id'});
-  }
+  // Save username in localStorage - will be written to profile on first login
+  localStorage.setItem('fl_pending_username', pseudo);
   setLoading('btn-signup',false);
   showMsg('msg-signup','success',t.okSignup);
 }
