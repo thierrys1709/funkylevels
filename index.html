@@ -316,8 +316,10 @@ async function loadSection(s){
   let levels=[];
 
   if(s==='new'){
-    let query=sb.from('levels').select('*, profiles(username)').eq('visibility','public').order('created_at',{ascending:false}).limit(24);
+    console.log('[Load] building query...');
+    let query=sb.from('levels').select('id,title,plays,completions,created_at,visibility').eq('visibility','public').order('created_at',{ascending:false}).limit(24);
     if(q)query=query.ilike('title','%'+q+'%');
+    console.log('[Load] sending query...');
     const{data,error}=await query;
     console.log('[Load] new levels:', data?.length, 'error:', error?.message);
     levels=data||[];
