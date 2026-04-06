@@ -237,7 +237,7 @@ function setLoading(btnId,loading){
 }
 
 async function doLogin(){
-  clearMsg('msg-login');const t=T[lang];
+  clearMsg('msg-login');const t=T[lang]||T['fr'];
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value;
   if(!email||!pass){showMsg('msg-login','error',t.errFields);return;}
@@ -255,7 +255,7 @@ async function checkUsernameAvailable(pseudo){
 }
 
 async function doSignup(){
-  clearMsg('msg-signup');const t=T[lang];
+  clearMsg('msg-signup');const t=T[lang]||T['fr'];
   const pseudo=document.getElementById('signup-pseudo').value.trim();
   const email=document.getElementById('signup-email').value.trim();
   const pass=document.getElementById('signup-pass').value;
@@ -289,7 +289,7 @@ function openReset(){
 function closeReset(){document.getElementById('reset-modal').classList.remove('show');}
 
 async function doReset(){
-  const t=T[lang];
+  const t=T[lang]||T['fr'];
   const email=document.getElementById('reset-email').value.trim();
   const msgEl=document.getElementById('reset-msg');
   const btn=document.getElementById('reset-ok-btn');
