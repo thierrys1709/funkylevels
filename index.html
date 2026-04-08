@@ -417,13 +417,17 @@ function levelCard(l){
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 async function openLevelModal(id){
-  const{data,error}=await sb.from('levels').select('*').eq('id',id).single();
-  if(error||!data)return;
+  const r=await fetch('https://cpmbkwrnchfutmrcmbfn.supabase.co/rest/v1/levels?select=*&id=eq.'+id,{
+    headers:{'apikey':'sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca','Authorization':'Bearer sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca'}
+  });
+  const arr=r.ok?await r.json():[];
+  const data=arr[0];
+  if(!data)return;
   _modalLevel=data;
-  const t=T[lang];
+  const t=T[lang]||T['fr'];
   const isOwner=currentUser&&currentUser.id===data.user_id;
   document.getElementById('modal-title').textContent=data.title||'Sans titre';
-  document.getElementById('modal-author').textContent='@'+(data.profiles?.username||'anonyme');
+  document.getElementById('modal-author').textContent='@'+(data.username||'anonyme');
   document.getElementById('modal-plays').textContent=(data.plays||0)+' '+t.plays;
   document.getElementById('modal-rating').textContent=data.rating?'⭐ '+Number(data.rating).toFixed(1):t.noRating;
   document.getElementById('modal-edit-btn').style.display=isOwner?'':'none';
