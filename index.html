@@ -67,6 +67,9 @@ nav{position:sticky;top:0;z-index:100;background:#0a0a16ee;backdrop-filter:blur(
 /* ── CARD ── */
 .level-card{background:var(--panel);border:1.5px solid var(--border);border-radius:5px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative;}
 .level-card:hover{border-color:var(--accent2);transform:translateY(-3px);box-shadow:0 8px 30px #a040f022;}
+.card-edit-btn{position:absolute;top:8px;right:8px;background:#1a1a3a;border:1.5px solid #4040aa;border-radius:6px;color:#90a0f0;font-size:14px;padding:5px 8px;cursor:pointer;opacity:0;transition:opacity .15s;z-index:2;}
+.level-card:hover .card-edit-btn{opacity:1;}
+.card-edit-btn:hover{background:#2a2a5a;border-color:#7060f0;}
 .level-thumb{height:110px;background:var(--panel2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
 .level-thumb-bg{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:16px 16px;opacity:.5;}
 .level-thumb-icon{font-size:36px;position:relative;z-index:1;}
@@ -400,13 +403,15 @@ function levelCard(l){
   const icons=['🌟','🎮','🔥','⚡','🌈','🎯','💫','🏆','🧩','🚀'];
   const icon=icons[Math.abs((l.id||'').charCodeAt(0)||0)%icons.length];
   const rating=l.rating?'⭐ '+Number(l.rating).toFixed(1):t.noRating;
-  return`<div class="level-card" data-id="${l.id}" onclick="openLevelModal('${l.id}')">
+  const isOwner=currentUser&&currentUser.id===l.user_id;
+  return`<div class="level-card" data-id="${l.id}" onclick="openLevelModal('${l.id}')" style="position:relative;">
     ${isNew?`<div class="level-badge">${t.new}</div>`:''}
+    ${isOwner?`<button class="card-edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'" title="${lang==='fr'?'Éditer':'Edit'}">✏️</button>`:''}
     <div class="level-thumb"><div class="level-thumb-bg"></div><div class="level-thumb-icon">${icon}</div></div>
     <div class="level-body">
       <div class="level-title">${esc(l.title||'Sans titre')}</div>
       <div class="level-meta">
-        <span class="level-author">@${esc(l.profiles?.username||'anonyme')}</span>
+        <span class="level-author">@${esc(l.profiles?.username||l.username||'anonyme')}</span>
       </div>
       <div class="level-plays">▶ ${l.plays||0} ${t.plays}</div>
       <div class="level-times" style="display:flex;gap:10px;font-family:Orbitron,monospace;font-size:9px;color:#a0a0cc;margin-top:4px;"></div>
