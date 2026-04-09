@@ -74,6 +74,10 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 .empty .icon{font-size:48px;margin-bottom:16px;}
 .empty p{font-family:Rajdhani,sans-serif;font-size:14px;line-height:1.8;}
 .loading{text-align:center;padding:60px;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--muted);}
+.vis-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.vis-dot.public{background:#40f090;box-shadow:0 0 5px #40f09088;}
+.vis-dot.code{background:#c090f0;box-shadow:0 0 5px #c090f088;}
+.vis-dot.private{background:#f04060;box-shadow:0 0 5px #f0406088;}
 
 /* TOAST */
 #settings-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a3a;border:1.5px solid var(--accent2);border-radius:6px;padding:12px 24px;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--text);opacity:0;transition:all .3s;z-index:999;pointer-events:none;}
@@ -332,7 +336,10 @@ function levelCard(l){
     <div class="level-thumb"><div class="level-thumb-bg"></div><div class="level-thumb-icon">${icon}</div></div>
     <div class="level-body">
       <div class="level-title">${esc(l.title||'Sans titre')}</div>
-      <div class="level-meta"><span class="level-author">@${esc(l.username||'anonyme')}</span></div>
+      <div class="level-meta">
+        <span class="level-author">@${esc(l.username||'anonyme')}</span>
+        ${isOwner?`<span class="vis-dot vis-${l.visibility||'private'}" title="${l.visibility==='public'?(lang==='fr'?'Public':'Public'):l.visibility==='code'?(lang==='fr'?'Accès par code':'Code access'):(lang==='fr'?'Privé':'Private')}"></span>`:''}
+      </div>
       <div class="level-plays">▶ ${l.plays||0} ${t.plays}</div>
       <div class="level-times"></div>
     </div>
