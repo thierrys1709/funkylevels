@@ -137,8 +137,18 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
     <a href="legal.html" style="font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;text-decoration:none;" id="footer-legal">Mentions légales</a>
     <a href="legal.html#privacy" style="font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;text-decoration:none;" id="footer-privacy">Politique de confidentialité</a>
     <a href="legal.html#terms" style="font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;text-decoration:none;" id="footer-terms">Conditions d'utilisation</a>
+    <a href="contact.html" style="font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;text-decoration:none;" id="footer-contact">Contact</a>
   </div>
 </footer>
+
+<!-- COOKIE BANNER -->
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#0d0d1e;border-top:2px solid #2a2a55;padding:16px 24px;z-index:9999;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+  <p id="cookie-text" style="font-family:Rajdhani,sans-serif;font-size:13px;color:#a0a0cc;flex:1;margin:0;line-height:1.6;">
+    🍪 Ce site utilise des cookies strictement nécessaires à l'authentification. Aucun cookie publicitaire.
+    <a href="legal.html#privacy" style="color:#a040f0;margin-left:4px;" id="cookie-link">En savoir plus</a>
+  </p>
+  <button onclick="acceptCookies()" style="font-family:'Press Start 2P',monospace;font-size:9px;padding:10px 20px;background:#a040f0;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;" id="cookie-btn">✓ COMPRIS</button>
+</div>
 
 <script>
 const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
@@ -219,9 +229,16 @@ function setLang(l){
   const fl=document.getElementById('footer-legal');
   const fp=document.getElementById('footer-privacy');
   const ft=document.getElementById('footer-terms');
+  const fc=document.getElementById('footer-contact');
   if(fl)fl.textContent=l==='fr'?'Mentions légales':'Legal Notice';
   if(fp)fp.textContent=l==='fr'?'Politique de confidentialité':'Privacy Policy';
   if(ft)ft.textContent=l==='fr'?'Conditions d\'utilisation':'Terms of Use';
+  if(fc)fc.textContent=l==='fr'?'Contact':'Contact';
+  const cb=document.getElementById('cookie-text');
+  const cbl=document.getElementById('cookie-link');
+  const cbb=document.getElementById('cookie-btn');
+  if(cb)cb.innerHTML=(l==='fr'?'🍪 Ce site utilise des cookies strictement nécessaires à l\'authentification. Aucun cookie publicitaire.':'🍪 This site uses cookies strictly necessary for authentication. No advertising cookies.')+' <a href="legal.html#privacy" style="color:#a040f0;margin-left:4px;">'+(l==='fr'?'En savoir plus':'Learn more')+'</a>';
+  if(cbb)cbb.textContent=l==='fr'?'✓ COMPRIS':'✓ GOT IT';
   loadSection(currentSection);
 }
 
@@ -390,6 +407,16 @@ sb.auth.onAuthStateChange(async(event,session)=>{
 });
 
 (async()=>{await checkAuth();})();
+
+function acceptCookies(){
+  localStorage.setItem('fl_cookies','1');
+  document.getElementById('cookie-banner').style.display='none';
+}
+
+// Show cookie banner if not accepted
+if(!localStorage.getItem('fl_cookies')){
+  document.getElementById('cookie-banner').style.display='flex';
+}
 </script>
 </body>
 </html>
