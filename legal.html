@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FunkyLevels — Mentions légales</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#08080f;color:#e8e8ff;font-family:Rajdhani,sans-serif;min-height:100vh;}
+nav{background:#06060ecc;border-bottom:1px solid #1e1e40;padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;}
+.nav-logo{font-family:Orbitron,monospace;font-size:14px;font-weight:900;color:#f0e040;letter-spacing:2px;text-decoration:none;}
+.lang-bar{margin-left:auto;display:flex;gap:4px;}
+.lang-btn{font-family:'Press Start 2P',monospace;font-size:10px;padding:6px 10px;border:1.5px solid #1e1e40;border-radius:3px;background:#12122a;color:#6060aa;cursor:pointer;}
+.lang-btn.active{border-color:#f0e040;color:#f0e040;}
+.container{max-width:760px;margin:0 auto;padding:48px 24px 80px;}
+h1{font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:#f0e040;letter-spacing:2px;margin-bottom:32px;}
+h2{font-family:Orbitron,monospace;font-size:12px;font-weight:700;color:#a040f0;letter-spacing:1px;margin:36px 0 12px;padding-top:36px;border-top:1px solid #1e1e40;}
+h2:first-of-type{border-top:none;margin-top:0;}
+p{font-size:15px;color:#a0a0cc;line-height:1.8;margin-bottom:12px;}
+ul{margin:8px 0 12px 20px;color:#a0a0cc;font-size:15px;line-height:1.8;}
+a{color:#a040f0;}
+.back{font-family:'Press Start 2P',monospace;font-size:9px;color:#6060aa;text-decoration:none;display:inline-flex;align-items:center;gap:8px;margin-bottom:32px;}
+.back:hover{color:#a040f0;}
+.anchor{scroll-margin-top:80px;}
+footer{border-top:1px solid #1e1e40;padding:24px;text-align:center;margin-top:40px;font-family:'Press Start 2P',monospace;font-size:7px;color:#4040aa;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
+  <div class="lang-bar">
+    <button class="lang-btn active" id="btn-fr" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+  </div>
+</nav>
+
+<div class="container">
+  <a href="index.html" class="back">← <span id="lbl-back">Retour</span></a>
+  <h1 id="lbl-title">MENTIONS LÉGALES</h1>
+
+  <!-- LEGAL NOTICE -->
+  <div class="anchor" id="legal">
+    <h2 id="lbl-legal">📋 MENTIONS LÉGALES</h2>
+    <p id="lbl-legal-1">FunkyLevels est un projet indépendant de création et partage de niveaux de platformer en ligne.</p>
+    <p id="lbl-legal-2">Ce site est hébergé par <strong>Vercel Inc.</strong>, 340 Pine Street, Suite 701, San Francisco, CA 94104, USA.</p>
+    <p id="lbl-legal-3">La base de données est gérée par <strong>Supabase Inc.</strong> Pour toute question, contactez-nous via le site.</p>
+  </div>
+
+  <!-- PRIVACY -->
+  <div class="anchor" id="privacy">
+    <h2 id="lbl-privacy">🔒 POLITIQUE DE CONFIDENTIALITÉ</h2>
+    <p id="lbl-priv-1">FunkyLevels collecte uniquement les données nécessaires au fonctionnement du service :</p>
+    <ul id="lbl-priv-list">
+      <li>Adresse email (pour la connexion et les notifications)</li>
+      <li>Pseudonyme choisi par l'utilisateur</li>
+      <li>Niveaux créés et scores de jeu</li>
+    </ul>
+    <p id="lbl-priv-2">Ces données sont stockées de manière sécurisée via Supabase. Elles ne sont jamais vendues ni partagées avec des tiers à des fins commerciales.</p>
+    <p id="lbl-priv-3">Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. La suppression peut être effectuée directement depuis vos paramètres de compte.</p>
+    <p id="lbl-priv-4">FunkyLevels n'utilise pas de cookies publicitaires. Les seuls cookies utilisés sont nécessaires à l'authentification.</p>
+    <p id="lbl-priv-5"><strong>Durée de conservation :</strong> Les données sont conservées tant que le compte est actif. En cas de suppression du compte, toutes les données associées sont effacées immédiatement.</p>
+    <p id="lbl-priv-6"><strong>Base légale :</strong> Le traitement est fondé sur le contrat (exécution du service) et le consentement (inscription volontaire).</p>
+    <p id="lbl-priv-7"><strong>Contact DPO / RGPD :</strong> Pour toute demande relative à vos données personnelles, utilisez notre <a href="contact.html">formulaire de contact</a> en sélectionnant "Demande RGPD".</p>
+  </div>
+
+  <!-- TERMS -->
+  <div class="anchor" id="terms">
+    <h2 id="lbl-terms">📜 CONDITIONS D'UTILISATION</h2>
+    <p id="lbl-terms-1">En utilisant FunkyLevels, vous acceptez les conditions suivantes :</p>
+    <ul id="lbl-terms-list">
+      <li id="t1">Vous êtes responsable du contenu que vous créez et partagez.</li>
+      <li id="t2">Il est interdit de publier du contenu offensant, illégal ou violant les droits de tiers.</li>
+      <li id="t3">Chaque utilisateur doit avoir au moins 13 ans pour créer un compte.</li>
+      <li id="t4">FunkyLevels se réserve le droit de supprimer tout contenu non conforme à ces règles.</li>
+      <li id="t5">L'utilisation du service est gratuite. FunkyLevels ne peut être tenu responsable d'interruptions de service.</li>
+    </ul>
+    <p id="lbl-terms-2">Les niveaux publiés restent la propriété intellectuelle de leurs créateurs. En les publiant sur FunkyLevels, vous accordez une licence d'affichage non-exclusive au site.</p>
+  </div>
+
+  <!-- CONTENT RULES -->
+  <div class="anchor" id="rules">
+    <h2 id="lbl-rules">🎮 CHARTE DE LA COMMUNAUTÉ</h2>
+    <p id="lbl-rules-1">Pour maintenir une communauté saine et amusante :</p>
+    <ul id="lbl-rules-list">
+      <li id="r1">Respectez les autres joueurs et créateurs.</li>
+      <li id="r2">Créez des niveaux jouables et équitables.</li>
+      <li id="r3">Ne partagez pas de liens ou contenus malveillants.</li>
+      <li id="r4">Signalez tout comportement abusif.</li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>© 2026 FUNKYLEVELS — ALL RIGHTS RESERVED</footer>
+
+<script>
+const T={
+  fr:{
+    back:'Retour', title:'MENTIONS LÉGALES',
+    legal:'📋 MENTIONS LÉGALES',
+    legal1:'FunkyLevels est un projet indépendant de création et partage de niveaux de platformer en ligne.',
+    legal2:'Ce site est hébergé par <strong>Vercel Inc.</strong>, 340 Pine Street, Suite 701, San Francisco, CA 94104, USA.',
+    legal3:'La base de données est gérée par <strong>Supabase Inc.</strong> Pour toute question, contactez-nous via le site.',
+    privacy:'🔒 POLITIQUE DE CONFIDENTIALITÉ',
+    priv1:'FunkyLevels collecte uniquement les données nécessaires au fonctionnement du service :',
+    privList:['Adresse email (pour la connexion et les notifications)','Pseudonyme choisi par l\'utilisateur','Niveaux créés et scores de jeu'],
+    priv2:'Ces données sont stockées de manière sécurisée via Supabase. Elles ne sont jamais vendues ni partagées avec des tiers à des fins commerciales.',
+    priv3:'Conformément au RGPD (Règlement UE 2016/679), vous disposez d\'un droit d\'accès, de rectification, de suppression et de portabilité de vos données. La suppression peut être effectuée directement depuis vos paramètres de compte ou en nous contactant via le formulaire de contact.',
+    priv4:'FunkyLevels n\'utilise pas de cookies publicitaires. Les seuls cookies utilisés sont nécessaires à l\'authentification.',
+    priv5:'Durée de conservation : Les données sont conservées tant que le compte est actif. En cas de suppression du compte, toutes les données associées sont effacées immédiatement.',
+    priv6:'Base légale : Le traitement est fondé sur le contrat (exécution du service) et le consentement (inscription volontaire).',
+    priv7:'Contact DPO / RGPD : Pour toute demande relative à vos données personnelles, utilisez notre formulaire de contact en sélectionnant "Demande RGPD".',
+    terms:'📜 CONDITIONS D\'UTILISATION',
+    terms1:'En utilisant FunkyLevels, vous acceptez les conditions suivantes :',
+    termsList:['Vous êtes responsable du contenu que vous créez et partagez.','Il est interdit de publier du contenu offensant, illégal ou violant les droits de tiers.','Chaque utilisateur doit avoir au moins 13 ans pour créer un compte.','FunkyLevels se réserve le droit de supprimer tout contenu non conforme à ces règles.','L\'utilisation du service est gratuite. FunkyLevels ne peut être tenu responsable d\'interruptions de service.'],
+    terms2:'Les niveaux publiés restent la propriété intellectuelle de leurs créateurs. En les publiant sur FunkyLevels, vous accordez une licence d\'affichage non-exclusive au site.',
+    rules:'🎮 CHARTE DE LA COMMUNAUTÉ',
+    rules1:'Pour maintenir une communauté saine et amusante :',
+    rulesList:['Respectez les autres joueurs et créateurs.','Créez des niveaux jouables et équitables.','Ne partagez pas de liens ou contenus malveillants.','Signalez tout comportement abusif.']
+  },
+  en:{
+    back:'Back', title:'LEGAL NOTICE',
+    legal:'📋 LEGAL NOTICE',
+    legal1:'FunkyLevels is an independent project for creating and sharing platformer levels online.',
+    legal2:'This site is hosted by <strong>Vercel Inc.</strong>, 340 Pine Street, Suite 701, San Francisco, CA 94104, USA.',
+    legal3:'The database is managed by <strong>Supabase Inc.</strong> For any questions, contact us via the site.',
+    privacy:'🔒 PRIVACY POLICY',
+    priv1:'FunkyLevels only collects data necessary for the service to function:',
+    privList:['Email address (for login and notifications)','Username chosen by the user','Created levels and game scores'],
+    priv2:'This data is stored securely via Supabase. It is never sold or shared with third parties for commercial purposes.',
+    priv3:'Under GDPR, you have the right to access, correct, and delete your data. Deletion can be done directly from your account settings.',
+    priv4:'FunkyLevels does not use advertising cookies. The only cookies used are necessary for authentication.',
+    priv5:'Retention period: Data is kept as long as the account is active. When an account is deleted, all associated data is immediately erased.',
+    priv6:'Legal basis: Processing is based on contract (service execution) and consent (voluntary registration).',
+    priv7:'DPO / GDPR contact: For any request regarding your personal data, use our contact form and select "GDPR request".',
+    terms:'📜 TERMS OF USE',
+    terms1:'By using FunkyLevels, you agree to the following:',
+    termsList:['You are responsible for the content you create and share.','It is forbidden to publish offensive, illegal content or content violating third-party rights.','Each user must be at least 13 years old to create an account.','FunkyLevels reserves the right to remove any content not complying with these rules.','The service is free. FunkyLevels cannot be held responsible for service interruptions.'],
+    terms2:'Published levels remain the intellectual property of their creators. By publishing on FunkyLevels, you grant the site a non-exclusive display license.',
+    rules:'🎮 COMMUNITY CHARTER',
+    rules1:'To maintain a healthy and fun community:',
+    rulesList:['Respect other players and creators.','Create fair and playable levels.','Do not share malicious links or content.','Report any abusive behavior.']
+  }
+};
+
+let lang=localStorage.getItem('fl_lang')||'fr';
+if(lang!=='fr'&&lang!=='en')lang='fr';
+
+function setLang(l){
+  lang=l;localStorage.setItem('fl_lang',l);
+  document.getElementById('btn-fr').classList.toggle('active',l==='fr');
+  document.getElementById('btn-en').classList.toggle('active',l==='en');
+  const t=T[l];
+  document.getElementById('lbl-back').textContent=t.back;
+  document.getElementById('lbl-title').textContent=t.title;
+  document.getElementById('lbl-legal').textContent=t.legal;
+  document.getElementById('lbl-legal-1').textContent=t.legal1;
+  document.getElementById('lbl-legal-2').innerHTML=t.legal2;
+  document.getElementById('lbl-legal-3').innerHTML=t.legal3;
+  document.getElementById('lbl-privacy').textContent=t.privacy;
+  document.getElementById('lbl-priv-1').textContent=t.priv1;
+  const pl=document.getElementById('lbl-priv-list');
+  pl.innerHTML=t.privList.map(i=>`<li>${i}</li>`).join('');
+  document.getElementById('lbl-priv-2').textContent=t.priv2;
+  document.getElementById('lbl-priv-3').textContent=t.priv3;
+  document.getElementById('lbl-priv-4').textContent=t.priv4;
+  const p5=document.getElementById('lbl-priv-5');if(p5)p5.textContent=t.priv5;
+  const p6=document.getElementById('lbl-priv-6');if(p6)p6.textContent=t.priv6;
+  const p7=document.getElementById('lbl-priv-7');if(p7)p7.innerHTML=t.priv7.replace('formulaire de contact','<a href="contact.html">formulaire de contact</a>').replace('contact form','<a href="contact.html">contact form</a>');
+  document.getElementById('lbl-terms').textContent=t.terms;
+  document.getElementById('lbl-terms-1').textContent=t.terms1;
+  const tl=document.getElementById('lbl-terms-list');
+  tl.innerHTML=t.termsList.map(i=>`<li>${i}</li>`).join('');
+  document.getElementById('lbl-terms-2').textContent=t.terms2;
+  document.getElementById('lbl-rules').textContent=t.rules;
+  document.getElementById('lbl-rules-1').textContent=t.rules1;
+  const rl=document.getElementById('lbl-rules-list');
+  rl.innerHTML=t.rulesList.map(i=>`<li>${i}</li>`).join('');
+}
+
+setLang(lang);
+</script>
+</body>
+</html>
