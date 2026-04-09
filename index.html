@@ -129,6 +129,17 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 
 <div id="settings-toast"></div>
 
+<footer style="border-top:1px solid #1e1e40;padding:24px;text-align:center;margin-top:40px;">
+  <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#4040aa;margin-bottom:10px;">
+    © 2026 FUNKYLEVELS — ALL RIGHTS RESERVED
+  </div>
+  <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
+    <a href="legal.html" style="font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;text-decoration:none;" id="footer-legal">Mentions légales</a>
+    <a href="legal.html#privacy" style="font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;text-decoration:none;" id="footer-privacy">Politique de confidentialité</a>
+    <a href="legal.html#terms" style="font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;text-decoration:none;" id="footer-terms">Conditions d'utilisation</a>
+  </div>
+</footer>
+
 <script>
 const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
 const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
@@ -205,6 +216,12 @@ function setLang(l){
   if(nc){const d=nc.style.display;nc.textContent=t.navCreate;nc.style.display=d;}
   document.getElementById('nav-login').textContent=t.navLogin;
   document.getElementById('nav-logout').textContent=t.navLogout;
+  const fl=document.getElementById('footer-legal');
+  const fp=document.getElementById('footer-privacy');
+  const ft=document.getElementById('footer-terms');
+  if(fl)fl.textContent=l==='fr'?'Mentions légales':'Legal Notice';
+  if(fp)fp.textContent=l==='fr'?'Politique de confidentialité':'Privacy Policy';
+  if(ft)ft.textContent=l==='fr'?'Conditions d\'utilisation':'Terms of Use';
   loadSection(currentSection);
 }
 
