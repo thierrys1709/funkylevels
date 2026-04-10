@@ -155,7 +155,7 @@ async function sendContact(){
   const subjectLabels={bug:'Bug Report',abuse:'Abuse Report',rgpd:'GDPR Request',question:'General Question',other:'Other'};
 
   try{
-    const res=await fetch('/api/contact',{
+    const res=await fetch('/api/send-contact',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({name,email,subject,message})
