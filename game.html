@@ -366,15 +366,28 @@ async function saveTime(ms){
 
 // ── Init ──────────────────────────────────────────────────
 async function init(){
-  // Profile
+  // Auth check — must be logged in to play
   const{data:sess}=await _sb.auth.getSession();
+  if(!sess.session){
+    const l=_lang();
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;text-align:center;padding:24px;">
+      <div style="font-size:32px;">🔒</div>
+      <div style="font-size:13px;color:#f0e040;letter-spacing:2px;">${l==='fr'?'CONNEXION REQUISE':'LOGIN REQUIRED'}</div>
+      <div style="font-size:11px;color:#6060aa;max-width:320px;line-height:1.8;font-family:Rajdhani,sans-serif;">${l==='fr'?'Tu dois être connecté pour jouer à FunkyLevels.':'You need to be logged in to play FunkyLevels.'}</div>
+      <a href="login.html?from=game" style="font-family:Orbitron,monospace;font-size:10px;padding:14px 28px;background:#a040f0;color:#fff;border-radius:4px;text-decoration:none;margin-top:8px;">${l==='fr'?'🎮 SE CONNECTER':'🎮 LOGIN'}</a>
+      <a href="index.html" style="font-family:Orbitron,monospace;font-size:9px;color:#4040aa;text-decoration:none;">← ${l==='fr'?'ACCUEIL':'HOME'}</a>
+    </div>`;
+    return;
+  }
+
+  // Profile
   if(sess.session){
     const{data:profile}=await _sb.from('profiles').select('character,lang').eq('id',sess.session.user.id).single();
     if(profile){
       if(profile.character){_charId=profile.character;localStorage.setItem('fl_char',profile.character);}
       if(profile.lang)localStorage.setItem('fl_lang',profile.lang);
     }
-  }else{
+  } else {
     _charId=localStorage.getItem('fl_char')||'default';
   }
   await loadCharacterSprite(_charId);
