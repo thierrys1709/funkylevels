@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FunkyLevels — Parcourir</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#08080f;color:#e8e8ff;font-family:Rajdhani,sans-serif;min-height:100vh;}
+nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(12px);border-bottom:1px solid #1e1e40;padding:0 24px;height:56px;display:flex;align-items:center;gap:12px;}
+.nav-logo{font-family:Orbitron,monospace;font-size:14px;font-weight:900;color:#f0e040;letter-spacing:2px;text-decoration:none;margin-right:auto;}
+.nav-back{font-family:'Press Start 2P',monospace;font-size:9px;color:#6060aa;text-decoration:none;padding:8px 14px;border:1.5px solid #2a2a55;border-radius:4px;}
+.nav-back:hover{color:#a040f0;border-color:#a040f0;}
+
+.container{max-width:1200px;margin:0 auto;padding:32px 24px 80px;}
+h1{font-family:Orbitron,monospace;font-size:16px;color:#f0e040;letter-spacing:2px;margin-bottom:24px;}
+
+/* SEARCH BAR */
+.search-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.search-input{flex:1;min-width:200px;background:#12122a;border:1.5px solid #2a2a55;border-radius:4px;color:#e8e8ff;font-family:Rajdhani,sans-serif;font-size:15px;padding:11px 16px;outline:none;transition:border-color .2s;}
+.search-input:focus{border-color:#a040f0;}
+.search-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:12px 18px;background:#a040f0;color:#fff;border:none;border-radius:4px;cursor:pointer;}
+.count-info{font-family:Rajdhani,sans-serif;font-size:13px;color:#4040aa;margin-left:auto;}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border:1.5px solid #1e1e40;border-radius:8px;}
+table{width:100%;border-collapse:collapse;min-width:700px;}
+thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
+th{font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;letter-spacing:1px;padding:14px 16px;text-align:left;white-space:nowrap;user-select:none;}
+th.sortable{cursor:pointer;transition:color .15s;}
+th.sortable:hover{color:#a040f0;}
+th.sorted-asc::after{content:' ▲';color:#a040f0;}
+th.sorted-desc::after{content:' ▼';color:#a040f0;}
+.lvl-tr{border-bottom:1px solid #1a1a35;cursor:pointer;transition:background .1s;}
+.lvl-tr:last-child{border-bottom:none;}
+.lvl-tr:hover{background:#0f0f20;}
+td{padding:14px 16px;vertical-align:middle;}
+.td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.new-badge{font-family:'Press Start 2P',monospace;font-size:6px;padding:2px 6px;background:#f0e040;color:#000;border-radius:2px;margin-left:8px;vertical-align:middle;}
+.td-date{font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;white-space:nowrap;width:110px;}
+.td-author{font-family:Rajdhani,sans-serif;font-size:13px;color:#a0a0cc;width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.td-plays{font-family:Orbitron,monospace;font-size:11px;color:#8080cc;width:80px;text-align:right;}
+.td-record{font-family:Orbitron,monospace;font-size:10px;width:100px;}
+.td-vis{width:90px;}
+.td-edit{width:70px;text-align:right;}
+.vis-badge{font-family:'Press Start 2P',monospace;font-size:6px;padding:3px 7px;border-radius:3px;}
+.vis-badge.public{background:#0d2a1a;color:#40f090;border:1px solid #40f090;}
+.vis-badge.code{background:#1a0d2a;color:#c090f0;border:1px solid #c090f0;}
+.vis-badge.private{background:#2a0d14;color:#f04060;border:1px solid #f04060;}
+.edit-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:5px 10px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;}
+.edit-btn:hover{background:#1a1a3a;border-color:#7060f0;}
+.wr{color:#c0a0ff;}
+.my{color:#f0e040;font-size:9px;}
+
+/* LOADER */
+.loader-row td{text-align:center;padding:24px;font-family:'Press Start 2P',monospace;font-size:8px;color:#4040aa;}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #2a2a55;border-top-color:#a040f0;border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.end-msg{text-align:center;padding:20px;font-family:'Press Start 2P',monospace;font-size:8px;color:#2a2a55;}
+.empty-msg{text-align:center;padding:60px;font-family:'Press Start 2P',monospace;font-size:10px;color:#4040aa;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
+  <a href="index.html" class="nav-back">← ACCUEIL</a>
+</nav>
+
+<div class="container">
+  <h1 id="page-title">🎮 TOUS LES NIVEAUX</h1>
+
+  <div class="search-bar">
+    <input type="text" class="search-input" id="search-input" placeholder="🔍 Rechercher un niveau ou un créateur..." onkeydown="if(event.key==='Enter')doSearch()">
+    <button class="search-btn" onclick="doSearch()">CHERCHER</button>
+    <span class="count-info" id="count-info"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="lvl-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-col="title" onclick="sortBy('title')">NOM</th>
+          <th class="sortable" data-col="created_at" onclick="sortBy('created_at')">DATE</th>
+          <th>CRÉATEUR</th>
+          <th class="sortable" data-col="plays" onclick="sortBy('plays')">PARTIES</th>
+          <th>RECORD</th>
+          <th>ÉTAT</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="lvl-tbody">
+        <tr class="loader-row"><td colspan="7"><span class="spinner"></span>Chargement...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="end-msg"></div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cpmbkwrnchfutmrcmbfn.supabase.co';
+const SUPABASE_KEY='sb_publishable_b9n_ZalBB9XAShFiK3HL3A_SOeSJ2ca';
+
+const PAGE_SIZE=30;
+let offset=0;
+let loading=false;
+let allLoaded=false;
+let sortCol='created_at';
+let sortDir='desc';
+let searchQ='';
+let currentUser=null;
+let worldBests={};
+let myBests={};
+
+const lang=(()=>{const l=localStorage.getItem('fl_lang')||'fr';return(l==='fr'||l==='en')?l:'fr';})();
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtMs(ms){if(!ms)return'—';return(ms/1000).toFixed(2)+'s';}
+function fmtDate(d){return new Date(d).toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');}
+function getToken(){
+  try{const k=Object.keys(localStorage).find(k=>k.includes('auth-token'));if(!k)return null;const o=JSON.parse(localStorage.getItem(k));return o?.access_token||o?.currentSession?.access_token||null;}catch(e){return null;}
+}
+
+async function sbFetch(path,token){
+  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(token||SUPABASE_KEY)}
+  });
+  return r.ok?r.json():[];
+}
+
+async function loadPage(){
+  if(loading||allLoaded)return;
+  loading=true;
+  showLoader();
+
+  let url='levels?select=id,title,plays,completions,created_at,visibility,user_id';
+  url+='&visibility=in.(public,code)';
+  if(searchQ)url+='&or=(title.ilike.*'+encodeURIComponent(searchQ)+'*)';
+  url+='&order='+sortCol+'.'+(sortDir)+',id.asc';
+  url+='&limit='+PAGE_SIZE+'&offset='+offset;
+
+  const data=await sbFetch(url);
+
+  hideLoader();
+  if(!Array.isArray(data)||data.length===0){
+    if(offset===0){
+      document.getElementById('lvl-tbody').innerHTML=`<tr><td colspan="7" class="empty-msg">${lang==='fr'?'AUCUN NIVEAU TROUVÉ':'NO LEVELS FOUND'}</td></tr>`;
+    }else{
+      document.getElementById('end-msg').innerHTML=`<p class="end-msg">— ${lang==='fr'?'FIN DE LA LISTE':'END OF LIST'} —</p>`;
+      allLoaded=true;
+    }
+    loading=false;
+    return;
+  }
+
+  // Fetch usernames for this batch
+  const uids=[...new Set(data.map(l=>l.user_id).filter(Boolean))];
+  let usernameMap={};
+  if(uids.length){
+    const profiles=await sbFetch('profiles?select=id,username&id=in.('+uids.join(',')+')')
+    if(Array.isArray(profiles))profiles.forEach(p=>{usernameMap[p.id]=p.username;});
+  }
+
+  const tbody=document.getElementById('lvl-tbody');
+  data.forEach(l=>{
+    l.username=usernameMap[l.user_id]||'anonyme';
+    const tr=createRow(l);
+    tbody.appendChild(tr);
+  });
+
+  offset+=data.length;
+  if(data.length<PAGE_SIZE){
+    document.getElementById('end-msg').innerHTML=`<p class="end-msg">— ${lang==='fr'?'FIN DE LA LISTE':'END OF LIST'} —</p>`;
+    allLoaded=true;
+  }
+
+  // Fetch records for this batch
+  fetchRecords(data.map(l=>l.id));
+  document.getElementById('count-info').textContent=offset+' '+(lang==='fr'?'niveau(x) chargé(s)':'level(s) loaded');
+  loading=false;
+}
+
+async function fetchRecords(ids){
+  if(!ids.length)return;
+  const idsStr=ids.join(',');
+  const records=await sbFetch('leaderboard?select=level_id,time_ms&level_id=in.('+idsStr+')&order=time_ms.asc');
+  if(Array.isArray(records))records.forEach(r=>{if(!worldBests[r.level_id])worldBests[r.level_id]=r.time_ms;});
+
+  if(currentUser){
+    const token=getToken();
+    const mine=await sbFetch('leaderboard?select=level_id,time_ms&level_id=in.('+idsStr+')&user_id=eq.'+currentUser.id+'&order=time_ms.asc',token);
+    if(Array.isArray(mine))mine.forEach(r=>{if(!myBests[r.level_id])myBests[r.level_id]=r.time_ms;});
+  }
+
+  // Update record cells
+  ids.forEach(id=>{
+    const el=document.querySelector(`.rec-cell[data-id="${id}"]`);
+    if(!el)return;
+    let html='';
+    if(worldBests[id])html+=`<span class="wr">🏆 ${fmtMs(worldBests[id])}</span>`;
+    if(myBests[id])html+=`<br><span class="my">⭐ ${fmtMs(myBests[id])}</span>`;
+    el.innerHTML=html||'—';
+  });
+}
+
+function createRow(l){
+  const age=(Date.now()-new Date(l.created_at).getTime())/1000/3600;
+  const isNew=age<48;
+  const isOwner=currentUser&&currentUser.id===l.user_id;
+  const visLabel=l.visibility==='public'?(lang==='fr'?'Public':'Public'):(lang==='fr'?'Invitation':'Invite');
+
+  const tr=document.createElement('tr');
+  tr.className='lvl-tr';
+  tr.innerHTML=`
+    <td class="td-name">${esc(l.title||'Sans titre')}${isNew?`<span class="new-badge">NEW</span>`:''}</td>
+    <td class="td-date">${fmtDate(l.created_at)}</td>
+    <td class="td-author">@${esc(l.username)}</td>
+    <td class="td-plays">${l.plays||0}</td>
+    <td class="td-record"><span class="rec-cell" data-id="${l.id}">—</span></td>
+    <td class="td-vis"><span class="vis-badge ${l.visibility}">${visLabel}</span></td>
+    <td class="td-edit">${isOwner?`<button class="edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'">✏️</button>`:''}</td>
+  `;
+  tr.onclick=()=>window.location.href='game.html?level='+l.id;
+  return tr;
+}
+
+function showLoader(){
+  const tbody=document.getElementById('lvl-tbody');
+  let row=document.getElementById('loader-row');
+  if(!row){
+    row=document.createElement('tr');
+    row.id='loader-row';
+    row.className='loader-row';
+    row.innerHTML=`<td colspan="7"><span class="spinner"></span>${lang==='fr'?'Chargement...':'Loading...'}</td>`;
+    tbody.appendChild(row);
+  }
+}
+function hideLoader(){
+  const row=document.getElementById('loader-row');
+  if(row)row.remove();
+}
+
+function sortBy(col){
+  if(sortCol===col){
+    sortDir=sortDir==='asc'?'desc':'asc';
+  }else{
+    sortCol=col;
+    sortDir=col==='title'?'asc':'desc';
+  }
+  // Update header classes
+  document.querySelectorAll('th.sortable').forEach(th=>{
+    th.classList.remove('sorted-asc','sorted-desc');
+    if(th.dataset.col===col)th.classList.add('sorted-'+sortDir);
+  });
+  reset();
+}
+
+function doSearch(){
+  searchQ=document.getElementById('search-input').value.trim();
+  reset();
+}
+
+function reset(){
+  offset=0;
+  allLoaded=false;
+  loading=false;
+  worldBests={};
+  myBests={};
+  document.getElementById('lvl-tbody').innerHTML='';
+  document.getElementById('end-msg').innerHTML='';
+  document.getElementById('count-info').textContent='';
+  loadPage();
+}
+
+// Infinite scroll
+window.addEventListener('scroll',()=>{
+  if((window.innerHeight+window.scrollY)>=document.body.offsetHeight-300){
+    loadPage();
+  }
+});
+
+// Init sort header
+document.querySelector('th[data-col="created_at"]').classList.add('sorted-desc');
+
+// Auth + start
+(async()=>{
+  try{
+    const{data}=await supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{realtime:{enabled:false}}).auth.getSession();
+    if(data.session)currentUser=data.session.user;
+  }catch(e){}
+  loadPage();
+})();
+</script>
+</body>
+</html>
