@@ -54,25 +54,28 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 
 /* GRID */
 .levels-wrap{max-width:900px;margin:0 auto;padding:0 24px 60px;}
-.levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
-.level-card{background:var(--panel);border:1.5px solid var(--border);border-radius:5px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative;}
-.level-card:hover{border-color:var(--accent2);transform:translateY(-3px);box-shadow:0 8px 30px #a040f022;}
-.card-edit-btn{position:absolute;top:8px;right:8px;background:#1a1a3a;border:1.5px solid #4040aa;border-radius:6px;color:#90a0f0;font-size:14px;padding:5px 8px;cursor:pointer;opacity:0;transition:opacity .15s;z-index:2;}
-.level-card:hover .card-edit-btn{opacity:1;}
-.card-edit-btn:hover{background:#2a2a5a;border-color:#7060f0;}
-.level-thumb{height:110px;background:var(--panel2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
-.level-thumb-bg{position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,#ffffff05 10px,#ffffff05 20px);}
-.level-thumb-icon{font-size:36px;position:relative;z-index:1;}
-.level-badge{position:absolute;top:8px;left:8px;font-family:'Press Start 2P',monospace;font-size:6px;padding:4px 8px;background:var(--accent);color:#000;border-radius:2px;}
-.level-body{padding:12px;}
-.level-title{font-family:Orbitron,monospace;font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;}
-.level-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:6px;}
-.level-author{font-size:11px;color:var(--muted);}
-.level-plays{font-size:12px;color:var(--muted);}
-.level-times{display:flex;gap:10px;font-family:Orbitron,monospace;font-size:9px;color:#a0a0cc;margin-top:4px;}
-.empty{text-align:center;padding:60px 24px;color:var(--muted);}
+.levels-grid{width:100%;}
+/* Level table */
+.lvl-table{width:100%;border-collapse:collapse;}
+.lvl-table thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
+.lvl-table th{font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;letter-spacing:1px;padding:12px 16px;text-align:left;white-space:nowrap;}
+.lvl-tr{border-bottom:1px solid #1a1a35;cursor:pointer;transition:background .1s;}
+.lvl-tr:last-child{border-bottom:none;}
+.lvl-tr:hover{background:#0f0f20;}
+.lvl-td{padding:14px 16px;vertical-align:middle;}
+.lvl-td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lvl-td-name .new-badge{font-family:'Press Start 2P',monospace;font-size:6px;padding:2px 6px;background:var(--accent);color:#000;border-radius:2px;margin-left:8px;}
+.lvl-td-date{font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;white-space:nowrap;width:120px;}
+.lvl-td-author{font-family:Rajdhani,sans-serif;font-size:13px;color:#a0a0cc;width:140px;}
+.lvl-td-stars{width:80px;white-space:nowrap;}
+.lvl-td-vis{width:90px;}
+.lvl-td-actions{width:80px;text-align:right;}
+.star-count{font-family:Orbitron,monospace;font-size:10px;color:#f0c040;}
+.edit-btn{font-family:'Press Start 2P',monospace;font-size:8px;padding:6px 12px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.edit-btn:hover{background:#1a1a3a;border-color:#7060f0;}
+.empty{text-align:center;padding:60px 24px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;}
 .empty .icon{font-size:48px;margin-bottom:16px;}
-.empty p{font-family:Rajdhani,sans-serif;font-size:14px;line-height:1.8;}
+.empty p{font-family:Rajdhani,sans-serif;font-size:14px;line-height:1.8;max-width:300px;}
 .loading{text-align:center;padding:60px;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--muted);}
 .vis-badge{font-family:'Press Start 2P',monospace;font-size:6px;padding:3px 7px;border-radius:3px;flex-shrink:0;}
 .vis-badge.public{background:#0d2a1a;color:#40f090;border:1px solid #40f090;}
@@ -103,7 +106,7 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
   <p id="hero-sub">Crée des niveaux de platformer fous,<br>partage-les et joue à ceux des autres !</p>
   <div class="hero-btns">
     <a href="studio.html" class="hero-btn a" id="hero-btn-create" style="display:none;">✏️ CRÉER UN NIVEAU</a>
-    <a href="#levels" class="hero-btn b" id="hero-btn-browse">🎮 PARCOURIR</a>
+    <a href="browse.html" class="hero-btn b" id="hero-btn-browse">🎮 PARCOURIR</a>
   </div>
 </div>
 
@@ -330,7 +333,16 @@ async function loadSection(s){
     return;
   }
 
-  grid.innerHTML=levels.map(l=>levelCard(l)).join('');
+  const t2=T[lang]||T['fr'];
+  const thead=`<thead><tr>
+    <th>${lang==='fr'?'NOM':'NAME'}</th>
+    <th>${lang==='fr'?'DATE':'DATE'}</th>
+    <th>${lang==='fr'?'CRÉATEUR':'CREATOR'}</th>
+    <th>${lang==='fr'?'NOTE':'RATING'}</th>
+    <th>${lang==='fr'?'ÉTAT':'STATUS'}</th>
+    <th></th>
+  </tr></thead>`;
+  grid.innerHTML=`<table class="lvl-table">${thead}<tbody>${levels.map(l=>levelRow(l)).join('')}</tbody></table>`;
 
   // Fetch leaderboard times
   const ids=levels.map(l=>l.id);
@@ -345,39 +357,33 @@ async function loadSection(s){
   }
 
   levels.forEach(l=>{
-    const card=document.querySelector(`.level-card[data-id="${l.id}"]`);
-    if(!card)return;
-    const el=card.querySelector('.level-times');
-    if(el){
-      let html='';
-      if(worldBests[l.id])html+=`<span title="Record mondial">🏆 ${fmtMs(worldBests[l.id])}</span>`;
-      if(myBests[l.id])html+=`<span title="Mon record">⭐ ${fmtMs(myBests[l.id])}</span>`;
-      el.innerHTML=html;
-    }
+    const starEl=document.querySelector(`.star-count[data-id="${l.id}"]`);
+    if(!starEl)return;
+    let html='';
+    if(worldBests[l.id])html+=`<span title="${lang==='fr'?'Record mondial':'World record'}" style="color:#c0a0ff;">🏆 ${fmtMs(worldBests[l.id])}</span>`;
+    if(myBests[l.id])html+=`<br><span title="${lang==='fr'?'Mon record':'My record'}" style="color:#f0e040;font-size:9px;">⭐ ${fmtMs(myBests[l.id])}</span>`;
+    if(html)starEl.innerHTML=html;
   });
 }
 
-function levelCard(l){
+function levelRow(l){
   const t=T[lang]||T['fr'];
   const age=(Date.now()-new Date(l.created_at).getTime())/1000/3600;
   const isNew=age<48;
-  const icons=['🌟','🎮','🔥','⚡','🌈','🎯','💫','🏆','🧩','🚀'];
-  const icon=icons[Math.abs((l.id||'').charCodeAt(0)||0)%icons.length];
   const isOwner=currentUser&&currentUser.id===l.user_id;
-  return`<div class="level-card" data-id="${l.id}" onclick="window.location.href='game.html?level=${l.id}'" style="position:relative;">
-    ${isNew?`<div class="level-badge">${t.new}</div>`:''}
-    ${isOwner?`<button class="card-edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'" title="${lang==='fr'?'Éditer':'Edit'}">✏️</button>`:''}
-    <div class="level-thumb"><div class="level-thumb-bg"></div><div class="level-thumb-icon">${icon}</div></div>
-    <div class="level-body">
-      <div class="level-title">${esc(l.title||'Sans titre')}</div>
-      <div class="level-meta">
-        <span class="level-author">@${esc(l.username||'anonyme')}</span>
-        <span class="vis-badge vis-${l.visibility||'private'}">${l.visibility==='public'?(lang==='fr'?'Public':'Public'):l.visibility==='code'?(lang==='fr'?'Invitation':'Invite'):(lang==='fr'?'Privé':'Private')}</span>
-      </div>
-      <div class="level-plays">▶ ${l.plays||0} ${t.plays}</div>
-      <div class="level-times"></div>
-    </div>
-  </div>`;
+  const d=new Date(l.created_at);
+  const dateStr=d.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
+  const visLabel=l.visibility==='public'?(lang==='fr'?'Public':'Public'):l.visibility==='code'?(lang==='fr'?'Invitation':'Invite'):(lang==='fr'?'Privé':'Private');
+  const stars=l.avg_rating?'⭐ '+Number(l.avg_rating).toFixed(1):'—';
+  return`<tr class="lvl-tr" data-id="${l.id}" onclick="window.location.href='game.html?level=${l.id}'">
+    <td class="lvl-td lvl-td-name">${esc(l.title||'Sans titre')}${isNew?`<span class="new-badge">${t.new}</span>`:''}</td>
+    <td class="lvl-td lvl-td-date">${dateStr}</td>
+    <td class="lvl-td lvl-td-author">@${esc(l.username||'anonyme')}</td>
+    <td class="lvl-td lvl-td-stars"><span class="star-count" data-id="${l.id}">—</span></td>
+    <td class="lvl-td lvl-td-vis"><span class="vis-badge vis-${l.visibility||'private'}">${visLabel}</span></td>
+    <td class="lvl-td lvl-td-actions">${isOwner?`<button class="edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'">✏️ ${lang==='fr'?'ÉDITER':'EDIT'}</button>`:''}
+    </td>
+  </tr>`;
 }
 
 function doLogout(){
