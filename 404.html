@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FunkyLevels — 404</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#08080f;color:#e8e8ff;font-family:'Press Start 2P',monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;text-align:center;padding:24px;}
+.code{font-size:clamp(48px,15vw,120px);color:#f0e040;font-family:Orbitron,monospace;font-weight:900;letter-spacing:8px;animation:flicker 3s infinite;}
+.msg{font-size:12px;color:#a040f0;letter-spacing:2px;margin-bottom:8px;}
+.sub{font-size:8px;color:#4040aa;line-height:2;}
+.btn{margin-top:16px;font-family:'Press Start 2P',monospace;font-size:10px;padding:14px 28px;background:#a040f0;color:#fff;border:none;border-radius:4px;cursor:pointer;text-decoration:none;transition:all .15s;}
+.btn:hover{background:#7030c0;}
+.counter{font-size:8px;color:#2a2a55;margin-top:8px;}
+@keyframes flicker{0%,100%{opacity:1;}92%{opacity:1;}93%{opacity:.4;}94%{opacity:1;}96%{opacity:.4;}97%{opacity:1;}}
+</style>
+</head>
+<body>
+<div class="code">404</div>
+<div class="msg">NIVEAU INTROUVABLE</div>
+<div class="sub">Cette page n'existe pas ou a été supprimée.<br>PAGE NOT FOUND</div>
+<a href="index.html" class="btn">🏠 RETOUR À L'ACCUEIL</a>
+<div class="counter" id="counter">Redirection dans 5s...</div>
+<script>
+let n=5;
+const c=document.getElementById('counter');
+const t=setInterval(()=>{
+  n--;
+  c.textContent='Redirection dans '+n+'s...';
+  if(n<=0){clearInterval(t);window.location.href='index.html';}
+},1000);
+</script>
+</body>
+</html>
