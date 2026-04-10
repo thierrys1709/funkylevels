@@ -146,8 +146,19 @@ async function sendContact(){
   const msg=document.getElementById('contact-msg');
   const btn=document.getElementById('btn-send');
 
+  // Validate fields
   if(!name||!email||!message){
     msg.className='msg err';msg.textContent=t.errFields;return;
+  }
+  if(name.length<2){
+    msg.className='msg err';msg.textContent=lang==='fr'?'Le nom doit contenir au moins 2 caractères.':'Name must be at least 2 characters.';return;
+  }
+  const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRegex.test(email)){
+    msg.className='msg err';msg.textContent=lang==='fr'?'Adresse email invalide.':'Invalid email address.';return;
+  }
+  if(message.length<10){
+    msg.className='msg err';msg.textContent=lang==='fr'?'Le message doit contenir au moins 10 caractères.':'Message must be at least 10 characters.';return;
   }
 
   btn.disabled=true;
