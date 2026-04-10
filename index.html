@@ -91,14 +91,15 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 
 <nav>
   <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
+  <a href="studio.html" class="nav-btn" id="nav-create" style="display:none;">✏️ CRÉER</a>
+  <div style="flex:1;"></div>
   <div class="lang-bar">
     <button class="lang-btn" id="btn-fr" onclick="setLang('fr')">FR</button>
     <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
   </div>
   <a href="settings.html" class="user-chip" id="nav-user" style="display:none;">👤</a>
-  <a href="studio.html" class="nav-btn" id="nav-create" style="display:none;">✏️ CRÉER</a>
   <a href="login.html" class="nav-btn primary" id="nav-login">CONNEXION</a>
-  <button class="nav-btn" id="nav-logout" style="display:none;" onclick="doLogout()">DÉCO</button>
+  <button class="nav-btn" id="nav-logout" style="display:none;" onclick="doLogout()">DÉCONNEXION</button>
 </nav>
 
 <div class="hero">
@@ -165,7 +166,7 @@ const T={
     statLevels:'NIVEAUX',statPlays:'PARTIES',
     searchPh:'🔍 Rechercher un niveau...',searchBtn:'CHERCHER',
     stabNew:'NOUVEAUX',stabTop:'MEILLEURS',stabMine:'MES NIVEAUX',
-    navCreate:'✏️ CRÉER',navLogin:'CONNEXION',navLogout:'DÉCO',
+    navCreate:'✏️ CRÉER',navLogin:'CONNEXION',navLogout:'DÉCONNEXION',
     loading:'Chargement...',
     emptyNew:'Aucun niveau pour le moment.\nSois le premier à en créer un !',
     emptyTop:'Aucun niveau pour le moment.',
@@ -228,7 +229,7 @@ function setLang(l){
   const nc=document.getElementById('nav-create');
   if(nc){const d=nc.style.display;nc.textContent=t.navCreate;nc.style.display=d;}
   document.getElementById('nav-login').textContent=t.navLogin;
-  document.getElementById('nav-logout').textContent=t.navLogout;
+  const nl=document.getElementById('nav-logout');if(nl){const d=nl.style.display;nl.textContent=t.navLogout;nl.style.display=d;}
   const fl=document.getElementById('footer-legal');
   const fp=document.getElementById('footer-privacy');
   const ft=document.getElementById('footer-terms');
