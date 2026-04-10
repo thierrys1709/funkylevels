@@ -197,5 +197,28 @@
     "codeMsg": "Code de partage : ",
     "codeCopied": "(copié !)",
     "errorTxt": "Erreur : "
+  },
+  "browse": {
+    "title": "🎮 TOUS LES NIVEAUX",
+    "back": "← ACCUEIL",
+    "search": "🔍 Rechercher un niveau ou un créateur...",
+    "searchBtn": "CHERCHER",
+    "loaded": "niveau(x) chargé(s)",
+    "thName": "NOM",
+    "thDate": "DATE",
+    "thCreator": "CRÉATEUR",
+    "thPlays": "PARTIES",
+    "thRecord": "RECORD",
+    "thStatus": "ÉTAT",
+    "empty": "AUCUN NIVEAU TROUVÉ",
+    "loading": "Chargement...",
+    "endList": "FIN DE LA LISTE",
+    "visPublic": "Public",
+    "visCode": "Invitation",
+    "visPrivate": "Privé",
+    "worldRecord": "Record mondial",
+    "myRecord": "Mon record",
+    "new": "NOUVEAU",
+    "edit": "✏️"
   }
 }
