@@ -342,6 +342,14 @@ async function loadSection(s){
     <th>${lang==='fr'?'ÉTAT':'STATUS'}</th>
     <th></th>
   </tr></thead>`;
+  // Fetch usernames for creators
+  const uids=[...new Set(levels.map(l=>l.user_id).filter(Boolean))];
+  if(uids.length){
+    const profiles=await sbFetch('profiles?select=id,username&id=in.('+uids.join(',')+')')
+    if(Array.isArray(profiles))profiles.forEach(p=>{
+      levels.forEach(l=>{if(l.user_id===p.id)l.username=p.username;});
+    });
+  }
   grid.innerHTML=`<table class="lvl-table">${thead}<tbody>${levels.map(l=>levelRow(l)).join('')}</tbody></table>`;
 
   // Fetch leaderboard times
