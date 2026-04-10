@@ -197,5 +197,28 @@
     "codeMsg": "Share code: ",
     "codeCopied": "(copied!)",
     "errorTxt": "Error: "
+  },
+  "browse": {
+    "title": "🎮 ALL LEVELS",
+    "back": "← HOME",
+    "search": "🔍 Search a level or creator...",
+    "searchBtn": "SEARCH",
+    "loaded": "level(s) loaded",
+    "thName": "NAME",
+    "thDate": "DATE",
+    "thCreator": "CREATOR",
+    "thPlays": "PLAYS",
+    "thRecord": "RECORD",
+    "thStatus": "STATUS",
+    "empty": "NO LEVELS FOUND",
+    "loading": "Loading...",
+    "endList": "END OF LIST",
+    "visPublic": "Public",
+    "visCode": "Invite",
+    "visPrivate": "Private",
+    "worldRecord": "World record",
+    "myRecord": "My record",
+    "new": "NEW",
+    "edit": "✏️"
   }
 }
