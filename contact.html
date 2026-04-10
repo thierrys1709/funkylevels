@@ -41,16 +41,17 @@ footer{border-top:1px solid #1e1e40;padding:24px;text-align:center;font-family:'
 
 <nav>
   <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
-  <div class="lang-bar">
-    <button class="lang-btn active" id="btn-fr" onclick="setLang('fr')">FR</button>
-    <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
-  </div>
 </nav>
 
 <div class="container">
   <a href="index.html" class="back">← <span id="lbl-back">Retour</span></a>
   <h1 id="lbl-title">CONTACT</h1>
   <p class="subtitle" id="lbl-subtitle">Une question, un signalement ou un problème ? On vous répond dans les plus brefs délais.</p>
+
+  <div style="display:flex;gap:6px;margin-bottom:16px;">
+    <button class="lang-btn active" id="btn-fr" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+  </div>
 
   <div class="card">
     <div class="field">
@@ -115,7 +116,7 @@ const T={
   }
 };
 
-let lang=localStorage.getItem('fl_lang')||'fr';
+let lang=localStorage.getItem('fl_lang')||'en';
 if(lang!=='fr'&&lang!=='en')lang='fr';
 
 function setLang(l){
