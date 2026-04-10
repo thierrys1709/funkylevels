@@ -142,7 +142,7 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 </footer>
 
 <!-- COOKIE BANNER -->
-<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#0d0d1e;border-top:2px solid #2a2a55;padding:16px 24px;z-index:9999;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#0d0d1e;border-top:2px solid #2a2a55;padding:16px 24px;z-index:9999;align-items:center;gap:16px;flex-wrap:wrap;">
   <p id="cookie-text" style="font-family:Rajdhani,sans-serif;font-size:13px;color:#a0a0cc;flex:1;margin:0;line-height:1.6;">
     🍪 Ce site utilise des cookies strictement nécessaires à l'authentification. Aucun cookie publicitaire.
     <a href="legal.html#privacy" style="color:#a040f0;margin-left:4px;" id="cookie-link">En savoir plus</a>
@@ -415,7 +415,8 @@ function acceptCookies(){
 
 // Show cookie banner if not accepted
 if(!localStorage.getItem('fl_cookies')){
-  document.getElementById('cookie-banner').style.display='flex';
+  const cb=document.getElementById('cookie-banner');
+  cb.style.display='flex';
 }
 </script>
 </body>
