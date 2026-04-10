@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FunkyLevels — Contact</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#08080f;color:#e8e8ff;font-family:Rajdhani,sans-serif;min-height:100vh;}
+nav{background:#06060ecc;border-bottom:1px solid #1e1e40;padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;}
+.nav-logo{font-family:Orbitron,monospace;font-size:14px;font-weight:900;color:#f0e040;letter-spacing:2px;text-decoration:none;}
+.lang-bar{margin-left:auto;display:flex;gap:4px;}
+.lang-btn{font-family:'Press Start 2P',monospace;font-size:10px;padding:6px 10px;border:1.5px solid #1e1e40;border-radius:3px;background:#12122a;color:#6060aa;cursor:pointer;}
+.lang-btn.active{border-color:#f0e040;color:#f0e040;}
+.container{max-width:600px;margin:0 auto;padding:48px 24px 80px;}
+.back{font-family:'Press Start 2P',monospace;font-size:9px;color:#6060aa;text-decoration:none;display:inline-flex;align-items:center;gap:8px;margin-bottom:32px;}
+.back:hover{color:#a040f0;}
+h1{font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:#f0e040;letter-spacing:2px;margin-bottom:8px;}
+.subtitle{font-size:14px;color:#6060aa;margin-bottom:32px;line-height:1.6;}
+.card{background:#0d0d1e;border:1.5px solid #2a2a55;border-radius:12px;padding:32px;}
+.field{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.field label{font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;letter-spacing:1px;}
+.field input,.field textarea,.field select{background:#12122a;border:1.5px solid #2a2a55;border-radius:4px;color:#e8e8ff;font-family:Rajdhani,sans-serif;font-size:15px;font-weight:600;padding:12px 14px;outline:none;transition:border-color .2s;width:100%;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#a040f0;}
+.field textarea{resize:vertical;min-height:120px;}
+.field select option{background:#12122a;}
+.btn-send{font-family:'Press Start 2P',monospace;font-size:10px;padding:14px 28px;background:#a040f0;color:#fff;border:none;border-radius:4px;cursor:pointer;width:100%;transition:all .15s;margin-top:8px;}
+.btn-send:hover{background:#7030c0;}
+.btn-send:disabled{opacity:.5;cursor:not-allowed;}
+.msg{font-family:Rajdhani,sans-serif;font-size:13px;font-weight:700;padding:12px 16px;border-radius:4px;margin-top:16px;display:none;}
+.msg.ok{display:block;background:#0d2a1a;color:#40f090;border:1px solid #40f090;}
+.msg.err{display:block;background:#2a0d14;color:#f04060;border:1px solid #f04060;}
+.privacy-note{font-size:12px;color:#4040aa;margin-top:20px;line-height:1.6;}
+.privacy-note a{color:#6060aa;}
+footer{border-top:1px solid #1e1e40;padding:24px;text-align:center;font-family:'Press Start 2P',monospace;font-size:7px;color:#4040aa;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
+  <div class="lang-bar">
+    <button class="lang-btn active" id="btn-fr" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+  </div>
+</nav>
+
+<div class="container">
+  <a href="index.html" class="back">← <span id="lbl-back">Retour</span></a>
+  <h1 id="lbl-title">CONTACT</h1>
+  <p class="subtitle" id="lbl-subtitle">Une question, un signalement ou un problème ? On vous répond dans les plus brefs délais.</p>
+
+  <div class="card">
+    <div class="field">
+      <label id="lbl-name">NOM / PSEUDO</label>
+      <input type="text" id="inp-name" maxlength="80" autocomplete="name">
+    </div>
+    <div class="field">
+      <label id="lbl-email">EMAIL</label>
+      <input type="email" id="inp-email" autocomplete="email">
+    </div>
+    <div class="field">
+      <label id="lbl-subject">SUJET</label>
+      <select id="inp-subject">
+        <option value="bug" id="opt-bug">🐛 Signaler un bug</option>
+        <option value="abuse" id="opt-abuse">🚨 Signaler un contenu abusif</option>
+        <option value="rgpd" id="opt-rgpd">🔒 Demande RGPD (accès / suppression)</option>
+        <option value="question" id="opt-question">❓ Question générale</option>
+        <option value="other" id="opt-other">💬 Autre</option>
+      </select>
+    </div>
+    <div class="field">
+      <label id="lbl-message">MESSAGE</label>
+      <textarea id="inp-message" maxlength="2000"></textarea>
+    </div>
+    <button class="btn-send" id="btn-send" onclick="sendContact()">
+      <span id="lbl-send">📨 ENVOYER</span>
+    </button>
+    <div class="msg" id="contact-msg"></div>
+    <p class="privacy-note" id="lbl-privacy-note">
+      Vos données sont utilisées uniquement pour répondre à votre message, conformément à notre 
+      <a href="legal.html#privacy">politique de confidentialité</a>.
+    </p>
+  </div>
+</div>
+
+<footer>© 2026 FUNKYLEVELS — ALL RIGHTS RESERVED</footer>
+
+<script>
+// API call goes through Vercel serverless function — no key exposed
+
+const T={
+  fr:{
+    back:'Retour', title:'CONTACT',
+    subtitle:'Une question, un signalement ou un problème ? On vous répond dans les plus brefs délais.',
+    name:'NOM / PSEUDO', email:'EMAIL', subject:'SUJET', message:'MESSAGE', send:'📨 ENVOYER',
+    sending:'ENVOI...', ok:'✅ Message envoyé ! Nous vous répondrons sous 48h.', 
+    err:'❌ Erreur lors de l\'envoi. Réessayez ou écrivez à contact@funkylevels.com',
+    errFields:'Remplissez tous les champs.',
+    subjects:['🐛 Signaler un bug','🚨 Signaler un contenu abusif','🔒 Demande RGPD (accès / suppression)','❓ Question générale','💬 Autre'],
+    privacyNote:'Vos données sont utilisées uniquement pour répondre à votre message, conformément à notre <a href="legal.html#privacy">politique de confidentialité</a>.'
+  },
+  en:{
+    back:'Back', title:'CONTACT',
+    subtitle:'A question, a report or an issue? We\'ll get back to you as soon as possible.',
+    name:'NAME / USERNAME', email:'EMAIL', subject:'SUBJECT', message:'MESSAGE', send:'📨 SEND',
+    sending:'SENDING...', ok:'✅ Message sent! We\'ll reply within 48h.',
+    err:'❌ Error sending. Please try again or write to contact@funkylevels.com',
+    errFields:'Please fill in all fields.',
+    subjects:['🐛 Report a bug','🚨 Report abusive content','🔒 GDPR request (access / deletion)','❓ General question','💬 Other'],
+    privacyNote:'Your data is used only to respond to your message, in accordance with our <a href="legal.html#privacy">privacy policy</a>.'
+  }
+};
+
+let lang=localStorage.getItem('fl_lang')||'fr';
+if(lang!=='fr'&&lang!=='en')lang='fr';
+
+function setLang(l){
+  lang=l;localStorage.setItem('fl_lang',l);
+  document.getElementById('btn-fr').classList.toggle('active',l==='fr');
+  document.getElementById('btn-en').classList.toggle('active',l==='en');
+  const t=T[l];
+  document.getElementById('lbl-back').textContent=t.back;
+  document.getElementById('lbl-title').textContent=t.title;
+  document.getElementById('lbl-subtitle').textContent=t.subtitle;
+  document.getElementById('lbl-name').textContent=t.name;
+  document.getElementById('lbl-email').textContent=t.email;
+  document.getElementById('lbl-subject').textContent=t.subject;
+  document.getElementById('lbl-message').textContent=t.message;
+  document.getElementById('lbl-send').textContent=t.send;
+  document.getElementById('lbl-privacy-note').innerHTML=t.privacyNote;
+  const sel=document.getElementById('inp-subject');
+  const vals=['bug','abuse','rgpd','question','other'];
+  t.subjects.forEach((s,i)=>{if(sel.options[i])sel.options[i].text=s;});
+}
+
+async function sendContact(){
+  const t=T[lang];
+  const name=document.getElementById('inp-name').value.trim();
+  const email=document.getElementById('inp-email').value.trim();
+  const subject=document.getElementById('inp-subject').value;
+  const message=document.getElementById('inp-message').value.trim();
+  const msg=document.getElementById('contact-msg');
+  const btn=document.getElementById('btn-send');
+
+  if(!name||!email||!message){
+    msg.className='msg err';msg.textContent=t.errFields;return;
+  }
+
+  btn.disabled=true;
+  document.getElementById('lbl-send').textContent=t.sending;
+  msg.className='msg';
+
+  const subjectLabels={bug:'Bug Report',abuse:'Abuse Report',rgpd:'GDPR Request',question:'General Question',other:'Other'};
+
+  try{
+    const res=await fetch('/api/contact',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,email,subject,message})
+    });
+    if(res.ok){
+      msg.className='msg ok';msg.textContent=t.ok;
+      document.getElementById('inp-name').value='';
+      document.getElementById('inp-email').value='';
+      document.getElementById('inp-message').value='';
+    }else{
+      throw new Error('HTTP '+res.status);
+    }
+  }catch(e){
+    msg.className='msg err';msg.innerHTML=t.err;
+  }
+
+  btn.disabled=false;
+  document.getElementById('lbl-send').textContent=t.send;
+}
+
+setLang(lang);
+</script>
+</body>
+</html>
