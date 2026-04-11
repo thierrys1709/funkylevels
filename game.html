@@ -171,12 +171,22 @@ let _attempt=0;
 
 // ── Navigation ────────────────────────────────────────────
 function showWinScreen(ms, prevBest, isNewRecord, l){
+  const isTestMode=new URLSearchParams(window.location.search).get('from')==='studio';
+
   // Current time
   const timeEl=document.getElementById('win-time-display');
   if(timeEl)timeEl.textContent=fmtTimeFull(ms);
 
-  // Record message
+  // Hide record info in test mode
   const recEl=document.getElementById('win-record-msg');
+  const bestEl=document.getElementById('win-best-display');
+  if(isTestMode){
+    if(recEl){recEl.textContent='';recEl.style.display='none';}
+    if(bestEl){bestEl.textContent='';bestEl.style.display='none';}
+    return;
+  }
+
+  // Record message
   if(recEl){
     if(isNewRecord&&prevBest!==null){
       const diff=prevBest-Math.round(ms);
@@ -194,9 +204,9 @@ function showWinScreen(ms, prevBest, isNewRecord, l){
   }
 
   // Best time
-  const bestEl=document.getElementById('win-best-display');
-  if(bestEl){
-    bestEl.textContent=_bestTime!==null
+  const bestEl2=document.getElementById('win-best-display');
+  if(bestEl2){
+    bestEl2.textContent=_bestTime!==null
       ?(l==='fr'?'MON RECORD : ':'MY BEST: ')+fmtTimeFull(_bestTime)
       :'';
   }
