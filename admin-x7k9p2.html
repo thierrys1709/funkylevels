@@ -291,7 +291,7 @@ async function updateStatus(id,status){
 // Auth check
 (async()=>{
   const{data}=await sb.auth.getSession();
-  const ADMIN_UID='0923acce-41b3-471c-bb8e-9931b78fd6fa';
+  const ADMIN_UID='9f071976-8bc7-4ee5-90d3-8095160962e8';
   if(!data.session||data.session.user.id!==ADMIN_UID){
     document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#08080f;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 ACCÈS REFUSÉ</div><a href="index.html" style="font-size:10px;color:#a040f0;padding:12px 24px;border:1.5px solid #a040f0;border-radius:6px;text-decoration:none;">🏠 ACCUEIL</a></div>';
     return;
