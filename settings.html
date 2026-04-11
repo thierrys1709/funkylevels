@@ -85,13 +85,13 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .lvl-vis-badge.code{background:#2a1a4a;color:#c090f0;border:1px solid #8040c0;}
 
 /* Visibility 3-button group */
-.vis-btn-group{display:flex;border-radius:6px;overflow:hidden;border:1.5px solid #2a2a55;}
-.vis-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 10px;cursor:pointer;border:none;border-right:1px solid #2a2a55;background:#12122a;color:#4040aa;transition:all .15s;white-space:nowrap;}
-.vis-btn:last-child{border-right:none;}
-.vis-btn:hover{filter:brightness(1.3);}
-.vis-btn.active-private{background:#1a2a4a;color:#90c0f0;}
-.vis-btn.active-public{background:#1a3a2a;color:#60e090;}
-.vis-btn.active-code{background:#2a1a4a;color:#c090f0;}
+.vis-btn-group{display:flex;gap:4px;}
+.vis-btn{font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;border:1.5px solid #2a2a55;border-radius:5px;background:#12122a;color:#4040aa;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.vis-btn:hover{border-color:#6060aa;color:#a0a0cc;background:#1a1a3a;}
+.vis-btn.active-private{background:#1a2a4a;color:#90c0f0;border-color:#4060c0;}
+.vis-btn.active-public{background:#1a3a2a;color:#60e090;border-color:#40a060;}
+.vis-btn.active-code{background:#2a1a4a;color:#c090f0;border-color:#8040c0;}
+.vis-btn:not([class*="active"]):hover{opacity:0.8;}
 /* Actions: always in DOM, invisible by default */
 .lvl-actions{display:flex;gap:6px;opacity:0;pointer-events:none;transition:opacity .15s;}
 .lvl-row:hover .lvl-actions{opacity:1;pointer-events:auto;}
@@ -464,9 +464,9 @@ async function loadStats(){
       '<td class="lvl-td-myrecord" style="font-family:Orbitron,monospace;font-size:10px;color:#f0e040;padding:14px 16px;white-space:nowrap;">—</td>'+
       '<td class="lvl-td-vis" data-level-id-vis="'+l.id+'">'+
         '<div class="vis-btn-group" data-level-id="'+l.id+'">'+
-          '<button class="vis-btn '+(vis==='private'?'active-private':'')+'" data-vis="private" onclick="event.stopPropagation();">🔒</button>'+
-          '<button class="vis-btn '+(vis==='public'?'active-public':'')+'" data-vis="public" onclick="event.stopPropagation();">🌍</button>'+
-          '<button class="vis-btn '+(vis==='code'?'active-code':'')+'" data-vis="code" onclick="event.stopPropagation();">🔑</button>'+
+          '<button class="vis-btn '+(vis==='private'?'active-private':'')+'" data-vis="private" onclick="event.stopPropagation();" title="Privé">🔒 '+(lang==='fr'?'Privé':'Private')+'</button>'+
+          '<button class="vis-btn '+(vis==='public'?'active-public':'')+'" data-vis="public" onclick="event.stopPropagation();" title="Public">🌍 Public</button>'+
+          '<button class="vis-btn '+(vis==='code'?'active-code':'')+'" data-vis="code" onclick="event.stopPropagation();" title="Par code">'+(lang==='fr'?'🔑 Code':'🔑 Code')+'</button>'+
         '</div>'+
       '</td>'+
       '<td class="lvl-td-actions"><div class="lvl-actions">'+
@@ -585,10 +585,12 @@ async function setVisibility(levelId, targetVis, btn, lvlData){
   if(error){alert((l==='fr'?'Erreur: ':'Error: ')+error.message);return;}
   lvlData.visibility=targetVis;
 
-  // Update buttons
+  // Update buttons active state
   const group=btn.closest('.vis-btn-group');
   if(group){
-    group.querySelectorAll('.vis-btn').forEach(b=>b.className='vis-btn');
+    group.querySelectorAll('.vis-btn').forEach(b=>{
+      b.className='vis-btn';
+    });
     btn.classList.add('active-'+targetVis);
   }
 }
