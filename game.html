@@ -1057,18 +1057,17 @@ init();
 </script>
 
 <!-- MOBILE CONTROLS -->
-<div id="mobile-controls" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;pointer-events:none;padding:0 16px 20px;user-select:none;">
-  <!-- Left side: arrows -->
-  <div style="position:absolute;bottom:20px;left:16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:auto;">
-    <button id="mb-up" class="mb-btn mb-up" onpointerdown="mbDown('up')" onpointerup="mbUp('up')" onpointercancel="mbUp('up')">▲</button>
-    <div style="display:flex;gap:6px;">
-      <button id="mb-left" class="mb-btn" onpointerdown="mbDown('left')" onpointerup="mbUp('left')" onpointercancel="mbUp('left')">◀</button>
-      <button id="mb-down" class="mb-btn" onpointerdown="mbDown('down')" onpointerup="mbUp('down')" onpointercancel="mbUp('down')">▼</button>
-      <button id="mb-right" class="mb-btn" onpointerdown="mbDown('right')" onpointerup="mbUp('right')" onpointercancel="mbUp('right')">▶</button>
-    </div>
+<div id="mobile-controls" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;pointer-events:none;padding:0 20px 24px;user-select:none;">
+  <!-- Left button -->
+  <div style="position:absolute;bottom:24px;left:20px;pointer-events:auto;">
+    <button id="mb-left" class="mb-btn" onpointerdown="mbDown('left')" onpointerup="mbUp('left')" onpointercancel="mbUp('left')">◀</button>
   </div>
-  <!-- Right side: jump -->
-  <div style="position:absolute;bottom:20px;right:16px;pointer-events:auto;">
+  <!-- Right button -->
+  <div style="position:absolute;bottom:24px;left:100px;pointer-events:auto;">
+    <button id="mb-right" class="mb-btn" onpointerdown="mbDown('right')" onpointerup="mbUp('right')" onpointercancel="mbUp('right')">▶</button>
+  </div>
+  <!-- Jump button -->
+  <div style="position:absolute;bottom:24px;right:20px;pointer-events:auto;">
     <button id="mb-jump" class="mb-btn mb-jump" onpointerdown="mbDown('jump')" onpointerup="mbUp('jump')" onpointercancel="mbUp('jump')">⬆</button>
   </div>
 </div>
@@ -1104,20 +1103,24 @@ if(isMobile){
 
 // Mobile button handlers - map to gKeys
 const mbMap={
-  up:'ArrowUp',
-  down:'ArrowDown',
   left:'ArrowLeft',
   right:'ArrowRight',
   jump:'Space'
 };
 
+// Fix speed consistency - use a Set to track active mobile keys
+const mbActive=new Set();
+
 function mbDown(dir){
+  if(mbActive.has(dir))return; // prevent duplicate fires
+  mbActive.add(dir);
   const key=mbMap[dir];
   if(key)gKeys[key]=true;
   const btn=document.getElementById('mb-'+dir);
   if(btn)btn.classList.add('pressed');
 }
 function mbUp(dir){
+  mbActive.delete(dir);
   const key=mbMap[dir];
   if(key)gKeys[key]=false;
   const btn=document.getElementById('mb-'+dir);
