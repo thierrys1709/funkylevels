@@ -1055,5 +1055,84 @@ document.addEventListener('keydown',()=>{
 resizeGameCanvas(); // Size canvas immediately on load
 init();
 </script>
+
+<!-- MOBILE CONTROLS -->
+<div id="mobile-controls" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;pointer-events:none;padding:0 16px 20px;user-select:none;">
+  <!-- Left side: arrows -->
+  <div style="position:absolute;bottom:20px;left:16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:auto;">
+    <button id="mb-up" class="mb-btn mb-up" onpointerdown="mbDown('up')" onpointerup="mbUp('up')" onpointercancel="mbUp('up')">▲</button>
+    <div style="display:flex;gap:6px;">
+      <button id="mb-left" class="mb-btn" onpointerdown="mbDown('left')" onpointerup="mbUp('left')" onpointercancel="mbUp('left')">◀</button>
+      <button id="mb-down" class="mb-btn" onpointerdown="mbDown('down')" onpointerup="mbUp('down')" onpointercancel="mbUp('down')">▼</button>
+      <button id="mb-right" class="mb-btn" onpointerdown="mbDown('right')" onpointerup="mbUp('right')" onpointercancel="mbUp('right')">▶</button>
+    </div>
+  </div>
+  <!-- Right side: jump -->
+  <div style="position:absolute;bottom:20px;right:16px;pointer-events:auto;">
+    <button id="mb-jump" class="mb-btn mb-jump" onpointerdown="mbDown('jump')" onpointerup="mbUp('jump')" onpointercancel="mbUp('jump')">⬆</button>
+  </div>
+</div>
+
+<style>
+.mb-btn{
+  width:56px;height:56px;
+  background:rgba(160,64,240,0.3);
+  border:2px solid rgba(160,64,240,0.6);
+  border-radius:12px;
+  color:#fff;
+  font-size:20px;
+  cursor:pointer;
+  touch-action:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .1s;
+  display:flex;align-items:center;justify-content:center;
+}
+.mb-btn:active,.mb-btn.pressed{background:rgba(160,64,240,0.7);}
+.mb-up{width:56px;}
+.mb-jump{width:72px;height:72px;font-size:28px;background:rgba(240,224,64,0.3);border-color:rgba(240,224,64,0.6);}
+.mb-jump:active,.mb-jump.pressed{background:rgba(240,224,64,0.7);}
+</style>
+
+<script>
+// Mobile detection
+const isMobile=/Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent)||('ontouchstart' in window);
+if(isMobile){
+  document.getElementById('mobile-controls').style.display='block';
+  // Prevent default touch scroll on canvas
+  document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+}
+
+// Mobile button handlers - map to gKeys
+const mbMap={
+  up:'ArrowUp',
+  down:'ArrowDown',
+  left:'ArrowLeft',
+  right:'ArrowRight',
+  jump:'Space'
+};
+
+function mbDown(dir){
+  const key=mbMap[dir];
+  if(key)gKeys[key]=true;
+  const btn=document.getElementById('mb-'+dir);
+  if(btn)btn.classList.add('pressed');
+}
+function mbUp(dir){
+  const key=mbMap[dir];
+  if(key)gKeys[key]=false;
+  const btn=document.getElementById('mb-'+dir);
+  if(btn)btn.classList.remove('pressed');
+}
+
+// Also show controls button in HUD on mobile
+if(isMobile){
+  // Hide controls when overlay is shown
+  const observer=new MutationObserver(()=>{
+    const anyOv=document.querySelector('.ov.show');
+    document.getElementById('mobile-controls').style.display=anyOv?'none':'block';
+  });
+  document.querySelectorAll('.ov').forEach(el=>observer.observe(el,{attributes:true,attributeFilter:['class']}));
+}
+</script>
 </body>
 </html>
