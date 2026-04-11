@@ -434,8 +434,8 @@ async function loadStats(){
     '<th>'+(lang==='fr'?'NOM':'NAME')+'</th>'+
     '<th>'+(lang==='fr'?'MODIFIÉ':'MODIFIED')+'</th>'+
     '<th>'+(lang==='fr'?'PARTIES / FINS':'PLAYS / ENDS')+'</th>'+
-    '<th>'+(lang==='fr'?'RECORD':'WORLD BEST')+'</th>'+
-    '<th>'+(lang==='fr'?'MON RECORD':'MY BEST')+'</th>'+
+    '<th style="width:70px;padding:10px 6px;">'+(lang==='fr'?'RECORD':'BEST')+'</th>'+
+    '<th style="width:70px;padding:10px 6px;">'+(lang==='fr'?'MON RECORD':'MY BEST')+'</th>'+
     '<th>'+(lang==='fr'?'ÉTAT':'STATUS')+'</th>'+
     '<th>'+(lang==='fr'?'ACTIONS':'ACTIONS')+'</th>'+
   '</tr>';
@@ -465,7 +465,7 @@ async function loadStats(){
       '<td class="lvl-td-date">'+dateStr+' <span style="color:#6060aa;">'+timeStr+'</span></td>'+
       '<td class="lvl-td-stats">▶ '+(l.plays||0)+' &nbsp;✓ '+(l.completions||0)+'</td>'+
       '<td class="lvl-td-record" style="font-family:Orbitron,monospace;font-size:10px;color:#c0a0ff;padding:14px 16px;white-space:nowrap;">—</td>'+
-      '<td class="lvl-td-myrecord" style="font-family:Orbitron,monospace;font-size:10px;color:#f0e040;padding:14px 16px;white-space:nowrap;">—</td>'+
+      '<td class="lvl-td-myrecord" style="font-family:Orbitron,monospace;font-size:9px;color:#f0e040;padding:14px 6px;white-space:nowrap;width:70px;">—</td>'+
       '<td class="lvl-td-vis" data-level-id-vis="'+l.id+'">'+
         '<div class="vis-btn-group" data-level-id="'+l.id+'">'+
           '<button class="vis-btn '+(vis==='private'?'active-private':'')+'" data-vis="private" onclick="event.stopPropagation();" title="Privé">🔒 '+(lang==='fr'?'Privé':'Private')+'</button>'+
