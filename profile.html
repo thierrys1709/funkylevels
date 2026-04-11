@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FunkyLevels — Profil</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#08080f;color:#e8e8ff;font-family:Rajdhani,sans-serif;min-height:100vh;}
+nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(12px);border-bottom:1px solid #1e1e40;padding:0 24px;height:56px;display:flex;align-items:center;gap:12px;}
+.nav-logo{font-family:Orbitron,monospace;font-size:14px;font-weight:900;color:#f0e040;letter-spacing:2px;text-decoration:none;margin-right:auto;}
+.nav-back{font-family:'Press Start 2P',monospace;font-size:9px;color:#6060aa;text-decoration:none;padding:8px 14px;border:1.5px solid #2a2a55;border-radius:4px;}
+.nav-back:hover{color:#a040f0;border-color:#a040f0;}
+
+.container{max-width:900px;margin:0 auto;padding:40px 24px 80px;}
+
+/* PROFILE CARD */
+.profile-card{background:#0d0d1e;border:1.5px solid #2a2a55;border-radius:12px;padding:32px;display:flex;align-items:center;gap:28px;margin-bottom:40px;flex-wrap:wrap;}
+.avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#a040f0,#4040aa);display:flex;align-items:center;justify-content:center;font-family:Orbitron,monospace;font-size:28px;font-weight:900;color:#fff;flex-shrink:0;border:3px solid #a040f0;}
+.profile-info{flex:1;}
+.profile-name{font-family:Orbitron,monospace;font-size:20px;font-weight:900;color:#f0e040;letter-spacing:2px;margin-bottom:8px;}
+.profile-meta{display:flex;gap:20px;flex-wrap:wrap;}
+.profile-stat{display:flex;flex-direction:column;align-items:center;background:#12122a;border:1px solid #2a2a55;border-radius:8px;padding:12px 20px;}
+.profile-stat-val{font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:#a040f0;}
+.profile-stat-lbl{font-family:'Press Start 2P',monospace;font-size:7px;color:#6060aa;margin-top:4px;}
+.profile-since{font-size:12px;color:#4040aa;margin-top:12px;}
+
+/* LEVELS TABLE */
+h2{font-family:Orbitron,monospace;font-size:13px;color:#e8e8ff;letter-spacing:2px;margin-bottom:16px;}
+.table-wrap{border:1.5px solid #1e1e40;border-radius:8px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
+th{font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;letter-spacing:1px;padding:12px 16px;text-align:left;white-space:nowrap;}
+.lvl-tr{border-bottom:1px solid #1a1a35;cursor:pointer;transition:background .1s;}
+.lvl-tr:last-child{border-bottom:none;}
+.lvl-tr:hover{background:#0f0f20;}
+td{padding:14px 16px;vertical-align:middle;}
+.td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.td-date{font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;white-space:nowrap;width:110px;}
+.td-plays{font-family:Orbitron,monospace;font-size:11px;color:#8080cc;width:80px;text-align:right;}
+.td-record{font-family:Orbitron,monospace;font-size:10px;width:120px;}
+.wr{color:#c0a0ff;}
+.my{color:#f0e040;font-size:9px;}
+.new-badge{font-family:'Press Start 2P',monospace;font-size:6px;padding:2px 6px;background:#f0e040;color:#000;border-radius:2px;margin-left:8px;vertical-align:middle;}
+.empty{text-align:center;padding:60px;font-family:'Press Start 2P',monospace;font-size:9px;color:#4040aa;}
+.loading{text-align:center;padding:40px;font-family:'Press Start 2P',monospace;font-size:8px;color:#4040aa;}
+.error-page{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:20px;text-align:center;}
+.error-page .code{font-family:Orbitron,monospace;font-size:48px;color:#f04060;}
+.error-page .msg{font-family:'Press Start 2P',monospace;font-size:10px;color:#6060aa;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
+  <a href="index.html" class="nav-back" id="nav-back">← ACCUEIL</a>
+</nav>
+
+<div class="container" id="main-content">
+  <div class="loading">Chargement...</div>
+</div>
+
+<script>
+const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
+const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
+
+const lang=(()=>{const l=localStorage.getItem('fl_lang')||'fr';return(l==='fr'||l==='en')?l:'fr';})();
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtMs(ms){if(!ms)return'—';return(ms/1000).toFixed(2)+'s';}
+function fmtDate(d){return new Date(d).toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');}
+
+async function sbFetch(path,token){
+  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(token||SUPABASE_KEY)}
+  });
+  return r.ok?r.json():[];
+}
+
+function getToken(){
+  try{const k=Object.keys(localStorage).find(k=>k.includes('auth-token'));if(!k)return null;const o=JSON.parse(localStorage.getItem(k));return o?.access_token||o?.currentSession?.access_token||null;}catch(e){return null;}
+}
+
+function showError(msg){
+  document.getElementById('main-content').innerHTML=`
+    <div class="error-page">
+      <div class="code">404</div>
+      <div class="msg">${msg}</div>
+      <a href="index.html" style="font-family:'Press Start 2P',monospace;font-size:9px;color:#a040f0;padding:12px 24px;border:1.5px solid #a040f0;border-radius:4px;text-decoration:none;margin-top:8px;">🏠 ACCUEIL</a>
+    </div>`;
+}
+
+(async()=>{
+  const params=new URLSearchParams(window.location.search);
+  const userId=params.get('id');
+  const username=params.get('u');
+
+  if(!userId&&!username){showError(lang==='fr'?'PROFIL INTROUVABLE':'PROFILE NOT FOUND');return;}
+
+  // Fetch profile
+  let profileUrl='profiles?select=id,username,created_at,character';
+  if(userId) profileUrl+='&id=eq.'+userId;
+  else profileUrl+='&username=eq.'+encodeURIComponent(username);
+
+  const profiles=await sbFetch(profileUrl);
+  const profile=profiles[0];
+  if(!profile){showError(lang==='fr'?'UTILISATEUR INTROUVABLE':'USER NOT FOUND');return;}
+
+  // Update page title
+  document.title='FunkyLevels — @'+profile.username;
+
+  // Fetch public levels
+  const levels=await sbFetch('levels?select=id,title,plays,completions,created_at,visibility&user_id=eq.'+profile.id+'&visibility=in.(public,code)&order=created_at.desc');
+
+  // Fetch world records for these levels
+  let worldBests={};
+  let myBests={};
+  if(levels.length){
+    const ids=levels.map(l=>l.id).join(',');
+    const records=await sbFetch('leaderboard?select=level_id,time_ms&level_id=in.('+ids+')&order=time_ms.asc');
+    if(Array.isArray(records))records.forEach(r=>{if(!worldBests[r.level_id])worldBests[r.level_id]=r.time_ms;});
+
+    const token=getToken();
+    if(token){
+      try{
+        const{data:sess}=await(await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2')).createClient(SUPABASE_URL,SUPABASE_KEY).auth.getSession();
+      }catch(e){}
+      const mine=await sbFetch('leaderboard?select=level_id,time_ms&level_id=in.('+ids+')&order=time_ms.asc',token);
+      if(Array.isArray(mine))mine.forEach(r=>{if(!myBests[r.level_id])myBests[r.level_id]=r.time_ms;});
+    }
+  }
+
+  // Avatar letter
+  const avatarLetter=(profile.username||'?')[0].toUpperCase();
+  const memberSince=lang==='fr'?'Membre depuis':'Member since';
+  const totalPlays=levels.reduce((a,l)=>a+(l.plays||0),0);
+
+  // Render
+  const levelsHtml=levels.length?`
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>${lang==='fr'?'NOM':'NAME'}</th>
+          <th>${lang==='fr'?'DATE':'DATE'}</th>
+          <th>${lang==='fr'?'PARTIES':'PLAYS'}</th>
+          <th>${lang==='fr'?'RECORD MONDIAL':'WORLD RECORD'}</th>
+          <th>${lang==='fr'?'MON RECORD':'MY RECORD'}</th>
+        </tr></thead>
+        <tbody>
+          ${levels.map(l=>{
+            const age=(Date.now()-new Date(l.created_at).getTime())/1000/3600;
+            const isNew=age<48;
+            return`<tr class="lvl-tr" onclick="window.location.href='game.html?level=${l.id}'">
+              <td class="td-name">${esc(l.title||'Sans titre')}${isNew?`<span class="new-badge">NEW</span>`:''}</td>
+              <td class="td-date">${fmtDate(l.created_at)}</td>
+              <td class="td-plays">${l.plays||0}</td>
+              <td class="td-record"><span class="wr">${worldBests[l.id]?'🏆 '+fmtMs(worldBests[l.id]):'—'}</span></td>
+              <td class="td-record"><span class="my">${myBests[l.id]?'⭐ '+fmtMs(myBests[l.id]):'—'}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `:`<div class="empty">${lang==='fr'?'AUCUN NIVEAU PUBLIÉ':'NO PUBLISHED LEVELS'}</div>`;
+
+  document.getElementById('main-content').innerHTML=`
+    <div class="profile-card">
+      <div class="avatar">${avatarLetter}</div>
+      <div class="profile-info">
+        <div class="profile-name">@${esc(profile.username||'anonyme')}</div>
+        <div class="profile-meta">
+          <div class="profile-stat">
+            <div class="profile-stat-val">${levels.length}</div>
+            <div class="profile-stat-lbl">${lang==='fr'?'NIVEAUX':'LEVELS'}</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-val">${totalPlays}</div>
+            <div class="profile-stat-lbl">${lang==='fr'?'PARTIES':'PLAYS'}</div>
+          </div>
+        </div>
+        <div class="profile-since">${memberSince} : ${fmtDate(profile.created_at)}</div>
+      </div>
+    </div>
+    <h2>🎮 ${lang==='fr'?'SES NIVEAUX':'THEIR LEVELS'}</h2>
+    ${levelsHtml}
+  `;
+})();
+</script>
+</body>
+</html>
