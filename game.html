@@ -57,7 +57,7 @@ body.test-mode #hud-best{display:none!important;}
 
 <div id="gwrap">
   <div id="gtopbar">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v2.5</span>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v2.6</span>
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <div id="test-mode-badge" style="display:none;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 16px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;letter-spacing:1px;">🧪 MODE TEST</div>
     <button class="gtop-btn" id="btn-fs" onclick="toggleFullscreen()" style="background:#1a1a0d;border:1.5px solid #7a7a3a;color:#f0e040;">⛶ PLEIN ÉCRAN</button>
@@ -120,12 +120,18 @@ body.test-mode #hud-best{display:none!important;}
   <div id="win-best-display" style="font-family:Orbitron,monospace;font-size:13px;color:#8080aa;letter-spacing:1px;"></div>
 
   <!-- Boutons -->
-  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
+  <!-- Titre + boutons publier (cachés par défaut) -->
+  <div id="publish-section" style="display:none;text-align:center;margin-top:8px;">
+    <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#f0e040;letter-spacing:2px;margin-bottom:10px;">🚀 PUBLIER CE NIVEAU</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="publishAsPublic()" id="btn-pub-public" style="background:#0d2a1a;color:#40f090;border:2px solid #40f090;font-size:11px;padding:12px 20px;">🌍 RENDRE PUBLIC</button>
+      <button onclick="publishAsCode()" id="btn-pub-code" style="background:#1a0d2a;color:#c090f0;border:2px solid #c090f0;font-size:11px;padding:12px 20px;">🔑 PAR CODE</button>
+    </div>
+  </div>
+  <!-- Autres boutons -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;">
     <button onclick="gameRespawn()" id="btn-replay" style="background:#1a1a3a;color:#90a0f0;border:2px solid #4040aa;font-size:11px;padding:12px 20px;">🔄 RECOMMENCER</button>
-    <button onclick="publishAsPublic()" id="btn-pub-public" style="background:#0d2a1a;color:#40f090;border:2px solid #40f090;font-size:11px;padding:12px 20px;display:none;">🌍 RENDRE PUBLIC</button>
-    <button onclick="publishAsCode()" id="btn-pub-code" style="background:#1a0d2a;color:#c090f0;border:2px solid #c090f0;font-size:11px;padding:12px 20px;display:none;">🔑 PAR CODE</button>
     <button onclick="goToEditor()" id="btn-edit-win" style="background:#1a2a1a;color:#60e090;border:2px solid #3a8a3a;font-size:11px;padding:12px 20px;display:none;">✏️ ÉDITER</button>
-    <button onclick="goToIndex()" id="btn-back" style="background:#1a1a1a;color:#aaa;border:2px solid #555;font-size:11px;padding:12px 20px;">🏠 ACCUEIL</button>
   </div>
 </div>
 
@@ -865,10 +871,10 @@ function gUpdate(now){
         // Show edit always (owner)
         if(btnEdit)btnEdit.style.display='';
 
-        // Show publish buttons if private
+        // Show publish section if private
         if(lvl.visibility==='private'){
-          if(btnPub)btnPub.style.display='';
-          if(btnCode)btnCode.style.display='';
+          const pubSection=document.getElementById('publish-section');
+          if(pubSection)pubSection.style.display='block';
         }
       }catch(e){console.warn('Win check error:',e);}
     })();
