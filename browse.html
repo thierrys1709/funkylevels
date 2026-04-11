@@ -216,7 +216,7 @@ function createRow(l){
   tr.innerHTML=`
     <td class="td-name">${esc(l.title||'Sans titre')}${isNew?`<span class="new-badge">NEW</span>`:''}</td>
     <td class="td-date">${fmtDate(l.created_at)}</td>
-    <td class="td-author">@${esc(l.username)}</td>
+    <td class="td-author"><a href="profile.html?id=${l.user_id}" onclick="event.stopPropagation();" style="color:#a0a0cc;text-decoration:none;">@${esc(l.username)}</a></td>
     <td class="td-plays">${l.plays||0}</td>
     <td class="td-record"><span class="rec-cell" data-id="${l.id}">—</span></td>
     <td class="td-vis"><span class="vis-badge ${l.visibility}">${visLabel}</span></td>
