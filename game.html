@@ -111,11 +111,12 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
   <div id="win-best-display" style="font-family:Orbitron,monospace;font-size:13px;color:#8080aa;letter-spacing:1px;"></div>
 
   <!-- Boutons -->
-  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
-    <button onclick="gameRespawn()" id="btn-replay" style="background:#1a1a3a;color:#90a0f0;border:2px solid #4040aa;font-size:13px;padding:14px 24px;">🔄 RECOMMENCER</button>
-    <button onclick="goToEditor()" id="btn-edit-win" style="background:#1a2a1a;color:#60e090;border:2px solid #3a8a3a;display:none;">✏️ ÉDITER</button>
-    <button onclick="publishFromGame()" id="btn-publish-win" style="background:#0a1e2a;color:#40c0f0;border:2px solid #308090;display:none;">🚀 PUBLIER</button>
-    <button onclick="goToIndex()" id="btn-back" style="background:#333;color:#aaa;border:2px solid #555;">🏠 ACCUEIL</button>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
+    <button onclick="gameRespawn()" id="btn-replay" style="background:#1a1a3a;color:#90a0f0;border:2px solid #4040aa;font-size:11px;padding:12px 20px;">🔄 RECOMMENCER</button>
+    <button onclick="publishAsPublic()" id="btn-pub-public" style="background:#0d2a1a;color:#40f090;border:2px solid #40f090;font-size:11px;padding:12px 20px;display:none;">🌍 RENDRE PUBLIC</button>
+    <button onclick="publishAsCode()" id="btn-pub-code" style="background:#1a0d2a;color:#c090f0;border:2px solid #c090f0;font-size:11px;padding:12px 20px;display:none;">🔑 PAR CODE</button>
+    <button onclick="goToEditor()" id="btn-edit-win" style="background:#1a2a1a;color:#60e090;border:2px solid #3a8a3a;font-size:11px;padding:12px 20px;display:none;">✏️ ÉDITER</button>
+    <button onclick="goToIndex()" id="btn-back" style="background:#1a1a1a;color:#aaa;border:2px solid #555;font-size:11px;padding:12px 20px;">🏠 ACCUEIL</button>
   </div>
 </div>
 
@@ -204,23 +205,28 @@ function showWinScreen(ms, prevBest, isNewRecord, l){
   }
 }
 
-async function publishFromGame(){
+async function publishLevel(visibility){
   if(!_currentLevelId)return;
   const{data:sess}=await _sb.auth.getSession();
   if(!sess.session)return;
-  const btn=document.getElementById('btn-publish-win');
-  if(btn){btn.textContent='⏳...';btn.disabled=true;}
+  const btnPub=document.getElementById('btn-pub-public');
+  const btnCode=document.getElementById('btn-pub-code');
+  if(btnPub)btnPub.disabled=true;
+  if(btnCode)btnCode.disabled=true;
   const{error}=await _sb.from('levels')
-    .update({visibility:'public',is_published:true})
+    .update({visibility,is_published:true})
     .eq('id',_currentLevelId)
     .eq('user_id',sess.session.user.id);
   if(error){
-    if(btn){btn.textContent='🚀 PUBLIER';btn.disabled=false;}
+    if(btnPub)btnPub.disabled=false;
+    if(btnCode)btnCode.disabled=false;
     alert('Erreur: '+error.message);
     return;
   }
   window.location.href='index.html';
 }
+function publishAsPublic(){publishLevel('public');}
+function publishAsCode(){publishLevel('code');}
 
 function goToEditor(){
   if(_currentLevelId)window.location.href='studio.html?level='+_currentLevelId+'&mode=edit';
@@ -797,10 +803,12 @@ function gUpdate(now){
           await _sb.from('levels').update({author_completed:true}).eq('id',_currentLevelId);
           if(_levelData)_levelData.author_completed=true;
         }
-        // Show publish button if level is private
-        const pubBtn=document.getElementById('btn-publish-win');
-        if(pubBtn&&lvl.visibility==='private'){
-          pubBtn.style.display='';
+        // Show publish + code buttons if level is private and author completed
+        if(lvl.visibility==='private'){
+          const btnPub=document.getElementById('btn-pub-public');
+          const btnCode=document.getElementById('btn-pub-code');
+          if(btnPub)btnPub.style.display='';
+          if(btnCode)btnCode.style.display='';
         }
       });
     }
