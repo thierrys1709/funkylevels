@@ -127,7 +127,12 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
 const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
 const _sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const _sbUrl=SUPABASE_URL;
+const _sbKey=SUPABASE_KEY;
 const _lang=()=>localStorage.getItem('fl_lang')||'fr';
+function _getToken(){
+  try{const k=Object.keys(localStorage).find(k=>k.includes('auth-token'));if(!k)return null;const o=JSON.parse(localStorage.getItem(k));return o?.access_token||o?.currentSession?.access_token||null;}catch(e){return null;}
+}
 
 // ── Lang ──────────────────────────────────────────────────
 let _langCache={};
