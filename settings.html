@@ -19,7 +19,7 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .nav-back:hover{border-color:var(--accent);color:var(--accent);}
 
 /* PAGE */
-.page{max-width:1100px;margin:0 auto;padding:32px 24px 80px;}
+.page{max-width:1400px;margin:0 auto;padding:32px 24px 80px;}
 .page-title{font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:var(--accent);margin-bottom:32px;text-align:center;text-shadow:0 0 20px var(--accent)44;}
 
 /* TABS */
@@ -75,10 +75,10 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 /* Real table cells */
 .lvl-row td{padding:12px 16px;vertical-align:middle;}
 .lvl-td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:130px;min-width:130px;max-width:130px;position:relative;}
-.lvl-td-date{font-family:Rajdhani,sans-serif;font-size:11px;color:#a0a0cc;white-space:nowrap;width:50px;}
-.lvl-td-stats{font-family:Rajdhani,sans-serif;font-size:11px;color:#8080aa;white-space:nowrap;width:80px;}
-.lvl-td-vis{width:140px;}
-.lvl-td-actions{width:120px;white-space:nowrap;}
+.lvl-td-date{font-family:Rajdhani,sans-serif;font-size:11px;color:#a0a0cc;white-space:nowrap;width:70px;}
+.lvl-td-stats{font-family:Rajdhani,sans-serif;font-size:11px;color:#8080aa;white-space:nowrap;width:100px;}
+.lvl-td-vis{width:160px;}
+.lvl-td-actions{width:140px;white-space:nowrap;}
 .lvl-vis-badge{font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;cursor:pointer;}
 .lvl-vis-badge.private{background:#1a2a4a;color:#90c0f0;border:1px solid #4060c0;}
 .lvl-vis-badge.public{background:#1a3a2a;color:#60e090;border:1px solid #40a060;}
@@ -433,7 +433,7 @@ async function loadStats(){
   thead.innerHTML='<tr>'+
     '<th>'+(lang==='fr'?'NOM':'NAME')+'</th>'+
     '<th>'+(lang==='fr'?'MODIFIÉ':'MODIFIED')+'</th>'+
-    '<th style="width:80px;padding:10px 8px;">'+(lang==='fr'?'▶ / ✓':'▶ / ✓')+'</th>'+
+    '<th style="width:100px;">'+(lang==='fr'?'PARTIES / FINS':'PLAYS / ENDS')+'</th>'+
     '<th style="width:70px;padding:10px 6px;">'+(lang==='fr'?'RECORD':'BEST')+'</th>'+
     '<th style="width:70px;padding:10px 6px;">'+(lang==='fr'?'MON RECORD':'MY BEST')+'</th>'+
     '<th>'+(lang==='fr'?'ÉTAT':'STATUS')+'</th>'+
@@ -463,7 +463,7 @@ async function loadStats(){
         '<input class="lvl-name-input" type="text" value="'+esc(l.title||'Sans titre')+'" maxlength="60" style="display:none;font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;background:#1a1a3a;border:1.5px solid #a040f0;border-radius:4px;padding:2px 8px;width:180px;outline:none;">'+
       '</td>'+
       '<td class="lvl-td-date">'+dateStr+'</td>'+
-      '<td class="lvl-td-stats">▶'+(l.plays||0)+' ✓'+(l.completions||0)+'</td>'+
+      '<td class="lvl-td-stats">▶ '+(l.plays||0)+' &nbsp;/&nbsp; '+(l.completions||0)+'</td>'+
       '<td class="lvl-td-record" style="font-family:Orbitron,monospace;font-size:10px;color:#c0a0ff;padding:14px 16px;white-space:nowrap;">—</td>'+
       '<td class="lvl-td-myrecord" style="font-family:Orbitron,monospace;font-size:9px;color:#f0e040;padding:14px 6px;white-space:nowrap;width:70px;">—</td>'+
       '<td class="lvl-td-vis" data-level-id-vis="'+l.id+'">'+
