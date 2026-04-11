@@ -911,7 +911,22 @@ function gDraw(){
   }
 }
 
-function gLoop(now){gUpdate(now);gDraw();if(gRunning||gWon)gRafId=requestAnimationFrame(gLoop);}
+let _lastFrameTime=0;
+const TARGET_FPS=60;
+const FRAME_MS=1000/TARGET_FPS;
+
+function gLoop(now){
+  // Fixed timestep - skip if too fast, catch up if too slow
+  const delta=now-_lastFrameTime;
+  if(delta<FRAME_MS*0.8){
+    gRafId=requestAnimationFrame(gLoop);
+    return;
+  }
+  _lastFrameTime=now-(delta%FRAME_MS);
+  gUpdate(now);
+  gDraw();
+  if(gRunning||gWon)gRafId=requestAnimationFrame(gLoop);
+}
 
 // ── Keys ──────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
