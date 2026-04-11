@@ -57,7 +57,7 @@ body.test-mode #hud-best{display:none!important;}
 
 <div id="gwrap">
   <div id="gtopbar">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v2.4</span>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v2.5</span>
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <div id="test-mode-badge" style="display:none;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 16px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;letter-spacing:1px;">🧪 MODE TEST</div>
     <button class="gtop-btn" id="btn-fs" onclick="toggleFullscreen()" style="background:#1a1a0d;border:1.5px solid #7a7a3a;color:#f0e040;">⛶ PLEIN ÉCRAN</button>
@@ -824,38 +824,55 @@ function gUpdate(now){
           if(data)_sb.from('levels').update({completions:(data.completions||0)+1}).eq('id',_currentLevelId);
         });
     }
-    // Mark author_completed if owner
-    if(_currentLevelId){
-      _sb.auth.getSession().then(async({data:s})=>{
-        if(!s.session)return;
-        const uid=s.session.user.id;
-        // Fetch level to check ownership
-        const{data:lvl}=await _sb.from('levels').select('user_id,author_completed,visibility').eq('id',_currentLevelId).single();
-        if(!lvl||lvl.user_id!==uid)return;
+    // Show buttons + mark author_completed (direct fetch, no hanging)
+    (async()=>{
+      const isTestMode=new URLSearchParams(window.location.search).get('from')==='studio';
+      const btnPub=document.getElementById('btn-pub-public');
+      const btnCode=document.getElementById('btn-pub-code');
+      const btnEdit=document.getElementById('btn-edit-win');
+
+      if(!_currentLevelId){
+        if(isTestMode&&btnEdit)btnEdit.style.display='';
+        return;
+      }
+
+      const token=_getToken();
+      if(!token)return;
+
+      try{
+        const r=await fetch(_sbUrl+'/rest/v1/levels?select=user_id,author_completed,visibility&id=eq.'+_currentLevelId,{
+          headers:{'apikey':_sbKey,'Authorization':'Bearer '+token}
+        });
+        if(!r.ok)return;
+        const arr=await r.json();
+        const lvl=arr&&arr[0];
+        if(!lvl)return;
+
+        // Check ownership via JWT
+        let uid=null;
+        try{uid=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub;}catch(e){}
+        if(!uid||lvl.user_id!==uid)return;
+
+        // Mark author_completed
         if(!lvl.author_completed){
-          await _sb.from('levels').update({author_completed:true}).eq('id',_currentLevelId);
-          if(_levelData)_levelData.author_completed=true;
+          fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{
+            method:'PATCH',
+            headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
+            body:JSON.stringify({author_completed:true})
+          });
         }
-        // Show buttons based on context
-        const isPreviewMode=new URLSearchParams(window.location.search).get('from')==='studio';
-        const btnPub=document.getElementById('btn-pub-public');
-        const btnCode=document.getElementById('btn-pub-code');
-        const btnEdit=document.getElementById('btn-edit-win');
-        if(isPreviewMode){
-          // Test mode from studio: show publish options + edit
-          if(lvl.visibility==='private'){
-            if(btnPub)btnPub.style.display='';
-            if(btnCode)btnCode.style.display='';
-          }
-          if(btnEdit)btnEdit.style.display='';
-        }else if(lvl.visibility==='private'){
-          // Private level played directly: show publish options
+
+        // Show edit always (owner)
+        if(btnEdit)btnEdit.style.display='';
+
+        // Show publish buttons if private
+        if(lvl.visibility==='private'){
           if(btnPub)btnPub.style.display='';
           if(btnCode)btnCode.style.display='';
-          if(btnEdit)btnEdit.style.display='';
         }
-      });
-    }
+      }catch(e){console.warn('Win check error:',e);}
+    })();
+
     setTimeout(()=>{
       document.getElementById('ovWin').classList.add('show');
     },600);
