@@ -45,6 +45,8 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 #ovWin h2 { color:#40f090; text-shadow:0 0 20px #40f090; }
 #ovDie h2 { color:#f04060; text-shadow:0 0 20px #f04060; }
 @keyframes testpulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+body.test-mode #win-record-msg,
+body.test-mode #win-best-display{display:none!important;}
 </style>
 </head>
 <body>
@@ -446,6 +448,8 @@ async function init(){
     // Show TEST MODE badge
     const badge=document.getElementById('test-mode-badge');
     if(badge)badge.style.display='';
+    // Add test-mode class to body to hide records via CSS
+    document.body.classList.add('test-mode');
   }
 
   if(preview){
