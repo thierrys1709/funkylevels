@@ -558,23 +558,17 @@ async function setVisibility(levelId, targetVis, btn, lvlData){
   let errorMsg=null;
 
   if(targetVis==='private'){
-    // Can go to private only if never played
-    if(plays>0){
-      const pp=(plays>1?'s':'');
-      errorMsg=l==='fr'
-        ?('Ce niveau a ete joue ('+plays+' partie'+pp+'). Impossible de le remettre en prive.')
-        :('This level has been played ('+plays+' game'+pp+'). Cannot set back to private.');
-    }
+    // Always allowed to go private (even with plays)
   }else{
     // public or code
     if(cur==='private'){
       if(!isPublished){
-        // Never published → must go through game to publish first
+        // Never been public/code → must publish through the game first
         errorMsg=l==='fr'
           ?'Pour publier, termine le niveau dans le jeu et clique sur "RENDRE PUBLIC" ou "PAR CODE".'
           :'To publish, finish the level in-game and click "MAKE PUBLIC" or "BY CODE".';
       }
-      // If was published before (is_published=true) → allow re-publishing
+      // Was published before (is_published=true) → allow re-publishing directly
     }
     // public ↔ code always allowed
   }
