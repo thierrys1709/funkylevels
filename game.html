@@ -44,6 +44,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 .ov button:hover { background:#fff; transform:translateY(-2px); }
 #ovWin h2 { color:#40f090; text-shadow:0 0 20px #40f090; }
 #ovDie h2 { color:#f04060; text-shadow:0 0 20px #f04060; }
+@keyframes testpulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
 </style>
 </head>
 <body>
@@ -51,6 +52,7 @@ body { background:#06060e; font-family:Rajdhani,sans-serif; display:flex; flex-d
 <div id="gwrap">
   <div id="gtopbar">
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
+    <div id="test-mode-badge" style="display:none;font-family:'Press Start 2P',monospace;font-size:8px;padding:6px 14px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;animation:testpulse 2s infinite;">🧪 MODE TEST</div>
     <button class="gtop-btn" id="btn-fs" onclick="toggleFullscreen()" style="background:#1a1a0d;border:1.5px solid #7a7a3a;color:#f0e040;">⛶ PLEIN ÉCRAN</button>
   </div>
 
@@ -426,6 +428,9 @@ async function init(){
       sessionStorage.setItem('fl_from_game','1');
       window.location.href='studio.html';
     };
+    // Show TEST MODE badge
+    const badge=document.getElementById('test-mode-badge');
+    if(badge)badge.style.display='';
   }
 
   if(preview){
@@ -803,12 +808,23 @@ function gUpdate(now){
           await _sb.from('levels').update({author_completed:true}).eq('id',_currentLevelId);
           if(_levelData)_levelData.author_completed=true;
         }
-        // Show publish + code buttons if level is private and author completed
-        if(lvl.visibility==='private'){
-          const btnPub=document.getElementById('btn-pub-public');
-          const btnCode=document.getElementById('btn-pub-code');
+        // Show buttons based on context
+        const isPreviewMode=new URLSearchParams(window.location.search).get('from')==='studio';
+        const btnPub=document.getElementById('btn-pub-public');
+        const btnCode=document.getElementById('btn-pub-code');
+        const btnEdit=document.getElementById('btn-edit-win');
+        if(isPreviewMode){
+          // Test mode from studio: show publish options + edit
+          if(lvl.visibility==='private'){
+            if(btnPub)btnPub.style.display='';
+            if(btnCode)btnCode.style.display='';
+          }
+          if(btnEdit)btnEdit.style.display='';
+        }else if(lvl.visibility==='private'){
+          // Private level played directly: show publish options
           if(btnPub)btnPub.style.display='';
           if(btnCode)btnCode.style.display='';
+          if(btnEdit)btnEdit.style.display='';
         }
       });
     }
