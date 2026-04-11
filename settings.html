@@ -74,7 +74,7 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .lvl-row:hover{background:#16163a;}
 /* Real table cells */
 .lvl-row td{padding:12px 16px;vertical-align:middle;}
-.lvl-td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
+.lvl-td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
 .lvl-td-date{font-family:Rajdhani,sans-serif;font-size:12px;color:#a0a0cc;white-space:nowrap;width:150px;}
 .lvl-td-stats{font-family:Rajdhani,sans-serif;font-size:12px;color:#8080aa;white-space:nowrap;width:110px;}
 .lvl-td-vis{width:90px;}
@@ -98,6 +98,7 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .lvl-act-btn{font-family:sans-serif;font-size:14px;padding:5px 10px;border-radius:4px;cursor:pointer;border:1.5px solid;transition:filter .1s;line-height:1;}
 .lvl-act-btn:hover{filter:brightness(1.3);}
 .lvl-act-play{background:#0d280d;border-color:#3a8a3a;color:#60e090;}
+.lvl-act-play.test-mode{background:#2a1a00;border-color:#f0a040;color:#f0a040;}
 .lvl-act-edit{background:#0d0d28;border-color:#4040aa;color:#90a0f0;}
 .lvl-act-dup{background:#1a1a0d;border-color:#7a7a3a;color:#e0d060;}
 .lvl-act-del{background:#280d0d;border-color:#aa3030;color:#f06060;}
@@ -457,7 +458,10 @@ async function loadStats(){
     tr.className='lvl-row';
     tr.setAttribute('data-level-id', l.id);
     tr.innerHTML=
-      '<td class="lvl-td-name">'+esc(l.title||'Sans titre')+'</td>'+
+      '<td class="lvl-td-name" title="'+(lang==='fr'?'Double-clic pour renommer':'Double-click to rename')+'">'+
+        '<span class="lvl-name-text">'+esc(l.title||'Sans titre')+'</span>'+
+        '<input class="lvl-name-input" type="text" value="'+esc(l.title||'Sans titre')+'" maxlength="60" style="display:none;font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;background:#1a1a3a;border:1.5px solid #a040f0;border-radius:4px;padding:2px 8px;width:180px;outline:none;">'+
+      '</td>'+
       '<td class="lvl-td-date">'+dateStr+' <span style="color:#6060aa;">'+timeStr+'</span></td>'+
       '<td class="lvl-td-stats">▶ '+(l.plays||0)+' &nbsp;✓ '+(l.completions||0)+'</td>'+
       '<td class="lvl-td-record" style="font-family:Orbitron,monospace;font-size:10px;color:#c0a0ff;padding:14px 16px;white-space:nowrap;">—</td>'+
@@ -470,7 +474,7 @@ async function loadStats(){
         '</div>'+
       '</td>'+
       '<td class="lvl-td-actions"><div class="lvl-actions">'+
-        '<button class="lvl-act-btn lvl-act-play" title="'+(lang==='fr'?'Jouer':'Play')+'">▶</button>'+
+        '<button class="lvl-act-btn lvl-act-play" title="'+(l.is_published?(lang==='fr'?'Jouer':'Play'):(lang==='fr'?'Tester le niveau':'Test level'))+'">'+(l.is_published?'▶':'🧪')+'</button>'+
         '<button class="lvl-act-btn lvl-act-edit" title="'+(lang==='fr'?'Éditer dans le studio':'Edit in studio')+'">✏️</button>'+
         '<button class="lvl-act-btn lvl-act-dup" title="'+(lang==='fr'?'Dupliquer':'Duplicate')+'">⧉</button>'+
         '<button class="lvl-act-btn lvl-act-del" title="'+(lang==='fr'?'Supprimer':'Delete')+'">🗑</button>'+
@@ -484,7 +488,41 @@ async function loadStats(){
         setVisibility(l.id,btn.dataset.vis,btn,l);
       };
     });
-    tr.querySelector('.lvl-act-play').onclick=(e)=>{e.stopPropagation();window.location.href='game.html?level='+l.id;};
+    const playBtn=tr.querySelector('.lvl-act-play');
+    if(playBtn){
+      if(!l.is_published)playBtn.classList.add('test-mode');
+      playBtn.onclick=(e)=>{e.stopPropagation();window.location.href='game.html?level='+l.id+(l.is_published?'':'&from=studio');};
+    }
+
+    // Inline rename on double-click
+    const nameCell=tr.querySelector('.lvl-td-name');
+    const nameText=tr.querySelector('.lvl-name-text');
+    const nameInput=tr.querySelector('.lvl-name-input');
+    if(nameCell&&nameText&&nameInput){
+      nameCell.ondblclick=(e)=>{
+        e.stopPropagation();
+        nameText.style.display='none';
+        nameInput.style.display='inline-block';
+        nameInput.focus();
+        nameInput.select();
+      };
+      const saveRename=async()=>{
+        const newTitle=nameInput.value.trim()||'Sans titre';
+        nameInput.style.display='none';
+        nameText.style.display='';
+        if(newTitle===l.title)return;
+        const{error}=await sb.from('levels').update({title:newTitle}).eq('id',l.id).eq('user_id',currentUser.id);
+        if(error){alert('Erreur: '+error.message);nameInput.value=l.title;return;}
+        l.title=newTitle;
+        nameText.textContent=newTitle;
+      };
+      nameInput.onblur=saveRename;
+      nameInput.onkeydown=(e)=>{
+        if(e.key==='Enter'){e.preventDefault();nameInput.blur();}
+        if(e.key==='Escape'){nameInput.value=l.title;nameInput.blur();}
+        e.stopPropagation();
+      };
+    }
     tr.querySelector('.lvl-act-edit').onclick=(e)=>{e.stopPropagation();window.location.href='studio.html?level='+l.id+'&mode=edit';};
     tr.querySelector('.lvl-act-dup').onclick=(e)=>{e.stopPropagation();duplicateLevelSettings(l);};
     tr.querySelector('.lvl-act-del').onclick=(e)=>{e.stopPropagation();deleteLevelSettings(l.id,l.title,tr);};
