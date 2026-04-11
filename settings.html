@@ -538,27 +538,18 @@ async function cycleVisibility(levelId, badge, lvlData){
   let errorMsg=null;
 
   if(cur==='private'){
-    // PRIVÉ → PUBLIC or CODE : need author_completed
-    if(!completed){
-      errorMsg=l==='fr'
-        ?'Tu dois d\'abord terminer ce niveau pour le publier !'
-        :'You must complete this level before publishing!';
-    }else{
-      next='public';
-    }
+    // Publish only from game.html win screen
+    showConfirm(
+      l==='fr'?'Pour publier, termine le niveau dans le jeu et clique sur "RENDRE PUBLIC" ou "PAR CODE".':'To publish, finish the level in-game and click "MAKE PUBLIC" or "BY CODE".',
+      null,{title:'ℹ️ '+(l==='fr'?'INFORMATION':'INFORMATION'),okOnly:true}
+    );
+    return;
   }else if(cur==='public'){
-    // PUBLIC → CODE : always allowed in settings
+    // PUBLIC → CODE always allowed
     next='code';
   }else if(cur==='code'){
-    // CODE → PRIVÉ : only if plays=0
-    if(plays>0){
-      const pp=(plays>1?'s':'');
-      errorMsg=l==='fr'
-        ?('Ce niveau a ete joue ('+plays+' partie'+pp+'). Il faut faire une copie pour le modifier.')
-        :('This level has been played ('+plays+' game'+pp+'). You must duplicate it to modify.');
-    }else{
-      next='private';
-    }
+    // CODE → PUBLIC always allowed
+    next='public';
   }
 
   if(errorMsg){
