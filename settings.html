@@ -487,7 +487,8 @@ async function loadStats(){
         '<button class="lvl-act-btn lvl-act-del" title="'+(lang==='fr'?'Supprimer':'Delete')+'">🗑</button>'+
       '</div></td>';
 
-    tr.querySelector('.lvl-vis-badge').onclick=(e)=>{e.stopPropagation();cycleVisibility(l.id,tr.querySelector('.lvl-vis-badge'),l);};
+    const visTrack=tr.querySelector('.vis-slider-track');
+    if(visTrack)visTrack.onclick=(e)=>{e.stopPropagation();cycleVisibility(l.id,visTrack,l);};
     tr.querySelector('.lvl-act-play').onclick=(e)=>{e.stopPropagation();window.location.href='game.html?level='+l.id;};
     tr.querySelector('.lvl-act-edit').onclick=(e)=>{e.stopPropagation();window.location.href='studio.html?level='+l.id+'&mode=edit';};
     tr.querySelector('.lvl-act-dup').onclick=(e)=>{e.stopPropagation();duplicateLevelSettings(l);};
