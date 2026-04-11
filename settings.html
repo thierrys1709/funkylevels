@@ -432,8 +432,8 @@ async function loadStats(){
   const thead=document.createElement('thead');
   thead.innerHTML='<tr>'+
     '<th>'+(lang==='fr'?'NOM':'NAME')+'</th>'+
-    '<th>'+(lang==='fr'?'MODIFIÉ':'MODIFIED')+'</th>'+
     '<th style="width:100px;">'+(lang==='fr'?'PARTIES / FINS':'PLAYS / ENDS')+'</th>'+
+    '<th>'+(lang==='fr'?'MODIFIÉ':'MODIFIED')+'</th>'+
     '<th style="width:70px;padding:10px 6px;">'+(lang==='fr'?'RECORD':'BEST')+'</th>'+
     '<th style="width:70px;padding:10px 6px;">'+(lang==='fr'?'MON RECORD':'MY BEST')+'</th>'+
     '<th>'+(lang==='fr'?'ÉTAT':'STATUS')+'</th>'+
@@ -462,8 +462,8 @@ async function loadStats(){
         '<span class="lvl-name-text">'+esc(l.title||'Sans titre')+'</span>'+
         '<input class="lvl-name-input" type="text" value="'+esc(l.title||'Sans titre')+'" maxlength="60" style="display:none;font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;background:#1a1a3a;border:1.5px solid #a040f0;border-radius:4px;padding:2px 8px;width:180px;outline:none;">'+
       '</td>'+
-      '<td class="lvl-td-date">'+dateStr+'</td>'+
       '<td class="lvl-td-stats">▶ '+(l.plays||0)+' &nbsp;/&nbsp; '+(l.completions||0)+'</td>'+
+      '<td class="lvl-td-date">'+dateStr+'</td>'+
       '<td class="lvl-td-record" style="font-family:Orbitron,monospace;font-size:10px;color:#c0a0ff;padding:14px 16px;white-space:nowrap;">—</td>'+
       '<td class="lvl-td-myrecord" style="font-family:Orbitron,monospace;font-size:9px;color:#f0e040;padding:14px 6px;white-space:nowrap;width:70px;">—</td>'+
       '<td class="lvl-td-vis" data-level-id-vis="'+l.id+'">'+
