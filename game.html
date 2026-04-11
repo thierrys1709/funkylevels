@@ -916,14 +916,15 @@ const TARGET_FPS=60;
 const FRAME_MS=1000/TARGET_FPS;
 
 function gLoop(now){
-  // Fixed timestep - skip if too fast, catch up if too slow
   const delta=now-_lastFrameTime;
-  if(delta<FRAME_MS*0.8){
-    gRafId=requestAnimationFrame(gLoop);
-    return;
+  // Cap delta to avoid huge jumps after tab switch
+  const clampedDelta=Math.min(delta, FRAME_MS*3);
+  _lastFrameTime=now;
+  // Run fixed number of substeps based on elapsed time
+  const steps=Math.round(clampedDelta/FRAME_MS);
+  for(let i=0;i<Math.max(1,steps);i++){
+    gUpdate(now);
   }
-  _lastFrameTime=now-(delta%FRAME_MS);
-  gUpdate(now);
   gDraw();
   if(gRunning||gWon)gRafId=requestAnimationFrame(gLoop);
 }
