@@ -550,30 +550,33 @@ async function duplicateLevelSettings(l){
 }
 
 async function setVisibility(levelId, targetVis, btn, lvlData){
-  // Simulate cycling to target - use cycleVisibility logic
   const cur=lvlData.visibility||'private';
-  if(cur===targetVis)return; // already this state
-  // Override: set lvlData.visibility to cur, then target to next
-  const fakeData={...lvlData,visibility:cur};
-  // Directly set next instead of cycling
+  if(cur===targetVis)return;
   const l=lang||'fr';
-  const plays=fakeData.plays||0;
-  const completed=fakeData.author_completed||false;
+  const plays=lvlData.plays||0;
+  const isPublished=lvlData.is_published||false;
   let errorMsg=null;
 
   if(targetVis==='private'){
+    // Can go to private only if never played
     if(plays>0){
       const pp=(plays>1?'s':'');
       errorMsg=l==='fr'
-        ?('Ce niveau a ete joue ('+plays+' partie'+pp+'). Il faut faire une copie pour le modifier.')
-        :('This level has been played ('+plays+' game'+pp+'). You must duplicate it to modify.');
+        ?('Ce niveau a ete joue ('+plays+' partie'+pp+'). Impossible de le remettre en prive.')
+        :('This level has been played ('+plays+' game'+pp+'). Cannot set back to private.');
     }
-  }else if(targetVis==='public'||targetVis==='code'){
+  }else{
+    // public or code
     if(cur==='private'){
-      errorMsg=l==='fr'
-        ?'Pour publier, termine le niveau dans le jeu et clique sur "RENDRE PUBLIC" ou "PAR CODE".'
-        :'To publish, finish the level in-game and click "MAKE PUBLIC" or "BY CODE".';
+      if(!isPublished){
+        // Never published → must go through game to publish first
+        errorMsg=l==='fr'
+          ?'Pour publier, termine le niveau dans le jeu et clique sur "RENDRE PUBLIC" ou "PAR CODE".'
+          :'To publish, finish the level in-game and click "MAKE PUBLIC" or "BY CODE".';
+      }
+      // If was published before (is_published=true) → allow re-publishing
     }
+    // public ↔ code always allowed
   }
 
   if(errorMsg){
@@ -585,12 +588,10 @@ async function setVisibility(levelId, targetVis, btn, lvlData){
   if(error){alert((l==='fr'?'Erreur: ':'Error: ')+error.message);return;}
   lvlData.visibility=targetVis;
 
-  // Update buttons active state
+  // Update buttons
   const group=btn.closest('.vis-btn-group');
   if(group){
-    group.querySelectorAll('.vis-btn').forEach(b=>{
-      b.className='vis-btn';
-    });
+    group.querySelectorAll('.vis-btn').forEach(b=>b.className='vis-btn');
     btn.classList.add('active-'+targetVis);
   }
 }
