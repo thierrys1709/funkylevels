@@ -249,8 +249,13 @@ function setLang(l){
 function applySession(user){
   if(!user)return;
   currentUser=user;
-  const username=user.user_metadata?.username||user.email.split('@')[0];
-  document.getElementById('nav-user').textContent='👤 '+username;
+  // Fetch username from profiles table
+  fetch('https://ydpkyktfvpdnjjiewctf.supabase.co/rest/v1/profiles?select=username&id=eq.'+user.id,{
+    headers:{'apikey':'sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD','Authorization':'Bearer sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD'}
+  }).then(r=>r.json()).then(data=>{
+    const username=(data&&data[0]&&data[0].username)||user.email.split('@')[0];
+    document.getElementById('nav-user').textContent='👤 '+username;
+  });
   document.getElementById('nav-user').style.display='';
   document.getElementById('nav-login').style.display='none';
   document.getElementById('nav-logout').style.display='';
