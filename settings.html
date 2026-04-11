@@ -83,6 +83,25 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .lvl-vis-badge.private{background:#1a2a4a;color:#90c0f0;border:1px solid #4060c0;}
 .lvl-vis-badge.public{background:#1a3a2a;color:#60e090;border:1px solid #40a060;}
 .lvl-vis-badge.code{background:#2a1a4a;color:#c090f0;border:1px solid #8040c0;}
+
+/* Visibility slider toggle */
+.vis-slider-wrap{display:flex;align-items:center;gap:6px;cursor:pointer;}
+.vis-slider-track{position:relative;width:90px;height:26px;border-radius:20px;transition:all .2s;border:1.5px solid;}
+.vis-slider-track.private{background:#1a2a4a;border-color:#4060c0;}
+.vis-slider-track.public{background:#1a3a2a;border-color:#40a060;}
+.vis-slider-track.code{background:#2a1a4a;border-color:#8040c0;}
+.vis-slider-thumb{position:absolute;top:2px;width:20px;height:18px;border-radius:14px;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:9px;}
+.vis-slider-track.private .vis-slider-thumb{left:2px;background:#4060c0;}
+.vis-slider-track.public .vis-slider-thumb{left:34px;background:#40a060;}
+.vis-slider-track.code .vis-slider-thumb{left:66px;background:#8040c0;}
+.vis-slider-label{font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;}
+.vis-slider-track.private .vis-slider-label-text{color:#90c0f0;}
+.vis-slider-track.public .vis-slider-label-text{color:#60e090;}
+.vis-slider-track.code .vis-slider-label-text{color:#c090f0;}
+.vis-slider-label-text{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-family:'Press Start 2P',monospace;font-size:6px;white-space:nowrap;}
+.vis-slider-track.private .vis-slider-label-text{right:auto;left:26px;color:#90c0f0;}
+.vis-slider-track.public .vis-slider-label-text{right:auto;left:58px;color:#60e090;}
+.vis-slider-track.code .vis-slider-label-text{left:auto;right:6px;color:#c090f0;}
 /* Actions: always in DOM, invisible by default */
 .lvl-actions{display:flex;gap:6px;opacity:0;pointer-events:none;transition:opacity .15s;}
 .lvl-row:hover .lvl-actions{opacity:1;pointer-events:auto;}
@@ -453,7 +472,14 @@ async function loadStats(){
       '<td class="lvl-td-stats">▶ '+(l.plays||0)+' &nbsp;✓ '+(l.completions||0)+'</td>'+
       '<td class="lvl-td-record" style="font-family:Orbitron,monospace;font-size:10px;color:#c0a0ff;padding:14px 16px;white-space:nowrap;">—</td>'+
       '<td class="lvl-td-myrecord" style="font-family:Orbitron,monospace;font-size:10px;color:#f0e040;padding:14px 16px;white-space:nowrap;">—</td>'+
-      '<td class="lvl-td-vis"><span class="lvl-vis-badge '+vis+'">'+visLabel+'</span></td>'+
+      '<td class="lvl-td-vis">'+
+        '<div class="vis-slider-track '+vis+'" onclick="event.stopPropagation();cycleVisibility(l.id,this,l)" title="'+(lang==='fr'?'Cliquer pour changer':'Click to change')+'">'+
+          '<div class="vis-slider-thumb">'+
+            (vis==='private'?'🔒':vis==='public'?'🌍':'🔑')+
+          '</div>'+
+          '<span class="vis-slider-label-text">'+visLabel.replace(/🔒 |🌍 |🔑 /,'')+'</span>'+
+        '</div>'+
+      '</td>'+
       '<td class="lvl-td-actions"><div class="lvl-actions">'+
         '<button class="lvl-act-btn lvl-act-play" title="'+(lang==='fr'?'Jouer':'Play')+'">▶</button>'+
         '<button class="lvl-act-btn lvl-act-edit" title="'+(lang==='fr'?'Éditer dans le studio':'Edit in studio')+'">✏️</button>'+
@@ -569,15 +595,18 @@ async function cycleVisibility(levelId, badge, lvlData){
   // Update local data
   lvlData.visibility=next;
 
-  // Update badge in place
-  const visLabels={
-    fr:{private:'🔒 Privé',public:'🌍 Public',code:'🔑 Code'},
-    en:{private:'🔒 Private',public:'🌍 Public',code:'🔑 Code'}
+  // Update slider in place
+  const visEmoji={private:'🔒',public:'🌍',code:'🔑'};
+  const visShort={
+    fr:{private:'Privé',public:'Public',code:'Code'},
+    en:{private:'Private',public:'Public',code:'Code'}
   };
-  const visClass={private:'private',public:'public',code:'code'};
   if(badge){
-    badge.textContent=(visLabels[l]||visLabels.fr)[next];
-    badge.className='lvl-vis-badge '+visClass[next];
+    badge.className='vis-slider-track '+next;
+    const thumb=badge.querySelector('.vis-slider-thumb');
+    if(thumb)thumb.textContent=visEmoji[next];
+    const lbl=badge.querySelector('.vis-slider-label-text');
+    if(lbl)lbl.textContent=(visShort[l]||visShort.fr)[next];
   }
 }
 
