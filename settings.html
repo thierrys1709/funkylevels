@@ -792,9 +792,10 @@ async function savePseudo(){
   }
 }
 
-function loadAccountInfo(){
+async function loadAccountInfo(){
   if(!currentUser)return;
-  const username=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
+  const{data:prof}=await sb.from('profiles').select('username').eq('id',currentUser.id).single();
+  const username=(prof&&prof.username)||currentUser.user_metadata?.username||currentUser.email.split('@')[0];
   const since=new Date(currentUser.created_at).toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
   const el_u=document.getElementById('account-username');
   const el_e=document.getElementById('account-email');
