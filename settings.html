@@ -6,7 +6,7 @@
 <title>FunkyLevels — Connexion</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+<script src="https://js.hcaptcha.com/1/api.js?onload=hcaptchaLoaded&render=explicit" async defer></script>
 <style>
   :root{--bg:#08080f;--panel:#0f0f1e;--border:#1e1e35;--accent:#f0e040;--accent2:#a040f0;--green:#40f090;--red:#f04060;--text:#cccccc;--muted:#444466;}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -239,6 +239,19 @@ setLang(lang);
 
 
 let _captchaRendered=false;
+
+function hcaptchaLoaded(){
+  // Render login captcha (visible by default)
+  if(!_captchaLoginRendered){
+    hcaptcha.render('hcaptcha-login-widget',{
+      sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',
+      theme:'dark',
+      callback:onCaptchaLoginSuccess,
+      'expired-callback':onCaptchaLoginExpired
+    });
+    _captchaLoginRendered=true;
+  }
+}
 let _captchaLoginRendered=false;
 let _captchaLoginToken='';
 function onCaptchaLoginSuccess(token){_captchaLoginToken=token;}
@@ -253,7 +266,7 @@ function switchTab(tab){
     if(!_captchaRendered&&typeof hcaptcha!=='undefined'){
       hcaptcha.render('hcaptcha-widget',{sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',theme:'dark',callback:onCaptchaSuccess,'expired-callback':onCaptchaExpired});
       _captchaRendered=true;
-    }else if(_captchaRendered&&typeof hcaptcha!=='undefined'){_captchaToken='';hcaptcha.reset();}
+    }else if(_captchaRendered){_captchaToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();}
   }
   if(tab==='login'){
     if(!_captchaLoginRendered&&typeof hcaptcha!=='undefined'){
@@ -375,14 +388,6 @@ sb.auth.getSession().then(({data})=>{if(data.session)window.location.href='index
 let _captchaToken='';
 function onCaptchaSuccess(token){_captchaToken=token;}
 function onCaptchaExpired(){_captchaToken='';}
-
-// Init login captcha on load
-window.addEventListener('load',()=>{
-  if(typeof hcaptcha!=='undefined'&&!_captchaLoginRendered){
-    hcaptcha.render('hcaptcha-login-widget',{sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',theme:'dark',callback:onCaptchaLoginSuccess,'expired-callback':onCaptchaLoginExpired});
-    _captchaLoginRendered=true;
-  }
-});
 
 // Auto-switch to signup if #signup in URL
 if(window.location.hash==='#signup'){
