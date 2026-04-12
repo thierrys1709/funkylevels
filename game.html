@@ -62,7 +62,7 @@ body.test-mode #star-rating{display:none!important;}
 
 <div id="gwrap">
   <div id="gtopbar">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.6</span>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.7</span>
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <div id="test-mode-badge" style="display:none;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 16px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;letter-spacing:1px;">🧪 MODE TEST</div>
     <div id="star-rating" style="display:none;align-items:center;gap:4px;">
@@ -210,6 +210,7 @@ const EW=3200;
 
 // ── State ─────────────────────────────────────────────────
 let _currentLevelId=null;
+let _isOwner=false;
 let lv=null;
 let _bestTime=null;
 let _gameStartTime=0;
@@ -747,8 +748,10 @@ async function init(){
   if(_currentLevelId)await loadBestTime();
   _attempt=0;
 
-  // Init star rating (only for published levels, not test mode)
-  if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')){
+  // Init star rating (only for published levels, not test mode, not own level)
+  _isOwner=!!(sess.session&&_levelData&&sess.session.user.id===_levelData.user_id);
+  const isOwner=_isOwner;
+  if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')&&!_isOwner){
     initStarRating();
   }
 
@@ -895,7 +898,7 @@ function gUpdate(now){
       stopTimer();
       setTimeout(()=>{
         document.getElementById('ovDie').classList.add('show');
-        if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')){
+        if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')&&!_isOwner){
           setTimeout(()=>showRatingOverlay('rating-inline-die'),400);
         }
       },200);
@@ -1135,7 +1138,7 @@ function gUpdate(now){
 
     setTimeout(()=>{
       document.getElementById('ovWin').classList.add('show');
-      if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')){
+      if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')&&!_isOwner){
         setTimeout(()=>showRatingOverlay('rating-inline-win'),800);
       }
     },600);
