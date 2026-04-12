@@ -241,16 +241,19 @@ setLang(lang);
 let _captchaRendered=false;
 
 function hcaptchaLoaded(){
-  // Render login captcha (visible by default)
-  if(!_captchaLoginRendered){
-    hcaptcha.render('hcaptcha-login-widget',{
-      sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',
-      theme:'dark',
-      callback:onCaptchaLoginSuccess,
-      'expired-callback':onCaptchaLoginExpired
-    });
-    _captchaLoginRendered=true;
-  }
+  setTimeout(()=>{
+    if(!_captchaLoginRendered){
+      try{
+        hcaptcha.render('hcaptcha-login-widget',{
+          sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',
+          theme:'dark',
+          callback:onCaptchaLoginSuccess,
+          'expired-callback':onCaptchaLoginExpired
+        });
+        _captchaLoginRendered=true;
+      }catch(e){console.warn('hcaptcha login render error',e);}
+    }
+  },300);
 }
 let _captchaLoginRendered=false;
 let _captchaLoginToken='';
