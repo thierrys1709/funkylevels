@@ -57,7 +57,7 @@ body.test-mode #hud-best{display:none!important;}
 
 <div id="gwrap">
   <div id="gtopbar">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v2.7</span>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v2.8</span>
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <div id="test-mode-badge" style="display:none;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 16px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;letter-spacing:1px;">🧪 MODE TEST</div>
     <button class="gtop-btn" id="btn-fs" onclick="toggleFullscreen()" style="background:#1a1a0d;border:1.5px solid #7a7a3a;color:#f0e040;">⛶ PLEIN ÉCRAN</button>
@@ -241,7 +241,6 @@ function publishAsPublic(){openPublishModal('public');}
 function publishAsCode(){openPublishModal('code');}
 
 async function openPublishModal(visibility){
-  if(!_currentLevelId)return;
   _pendingVisibility=visibility;
   const l=_lang();
   // Fetch current title
@@ -273,20 +272,53 @@ function cancelPublish(){
 }
 
 async function confirmPublish(){
-  if(!_currentLevelId||!_pendingVisibility)return;
+  if(!_pendingVisibility)return;
   const input=document.getElementById('pub-name-input');
   const newTitle=(input?input.value.trim():'')||'Mon niveau';
   const confirmBtn=document.getElementById('pub-confirm-btn');
   if(confirmBtn){confirmBtn.disabled=true;confirmBtn.textContent='⏳...';}
 
   const token=_getToken();
-  const r=await fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{
-    method:'PATCH',
-    headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({title:newTitle,visibility:_pendingVisibility,is_published:true})
-  });
+  if(!token){alert('Non connecté');return;}
 
-  if(!r.ok){
+  let ok=false;
+
+  if(_currentLevelId){
+    // Level already exists in DB — just update
+    const r=await fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{
+      method:'PATCH',
+      headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({title:newTitle,visibility:_pendingVisibility,is_published:true,author_completed:true})
+    });
+    ok=r.ok;
+  }else{
+    // Level not saved yet (preview mode) — create + publish in one step
+    const levelData=lv||JSON.parse(sessionStorage.getItem('fl_preview_level')||'null');
+    if(!levelData){alert('Données du niveau introuvables');return;}
+    function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
+    const uid=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub;
+    const r=await fetch(_sbUrl+'/rest/v1/levels',{
+      method:'POST',
+      headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=representation'},
+      body:JSON.stringify({
+        user_id:uid,
+        title:newTitle,
+        data:levelData,
+        visibility:_pendingVisibility,
+        is_published:true,
+        author_completed:true,
+        share_code:genCode(),
+        plays:0,completions:0
+      })
+    });
+    ok=r.ok;
+    if(ok){
+      const arr=await r.json();
+      if(arr&&arr[0])_currentLevelId=arr[0].id;
+    }
+  }
+
+  if(!ok){
     if(confirmBtn){confirmBtn.disabled=false;confirmBtn.textContent='🚀 PUBLIER';}
     alert('Erreur lors de la publication');
     return;
