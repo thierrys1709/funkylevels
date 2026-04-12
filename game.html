@@ -62,7 +62,7 @@ body.test-mode #star-rating{display:none!important;}
 
 <div id="gwrap">
   <div id="gtopbar">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.3</span>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.4</span>
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <div id="test-mode-badge" style="display:none;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 16px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;letter-spacing:1px;">🧪 MODE TEST</div>
     <div id="star-rating" style="display:none;align-items:center;gap:4px;">
@@ -72,12 +72,6 @@ body.test-mode #star-rating{display:none!important;}
       <span id="star-3" class="star-btn" data-val="3">★</span>
       <span id="star-4" class="star-btn" data-val="4">★</span>
       <span id="star-5" class="star-btn" data-val="5">★</span>
-      <span id="star-6" class="star-btn" data-val="6">★</span>
-      <span id="star-7" class="star-btn" data-val="7">★</span>
-      <span id="star-8" class="star-btn" data-val="8">★</span>
-      <span id="star-9" class="star-btn" data-val="9">★</span>
-      <span id="star-10" class="star-btn" data-val="10">★</span>
-      <span id="star-label" style="font-family:Orbitron,monospace;font-size:10px;color:#f0e040;min-width:28px;margin-left:2px;"></span>
     </div>
     <button class="gtop-btn" id="btn-fs" onclick="toggleFullscreen()" style="background:#1a1a0d;border:1.5px solid #7a7a3a;color:#f0e040;">⛶ PLEIN ÉCRAN</button>
   </div>
@@ -501,8 +495,55 @@ function updateStarDisplay(rating){
     const v=parseInt(s.dataset.val);
     s.classList.toggle('filled',v<=rating);
   });
-  const lbl=document.getElementById('star-label');
-  if(lbl)lbl.textContent=rating>0?rating+'/10':'';
+  // Also update overlay stars
+  const ovStars=document.querySelectorAll('.ovstar');
+  ovStars.forEach(s=>{
+    const v=parseInt(s.dataset.val);
+    s.style.color=v<=rating?'#f0e040':'#2a2a55';
+  });
+}
+
+function showRatingOverlay(){
+  if(!_currentLevelId)return;
+  const ov=document.getElementById('rating-overlay');
+  const popup=document.getElementById('rating-popup');
+  if(!ov)return;
+  // Reset animation
+  if(popup){popup.style.animation='none';void popup.offsetWidth;popup.style.animation='';}
+  ov.style.display='flex';
+  document.getElementById('rating-confirm-msg').textContent='';
+  updateStarDisplay(_userRating);
+
+  const ovStars=document.querySelectorAll('.ovstar');
+  ovStars.forEach(star=>{
+    const val=parseInt(star.dataset.val);
+    star.onmouseenter=()=>{
+      ovStars.forEach(s=>s.style.color=parseInt(s.dataset.val)<=val?'#f0c040':'#2a2a55');
+    };
+    star.onmouseleave=()=>{
+      ovStars.forEach(s=>s.style.color=parseInt(s.dataset.val)<=_userRating?'#f0e040':'#2a2a55');
+    };
+    star.onclick=async()=>{
+      await saveRating(val);
+      // Burst animation on selected stars
+      ovStars.forEach(s=>{
+        if(parseInt(s.dataset.val)<=val){
+          s.classList.remove('burst');
+          void s.offsetWidth;
+          s.classList.add('burst');
+        }
+      });
+      const labels=['','😞 Nul','😐 Bof','😊 Sympa','😍 Super !','🔥 Excellent !'];
+      const msg=document.getElementById('rating-confirm-msg');
+      if(msg){msg.textContent=labels[val]||val+' ★';msg.style.color='#40f090';}
+      setTimeout(closeRatingOverlay,1400);
+    };
+  });
+}
+
+function closeRatingOverlay(){
+  const ov=document.getElementById('rating-overlay');
+  if(ov)ov.style.display='none';
 }
 
 async function loadUserRating(){
@@ -727,6 +768,7 @@ function startGameFrom(sx,sy){
 function gameRespawn(){
   document.getElementById('ovDie').classList.remove('show');
   document.getElementById('ovWin').classList.remove('show');
+  closeRatingOverlay();
   gDeadPending=false;
   // Short pause before restarting
   setTimeout(()=>startGameFrom(gLv.start.x,gLv.start.y), 800);
@@ -826,6 +868,9 @@ function gUpdate(now){
       stopTimer();
       setTimeout(()=>{
         document.getElementById('ovDie').classList.add('show');
+        if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')){
+          setTimeout(showRatingOverlay,400);
+        }
       },200);
     }
     return;
@@ -1063,6 +1108,9 @@ function gUpdate(now){
 
     setTimeout(()=>{
       document.getElementById('ovWin').classList.add('show');
+      if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')){
+        setTimeout(showRatingOverlay,800);
+      }
     },600);
   }
 
@@ -1343,6 +1391,23 @@ init();
     </div>
   </div>
 </div>
+
+<!-- RATING OVERLAY -->
+<div id="rating-overlay" style="display:none;position:fixed;inset:0;z-index:200;pointer-events:none;align-items:center;justify-content:center;">
+  <div id="rating-popup" style="background:#0d0d1eee;border:2px solid #2a2a55;border-radius:16px;padding:28px 36px;display:flex;flex-direction:column;align-items:center;gap:16px;pointer-events:auto;animation:ratePop .25s ease-out;">
+    <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#a0a0cc;letter-spacing:1px;">NOTER CE NIVEAU</div>
+    <div id="overlay-stars" style="display:flex;gap:8px;">
+      <span class="ovstar" data-val="1" style="font-size:36px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="2" style="font-size:36px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="3" style="font-size:36px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="4" style="font-size:36px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="5" style="font-size:36px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+    </div>
+    <div id="rating-confirm-msg" style="font-family:Orbitron,monospace;font-size:11px;color:#40f090;min-height:20px;"></div>
+    <button onclick="closeRatingOverlay()" style="font-family:'Press Start 2P',monospace;font-size:7px;padding:8px 16px;background:#12122a;border:1.5px solid #2a2a55;border-radius:4px;color:#4040aa;cursor:pointer;">FERMER</button>
+  </div>
+</div>
+@keyframes ratePop{from{transform:scale(0.7);opacity:0;}to{transform:scale(1);opacity:1;}}
 
 <!-- MOBILE CONTROLS -->
 <div id="mobile-controls" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;pointer-events:none;padding:0 20px 24px;user-select:none;">
