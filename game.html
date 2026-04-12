@@ -57,7 +57,7 @@ body.test-mode #hud-best{display:none!important;}
 
 <div id="gwrap">
   <div id="gtopbar">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v2.6</span>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v2.7</span>
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <div id="test-mode-badge" style="display:none;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 16px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;letter-spacing:1px;">🧪 MODE TEST</div>
     <button class="gtop-btn" id="btn-fs" onclick="toggleFullscreen()" style="background:#1a1a0d;border:1.5px solid #7a7a3a;color:#f0e040;">⛶ PLEIN ÉCRAN</button>
@@ -235,28 +235,65 @@ function showWinScreen(ms, prevBest, isNewRecord, l){
   }
 }
 
-async function publishLevel(visibility){
+let _pendingVisibility=null;
+
+function publishAsPublic(){openPublishModal('public');}
+function publishAsCode(){openPublishModal('code');}
+
+async function openPublishModal(visibility){
   if(!_currentLevelId)return;
-  const{data:sess}=await _sb.auth.getSession();
-  if(!sess.session)return;
-  const btnPub=document.getElementById('btn-pub-public');
-  const btnCode=document.getElementById('btn-pub-code');
-  if(btnPub)btnPub.disabled=true;
-  if(btnCode)btnCode.disabled=true;
-  const{error}=await _sb.from('levels')
-    .update({visibility,is_published:true})
-    .eq('id',_currentLevelId)
-    .eq('user_id',sess.session.user.id);
-  if(error){
-    if(btnPub)btnPub.disabled=false;
-    if(btnCode)btnCode.disabled=false;
-    alert('Erreur: '+error.message);
+  _pendingVisibility=visibility;
+  const l=_lang();
+  // Fetch current title
+  const token=_getToken();
+  let currentTitle='';
+  try{
+    const r=await fetch(_sbUrl+'/rest/v1/levels?select=title&id=eq.'+_currentLevelId,{
+      headers:{'apikey':_sbKey,'Authorization':'Bearer '+(token||_sbKey)}
+    });
+    const arr=await r.json();
+    currentTitle=arr&&arr[0]?arr[0].title||'':'';
+  }catch(e){}
+
+  const modal=document.getElementById('publish-modal');
+  const input=document.getElementById('pub-name-input');
+  const title=document.getElementById('pub-modal-title');
+  const confirmBtn=document.getElementById('pub-confirm-btn');
+
+  if(title)title.textContent=visibility==='public'?'🌍 '+(l==='fr'?'RENDRE PUBLIC':'MAKE PUBLIC'):'🔑 '+(l==='fr'?'PUBLIER PAR CODE':'PUBLISH BY CODE');
+  if(input)input.value=currentTitle;
+  if(confirmBtn)confirmBtn.textContent=visibility==='public'?'🌍 '+(l==='fr'?'PUBLIER':'PUBLISH'):'🔑 '+(l==='fr'?'PUBLIER':'PUBLISH');
+  if(modal)modal.style.display='flex';
+  setTimeout(()=>{if(input){input.focus();input.select();}},100);
+}
+
+function cancelPublish(){
+  document.getElementById('publish-modal').style.display='none';
+  _pendingVisibility=null;
+}
+
+async function confirmPublish(){
+  if(!_currentLevelId||!_pendingVisibility)return;
+  const input=document.getElementById('pub-name-input');
+  const newTitle=(input?input.value.trim():'')||'Mon niveau';
+  const confirmBtn=document.getElementById('pub-confirm-btn');
+  if(confirmBtn){confirmBtn.disabled=true;confirmBtn.textContent='⏳...';}
+
+  const token=_getToken();
+  const r=await fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{
+    method:'PATCH',
+    headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({title:newTitle,visibility:_pendingVisibility,is_published:true})
+  });
+
+  if(!r.ok){
+    if(confirmBtn){confirmBtn.disabled=false;confirmBtn.textContent='🚀 PUBLIER';}
+    alert('Erreur lors de la publication');
     return;
   }
+  document.getElementById('publish-modal').style.display='none';
   window.location.href='index.html';
 }
-function publishAsPublic(){publishLevel('public');}
-function publishAsCode(){publishLevel('code');}
 
 function goToEditor(){
   if(_currentLevelId)window.location.href='studio.html?level='+_currentLevelId+'&mode=edit';
@@ -1146,6 +1183,21 @@ document.addEventListener('keydown',()=>{
 resizeGameCanvas(); // Size canvas immediately on load
 init();
 </script>
+
+<!-- PUBLISH NAME MODAL -->
+<div id="publish-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:#0d0d1e;border:2px solid #2a2a55;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:20px;">
+    <div id="pub-modal-title" style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#f0e040;text-align:center;letter-spacing:1px;">🚀 PUBLIER LE NIVEAU</div>
+    <div>
+      <label style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;letter-spacing:1px;display:block;margin-bottom:8px;">NOM DU NIVEAU</label>
+      <input id="pub-name-input" type="text" maxlength="60" style="width:100%;background:#12122a;border:1.5px solid #a040f0;border-radius:4px;color:#e8e8ff;font-family:Orbitron,monospace;font-size:12px;padding:12px 14px;outline:none;box-sizing:border-box;">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="cancelPublish()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;border-radius:6px;cursor:pointer;background:#12122a;border:1.5px solid #2a2a55;color:#a0a0cc;">ANNULER</button>
+      <button id="pub-confirm-btn" onclick="confirmPublish()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;border-radius:6px;cursor:pointer;background:#0d2a1a;border:1.5px solid #40f090;color:#40f090;">🚀 PUBLIER</button>
+    </div>
+  </div>
+</div>
 
 <!-- MOBILE CONTROLS -->
 <div id="mobile-controls" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;pointer-events:none;padding:0 20px 24px;user-select:none;">
