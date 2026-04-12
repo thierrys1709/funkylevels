@@ -155,6 +155,17 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
   <button onclick="acceptCookies()" style="font-family:'Press Start 2P',monospace;font-size:9px;padding:10px 20px;background:#a040f0;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;" id="cookie-btn">✓ COMPRIS</button>
 </div>
 
+<!-- CHOOSE USERNAME MODAL -->
+<div id="pseudo-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:#0d0d1e;border:2px solid #a040f0;border-radius:12px;padding:36px 32px;width:min(420px,90vw);display:flex;flex-direction:column;gap:20px;text-align:center;">
+    <div style="font-family:Orbitron,monospace;font-size:14px;color:#f0e040;letter-spacing:2px;">👤 CHOISIS TON PSEUDO</div>
+    <div style="font-family:Rajdhani,sans-serif;font-size:14px;color:#6060aa;line-height:1.6;">Bienvenue sur FunkyLevels !<br>Choisis un pseudo pour ton profil.</div>
+    <input id="pseudo-input" type="text" maxlength="20" placeholder="MonPseudo" style="background:#12122a;border:1.5px solid #4040aa;border-radius:6px;color:#e8e8ff;font-family:Orbitron,monospace;font-size:14px;padding:14px;outline:none;text-align:center;width:100%;box-sizing:border-box;">
+    <div id="pseudo-msg" style="font-family:Rajdhani,sans-serif;font-size:13px;color:#f04060;min-height:18px;"></div>
+    <button id="pseudo-btn" onclick="savePseudo()" style="font-family:Orbitron,monospace;font-size:11px;padding:14px;background:#a040f0;color:#fff;border:none;border-radius:6px;cursor:pointer;letter-spacing:1px;">✓ CONFIRMER</button>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
 const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
@@ -247,11 +258,52 @@ function setLang(l){
   loadSection(currentSection);
 }
 
+async function checkNeedsPseudo(user){
+  if(!user)return;
+  try{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/profiles?select=username&id=eq.'+user.id,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+getToken()}
+    });
+    const arr=await r.json();
+    if(arr&&arr[0]&&!arr[0].username){
+      // No username - show modal
+      document.getElementById('pseudo-modal').style.display='flex';
+      document.getElementById('pseudo-input').focus();
+    }
+  }catch(e){}
+}
+
+async function savePseudo(){
+  const pseudo=document.getElementById('pseudo-input').value.trim();
+  const msg=document.getElementById('pseudo-msg');
+  const btn=document.getElementById('pseudo-btn');
+  if(!pseudo||pseudo.length<3){msg.textContent='Pseudo trop court (3 min) !';return;}
+  if(!/^[a-zA-Z0-9_]+$/.test(pseudo)){msg.textContent='Lettres, chiffres et _ seulement.';return;}
+  btn.disabled=true;btn.textContent='...';
+  // Check availability
+  const r=await fetch(SUPABASE_URL+'/rest/v1/profiles?select=id&username=ilike.'+encodeURIComponent(pseudo),{
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+getToken()}
+  });
+  const arr=await r.json();
+  if(arr&&arr.length>0){msg.textContent='Ce pseudo est déjà pris !';btn.disabled=false;btn.textContent='✓ CONFIRMER';return;}
+  // Save
+  await fetch(SUPABASE_URL+'/rest/v1/profiles?id=eq.'+currentUser.id,{
+    method:'PATCH',
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+getToken(),'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({username:pseudo})
+  });
+  document.getElementById('pseudo-modal').style.display='none';
+  document.getElementById('nav-user').textContent='👤 '+pseudo;
+  btn.disabled=false;btn.textContent='✓ CONFIRMER';
+}
+
 function applySession(user){
   if(!user)return;
   currentUser=user;
   const signupBtn=document.getElementById('nav-signup');
   if(signupBtn)signupBtn.style.display='none';
+  // Check if user needs to choose a pseudo (Google signup)
+  checkNeedsPseudo(user);
   // Fetch username from profiles table
   fetch('https://ydpkyktfvpdnjjiewctf.supabase.co/rest/v1/profiles?select=username&id=eq.'+user.id,{
     headers:{'apikey':'sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD','Authorization':'Bearer sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD'}
