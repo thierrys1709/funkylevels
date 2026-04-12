@@ -310,6 +310,7 @@ function switchSection(s){
 function doSearch(){loadSection(currentSection);}
 
 async function loadSection(s){
+  currentSection=s;
   const grid=document.getElementById('levels-grid');
   const t=T[lang]||T['fr'];
   grid.innerHTML=`<div class="loading">${t.loading}</div>`;
@@ -393,7 +394,7 @@ function levelRow(l){
     <td class="lvl-td lvl-td-name">${esc(l.title||'Sans titre')}${isNew?`<span class="new-badge">${t.new}</span>`:''}</td>
     <td class="lvl-td lvl-td-date">${dateStr}</td>
     <td class="lvl-td lvl-td-author">@${esc(l.username||'anonyme')}</td>
-    <td class="lvl-td lvl-td-stars"><span class="star-count" data-id="${l.id}">—</span></td>
+    <td class="lvl-td lvl-td-stars">${l.avgRating?`<span style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#f0e040;">★ ${l.avgRating.toFixed(2)}</span><span style="font-family:Rajdhani,sans-serif;font-size:11px;color:#6060aa;margin-left:4px;">(${l.ratingCount})</span>`:'<span style="color:#3a3a55;">—</span>'}</td>
     <td class="lvl-td lvl-td-vis"><span class="vis-badge vis-${l.visibility||'private'}">${visLabel}</span></td>
     <td class="lvl-td lvl-td-actions">${isOwner?`<button class="edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'">✏️ ${lang==='fr'?'ÉDITER':'EDIT'}</button>`:''}
     </td>
