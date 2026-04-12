@@ -337,9 +337,31 @@ async function loadSection(s){
       });
     }
   }else if(s==='top'){
-    let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=eq.public&order=plays.desc&limit=24';
+    // 1. Get all ratings
+    const allRatings=await sbFetch('ratings?select=level_id,score&limit=2000');
+    if(!Array.isArray(allRatings)||!allRatings.length){levels=[];}
+    // 2. Compute avg per level
+    const rmap={};
+    allRatings.forEach(r=>{
+      if(!rmap[r.level_id])rmap[r.level_id]={sum:0,count:0};
+      rmap[r.level_id].sum+=r.score;
+      rmap[r.level_id].count++;
+    });
+    const ratedIds=Object.keys(rmap);
+    if(!ratedIds.length){levels=[];}
+    // 3. Fetch only rated public levels
+    let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=eq.public&id=in.('+ratedIds.join(',')+')';
     if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
     levels=await sbFetch(url);
+    // 4. Attach avg and sort descending
+    levels.forEach(l=>{
+      const r=rmap[l.id];
+      l.avgRating=r?(Math.round((r.sum/r.count)*100)/100):null;
+      l.ratingCount=r?r.count:0;
+    });
+    levels=levels.filter(l=>l.avgRating!=null);
+    levels.sort((a,b)=>b.avgRating-a.avgRating);
+    levels=levels.slice(0,24);
   }else if(s==='mine'){
     if(!currentUser){grid.innerHTML=`<div class="empty"><div class="icon">🔒</div><p>${t.notLogged}</p></div>`;return;}
     // Get token from localStorage directly without using sb.auth
