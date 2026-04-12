@@ -218,8 +218,18 @@ function setLang(l){
 }
 setLang(lang);
 
+// Math captcha
+let _captchaAnswer=0;
+function generateCaptcha(){
+  const a=Math.floor(Math.random()*10)+1;
+  const b=Math.floor(Math.random()*10)+1;
+  _captchaAnswer=a+b;
+  const el=document.getElementById('captcha-question');
+  if(el)el.textContent=a+' + '+b+' = ?';
+}
+
 function switchTab(tab){
-  if(tab==='signup')generateCaptcha();
+  if(tab==='signup'){generateCaptcha();}
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.form').forEach(f=>f.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
