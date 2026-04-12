@@ -62,7 +62,7 @@ body.test-mode #star-rating{display:none!important;}
 
 <div id="gwrap">
   <div id="gtopbar">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.5</span>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.6</span>
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <div id="test-mode-badge" style="display:none;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 16px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;letter-spacing:1px;">🧪 MODE TEST</div>
     <div id="star-rating" style="display:none;align-items:center;gap:4px;">
@@ -119,6 +119,18 @@ body.test-mode #star-rating{display:none!important;}
   <p id="die-msg"></p>
   <button onclick="gameRespawn()" id="btn-retry">RÉESSAYER</button>
   <button onclick="goToIndex()" style="background:#333;color:#aaa;margin-top:-8px;" id="btn-quit">QUITTER</button>
+  <!-- Rating inline die -->
+  <div id="rating-inline-die" style="display:none;flex-direction:column;align-items:center;gap:6px;margin-top:8px;">
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#4040aa;letter-spacing:1px;">NOTER CE NIVEAU</span>
+    <div class="inline-stars" style="display:flex;gap:6px;">
+      <span class="ovstar" data-val="1" style="font-size:30px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="2" style="font-size:30px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="3" style="font-size:30px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="4" style="font-size:30px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="5" style="font-size:30px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+    </div>
+    <span id="rating-die-msg" style="font-family:Orbitron,monospace;font-size:11px;color:#40f090;min-height:16px;"></span>
+  </div>
 </div>
 <div class="ov" id="ovWin">
   <h2 id="ov-win-title">ARRIVÉ !</h2>
@@ -145,6 +157,18 @@ body.test-mode #star-rating{display:none!important;}
   <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;">
     <button onclick="gameRespawn()" id="btn-replay" style="background:#1a1a3a;color:#90a0f0;border:2px solid #4040aa;font-size:11px;padding:12px 20px;">🔄 RECOMMENCER</button>
     <button onclick="goToEditor()" id="btn-edit-win" style="background:#1a2a1a;color:#60e090;border:2px solid #3a8a3a;font-size:11px;padding:12px 20px;display:none;">✏️ ÉDITER</button>
+  </div>
+  <!-- Rating inline -->
+  <div id="rating-inline-win" style="display:none;flex-direction:column;align-items:center;gap:6px;margin-top:14px;">
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#4040aa;letter-spacing:1px;">NOTER CE NIVEAU</span>
+    <div class="inline-stars" style="display:flex;gap:6px;">
+      <span class="ovstar" data-val="1" style="font-size:30px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="2" style="font-size:30px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="3" style="font-size:30px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="4" style="font-size:30px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+      <span class="ovstar" data-val="5" style="font-size:30px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
+    </div>
+    <span id="rating-win-msg" style="font-family:Orbitron,monospace;font-size:11px;color:#40f090;min-height:16px;"></span>
   </div>
 </div>
 
@@ -503,46 +527,50 @@ function updateStarDisplay(rating){
   });
 }
 
-function showRatingOverlay(){
+function showRatingOverlay(containerId){
   if(!_currentLevelId)return;
-  const ov=document.getElementById('rating-overlay');
-  const popup=document.getElementById('rating-popup');
-  if(!ov)return;
-  // Reset animation
-  if(popup){popup.style.animation='none';void popup.offsetWidth;popup.style.animation='';}
-  ov.style.display='flex';
-  document.getElementById('rating-confirm-msg').textContent='';
-  updateStarDisplay(_userRating);
+  const container=document.getElementById(containerId);
+  if(!container)return;
+  container.style.display='flex';
 
-  const ovStars=document.querySelectorAll('.ovstar');
+  // Init stars in this container
+  const ovStars=container.querySelectorAll('.ovstar');
+  const msgId=containerId==='rating-inline-win'?'rating-win-msg':'rating-die-msg';
+
+  // Show current rating
+  ovStars.forEach(s=>s.style.color=parseInt(s.dataset.val)<=_userRating?'#f0e040':'#2a2a55');
+
   ovStars.forEach(star=>{
     const val=parseInt(star.dataset.val);
     star.onmouseenter=()=>{
+      // Show hover state only - don't show previous rating
       ovStars.forEach(s=>s.style.color=parseInt(s.dataset.val)<=val?'#f0c040':'#2a2a55');
     };
     star.onmouseleave=()=>{
+      // On leave: show current saved rating
       ovStars.forEach(s=>s.style.color=parseInt(s.dataset.val)<=_userRating?'#f0e040':'#2a2a55');
     };
     star.onclick=async()=>{
       await saveRating(val);
-      // Burst animation on selected stars
+      // Update all stars in this container immediately
       ovStars.forEach(s=>{
+        s.style.color=parseInt(s.dataset.val)<=val?'#f0e040':'#2a2a55';
         if(parseInt(s.dataset.val)<=val){
-          s.classList.remove('burst');
-          void s.offsetWidth;
-          s.classList.add('burst');
+          s.classList.remove('burst');void s.offsetWidth;s.classList.add('burst');
         }
       });
-      const labels=['','⭐','⭐⭐','⭐⭐⭐','⭐⭐⭐⭐','🔥'];
-      const msg=document.getElementById('rating-confirm-msg');
-      if(msg){msg.textContent=labels[val]||'';msg.style.color='#40f090';}
+      const labels=['','😐','🙂','😊','😍','🔥'];
+      const msg=document.getElementById(msgId);
+      if(msg)msg.textContent=labels[val]||'';
     };
   });
 }
 
 function closeRatingOverlay(){
-  const ov=document.getElementById('rating-overlay');
-  if(ov)ov.style.display='none';
+  const w=document.getElementById('rating-inline-win');
+  const d=document.getElementById('rating-inline-die');
+  if(w)w.style.display='none';
+  if(d)d.style.display='none';
 }
 
 async function loadUserRating(){
@@ -868,7 +896,7 @@ function gUpdate(now){
       setTimeout(()=>{
         document.getElementById('ovDie').classList.add('show');
         if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')){
-          setTimeout(showRatingOverlay,400);
+          setTimeout(()=>showRatingOverlay('rating-inline-die'),400);
         }
       },200);
     }
@@ -1108,7 +1136,7 @@ function gUpdate(now){
     setTimeout(()=>{
       document.getElementById('ovWin').classList.add('show');
       if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')){
-        setTimeout(showRatingOverlay,800);
+        setTimeout(()=>showRatingOverlay('rating-inline-win'),800);
       }
     },600);
   }
@@ -1391,20 +1419,7 @@ init();
   </div>
 </div>
 
-<!-- RATING WIDGET (non-blocking, bottom of screen) -->
-<div id="rating-overlay" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;pointer-events:auto;">
-  <div id="rating-popup" style="background:#0d0d1ecc;border:1.5px solid #2a2a55;border-radius:10px;padding:10px 20px;display:flex;align-items:center;gap:10px;animation:ratePop .2s ease-out;backdrop-filter:blur(4px);">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#6060aa;white-space:nowrap;">NOTER :</span>
-    <div id="overlay-stars" style="display:flex;gap:4px;">
-      <span class="ovstar" data-val="1" style="font-size:28px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
-      <span class="ovstar" data-val="2" style="font-size:28px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
-      <span class="ovstar" data-val="3" style="font-size:28px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
-      <span class="ovstar" data-val="4" style="font-size:28px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
-      <span class="ovstar" data-val="5" style="font-size:28px;cursor:pointer;color:#2a2a55;transition:color .1s,transform .15s;">★</span>
-    </div>
-    <span id="rating-confirm-msg" style="font-family:Orbitron,monospace;font-size:11px;color:#40f090;min-width:40px;"></span>
-  </div>
-</div>
+
 <!-- MOBILE CONTROLS -->
 <div id="mobile-controls" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;pointer-events:none;padding:0 20px 24px;user-select:none;">
   <!-- Left button -->
