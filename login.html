@@ -328,6 +328,12 @@ document.addEventListener('keydown',e=>{
 });
 
 sb.auth.getSession().then(({data})=>{if(data.session)window.location.href='index.html';});
+
+// Auto-switch to signup if #signup in URL
+if(window.location.hash==='#signup'){
+  switchTab('signup');
+}
+generateCaptcha();
 </script>
 </body>
 </html>
