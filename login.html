@@ -344,7 +344,7 @@ async function doSignup(){
 }
 
 async function doGoogle(){
-  const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/index.html'}});
+  const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://funkylevels.com/index.html'}});
   if(error)alert(error.message);
 }
 
