@@ -62,7 +62,7 @@ body.test-mode #star-rating{display:none!important;}
 
 <div id="gwrap">
   <div id="gtopbar">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.1</span>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.2</span>
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <div id="test-mode-badge" style="display:none;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 16px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;letter-spacing:1px;">🧪 MODE TEST</div>
     <div id="star-rating" style="display:none;align-items:center;gap:4px;">
@@ -533,24 +533,18 @@ async function saveRating(score){
   }
   try{
     const uid=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub;
-    // Try update first, if no rows then insert
-    const patchR=await fetch(_sbUrl+'/rest/v1/ratings?level_id=eq.'+_currentLevelId+'&user_id=eq.'+uid,{
-      method:'PATCH',
-      headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({score})
+    // Upsert using on_conflict
+    await fetch(_sbUrl+'/rest/v1/ratings',{
+      method:'POST',
+      headers:{
+        'apikey':_sbKey,
+        'Authorization':'Bearer '+token,
+        'Content-Type':'application/json',
+        'Prefer':'resolution=merge-duplicates,return=minimal'
+      },
+      body:JSON.stringify({level_id:_currentLevelId,user_id:uid,score})
     });
-    // Check if any row was updated (Content-Range header)
-    const range=patchR.headers.get('content-range');
-    const updated=range&&range!=='*';
-    if(!updated){
-      // No existing row, insert
-      await fetch(_sbUrl+'/rest/v1/ratings',{
-        method:'POST',
-        headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body:JSON.stringify({level_id:_currentLevelId,user_id:uid,score})
-      });
-    }
-  }catch(e){}
+  }catch(e){console.warn('rating error',e);}
 }
 
 function updateAttemptDisplay(){
