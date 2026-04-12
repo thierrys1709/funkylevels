@@ -361,7 +361,7 @@ async function loadSection(s){
     <th>${lang==='fr'?'DATE':'DATE'}</th>
     <th>${lang==='fr'?'CRÉATEUR':'CREATOR'}</th>
     <th>${lang==='fr'?'NOTE':'RATING'}</th>
-    <th>${lang==='fr'?'ÉTAT':'STATUS'}</th>
+    ${s==='mine'?`<th>${lang==='fr'?'ÉTAT':'STATUS'}</th>`:''}
     <th></th>
   </tr></thead>`;
   // Fetch usernames for creators
