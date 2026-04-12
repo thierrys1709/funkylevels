@@ -32,7 +32,7 @@
   .form{padding:28px 24px;display:none;flex-direction:column;gap:18px;}
   .form.active{display:flex;}
   .field{display:flex;flex-direction:column;gap:8px;}
-  .field label{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+  .field label{font-size:9px;color:#e8e8ff;letter-spacing:2px;text-transform:uppercase;}
   .field input{background:#0a0a18;border:1.5px solid var(--border);border-radius:3px;color:var(--text);font-family:'Press Start 2P',monospace;font-size:11px;padding:12px 14px;outline:none;transition:border-color .2s;width:100%;}
   .field input:focus{border-color:var(--accent2);}
   .field input::placeholder{color:#333355;}
@@ -116,7 +116,12 @@ for(let i=0;i<20;i++){const p=document.createElement('div');p.className='pixel';
       <div class="field"><label id="lbl-signup-pass">Mot de passe</label><input type="password" id="signup-pass" placeholder="8 caractères minimum" autocomplete="new-password"></div>
       <div class="field"><label id="lbl-signup-pass2">Confirmer le mot de passe</label><input type="password" id="signup-pass2" placeholder="Répète ton mot de passe" autocomplete="new-password"></div>
       <!-- hCaptcha -->
-      <div class="h-captcha" data-sitekey="807cbb66-d48c-4f64-aaca-e2ac51009100" data-theme="dark" id="hcaptcha-widget"></div>
+      <div class="h-captcha" 
+           data-sitekey="807cbb66-d48c-4f64-aaca-e2ac51009100" 
+           data-theme="dark"
+           data-callback="onCaptchaSuccess"
+           data-expired-callback="onCaptchaExpired"
+           id="hcaptcha-widget"></div>
       <!-- Terms checkbox -->
       <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
         <input type="checkbox" id="terms-check" style="margin-top:3px;accent-color:#a040f0;width:16px;height:16px;flex-shrink:0;">
@@ -287,7 +292,7 @@ async function doSignup(){
   const terms=document.getElementById('terms-check');
   if(!terms||!terms.checked){showMsg('msg-signup','error',l==='fr'?"Tu dois accepter les conditions d'utilisation.":'You must accept the terms of service.');return;}
   // hCaptcha check
-  const hcaptchaToken=typeof hcaptcha!=='undefined'?hcaptcha.getResponse():'';
+  const hcaptchaToken=_captchaToken||'';
   if(!hcaptchaToken){showMsg('msg-signup','error',l==='fr'?'Merci de compléter le captcha !':'Please complete the captcha!');return;}
   // Check username availability
   const available=await checkUsernameAvailable(pseudo);
@@ -297,7 +302,7 @@ async function doSignup(){
   if(error){
     setLoading('btn-signup',false);
     showMsg('msg-signup','error',error.message);
-    if(typeof hcaptcha!=='undefined')hcaptcha.reset();
+    _captchaToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();
     return;
   }
   localStorage.setItem('fl_pending_username',pseudo);
@@ -344,6 +349,11 @@ document.addEventListener('keydown',e=>{
 });
 
 sb.auth.getSession().then(({data})=>{if(data.session)window.location.href='index.html';});
+
+// hCaptcha callbacks
+let _captchaToken='';
+function onCaptchaSuccess(token){_captchaToken=token;}
+function onCaptchaExpired(){_captchaToken='';}
 
 // Auto-switch to signup if #signup in URL
 if(window.location.hash==='#signup'){
