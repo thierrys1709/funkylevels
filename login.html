@@ -232,7 +232,7 @@ setLang(lang);
 
 
 function switchTab(tab){
-  if(tab==='signup'){}
+  if(tab==='signup'&&typeof hcaptcha!=='undefined')hcaptcha.reset();
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.form').forEach(f=>f.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
@@ -273,21 +273,34 @@ async function checkUsernameAvailable(pseudo){
 }
 
 async function doSignup(){
-  clearMsg('msg-signup');const t=T[lang]||T['fr'];
+  clearMsg('msg-signup');const l=lang;const t=T[l]||T['fr'];
   const pseudo=document.getElementById('signup-pseudo').value.trim();
   const email=document.getElementById('signup-email').value.trim();
   const pass=document.getElementById('signup-pass').value;
+  const pass2=document.getElementById('signup-pass2').value;
   if(!pseudo||!email||!pass){showMsg('msg-signup','error',t.errFields);return;}
-  if(pseudo.length<3){showMsg('msg-signup','error','Le pseudo doit avoir au moins 3 caractères.');return;}
+  if(pseudo.length<3){showMsg('msg-signup','error',l==='fr'?'Le pseudo doit avoir au moins 3 caractères.':'Username must be at least 3 characters.');return;}
   if(pass.length<8){showMsg('msg-signup','error',t.errLen);return;}
+  if(pass!==pass2){showMsg('msg-signup','error',l==='fr'?'Les mots de passe ne correspondent pas !':'Passwords do not match!');return;}
+  if(!/[a-zA-Z]/.test(pass)||!/[0-9]/.test(pass)){showMsg('msg-signup','error',l==='fr'?'Le mot de passe doit contenir des lettres et des chiffres.':'Password must contain letters and digits.');return;}
+  // Terms check
+  const terms=document.getElementById('terms-check');
+  if(!terms||!terms.checked){showMsg('msg-signup','error',l==='fr'?"Tu dois accepter les conditions d'utilisation.":'You must accept the terms of service.');return;}
+  // hCaptcha check
+  const hcaptchaToken=typeof hcaptcha!=='undefined'?hcaptcha.getResponse():'';
+  if(!hcaptchaToken){showMsg('msg-signup','error',l==='fr'?'Merci de compléter le captcha !':'Please complete the captcha!');return;}
   // Check username availability
   const available=await checkUsernameAvailable(pseudo);
-  if(!available){showMsg('msg-signup','error','Ce pseudo est déjà pris !');return;}
+  if(!available){showMsg('msg-signup','error',l==='fr'?'Ce pseudo est déjà pris !':'Username already taken!');return;}
   setLoading('btn-signup',true);
   const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{username:pseudo},captchaToken:hcaptchaToken}});
-  if(error){setLoading('btn-signup',false);showMsg('msg-signup','error',error.message);return;}
-  // Save username in localStorage - will be written to profile on first login
-  localStorage.setItem('fl_pending_username', pseudo);
+  if(error){
+    setLoading('btn-signup',false);
+    showMsg('msg-signup','error',error.message);
+    if(typeof hcaptcha!=='undefined')hcaptcha.reset();
+    return;
+  }
+  localStorage.setItem('fl_pending_username',pseudo);
   setLoading('btn-signup',false);
   showMsg('msg-signup','success',t.okSignup);
 }
