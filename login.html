@@ -101,6 +101,7 @@ for(let i=0;i<20;i++){const p=document.createElement('div');p.className='pixel';
         <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
       </div>
       <div class="forgot-link"><button onclick="openReset()" id="forgot-btn">Mot de passe oublié ?</button></div>
+      <div id="hcaptcha-login-widget" style="margin:4px 0;"></div>
       <button class="btn-main" id="btn-login" onclick="doLogin()">JOUER →</button>
       <div class="sep" id="sep-login">OU</div>
       <button class="btn-google" onclick="doGoogle()">
@@ -116,6 +117,7 @@ for(let i=0;i<20;i++){const p=document.createElement('div');p.className='pixel';
       <div class="field"><label id="lbl-signup-pass">Mot de passe</label><input type="password" id="signup-pass" placeholder="8 caractères minimum" autocomplete="new-password"></div>
       <div class="field"><label id="lbl-signup-pass2">Confirmer le mot de passe</label><input type="password" id="signup-pass2" placeholder="Répète ton mot de passe" autocomplete="new-password"></div>
 
+      <div id="hcaptcha-signup-widget" style="margin:4px 0;"></div>
       <!-- Terms checkbox -->
       <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
         <input type="checkbox" id="terms-check" style="margin-top:3px;accent-color:#a040f0;width:16px;height:16px;flex-shrink:0;">
@@ -131,9 +133,7 @@ for(let i=0;i<20;i++){const p=document.createElement('div');p.className='pixel';
       </button>
     </div>
   </div>
-  <!-- Single shared hCaptcha widget -->
-  <div id="hcaptcha-shared" style="display:flex;justify-content:center;margin-top:16px;"></div>
-  <div class="back-link" style="margin-top:12px;"><a href="studio.html" id="back-link-txt">← RETOUR AU JEU</a></div>
+  <div class="back-link"><a href="studio.html" id="back-link-txt">← RETOUR AU JEU</a></div>
 </div>
 
 <!-- RESET MODAL -->
@@ -234,21 +234,22 @@ setLang(lang);
 
 let _captchaRendered=false;
 
-let _sharedCaptchaToken='';
-function onSharedCaptcha(token){_sharedCaptchaToken=token;}
-function onSharedCaptchaExpired(){_sharedCaptchaToken='';}
+let _loginToken='';
+let _signupToken='';
+function onLoginCaptcha(t){_loginToken=t;}
+function onLoginExpired(){_loginToken='';}
+function onSignupCaptcha(t){_signupToken=t;}
+function onSignupExpired(){_signupToken='';}
 
 function hcaptchaLoaded(){
   setTimeout(()=>{
     try{
-      hcaptcha.render('hcaptcha-shared',{
-        sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',
-        theme:'dark',
-        callback:onSharedCaptcha,
-        'expired-callback':onSharedCaptchaExpired
-      });
-    }catch(e){console.warn('hcaptcha render error',e);}
-  },200);
+      hcaptcha.render('hcaptcha-login-widget',{sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',theme:'dark',callback:onLoginCaptcha,'expired-callback':onLoginExpired});
+    }catch(e){}
+    try{
+      hcaptcha.render('hcaptcha-signup-widget',{sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',theme:'dark',callback:onSignupCaptcha,'expired-callback':onSignupExpired});
+    }catch(e){}
+  },300);
 }
 let _captchaLoginRendered=false;
 let _captchaLoginToken='';
@@ -264,7 +265,7 @@ function switchTab(tab){
     if(!_captchaRendered&&typeof hcaptcha!=='undefined'){
       hcaptcha.render('hcaptcha-widget',{sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',theme:'dark',callback:onCaptchaSuccess,'expired-callback':onCaptchaExpired});
       _captchaRendered=true;
-    }else if(_captchaRendered){_sharedCaptchaToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();}
+    }else if(_captchaRendered){_loginToken='';_signupToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();}
   }
   if(tab==='login'){
     if(!_captchaLoginRendered&&typeof hcaptcha!=='undefined'){
@@ -290,12 +291,12 @@ async function doLogin(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value;
   if(!email||!pass){showMsg('msg-login','error',t.errFields);return;}
-  const loginToken=_sharedCaptchaToken||'';
+  const loginToken=_loginToken||'';
   if(!loginToken){showMsg('msg-login','error',l==='fr'?'Merci de compléter le captcha !':'Please complete the captcha!');return;}
   setLoading('btn-login',true);
   const{error}=await sb.auth.signInWithPassword({email,password:pass,options:{captchaToken:loginToken}});
   setLoading('btn-login',false);
-  if(error){showMsg('msg-login','error',error.message.includes('Invalid')?t.errCreds:error.message);_sharedCaptchaToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();}
+  if(error){showMsg('msg-login','error',error.message.includes('Invalid')?t.errCreds:error.message);_loginToken='';_signupToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();}
   else{
     showMsg('msg-login','success',t.okLogin);
     // Simple: just redirect immediately, session is set by Supabase client
@@ -324,7 +325,7 @@ async function doSignup(){
   const terms=document.getElementById('terms-check');
   if(!terms||!terms.checked){showMsg('msg-signup','error',l==='fr'?"Tu dois accepter les conditions d'utilisation.":'You must accept the terms of service.');return;}
   // hCaptcha check
-  const hcaptchaToken=_sharedCaptchaToken||'';
+  const hcaptchaToken=_signupToken||'';
   if(!hcaptchaToken){showMsg('msg-signup','error',l==='fr'?'Merci de compléter le captcha !':'Please complete the captcha!');return;}
   // Check username availability
   const available=await checkUsernameAvailable(pseudo);
@@ -334,7 +335,7 @@ async function doSignup(){
   if(error){
     setLoading('btn-signup',false);
     showMsg('msg-signup','error',error.message);
-    _sharedCaptchaToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();
+    _loginToken='';_signupToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();
     return;
   }
   localStorage.setItem('fl_pending_username',pseudo);
