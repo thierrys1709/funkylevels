@@ -3,997 +3,390 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FunkyLevels — Paramètres</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<title>FunkyLevels — Connexion</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 <style>
-:root{--bg:#070710;--bg2:#0d0d1e;--bg3:#12122a;--border:#1e1e40;--border2:#2a2a55;--accent:#f0e040;--accent2:#7060f0;--green:#40f090;--red:#f04060;--blue:#4090f0;--text:#e8e8ff;--text2:#a0a0cc;--muted:#6060aa;--input-bg:#080816;}
-body.light{--bg:#f0f0fa;--bg2:#e4e4f4;--bg3:#d8d8ee;--border:#c0c0dc;--border2:#a0a0c8;--text:#111128;--text2:#444466;--muted:#888899;--input-bg:#f8f8ff;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);font-family:Rajdhani,sans-serif;min-height:100vh;color:var(--text);transition:background .3s,color .3s;}
+  :root{--bg:#08080f;--panel:#0f0f1e;--border:#1e1e35;--accent:#f0e040;--accent2:#a040f0;--green:#40f090;--red:#f04060;--text:#cccccc;--muted:#444466;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);font-family:'Press Start 2P',monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--text);}
+  .bg-grid{position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:32px 32px;opacity:.5;pointer-events:none;}
+  .pixel{position:fixed;border-radius:1px;opacity:0;animation:floatPixel linear infinite;}
+  @keyframes floatPixel{0%{opacity:0;transform:translateY(100vh) rotate(0)}10%{opacity:.6}90%{opacity:.3}100%{opacity:0;transform:translateY(-100px) rotate(360deg)}}
+  .lang-switch{position:fixed;top:16px;right:16px;z-index:100;display:flex;gap:6px;}
+  .lang-btn{font-family:'Press Start 2P',monospace;font-size:10px;padding:6px 10px;border:1.5px solid var(--border);border-radius:3px;background:var(--panel);color:var(--muted);cursor:pointer;transition:all .15s;}
+  .lang-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .lang-btn.active{border-color:var(--accent);color:var(--accent);background:#f0e04015;}
+  .container{position:relative;z-index:10;width:100%;max-width:420px;padding:20px;animation:fadeIn .6s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .logo{text-align:center;margin-bottom:32px;}
+  .logo h1{font-size:20px;color:var(--accent);text-shadow:0 0 20px var(--accent),0 0 40px var(--accent);letter-spacing:2px;animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{text-shadow:0 0 20px var(--accent),0 0 40px var(--accent)}50%{text-shadow:0 0 30px var(--accent),0 0 60px var(--accent),0 0 80px var(--accent)}}
+  .logo p{font-size:9px;color:var(--muted);margin-top:10px;letter-spacing:3px;}
+  .card{background:var(--panel);border:2px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 0 40px #00000099,0 0 80px #a040f011;}
+  .tabs{display:flex;border-bottom:2px solid var(--border);}
+  .tab{flex:1;padding:16px;font-family:'Press Start 2P',monospace;font-size:10px;background:transparent;border:none;color:var(--muted);cursor:pointer;transition:all .2s;}
+  .tab:hover{color:var(--text);background:#ffffff08;}
+  .tab.active{color:var(--accent);background:#f0e04010;border-bottom:2px solid var(--accent);margin-bottom:-2px;}
+  .form{padding:28px 24px;display:none;flex-direction:column;gap:18px;}
+  .form.active{display:flex;}
+  .field{display:flex;flex-direction:column;gap:8px;}
+  .field label{font-size:9px;color:#e8e8ff;letter-spacing:2px;text-transform:uppercase;}
+  .field input{background:#0a0a18;border:1.5px solid var(--border);border-radius:3px;color:var(--text);font-family:'Press Start 2P',monospace;font-size:11px;padding:12px 14px;outline:none;transition:border-color .2s;width:100%;}
+  .field input:focus{border-color:var(--accent2);}
+  .field input::placeholder{color:#333355;}
+  .forgot-link{text-align:right;}
+  .forgot-link button{font-family:'Press Start 2P',monospace;font-size:8px;background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 0;transition:color .2s;}
+  .forgot-link button:hover{color:var(--accent2);}
+  .btn-main{font-family:'Press Start 2P',monospace;font-size:11px;padding:14px;border:none;border-radius:3px;cursor:pointer;background:var(--accent);color:#111;transition:all .15s;letter-spacing:1px;margin-top:4px;}
+  .btn-main:hover{background:#fff;transform:translateY(-1px);box-shadow:0 4px 20px #f0e04055;}
+  .btn-main:active{transform:translateY(0);}
+  .btn-main:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-google{font-family:'Press Start 2P',monospace;font-size:10px;padding:12px;border:1.5px solid var(--border);border-radius:3px;cursor:pointer;background:transparent;color:var(--text);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:10px;}
+  .btn-google:hover{border-color:#4285f4;color:#4285f4;background:#4285f410;}
+  .sep{display:flex;align-items:center;gap:12px;font-size:9px;color:var(--muted);}
+  .sep::before,.sep::after{content:'';flex:1;height:1px;background:var(--border);}
+  .msg{font-size:10px;padding:10px 12px;border-radius:3px;display:none;line-height:2.2;text-align:center;}
+  .msg.error{background:#f0406020;border:1px solid var(--red);color:var(--red);display:block;}
+  .msg.success{background:#40f09020;border:1px solid var(--green);color:var(--green);display:block;}
+  .back-link{text-align:center;margin-top:20px;font-size:9px;color:var(--muted);}
+  .back-link a{color:var(--accent2);text-decoration:none;transition:color .2s;}
+  .back-link a:hover{color:var(--accent);}
+  .spinner{display:inline-block;width:10px;height:10px;border:2px solid #11111166;border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-/* NAV */
-nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur(10px);border-bottom:2px solid var(--border2);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 2px 20px #00000044;}
-.nav-logo{font-family:Orbitron,monospace;font-size:14px;font-weight:900;color:var(--accent);text-shadow:0 0 12px var(--accent)44;text-decoration:none;}
-.nav-back{font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;padding:8px 16px;border:1.5px solid var(--border2);border-radius:4px;background:transparent;color:var(--text2);cursor:pointer;text-decoration:none;transition:all .15s;}
-.nav-back:hover{border-color:var(--accent);color:var(--accent);}
-
-/* PAGE */
-.page{max-width:1400px;margin:0 auto;padding:32px 24px 80px;}
-.page-title{font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:var(--accent);margin-bottom:32px;text-align:center;text-shadow:0 0 20px var(--accent)44;}
-
-/* TABS */
-.tabs{display:flex;border-bottom:2px solid var(--border2);margin-bottom:28px;gap:0;}
-.tab-btn{font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;padding:14px 24px;background:transparent;border:none;color:var(--muted);cursor:pointer;transition:all .2s;border-bottom:3px solid transparent;margin-bottom:-2px;letter-spacing:.5px;}
-.tab-btn:hover{color:var(--text);}
-.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
-
-/* TAB CONTENT */
-.tab-pane{display:none;flex-direction:column;gap:20px;}
-.tab-pane.active{display:flex;}
-
-/* SECTION CARD */
-.card{background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:24px;}
-.card-title{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:var(--accent2);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);letter-spacing:1px;}
-
-/* CHAR GRID */
-.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;}
-.char-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border:2px solid var(--border);border-radius:6px;cursor:pointer;transition:all .2s;background:var(--bg3);}
-.char-item:hover{border-color:var(--accent2);}
-.char-item.selected{border-color:var(--accent);background:#f0e04012;}
-.char-icon{width:36px;height:47px;image-rendering:pixelated;}
-.char-icon-fallback{font-size:28px;display:none;}
-.char-name{font-family:Rajdhani,sans-serif;font-weight:700;font-size:9px;color:var(--muted);text-align:center;letter-spacing:1px;}
-.char-item.selected .char-name{color:var(--accent);}
-
-/* LANG OPTIONS */
-.lang-options{display:flex;gap:12px;flex-wrap:wrap;}
-.lang-option{display:flex;align-items:center;gap:12px;padding:14px 20px;border:2px solid var(--border);border-radius:6px;cursor:pointer;transition:all .2s;background:var(--bg3);font-weight:700;font-size:14px;}
-.lang-option:hover{border-color:var(--accent2);}
-.lang-option.selected{border-color:var(--accent);background:#f0e04012;}
-.lang-option span:first-child{font-size:22px;}
-
-/* FORM ELEMENTS */
-.field{display:flex;flex-direction:column;gap:6px;}
-.field label{font-family:Rajdhani,sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;}
-.btn-primary{font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;padding:12px 20px;background:var(--accent);color:#111;border:none;border-radius:5px;cursor:pointer;transition:all .15s;letter-spacing:.5px;align-self:flex-start;}
-.btn-primary:hover{background:#fff;transform:translateY(-1px);}
-.btn-danger{font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;padding:12px 20px;background:#2a1a1a;color:var(--red);border:2px solid var(--red);border-radius:5px;cursor:pointer;transition:all .15s;}
-.btn-danger:hover{background:#3a1a1a;transform:translateY(-1px);}
-.msg{font-family:Rajdhani,sans-serif;font-size:13px;font-weight:600;padding:10px 14px;border-radius:4px;display:none;line-height:1.8;}
-.msg.ok{background:#40f09018;border:1px solid var(--green);color:var(--green);display:block;}
-.msg.err{background:#f0406018;border:1px solid var(--red);color:var(--red);display:block;}
-
-/* LEVELS TABLE */
-.levels-table{width:100%;border-collapse:collapse;table-layout:fixed;}
-.stats-table-wrap{overflow-x:hidden;width:100%;}
-.levels-table thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
-.levels-table th{font-family:Rajdhani,sans-serif;font-size:10px;font-weight:700;color:#6060aa;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;text-align:left;white-space:nowrap;}
-.lvl-row{cursor:pointer;border-bottom:1px solid #1a1a35;transition:background .1s;}
-.lvl-row:last-child{border-bottom:none;}
-.lvl-row:hover{background:#16163a;}
-/* Real table cells */
-.lvl-row td{padding:12px 16px;vertical-align:middle;}
-.lvl-td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:130px;min-width:130px;max-width:130px;position:relative;}
-.lvl-td-date{font-family:Rajdhani,sans-serif;font-size:11px;color:#a0a0cc;white-space:nowrap;width:70px;}
-.lvl-td-stats{font-family:Rajdhani,sans-serif;font-size:11px;color:#8080aa;white-space:nowrap;width:100px;}
-.lvl-td-vis{width:160px;}
-.lvl-td-actions{width:140px;white-space:nowrap;}
-.lvl-vis-badge{font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;cursor:pointer;}
-.lvl-vis-badge.private{background:#1a2a4a;color:#90c0f0;border:1px solid #4060c0;}
-.lvl-vis-badge.public{background:#1a3a2a;color:#60e090;border:1px solid #40a060;}
-.lvl-vis-badge.code{background:#2a1a4a;color:#c090f0;border:1px solid #8040c0;}
-
-/* Visibility 3-button group */
-.vis-btn-group{display:flex;gap:4px;}
-.vis-btn{font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;border:1.5px solid #2a2a55;border-radius:5px;background:#12122a;color:#4040aa;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
-.vis-btn:hover{border-color:#6060aa;color:#a0a0cc;background:#1a1a3a;}
-.vis-btn.active-private{background:#1a2a4a;color:#90c0f0;border-color:#4060c0;}
-.vis-btn.active-public{background:#1a3a2a;color:#60e090;border-color:#40a060;}
-.vis-btn.active-code{background:#2a1a4a;color:#c090f0;border-color:#8040c0;}
-.vis-btn:not([class*="active"]):hover{opacity:0.8;}
-/* Actions: always in DOM, invisible by default */
-.lvl-actions{display:flex;gap:6px;opacity:0;pointer-events:none;transition:opacity .15s;}
-.lvl-row:hover .lvl-actions{opacity:1;pointer-events:auto;}
-.lvl-act-btn{font-family:sans-serif;font-size:14px;padding:5px 10px;border-radius:4px;cursor:pointer;border:1.5px solid;transition:filter .1s;line-height:1;}
-.lvl-act-btn:hover{filter:brightness(1.3);}
-.lvl-act-play{background:#0d280d;border-color:#3a8a3a;color:#60e090;}
-.lvl-act-play.test-mode{background:#2a1a00;border-color:#f0a040;color:#f0a040;}
-.lvl-act-edit{background:#0d0d28;border-color:#4040aa;color:#90a0f0;}
-.lvl-act-dup{background:#1a1a0d;border-color:#7a7a3a;color:#e0d060;}
-.lvl-act-del{background:#280d0d;border-color:#aa3030;color:#f06060;}
-.no-levels{font-family:Rajdhani,sans-serif;font-size:14px;font-weight:600;color:var(--muted);text-align:center;padding:40px;}
-
-/* ACCOUNT */
-.account-info{display:flex;flex-direction:column;gap:6px;background:var(--bg3);border:1.5px solid var(--border);border-radius:6px;padding:16px;}
-.account-info span{font-family:Rajdhani,sans-serif;font-size:13px;color:var(--text2);}
-.account-info strong{color:var(--accent);font-weight:700;}
-.danger-zone{border-color:var(--red)!important;}
-.danger-zone .card-title{color:var(--red);}
-.danger-desc{font-family:Rajdhani,sans-serif;font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:16px;}
-
-/* CONFIRM MODAL */
-#confirm-modal{display:none;position:fixed;inset:0;background:#000000cc;z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-#confirm-modal.show{display:flex;}
-.confirm-box{background:var(--bg2);border:2px solid var(--red);border-radius:8px;padding:32px 28px;width:400px;display:flex;flex-direction:column;gap:20px;box-shadow:0 0 40px #f0406033;}
-.confirm-box h3{font-family:Orbitron,monospace;font-size:14px;font-weight:700;color:var(--red);text-align:center;}
-.confirm-box p{font-family:Rajdhani,sans-serif;font-size:14px;color:var(--text2);text-align:center;line-height:1.8;}
-.confirm-row{display:flex;gap:12px;}
-.confirm-btn{flex:1;font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;padding:12px;border:none;border-radius:4px;cursor:pointer;transition:all .15s;}
-.confirm-btn.yes{background:var(--red);color:#fff;}
-.confirm-btn.yes:hover{background:#ff6070;}
-.confirm-btn.no{background:var(--bg3);color:var(--text2);border:1.5px solid var(--border2);}
-.confirm-btn.no:hover{color:var(--text);}
-
-/* TOAST */
-#settings-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg2);border:1.5px solid var(--green);color:var(--green);font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;padding:12px 22px;border-radius:4px;z-index:999;transition:transform .3s;pointer-events:none;}
-#settings-toast.show{transform:translateX(-50%) translateY(0);}
-
-/* SPINNER */
-.spinner{display:inline-block;width:10px;height:10px;border:2px solid #11111166;border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px;}
-@keyframes spin{to{transform:rotate(360deg)}}
+  /* Reset modal */
+  #reset-modal{display:none;position:fixed;inset:0;background:#000000bb;z-index:300;align-items:center;justify-content:center;}
+  #reset-modal.show{display:flex;}
+  .reset-box{background:var(--panel);border:2px solid var(--border);border-radius:6px;padding:28px 24px;width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 0 40px #000000cc;}
+  .reset-box h3{font-size:8px;color:var(--accent2);text-align:center;}
+  .reset-box p{font-size:6px;color:var(--muted);line-height:2.2;text-align:center;}
+  .reset-row{display:flex;gap:10px;}
+  .reset-btn{flex:1;font-family:'Press Start 2P',monospace;font-size:10px;padding:11px;border:none;border-radius:3px;cursor:pointer;transition:all .15s;}
+  .reset-btn.ok{background:var(--accent2);color:#fff;}
+  .reset-btn.ok:hover{background:#b060ff;}
+  .reset-btn.ok:disabled{opacity:.5;cursor:not-allowed;}
+  .reset-btn.cancel{background:#1a1a2a;color:#888;border:1.5px solid #333;}
+  .reset-btn.cancel:hover{color:#ccc;}
 </style>
 </head>
 <body>
-<div class="bg-grid" style="position:fixed;inset:0;background-image:linear-gradient(#1e1e4022 1px,transparent 1px),linear-gradient(90deg,#1e1e4022 1px,transparent 1px);background-size:32px 32px;pointer-events:none;"></div>
+<div class="bg-grid"></div>
+<div class="lang-switch">
+  <button class="lang-btn active" id="btn-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+  <button class="lang-btn" id="btn-en" onclick="setLang('en')">🇬🇧 EN</button>
+</div>
+<script>
+const colors=['#f0e040','#a040f0','#40f090','#4090f0','#f04060'];
+for(let i=0;i<20;i++){const p=document.createElement('div');p.className='pixel';p.style.left=Math.random()*100+'vw';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=(Math.random()*10)+'s';p.style.width=p.style.height=(4+Math.random()*6)+'px';document.body.appendChild(p);}
+</script>
 
-<nav>
-  <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
-  <a href="index.html" class="nav-back" id="nav-back">← RETOUR</a>
-</nav>
-
-<div class="page">
-  <div class="page-title" id="page-title">⚙️ PARAMÈTRES</div>
-
-  <!-- TABS -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('general')" id="tab-general">⚙️ GÉNÉRAL</button>
-    <button class="tab-btn" onclick="switchTab('levels')" id="tab-levels">🎮 NIVEAUX</button>
-    <button class="tab-btn" onclick="switchTab('account')" id="tab-account">👤 COMPTE</button>
+<div class="container">
+  <div class="logo">
+    <h1>⚡ FUNKYLEVELS</h1>
+    <p id="logo-sub">CRÉE · PARTAGE · JOUE</p>
   </div>
-
-  <!-- ══ TAB: GÉNÉRAL ══ -->
-  <div class="tab-pane active" id="pane-general">
-
-    <!-- Personnage -->
-    <div class="card">
-      <div class="card-title" id="char-title">🎮 MON PERSONNAGE</div>
-      <div class="char-grid" id="char-grid"></div>
-      <div id="char-msg" class="msg" style="margin-top:12px;"></div>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">CONNEXION</button>
+      <button class="tab" id="tab-signup" onclick="switchTab('signup')">INSCRIPTION</button>
     </div>
-
-    <!-- Langue -->
-    <div class="card">
-      <div class="card-title" id="lang-title">🌍 LANGUE PAR DÉFAUT</div>
-      <div class="lang-options" id="lang-options"></div>
-      <div style="margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <button class="btn-primary" id="btn-save-lang" onclick="saveLang()">💾 SAUVEGARDER</button>
-        <div id="lang-msg" class="msg"></div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ══ TAB: NIVEAUX ══ -->
-  <div class="tab-pane" id="pane-levels">
-    <div class="card">
-      <div class="card-title" id="stats-title">🎮 MES NIVEAUX</div>
-      <div id="stats-content"><div class="no-levels" id="stats-loading">Chargement...</div></div>
-    </div>
-  </div>
-
-  <!-- ══ TAB: COMPTE ══ -->
-  <div class="tab-pane" id="pane-account">
-
-    <!-- Infos compte -->
-    <div class="card">
-      <div class="card-title" id="account-info-title">👤 MON COMPTE</div>
-      <div class="account-info">
-        <span id="account-username"></span>
-        <span id="account-email"></span>
-        <span id="account-since"></span>
-      </div>
-    </div>
-
-    <!-- Changer pseudo -->
-    <div class="card">
-      <div class="card-title" id="pseudo-title">✏️ CHANGER MON PSEUDO</div>
+    <!-- LOGIN -->
+    <div class="form active" id="form-login">
+      <div id="msg-login" class="msg"></div>
+      <div class="field"><label id="lbl-login-email">Email</label><input type="email" id="login-email" placeholder="ton@email.com" autocomplete="email"></div>
       <div class="field">
-        <label id="pseudo-lbl">NOUVEAU PSEUDO</label>
-        <input type="text" id="new-pseudo" maxlength="20" autocomplete="off"
-          style="background:var(--input-bg);border:1.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;padding:10px 14px;outline:none;width:100%;transition:border-color .2s;"
-          oninput="checkPseudoAvail()" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--border2)'">
+        <label id="lbl-login-pass">Mot de passe</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
       </div>
-      <div id="pseudo-counter" style="font-family:Rajdhani,sans-serif;font-size:13px;font-weight:600;margin-bottom:8px;"></div>
-      <div id="pseudo-avail" style="font-family:Rajdhani,sans-serif;font-size:13px;font-weight:600;min-height:20px;margin-top:4px;"></div>
-      <div style="margin-top:12px;">
-        <button class="btn-primary" id="btn-save-pseudo" onclick="savePseudo()" disabled style="opacity:.5;">💾 <span id="btn-pseudo-txt">SAUVEGARDER</span></button>
-      </div>
-      <div id="pseudo-msg" class="msg" style="margin-top:10px;"></div>
+      <div class="forgot-link"><button onclick="openReset()" id="forgot-btn">Mot de passe oublié ?</button></div>
+      <!-- hCaptcha login -->
+      <div id="hcaptcha-login-widget"></div>
+      <button class="btn-main" id="btn-login" onclick="doLogin()">JOUER →</button>
+      <div class="sep" id="sep-login">OU</div>
+      <button class="btn-google" onclick="doGoogle()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        <span id="google-login-txt">CONTINUER AVEC GOOGLE</span>
+      </button>
     </div>
-
-    <!-- Danger zone -->
-    <div class="card danger-zone">
-      <div class="card-title" id="danger-title">⚠️ ZONE DANGEREUSE</div>
-      <p class="danger-desc" id="danger-desc">Supprimer ton compte effacera définitivement ton profil et tous tes niveaux. Cette action est irréversible.</p>
-      <button class="btn-danger" onclick="showAccountDeleteConfirm()" id="btn-delete">🗑 SUPPRIMER MON COMPTE</button>
+    <!-- SIGNUP -->
+    <div class="form" id="form-signup">
+      <div id="msg-signup" class="msg"></div>
+      <div class="field"><label id="lbl-signup-pseudo">Pseudo</label><input type="text" id="signup-pseudo" placeholder="MonPseudo" maxlength="20" autocomplete="username"></div>
+      <div class="field"><label id="lbl-signup-email">Email</label><input type="email" id="signup-email" placeholder="ton@email.com" autocomplete="email"></div>
+      <div class="field"><label id="lbl-signup-pass">Mot de passe</label><input type="password" id="signup-pass" placeholder="8 caractères minimum" autocomplete="new-password"></div>
+      <div class="field"><label id="lbl-signup-pass2">Confirmer le mot de passe</label><input type="password" id="signup-pass2" placeholder="Répète ton mot de passe" autocomplete="new-password"></div>
+      <!-- hCaptcha -->
+      <div class="h-captcha" 
+           data-sitekey="807cbb66-d48c-4f64-aaca-e2ac51009100" 
+           data-theme="dark"
+           data-callback="onCaptchaSuccess"
+           data-expired-callback="onCaptchaExpired"
+           id="hcaptcha-widget"></div>
+      <!-- Terms checkbox -->
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="terms-check" style="margin-top:3px;accent-color:#a040f0;width:16px;height:16px;flex-shrink:0;">
+        <span style="font-family:Rajdhani,sans-serif;font-size:13px;color:#6060aa;line-height:1.5;">
+          J'accepte les <a href="legal.html" target="_blank" style="color:#a040f0;">conditions d'utilisation</a>
+        </span>
+      </label>
+      <button class="btn-main" id="btn-signup" onclick="doSignup()">CRÉER MON COMPTE →</button>
+      <div class="sep" id="sep-signup">OU</div>
+      <button class="btn-google" onclick="doGoogle()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        <span id="google-signup-txt">CONTINUER AVEC GOOGLE</span>
+      </button>
     </div>
-
   </div>
+  <div class="back-link"><a href="studio.html" id="back-link-txt">← RETOUR AU JEU</a></div>
 </div>
 
-<!-- CONFIRM MODAL -->
-<div id="confirm-modal">
-  <div class="confirm-box">
-    <h3 id="confirm-title">⚠️ CONFIRMATION</h3>
-    <p id="confirm-desc">Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ?</p>
-    <div class="confirm-row">
-      <button class="confirm-btn no" onclick="confirmCancel()" id="confirm-no">ANNULER</button>
-      <button class="confirm-btn yes" onclick="confirmOk()" id="confirm-yes">SUPPRIMER</button>
+<!-- RESET MODAL -->
+<div id="reset-modal">
+  <div class="reset-box">
+    <h3 id="reset-title">🔑 MOT DE PASSE OUBLIÉ</h3>
+    <p id="reset-desc">Entre ton email et on t'envoie un lien pour réinitialiser ton mot de passe.</p>
+    <div id="reset-msg" class="msg"></div>
+    <div class="field"><label id="reset-email-lbl">EMAIL</label><input type="email" id="reset-email" placeholder="ton@email.com" autocomplete="email" style="margin-top:8px;"></div>
+    <div class="reset-row">
+      <button class="reset-btn cancel" onclick="closeReset()" id="reset-cancel-btn">ANNULER</button>
+      <button class="reset-btn ok" onclick="doReset()" id="reset-ok-btn">ENVOYER →</button>
     </div>
   </div>
 </div>
-
-<div id="settings-toast"></div>
 
 <script>
-
 const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
 const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let CHARACTERS=[];
-
-async function loadManifest(){
-  try{
-    const r=await fetch('characters/manifest.json');
-    CHARACTERS=await r.json();
-  }catch(e){
-    // Fallback si manifest non trouvé
-    CHARACTERS=[
-      {id:'default',icon:'🧑',name:'DEFAULT',file:'characters/default.svg'},
-      {id:'ninja',icon:'🥷',name:'NINJA',file:'characters/ninja.svg'},
-      {id:'robot',icon:'🤖',name:'ROBOT',file:'characters/robot.svg'},
-    ];
+const T={
+  fr:{
+    logoSub:'CRÉE · PARTAGE · JOUE',
+    tabLogin:'CONNEXION',tabSignup:'INSCRIPTION',
+    lblLoginEmail:'Email',lblLoginPass:'Mot de passe',
+    lblPseudo:'Pseudo',lblSignupEmail:'Email',lblSignupPass:'Mot de passe',
+    btnLogin:'JOUER →',btnSignup:'CRÉER MON COMPTE →',
+    google:'CONTINUER AVEC GOOGLE',or:'OU',back:'← RETOUR AU JEU',
+    phEmail:'ton@email.com',phPass:'••••••••',phPseudo:'MonPseudo',phPassNew:'8 caractères minimum',
+    errFields:'Remplis tous les champs !',errLen:'Mot de passe trop court (8 min).',
+    errCreds:'Email ou mot de passe incorrect.',
+    okLogin:'Connexion réussie ! Redirection...',okSignup:'Compte créé ! Vérifie ta boîte mail.',
+    forgot:'Mot de passe oublié ?',
+    resetTitle:'🔑 MOT DE PASSE OUBLIÉ',
+    resetDesc:"Entre ton email et on t'envoie un lien pour réinitialiser ton mot de passe.",
+    resetLbl:'EMAIL',resetCancel:'ANNULER',resetOk:'ENVOYER →',
+    resetSending:'ENVOI...',resetSuccess:'Email envoyé ! Vérifie ta boîte mail.',
+    resetErrEmpty:'Entre ton email !'
+  },
+  en:{
+    logoSub:'CREATE · SHARE · PLAY',
+    tabLogin:'LOGIN',tabSignup:'SIGN UP',
+    lblLoginEmail:'Email',lblLoginPass:'Password',
+    lblPseudo:'Username',lblSignupEmail:'Email',lblSignupPass:'Password',
+    btnLogin:'PLAY →',btnSignup:'CREATE ACCOUNT →',
+    google:'CONTINUE WITH GOOGLE',or:'OR',back:'← BACK TO GAME',
+    phEmail:'your@email.com',phPass:'••••••••',phPseudo:'MyUsername',phPassNew:'8 characters minimum',
+    errFields:'Please fill in all fields!',errLen:'Password too short (8 min).',
+    errCreds:'Invalid email or password.',
+    okLogin:'Logged in! Redirecting...',okSignup:'Account created! Check your email.',
+    forgot:'Forgot password?',
+    resetTitle:'🔑 FORGOT PASSWORD',
+    resetDesc:"Enter your email and we'll send you a link to reset your password.",
+    resetLbl:'EMAIL',resetCancel:'CANCEL',resetOk:'SEND →',
+    resetSending:'SENDING...',resetSuccess:'Email sent! Check your inbox.',
+    resetErrEmpty:'Enter your email!'
   }
-}
+};
 
-let _langData={};
 let lang=localStorage.getItem('fl_lang')||'fr';
 
-async function loadLangData(l){
-  if(_langData[l])return _langData[l];
-  try{
-    const r=await fetch('lang/'+l+'.json');
-    _langData[l]=await r.json();
-    return _langData[l];
-  }catch(e){
-    if(l!=='fr')return loadLangData('fr');
-    return {};
-  }
+function setLang(l){
+  lang=l;localStorage.setItem('fl_lang',l);
+  document.getElementById('btn-fr').classList.toggle('active',l==='fr');
+  document.getElementById('btn-en').classList.toggle('active',l==='en');
+  const t=T[l];
+  document.getElementById('logo-sub').textContent=t.logoSub;
+  document.getElementById('tab-login').textContent=t.tabLogin;
+  document.getElementById('tab-signup').textContent=t.tabSignup;
+  document.getElementById('lbl-login-email').textContent=t.lblLoginEmail;
+  document.getElementById('lbl-login-pass').textContent=t.lblLoginPass;
+  document.getElementById('lbl-signup-pseudo').textContent=t.lblPseudo;
+  document.getElementById('lbl-signup-email').textContent=t.lblSignupEmail;
+  document.getElementById('lbl-signup-pass').textContent=t.lblSignupPass;
+  document.getElementById('btn-login').textContent=t.btnLogin;
+  document.getElementById('btn-signup').textContent=t.btnSignup;
+  document.getElementById('google-login-txt').textContent=t.google;
+  document.getElementById('google-signup-txt').textContent=t.google;
+  document.getElementById('sep-login').textContent=t.or;
+  document.getElementById('sep-signup').textContent=t.or;
+  document.getElementById('back-link-txt').textContent=t.back;
+  document.getElementById('login-email').placeholder=t.phEmail;
+  document.getElementById('login-pass').placeholder=t.phPass;
+  document.getElementById('signup-pseudo').placeholder=t.phPseudo;
+  document.getElementById('signup-email').placeholder=t.phEmail;
+  document.getElementById('signup-pass').placeholder=t.phPassNew;
+  document.getElementById('forgot-btn').textContent=t.forgot;
+  document.getElementById('reset-title').textContent=t.resetTitle;
+  document.getElementById('reset-desc').textContent=t.resetDesc;
+  document.getElementById('reset-email-lbl').textContent=t.resetLbl;
+  document.getElementById('reset-cancel-btn').textContent=t.resetCancel;
+  document.getElementById('reset-ok-btn').textContent=t.resetOk;
 }
-
-function T(section){
-  return (_langData[lang]||{})[section]||{};
-}
-
-// Load available languages for the selector
-async function loadLangOptions(){
-  try{
-    const manifest=await fetch('lang/manifest.json').then(r=>r.json());
-    const container=document.getElementById('lang-options');
-    if(!container)return;
-    container.innerHTML=manifest.map(m=>`
-      <div class="lang-option${lang===m.id?' selected':''}" id="lang-${m.id}" onclick="selectLang('${m.id}')">
-        <span style="font-size:20px;">${m.flag}</span>
-        <span>${m.name.toUpperCase()}</span>
-      </div>
-    `).join('');
-  }catch(e){}
-}
-
-localStorage.getItem('fl_lang')||'fr';
-let currentUser=null;
-let selectedChar=localStorage.getItem('fl_char')||'default';
-let selectedLang=lang;
-
-async function applyLang(l){
-  await loadLangData(l);
-  const t=T('settings');
-  if(!t||!t.pageTitle)return;
-  const s=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.textContent=val;};
-  s('page-title',t.pageTitle);
-  // Tabs
-  s('tab-general',t.tabGeneral||'⚙️ GÉNÉRAL');
-  s('tab-levels',t.tabLevels||'🎮 NIVEAUX');
-  s('tab-account',t.tabAccount||'👤 COMPTE');
-  // Account tab
-  s('pseudo-title',t.pseudoTitle);
-  s('pseudo-lbl',t.pseudoLbl);
-  s('btn-save-pseudo',t.pseudoSave);
-  s('account-info-title',t.accountInfoTitle);
-  s('danger-title',t.dangerTitle);
-  s('danger-desc',t.dangerDesc);
-  s('btn-delete',t.btnDelete);
-  s('confirm-title',t.confirmTitle);
-  s('confirm-desc',t.confirmDesc);
-  s('confirm-no',t.confirmNo);
-  s('confirm-yes',t.confirmYes);
-  s('nav-back',t.back);
-  s('char-title',t.charTitle);
-  s('lang-title',t.langTitle);
-  s('btn-save-lang',t.saveLang);
-  s('stats-title',t.statsTitle);
-  s('danger-title',t.dangerTitle);
-  s('danger-desc',t.dangerDesc);
-  s('btn-delete',t.btnDelete);
-  s('confirm-title',t.confirmTitle);
-  s('confirm-desc',t.confirmDesc);
-  s('confirm-no',t.confirmNo);
-  s('confirm-yes',t.confirmYes);
-  s('stats-loading',t.statsLoading);
-}
-
-function buildCharGrid(){
-  const grid=document.getElementById('char-grid');
-  grid.innerHTML=CHARACTERS.map(c=>`
-    <div class="char-item${selectedChar===c.id?' selected':''}" onclick="selectChar('${c.id}')" id="char-${c.id}">
-      <div class="char-icon">
-        <img src="${c.file}" alt="${c.name}"
-          style="width:32px;height:42px;image-rendering:pixelated;"
-          onerror="this.style.display='none';this.nextSibling.style.display='block';">
-        <span style="display:none;font-size:24px;">${c.icon}</span>
-      </div>
-      <div class="char-name">${c.name}</div>
-    </div>
-  `).join('');
-}
-
-function selectChar(id){
-  selectedChar=id;
-  document.querySelectorAll('.char-item').forEach(el=>el.classList.remove('selected'));
-  document.getElementById('char-'+id).classList.add('selected');
-  localStorage.setItem('fl_char',id);
-  const t=T('settings');
-  const msg=document.getElementById('char-msg');
-  msg.className='msg ok';msg.textContent=t.charSaved;
-  setTimeout(()=>msg.className='msg',2000);
-}
-
-function selectLang(l){
-  selectedLang=l;
-  document.getElementById('lang-fr').classList.toggle('selected',l==='fr');
-  document.getElementById('lang-en').classList.toggle('selected',l==='en');
-}
-
-async function saveLang(){
-  lang=selectedLang;
-  localStorage.setItem('fl_lang',lang);
-  await saveProfile({lang:lang});
-  await loadLangData(lang);
-  await applyLang(lang);
-  const msg=document.getElementById('lang-msg');
-  const t=T('settings');
-  if(msg){msg.className='msg ok';msg.textContent=(t&&t.langSaved)||'Saved!';setTimeout(()=>msg.className='msg',2000);}
-}
-
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function fmtMs(ms){if(!ms&&ms!==0)return'—';return(ms/1000).toFixed(2)+'s';}
-
-function copyCode(code){
-  navigator.clipboard?.writeText(code).then(()=>{
-    showToast(lang==='fr'?'Code copié !':'Code copied!');
-  }).catch(()=>alert(code));
-}
-
-function showToast(msg){
-  let t=document.getElementById('settings-toast');
-  if(!t){
-    t=document.createElement('div');
-    t.id='settings-toast';
-    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--panel);border:1.5px solid var(--green);color:var(--green);font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:12px 20px;border-radius:4px;z-index:999;transition:transform .3s;';
-    document.body.appendChild(t);
-  }
-  t.textContent=msg;
-  t.style.transform='translateX(-50%) translateY(0)';
-  setTimeout(()=>t.style.transform='translateX(-50%) translateY(80px)',2500);
-}
-
-async function loadStats(){
-  await loadLangData(lang);
-  const t=T('settings');
-  const el=document.getElementById('stats-content');
-  if(!currentUser){
-    el.innerHTML='<div class="no-levels">'+(t.notLogged||'...')+'</div>';
-    return;
-  }
-
-  // Fetch levels
-  const{data:levels,error}=await sb
-    .from('levels')
-    .select('*')
-    .eq('user_id',currentUser.id)
-    .order('created_at',{ascending:false});
-
-  if(error||!levels||!levels.length){
-    el.innerHTML='<div class="no-levels">'+(t.statsEmpty||'Aucun niveau.')+'</div>';
-    return;
-  }
-
-  // Fetch ratings for all levels
-  const ids=levels.map(l=>l.id);
-  const{data:ratings}=await sb.from('ratings').select('*').in('level_id',ids);
-  const ratingMap={};
-  if(ratings){ratings.forEach(r=>{if(!ratingMap[r.level_id])ratingMap[r.level_id]=[];ratingMap[r.level_id].push(r.score);});}
-
-  // Build table
-  const table=document.createElement('table');
-  table.className='levels-table';
-  const thead=document.createElement('thead');
-  thead.innerHTML='<tr>'+
-    '<th>'+(lang==='fr'?'NOM':'NAME')+'</th>'+
-    '<th style="width:100px;">'+(lang==='fr'?'PARTIES / FINS':'PLAYS / ENDS')+'</th>'+
-    '<th>'+(lang==='fr'?'MODIFIÉ':'MODIFIED')+'</th>'+
-    '<th style="width:70px;padding:10px 6px;">'+(lang==='fr'?'RECORD':'BEST')+'</th>'+
-    '<th style="width:70px;padding:10px 6px;">'+(lang==='fr'?'MON RECORD':'MY BEST')+'</th>'+
-    '<th>'+(lang==='fr'?'ÉTAT':'STATUS')+'</th>'+
-    '<th>'+(lang==='fr'?'ACTIONS':'ACTIONS')+'</th>'+
-  '</tr>';
-  table.appendChild(thead);
-  const tbody=document.createElement('tbody');
-
-  levels.forEach(l=>{
-    const vis=l.visibility||'private';
-    const visLabels={
-      fr:{private:'🔒 Privé',public:'🌍 Public',code:'🔑 Code'},
-      en:{private:'🔒 Private',public:'🌍 Public',code:'🔑 Code'}
-    };
-    const visLabel=(visLabels[lang]||visLabels.fr)[vis];
-    const ts=l.updated_at||l.created_at;
-    const d=new Date(ts);
-    const dateStr=d.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
-    const timeStr=d.toLocaleTimeString(lang==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'});
-
-    const tr=document.createElement('tr');
-    tr.className='lvl-row';
-    tr.setAttribute('data-level-id', l.id);
-    tr.innerHTML=
-      '<td class="lvl-td-name" title="'+(lang==='fr'?'Double-clic pour renommer':'Double-click to rename')+'">'+
-        '<span class="lvl-name-text">'+esc(l.title||'Sans titre')+'</span>'+
-        '<input class="lvl-name-input" type="text" value="'+esc(l.title||'Sans titre')+'" maxlength="60" style="display:none;font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;background:#1a1a3a;border:1.5px solid #a040f0;border-radius:4px;padding:2px 8px;width:180px;outline:none;">'+
-      '</td>'+
-      '<td class="lvl-td-stats">▶ '+(l.plays||0)+' &nbsp;/&nbsp; '+(l.completions||0)+'</td>'+
-      '<td class="lvl-td-date">'+dateStr+'</td>'+
-      '<td class="lvl-td-record" style="font-family:Orbitron,monospace;font-size:10px;color:#c0a0ff;padding:14px 16px;white-space:nowrap;">—</td>'+
-      '<td class="lvl-td-myrecord" style="font-family:Orbitron,monospace;font-size:9px;color:#f0e040;padding:14px 6px;white-space:nowrap;width:70px;">—</td>'+
-      '<td class="lvl-td-vis" data-level-id-vis="'+l.id+'">'+
-        '<div class="vis-btn-group" data-level-id="'+l.id+'">'+
-          '<button class="vis-btn '+(vis==='private'?'active-private':'')+'" data-vis="private" onclick="event.stopPropagation();" title="Privé">🔒 '+(lang==='fr'?'Privé':'Private')+'</button>'+
-          '<button class="vis-btn '+(vis==='public'?'active-public':'')+'" data-vis="public" onclick="event.stopPropagation();" title="Public">🌍 Public</button>'+
-          '<button class="vis-btn '+(vis==='code'?'active-code':'')+'" data-vis="code" onclick="event.stopPropagation();" title="Par code">'+(lang==='fr'?'🔑 Code':'🔑 Code')+'</button>'+
-        '</div>'+
-      '</td>'+
-      '<td class="lvl-td-actions"><div class="lvl-actions">'+
-        '<button class="lvl-act-btn lvl-act-play" title="'+(l.is_published?(lang==='fr'?'Jouer':'Play'):(lang==='fr'?'Tester le niveau':'Test level'))+'">'+(l.is_published?'▶':'🧪')+'</button>'+
-        '<button class="lvl-act-btn lvl-act-edit" title="'+(lang==='fr'?'Éditer dans le studio':'Edit in studio')+'">✏️</button>'+
-        '<button class="lvl-act-btn lvl-act-dup" title="'+(lang==='fr'?'Dupliquer':'Duplicate')+'">⧉</button>'+
-        '<button class="lvl-act-btn lvl-act-del" title="'+(lang==='fr'?'Supprimer':'Delete')+'">🗑</button>'+
-      '</div></td>';
-
-    // Visibility buttons
-    const visBtns=tr.querySelectorAll('.vis-btn');
-    visBtns.forEach(btn=>{
-      btn.onclick=(e)=>{
-        e.stopPropagation();
-        setVisibility(l.id,btn.dataset.vis,btn,l);
-      };
-    });
-    const playBtn=tr.querySelector('.lvl-act-play');
-    if(playBtn){
-      if(!l.is_published)playBtn.classList.add('test-mode');
-      playBtn.onclick=(e)=>{e.stopPropagation();window.location.href='game.html?level='+l.id+(l.is_published?'':'&from=studio');};
-    }
-
-    // Inline rename on double-click
-    const nameCell=tr.querySelector('.lvl-td-name');
-    const nameText=tr.querySelector('.lvl-name-text');
-    const nameInput=tr.querySelector('.lvl-name-input');
-    if(nameCell&&nameText&&nameInput){
-      nameCell.ondblclick=(e)=>{
-        e.stopPropagation();
-        nameText.style.display='none';
-        nameInput.style.display='inline-block';
-        nameInput.focus();
-        nameInput.select();
-      };
-      const saveRename=async()=>{
-        const newTitle=nameInput.value.trim()||'Sans titre';
-        nameInput.style.display='none';
-        nameText.style.display='';
-        if(newTitle===l.title)return;
-        const{error}=await sb.from('levels').update({title:newTitle}).eq('id',l.id).eq('user_id',currentUser.id);
-        if(error){alert('Erreur: '+error.message);nameInput.value=l.title;return;}
-        l.title=newTitle;
-        nameText.textContent=newTitle;
-      };
-      nameInput.onblur=saveRename;
-      nameInput.onkeydown=(e)=>{
-        if(e.key==='Enter'){e.preventDefault();nameInput.blur();}
-        if(e.key==='Escape'){nameInput.value=l.title;nameInput.blur();}
-        e.stopPropagation();
-      };
-    }
-    tr.querySelector('.lvl-act-edit').onclick=(e)=>{e.stopPropagation();window.location.href='studio.html?level='+l.id+'&mode=edit';};
-    tr.querySelector('.lvl-act-dup').onclick=(e)=>{e.stopPropagation();duplicateLevelSettings(l);};
-    tr.querySelector('.lvl-act-del').onclick=(e)=>{e.stopPropagation();deleteLevelSettings(l.id,l.title,tr);};
-
-    tbody.appendChild(tr);
-  });
-
-  table.appendChild(tbody);
-  const wrap=document.createElement('div');
-  wrap.className='stats-table-wrap';
-  wrap.appendChild(table);
-  el.innerHTML='';
-  el.appendChild(wrap);
-
-  // Fetch leaderboard for all levels
-  if(levels.length){
-    const ids=levels.map(l=>l.id);
-    // World records
-    const{data:records}=await sb.from('leaderboard')
-      .select('level_id,time_ms')
-      .in('level_id',ids)
-      .order('time_ms',{ascending:true});
-    const worldBests={};
-    if(records)records.forEach(r=>{if(!worldBests[r.level_id])worldBests[r.level_id]=r.time_ms;});
-
-    // My bests
-    const{data:mine}=await sb.from('leaderboard')
-      .select('level_id,time_ms')
-      .in('level_id',ids)
-      .eq('user_id',currentUser.id)
-      .order('time_ms',{ascending:true});
-    const myBests={};
-    if(mine)mine.forEach(r=>{if(!myBests[r.level_id])myBests[r.level_id]=r.time_ms;});
-
-    // Update cells
-    levels.forEach(l=>{
-      const tr=document.querySelector(`tr[data-level-id="${l.id}"]`);
-      if(!tr)return;
-      const wr=tr.querySelector('.lvl-td-record');
-      const my=tr.querySelector('.lvl-td-myrecord');
-      if(wr)wr.textContent=worldBests[l.id]?fmtMs(worldBests[l.id]):'—';
-      if(my)my.textContent=myBests[l.id]?fmtMs(myBests[l.id]):'—';
-    });
-  }
-}
-
-async function duplicateLevelSettings(l){
-  function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
-  const{error}=await sb.from('levels').insert({
-    user_id:currentUser.id,
-    title:(l.title||'Sans titre')+' (copie)',
-    data:l.data,
-    plays:0,
-    completions:0,
-    visibility:'private',
-    share_code:genCode(),
-    author_completed:false,
-    is_published:false
-  });
-  if(error){alert('Erreur: '+error.message);return;}
-  showToast(lang==='fr'?'Niveau dupliqué !':'Level duplicated!');
-  loadStats();
-}
-
-async function setVisibility(levelId, targetVis, btn, lvlData){
-  const cur=lvlData.visibility||'private';
-  if(cur===targetVis)return;
-  const l=lang||'fr';
-  const plays=lvlData.plays||0;
-  const isPublished=lvlData.is_published||false;
-  let errorMsg=null;
-
-  if(targetVis==='private'){
-    // Always allowed to go private (even with plays)
-  }else{
-    // public or code
-    if(cur==='private'){
-      if(!isPublished){
-        // Never been public/code → must publish through the game first
-        errorMsg=l==='fr'
-          ?'Pour publier, termine le niveau dans le jeu et clique sur "RENDRE PUBLIC" ou "PAR CODE".'
-          :'To publish, finish the level in-game and click "MAKE PUBLIC" or "BY CODE".';
-      }
-      // Was published before (is_published=true) → allow re-publishing directly
-    }
-    // public ↔ code always allowed
-  }
-
-  if(errorMsg){
-    showConfirm(errorMsg,null,{title:'⚠️ '+(l==='fr'?'IMPOSSIBLE':'NOT ALLOWED'),okOnly:true});
-    return;
-  }
-
-  const{error}=await sb.from('levels').update({visibility:targetVis}).eq('id',levelId).eq('user_id',currentUser.id);
-  if(error){alert((l==='fr'?'Erreur: ':'Error: ')+error.message);return;}
-  lvlData.visibility=targetVis;
-
-  // Update buttons
-  const group=btn.closest('.vis-btn-group');
-  if(group){
-    group.querySelectorAll('.vis-btn').forEach(b=>b.className='vis-btn');
-    btn.classList.add('active-'+targetVis);
-  }
-}
-
-async function cycleVisibility(levelId, badge, lvlData){
-  const cur=lvlData.visibility||'private';
-  const plays=lvlData.plays||0;
-  const completed=lvlData.author_completed||false;
-  const l=lang||'fr';
-
-  // Determine allowed transitions
-  let next=null;
-  let errorMsg=null;
-
-  if(cur==='private'){
-    // Publish only from game.html win screen
-    showConfirm(
-      l==='fr'?'Pour publier, termine le niveau dans le jeu et clique sur "RENDRE PUBLIC" ou "PAR CODE".':'To publish, finish the level in-game and click "MAKE PUBLIC" or "BY CODE".',
-      null,{title:'ℹ️ '+(l==='fr'?'INFORMATION':'INFORMATION'),okOnly:true}
-    );
-    return;
-  }else if(cur==='public'){
-    // PUBLIC → CODE always allowed
-    next='code';
-  }else if(cur==='code'){
-    // CODE → PUBLIC always allowed
-    next='public';
-  }
-
-  if(errorMsg){
-    showConfirm(errorMsg, null, {title:'⚠️ '+(l==='fr'?'IMPOSSIBLE':'NOT ALLOWED'), okOnly:true});
-    return;
-  }
-
-  if(!next)return;
-
-  // If going from public/code → private but plays>0 (blocked above for code)
-  // If going private→public, reset author_completed to false to require re-completion after edits
-  const updates={visibility:next};
-
-  const{error}=await sb.from('levels').update(updates).eq('id',levelId).eq('user_id',currentUser.id);
-  if(error){alert((l==='fr'?'Erreur: ':'Error: ')+error.message);return;}
-
-  // Update local data
-  lvlData.visibility=next;
-
-  // No badge to update (handled by 3-button group)
-}
+setLang(lang);
 
 
-async function loadProfile(){
-  const{data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
-  if(data){
-    if(data.lang){lang=data.lang;selectedLang=lang;localStorage.setItem('fl_lang',lang);}
-    if(data.character){selectedChar=data.character;localStorage.setItem('fl_char',data.character);}
-  }
-}
 
-async function saveProfile(updates){
-  // Upsert profile
-  const{error}=await sb.from('profiles').upsert({id:currentUser.id,...updates},{onConflict:'id'});
-  return error;
-}
+let _captchaRendered=false;
+let _captchaLoginRendered=false;
+let _captchaLoginToken='';
+function onCaptchaLoginSuccess(token){_captchaLoginToken=token;}
+function onCaptchaLoginExpired(){_captchaLoginToken='';}
 
-// Override selectChar to also save to DB
-const _origSelectChar=selectChar;
-selectChar=async function(id){
-  selectedChar=id;
-  document.querySelectorAll('.char-item').forEach(el=>el.classList.remove('selected'));
-  document.getElementById('char-'+id).classList.add('selected');
-  localStorage.setItem('fl_char',id);
-  await saveProfile({character:id});
-  const t=T('settings');
-  const msg=document.getElementById('char-msg');
-  msg.className='msg ok';msg.textContent=t.charSaved;
-  setTimeout(()=>msg.className='msg',2000);
-};
-
-// Override saveLang to also save to DB
-const _origSaveLang=saveLang;
-saveLang=async function(){
-  lang=selectedLang;
-  localStorage.setItem('fl_lang',lang);
-  await saveProfile({lang:lang});
-  applyLang(lang);
-  const msg=document.getElementById('lang-msg');
-  msg.className='msg ok';msg.textContent=T('settings').langSaved;
-  setTimeout(()=>msg.className='msg',2000);
-};
-
-// Init
 function switchTab(tab){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.form').forEach(f=>f.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('pane-'+tab).classList.add('active');
-  if(tab==='levels')loadStats();
-  if(tab==='account'){loadAccountInfo();loadPseudoInfo();}
-}
-
-let _pseudoTimer=null;
-let _pseudoInfo=null; // {changes, reset_date}
-const MAX_CHANGES=2;
-const RESET_MONTHS=12;
-
-async function loadPseudoInfo(){
-  const{data}=await sb.from('profiles')
-    .select('pseudo_changes,pseudo_reset_date')
-    .eq('id',currentUser.id).single();
-  if(!data)return;
-
-  // Check if we need to reset (12 months passed)
-  const resetDate=new Date(data.pseudo_reset_date);
-  const now=new Date();
-  const monthsDiff=(now.getFullYear()-resetDate.getFullYear())*12+(now.getMonth()-resetDate.getMonth());
-  
-  if(monthsDiff>=RESET_MONTHS){
-    // Reset counter
-    await sb.from('profiles').update({pseudo_changes:0,pseudo_reset_date:now.toISOString()}).eq('id',currentUser.id);
-    _pseudoInfo={changes:0,reset_date:now};
-  }else{
-    _pseudoInfo={changes:data.pseudo_changes||0,reset_date:resetDate};
+  document.getElementById('form-'+tab).classList.add('active');
+  if(tab==='signup'){
+    if(!_captchaRendered&&typeof hcaptcha!=='undefined'){
+      hcaptcha.render('hcaptcha-widget',{sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',theme:'dark',callback:onCaptchaSuccess,'expired-callback':onCaptchaExpired});
+      _captchaRendered=true;
+    }else if(_captchaRendered&&typeof hcaptcha!=='undefined'){_captchaToken='';hcaptcha.reset();}
   }
-  updatePseudoCounter();
-}
-
-function updatePseudoCounter(){
-  const el=document.getElementById('pseudo-counter');
-  if(!el||!_pseudoInfo)return;
-  const remaining=MAX_CHANGES-_pseudoInfo.changes;
-  const resetDate=_pseudoInfo.reset_date;
-  const nextReset=new Date(resetDate);
-  nextReset.setMonth(nextReset.getMonth()+RESET_MONTHS);
-  const nextResetStr=nextReset.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
-
-  if(remaining<=0){
-    el.style.color='var(--red)';
-    el.textContent=lang==='fr'
-      ?'🚫 Plus de changements disponibles. Réinitialisation le '+nextResetStr
-      :'🚫 No changes left. Resets on '+nextResetStr;
-    document.getElementById('new-pseudo').disabled=true;
-    document.getElementById('btn-save-pseudo').disabled=true;
-    document.getElementById('btn-save-pseudo').style.opacity='.3';
-  }else if(remaining===1){
-    el.style.color='var(--red)';
-    el.textContent=lang==='fr'
-      ?'⚠️ Il te reste 1 changement (réinit le '+nextResetStr+')'
-      :'⚠️ 1 change remaining (resets on '+nextResetStr+')';
-  }else{
-    el.style.color='var(--green)';
-    el.textContent=lang==='fr'
-      ?'✅ '+remaining+' changements disponibles cette année'
-      :'✅ '+remaining+' changes available this year';
+  if(tab==='login'){
+    if(!_captchaLoginRendered&&typeof hcaptcha!=='undefined'){
+      hcaptcha.render('hcaptcha-login-widget',{sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',theme:'dark',callback:onCaptchaLoginSuccess,'expired-callback':onCaptchaLoginExpired});
+      _captchaLoginRendered=true;
+    }else if(_captchaLoginRendered&&typeof hcaptcha!=='undefined'){_captchaLoginToken='';hcaptcha.reset('hcaptcha-login-widget');}
   }
 }
 
-async function checkPseudoAvail(){
-  if(_pseudoInfo&&_pseudoInfo.changes>=MAX_CHANGES)return;
-  const input=document.getElementById('new-pseudo');
-  const avail=document.getElementById('pseudo-avail');
-  const btn=document.getElementById('btn-save-pseudo');
-  const val=input.value.trim();
+function showMsg(id,type,text){const el=document.getElementById(id);el.className='msg '+type;el.textContent=text;}
+function clearMsg(id){document.getElementById(id).className='msg';}
 
-  avail.textContent='';
-  btn.disabled=true;
-  btn.style.opacity='.5';
-
-  if(val.length<3){
-    avail.style.color='var(--muted)';
-    avail.textContent=val.length>0?(lang==='fr'?'Minimum 3 caractères':'Minimum 3 characters'):'';
-    return;
-  }
-  if(!/^[a-zA-Z0-9_-]+$/.test(val)){
-    avail.style.color='var(--red)';
-    avail.textContent=lang==='fr'?'Lettres, chiffres, _ et - uniquement':'Letters, numbers, _ and - only';
-    return;
-  }
-
-  clearTimeout(_pseudoTimer);
-  avail.style.color='var(--muted)';
-  avail.textContent=lang==='fr'?'Vérification...':'Checking...';
-
-  _pseudoTimer=setTimeout(async()=>{
-    const{data}=await sb.from('profiles').select('id').ilike('username',val).maybeSingle();
-    const taken=data&&data.id!==currentUser.id;
-    if(taken){
-      avail.style.color='var(--red)';
-      avail.textContent='❌ '+(lang==='fr'?'Pseudo déjà utilisé !':'Username already taken!');
-      btn.disabled=true;btn.style.opacity='.5';
-    }else{
-      avail.style.color='var(--green)';
-      avail.textContent='✅ '+(lang==='fr'?'Disponible !':'Available!');
-      btn.disabled=false;btn.style.opacity='1';
-    }
-  },500);
+function setLoading(btnId,loading){
+  const btn=document.getElementById(btnId);
+  const t=T[lang]||T['fr'];
+  if(!btn)return;
+  if(loading){btn.disabled=true;btn.innerHTML='<span class="spinner"></span>'+(lang==='fr'?'CHARGEMENT...':'LOADING...');}
+  else{btn.disabled=false;btn.textContent=btnId==='btn-login'?(t.btnLogin||'CONNEXION'):(t.btnSignup||'CRÉER MON COMPTE →');}
 }
 
-async function savePseudo(){
-  const val=document.getElementById('new-pseudo').value.trim();
-  const msg=document.getElementById('pseudo-msg');
-  const btn=document.getElementById('btn-save-pseudo');
-  if(!val||val.length<3)return;
-  if(!_pseudoInfo||_pseudoInfo.changes>=MAX_CHANGES){
-    msg.className='msg err';
-    msg.textContent=lang==='fr'?'Plus de changements disponibles cette année.':'No changes left this year.';
-    return;
-  }
-
-  btn.disabled=true;
-  btn.innerHTML='<span class="spinner"></span>'+(lang==='fr'?'SAUVEGARDE...':'SAVING...');
-  msg.className='msg';
-
-  const newChanges=(_pseudoInfo.changes||0)+1;
-  // Double-check availability before saving
-  const{data:taken}=await sb.from('profiles').select('id').ilike('username',val).maybeSingle();
-  if(taken&&taken.id!==currentUser.id){
-    btn.disabled=false;btn.innerHTML='💾 '+(lang==='fr'?'SAUVEGARDER':'SAVE');
-    msg.className='msg err';
-    msg.textContent=lang==='fr'?'❌ Pseudo déjà utilisé !':'❌ Username already taken!';
-    return;
-  }
-  const{error}=await sb.from('profiles').update({
-    username:val,
-    pseudo_changes:newChanges
-  }).eq('id',currentUser.id);
-
-  btn.disabled=false;
-  btn.innerHTML='💾 '+(lang==='fr'?'SAUVEGARDER':'SAVE');
-
-  if(error){
-    if(error.code==='23505'){
-      msg.className='msg err';
-      msg.textContent=lang==='fr'?'❌ Pseudo déjà utilisé !':'❌ Username already taken!';
-    }else{
-      msg.className='msg err';
-      msg.textContent='Erreur: '+error.message;
-    }
-  }else{
-    await sb.auth.updateUser({data:{username:val}});
-    _pseudoInfo.changes=newChanges;
-    msg.className='msg ok';
-    msg.textContent=lang==='fr'?'✅ Pseudo mis à jour !':'✅ Username updated!';
-    document.getElementById('new-pseudo').value='';
-    document.getElementById('pseudo-avail').textContent='';
-    updatePseudoCounter();
-    loadAccountInfo();
-    showToast(lang==='fr'?'Pseudo mis à jour !':'Username updated!');
-    setTimeout(()=>msg.className='msg',3000);
-  }
-}
-
-async function loadAccountInfo(){
-  if(!currentUser)return;
-  const{data:prof}=await sb.from('profiles').select('username').eq('id',currentUser.id).single();
-  const username=(prof&&prof.username)||currentUser.user_metadata?.username||currentUser.email.split('@')[0];
-  const since=new Date(currentUser.created_at).toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
-  const el_u=document.getElementById('account-username');
-  const el_e=document.getElementById('account-email');
-  const el_s=document.getElementById('account-since');
-  if(el_u)el_u.innerHTML='<strong>'+(lang==='fr'?'Pseudo':'Username')+':</strong> '+esc(username);
-  if(el_e)el_e.innerHTML='<strong>Email:</strong> '+esc(currentUser.email);
-  if(el_s)el_s.innerHTML='<strong>'+(lang==='fr'?'Membre depuis':'Member since')+':</strong> '+since;
-}
-
-(async()=>{
-  const{data}=await sb.auth.getSession();
-  if(!data.session){window.location.href='login.html';return;}
-  currentUser=data.session.user;
-  await loadLangData(lang);
-  await loadLangData(lang==='fr'?'en':'fr'); // preload other lang
-  await loadManifest();
-  await loadLangOptions();
-  await loadProfile();
-  loadAccountInfo();
-  selectedLang=lang;
-  document.getElementById('lang-fr').classList.toggle('selected',lang==='fr');
-  document.getElementById('lang-en').classList.toggle('selected',lang==='en');
-  applyLang(lang);
-  buildCharGrid();
-  loadStats();
-})();
-
-let _confirmCallback=null;
-
-function showConfirm(msg, onOk, opts){
-  const modal=document.getElementById('confirm-modal');
-  const desc=document.getElementById('confirm-desc');
-  const title=document.getElementById('confirm-title');
-  const yesBtn=document.getElementById('confirm-yes');
-  const noBtn=document.getElementById('confirm-no');
-  const l=lang||'fr';
-  if(desc)desc.textContent=msg;
-  if(opts&&opts.title){
-    if(title)title.textContent=opts.title;
-  }else{
-    if(title)title.textContent='🗑 '+(l==='fr'?'SUPPRIMER':'DELETE');
-  }
-  if(opts&&opts.okOnly){
-    if(yesBtn)yesBtn.style.display='none';
-    if(noBtn)noBtn.textContent='OK';
-  }else{
-    if(yesBtn)yesBtn.style.display='';
-    if(noBtn)noBtn.textContent=l==='fr'?'ANNULER':'CANCEL';
-  }
-  modal.classList.add('show');
-  _confirmCallback=onOk;
-}
-function confirmOk(){
-  document.getElementById('confirm-modal').classList.remove('show');
-  if(_confirmCallback)_confirmCallback();
-  _confirmCallback=null;
-}
-function confirmCancel(){
-  document.getElementById('confirm-modal').classList.remove('show');
-  // Restore buttons to default state
-  const yesBtn=document.getElementById('confirm-yes');
-  const noBtn=document.getElementById('confirm-no');
-  const l=lang||'fr';
-  if(yesBtn)yesBtn.style.display='';
-  if(noBtn)noBtn.textContent=l==='fr'?'ANNULER':'CANCEL';
-  _confirmCallback=null;
-}
-function showAccountDeleteConfirm(){
-  const modal=document.getElementById('confirm-modal');
-  const desc=document.getElementById('confirm-desc');
-  const title=document.getElementById('confirm-title');
-  const l=lang||'fr';
-  if(title)title.textContent='⚠️ SUPPRIMER MON COMPTE';
-  if(desc)desc.textContent=l==='fr'?'Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ?':'Are you sure you want to delete your account and all your levels?';
-  modal.classList.add('show');
-  _confirmCallback=async()=>{await doDelete();};
-}
-
-async function doDelete(){
-  if(!currentUser)return;
-  const uid=currentUser.id;
-  const l=lang||'fr';
-  try{
-    // 1. Delete leaderboard entries
-    await sb.from('leaderboard').delete().eq('user_id',uid);
-    // 2. Delete ratings
-    await sb.from('ratings').delete().eq('user_id',uid);
-    // 3. Delete levels
-    await sb.from('levels').delete().eq('user_id',uid);
-    // 4. Delete profile
-    await sb.from('profiles').delete().eq('id',uid);
-    // 5. Delete auth account
-    const{error}=await sb.rpc('delete_user');
-    if(error){
-      // Fallback: sign out even if RPC fails
-      console.warn('delete_user RPC error:', error.message);
-    }
-    await sb.auth.signOut();
+async function doLogin(){
+  clearMsg('msg-login');const l=lang;const t=T[l]||T['fr'];
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  if(!email||!pass){showMsg('msg-login','error',t.errFields);return;}
+  const loginToken=_captchaLoginToken||'';
+  if(!loginToken){showMsg('msg-login','error',l==='fr'?'Merci de compléter le captcha !':'Please complete the captcha!');return;}
+  setLoading('btn-login',true);
+  const{error}=await sb.auth.signInWithPassword({email,password:pass,options:{captchaToken:loginToken}});
+  setLoading('btn-login',false);
+  if(error){showMsg('msg-login','error',error.message.includes('Invalid')?t.errCreds:error.message);_captchaLoginToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();}
+  else{
+    showMsg('msg-login','success',t.okLogin);
+    // Simple: just redirect immediately, session is set by Supabase client
     window.location.href='index.html';
-  }catch(e){
-    alert((l==='fr'?'Erreur lors de la suppression : ':'Error during deletion: ')+e.message);
   }
 }
 
-async function deleteLevelSettings(id, title, tr){
-  const msg=(lang==='fr')
-    ?('Supprimer "'+title+'" ? Cette action est irreversible.')
-    :('Delete "'+title+'" ? This cannot be undone.');
-  showConfirm(msg, async()=>{
-    const{error}=await sb.from('levels').delete().eq('id',id).eq('user_id',currentUser.id);
-    if(error){alert((lang==='fr'?'Erreur : ':'Error: ')+error.message);return;}
-    tr.style.transition='opacity .3s';
-    tr.style.opacity='0';
-    setTimeout(()=>tr.remove(),300);
-  });
+async function checkUsernameAvailable(pseudo){
+  if(!pseudo||pseudo.length<3)return false;
+  const{data}=await sb.from('profiles').select('id').eq('username',pseudo).maybeSingle();
+  return !data; // true = available
+}
+
+async function doSignup(){
+  clearMsg('msg-signup');const l=lang;const t=T[l]||T['fr'];
+  const pseudo=document.getElementById('signup-pseudo').value.trim();
+  const email=document.getElementById('signup-email').value.trim();
+  const pass=document.getElementById('signup-pass').value;
+  const pass2=document.getElementById('signup-pass2').value;
+  if(!pseudo||!email||!pass){showMsg('msg-signup','error',t.errFields);return;}
+  if(pseudo.length<3){showMsg('msg-signup','error',l==='fr'?'Le pseudo doit avoir au moins 3 caractères.':'Username must be at least 3 characters.');return;}
+  if(pass.length<8){showMsg('msg-signup','error',t.errLen);return;}
+  if(pass!==pass2){showMsg('msg-signup','error',l==='fr'?'Les mots de passe ne correspondent pas !':'Passwords do not match!');return;}
+  if(!/[a-zA-Z]/.test(pass)||!/[0-9]/.test(pass)){showMsg('msg-signup','error',l==='fr'?'Le mot de passe doit contenir des lettres et des chiffres.':'Password must contain letters and digits.');return;}
+  // Terms check
+  const terms=document.getElementById('terms-check');
+  if(!terms||!terms.checked){showMsg('msg-signup','error',l==='fr'?"Tu dois accepter les conditions d'utilisation.":'You must accept the terms of service.');return;}
+  // hCaptcha check
+  const hcaptchaToken=_captchaToken||'';
+  if(!hcaptchaToken){showMsg('msg-signup','error',l==='fr'?'Merci de compléter le captcha !':'Please complete the captcha!');return;}
+  // Check username availability
+  const available=await checkUsernameAvailable(pseudo);
+  if(!available){showMsg('msg-signup','error',l==='fr'?'Ce pseudo est déjà pris !':'Username already taken!');return;}
+  setLoading('btn-signup',true);
+  const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{username:pseudo},captchaToken:hcaptchaToken}});
+  if(error){
+    setLoading('btn-signup',false);
+    showMsg('msg-signup','error',error.message);
+    _captchaToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();
+    return;
+  }
+  localStorage.setItem('fl_pending_username',pseudo);
+  setLoading('btn-signup',false);
+  showMsg('msg-signup','success',t.okSignup);
+}
+
+async function doGoogle(){
+  const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/index.html'}});
+  if(error)alert(error.message);
+}
+
+// ── Reset password ────────────────────────
+function openReset(){
+  document.getElementById('reset-msg').className='msg';
+  document.getElementById('reset-email').value='';
+  document.getElementById('reset-modal').classList.add('show');
+  document.getElementById('reset-email').focus();
+}
+function closeReset(){document.getElementById('reset-modal').classList.remove('show');}
+
+async function doReset(){
+  const t=T[lang]||T['fr'];
+  const email=document.getElementById('reset-email').value.trim();
+  const msgEl=document.getElementById('reset-msg');
+  const btn=document.getElementById('reset-ok-btn');
+  if(!email){msgEl.className='msg error';msgEl.textContent=t.resetErrEmpty;return;}
+  btn.disabled=true;btn.textContent=t.resetSending;
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/reset.html'});
+  btn.disabled=false;btn.textContent=t.resetOk;
+  if(error){msgEl.className='msg error';msgEl.textContent=error.message;}
+  else{msgEl.className='msg success';msgEl.textContent=t.resetSuccess;setTimeout(()=>closeReset(),2500);}
+}
+
+document.getElementById('reset-modal').addEventListener('click',e=>{if(e.target===document.getElementById('reset-modal'))closeReset();});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(document.getElementById('reset-modal').classList.contains('show')){doReset();return;}
+    if(document.getElementById('form-login').classList.contains('active'))doLogin();
+    else doSignup();
+  }
+  if(e.key==='Escape')closeReset();
+});
+
+sb.auth.getSession().then(({data})=>{if(data.session)window.location.href='index.html';});
+
+// hCaptcha callbacks
+let _captchaToken='';
+function onCaptchaSuccess(token){_captchaToken=token;}
+function onCaptchaExpired(){_captchaToken='';}
+
+// Init login captcha on load
+window.addEventListener('load',()=>{
+  if(typeof hcaptcha!=='undefined'&&!_captchaLoginRendered){
+    hcaptcha.render('hcaptcha-login-widget',{sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',theme:'dark',callback:onCaptchaLoginSuccess,'expired-callback':onCaptchaLoginExpired});
+    _captchaLoginRendered=true;
+  }
+});
+
+// Auto-switch to signup if #signup in URL
+if(window.location.hash==='#signup'){
+  switchTab('signup');
 }
 
 </script>
