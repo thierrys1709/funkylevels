@@ -51,15 +51,32 @@ body.test-mode #hud-global-time,
 body.test-mode #hud-global-user,
 body.test-mode #hud-personal-lbl,
 body.test-mode #hud-best{display:none!important;}
+body.test-mode #star-rating{display:none!important;}
+.star-btn{font-size:18px;cursor:pointer;color:#2a2a55;transition:color .1s;line-height:1;user-select:none;}
+.star-btn.filled{color:#f0e040;text-shadow:0 0 8px #f0e04088;}
+.star-btn:hover,.star-btn.hover{color:#f0c040;}
+#star-rating{gap:1px;}
 </style>
 </head>
 <body>
 
 <div id="gwrap">
   <div id="gtopbar">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v2.9</span>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.0</span>
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <div id="test-mode-badge" style="display:none;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 16px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;letter-spacing:1px;">🧪 MODE TEST</div>
+    <div id="star-rating" style="display:none;align-items:center;gap:2px;" title="Noter ce niveau">
+      <span id="star-1" class="star-btn" data-val="1">★</span>
+      <span id="star-2" class="star-btn" data-val="2">★</span>
+      <span id="star-3" class="star-btn" data-val="3">★</span>
+      <span id="star-4" class="star-btn" data-val="4">★</span>
+      <span id="star-5" class="star-btn" data-val="5">★</span>
+      <span id="star-6" class="star-btn" data-val="6">★</span>
+      <span id="star-7" class="star-btn" data-val="7">★</span>
+      <span id="star-8" class="star-btn" data-val="8">★</span>
+      <span id="star-9" class="star-btn" data-val="9">★</span>
+      <span id="star-10" class="star-btn" data-val="10">★</span>
+    </div>
     <button class="gtop-btn" id="btn-fs" onclick="toggleFullscreen()" style="background:#1a1a0d;border:1.5px solid #7a7a3a;color:#f0e040;">⛶ PLEIN ÉCRAN</button>
   </div>
 
@@ -444,6 +461,82 @@ function updateBestDisplay(){
   el.textContent=_bestTime!==null?fmtTimeFull(_bestTime):'—';
 }
 
+// ── Star Rating ───────────────────────────────────────────
+let _userRating=0;
+
+function initStarRating(){
+  const container=document.getElementById('star-rating');
+  if(!container)return;
+  const stars=container.querySelectorAll('.star-btn');
+
+  // Load existing rating
+  loadUserRating();
+
+  stars.forEach(star=>{
+    const val=parseInt(star.dataset.val);
+
+    star.onmouseenter=()=>{
+      stars.forEach(s=>{
+        s.classList.toggle('hover',parseInt(s.dataset.val)<=val);
+        s.classList.remove('filled');
+      });
+    };
+    star.onmouseleave=()=>{
+      stars.forEach(s=>s.classList.remove('hover'));
+      updateStarDisplay(_userRating);
+    };
+    star.onclick=async()=>{
+      await saveRating(val);
+    };
+  });
+
+  container.style.display='flex';
+}
+
+function updateStarDisplay(rating){
+  const stars=document.querySelectorAll('.star-btn');
+  stars.forEach(s=>{
+    const v=parseInt(s.dataset.val);
+    s.classList.toggle('filled',v<=rating);
+  });
+}
+
+async function loadUserRating(){
+  if(!_currentLevelId)return;
+  const token=_getToken();
+  if(!token)return;
+  try{
+    const r=await fetch(_sbUrl+'/rest/v1/ratings?select=score&level_id=eq.'+_currentLevelId,{
+      headers:{'apikey':_sbKey,'Authorization':'Bearer '+token}
+    });
+    const arr=await r.json();
+    if(arr&&arr[0]){_userRating=arr[0].score;updateStarDisplay(_userRating);}
+  }catch(e){}
+}
+
+async function saveRating(score){
+  if(!_currentLevelId)return;
+  const token=_getToken();
+  if(!token)return;
+  _userRating=score;
+  updateStarDisplay(score);
+  // Show brief feedback
+  const container=document.getElementById('star-rating');
+  if(container){
+    const old=container.title;
+    container.title=score+'/10 ✓';
+    setTimeout(()=>container.title=old,1500);
+  }
+  try{
+    const uid=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub;
+    await fetch(_sbUrl+'/rest/v1/ratings',{
+      method:'POST',
+      headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({level_id:_currentLevelId,user_id:uid,score})
+    });
+  }catch(e){}
+}
+
 function updateAttemptDisplay(){
   const el=document.getElementById('hud-attempt');
   if(!el)return;
@@ -575,6 +668,11 @@ async function init(){
   // Load best time only for saved levels
   if(_currentLevelId)await loadBestTime();
   _attempt=0;
+
+  // Init star rating (only for published levels, not test mode)
+  if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')){
+    initStarRating();
+  }
 
   // Show HUD
   
