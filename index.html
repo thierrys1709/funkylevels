@@ -273,6 +273,27 @@ async function checkNeedsPseudo(user){
   }catch(e){}
 }
 
+async function detectAndSaveCountry(userId){
+  try{
+    // Check if country already set
+    const r=await fetch(SUPABASE_URL+'/rest/v1/profiles?select=country&id=eq.'+userId,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+getToken()}
+    });
+    const arr=await r.json();
+    if(arr&&arr[0]&&arr[0].country)return; // already set
+    // Detect via IP
+    const geo=await fetch('https://ipapi.co/json/');
+    const data=await geo.json();
+    if(data&&data.country_code){
+      await fetch(SUPABASE_URL+'/rest/v1/profiles?id=eq.'+userId,{
+        method:'PATCH',
+        headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+getToken(),'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({country:data.country_code})
+      });
+    }
+  }catch(e){}
+}
+
 async function savePseudo(){
   const pseudo=document.getElementById('pseudo-input').value.trim();
   const msg=document.getElementById('pseudo-msg');
@@ -304,6 +325,8 @@ function applySession(user){
   if(signupBtn)signupBtn.style.display='none';
   // Check if user needs to choose a pseudo (Google signup)
   checkNeedsPseudo(user);
+  // Detect and save country if not already set
+  detectAndSaveCountry(user.id);
   // Fetch username from profiles table
   fetch('https://ydpkyktfvpdnjjiewctf.supabase.co/rest/v1/profiles?select=username&id=eq.'+user.id,{
     headers:{'apikey':'sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD','Authorization':'Bearer sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD'}
