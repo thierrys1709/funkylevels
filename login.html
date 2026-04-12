@@ -236,12 +236,26 @@ setLang(lang);
 
 
 
+let _captchaRendered=false;
 function switchTab(tab){
-  if(tab==='signup'&&typeof hcaptcha!=='undefined')hcaptcha.reset();
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.form').forEach(f=>f.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('form-'+tab).classList.add('active');
+  if(tab==='signup'){
+    if(!_captchaRendered&&typeof hcaptcha!=='undefined'){
+      hcaptcha.render('hcaptcha-widget',{
+        sitekey:'807cbb66-d48c-4f64-aaca-e2ac51009100',
+        theme:'dark',
+        callback:onCaptchaSuccess,
+        'expired-callback':onCaptchaExpired
+      });
+      _captchaRendered=true;
+    } else if(_captchaRendered&&typeof hcaptcha!=='undefined'){
+      _captchaToken='';
+      hcaptcha.reset();
+    }
+  }
 }
 
 function showMsg(id,type,text){const el=document.getElementById(id);el.className='msg '+type;el.textContent=text;}
