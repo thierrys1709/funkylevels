@@ -98,6 +98,7 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
     <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
   </div>
   <a href="settings.html" class="user-chip" id="nav-user" style="display:none;">👤</a>
+  <a href="login.html#signup" class="nav-btn" id="nav-signup" style="border-color:#a040f0;color:#a040f0;">✨ INSCRIPTION</a>
   <a href="login.html" class="nav-btn primary" id="nav-login">CONNEXION</a>
   <button class="nav-btn" id="nav-logout" style="display:none;" onclick="doLogout()">DÉCONNEXION</button>
 </nav>
@@ -249,6 +250,8 @@ function setLang(l){
 function applySession(user){
   if(!user)return;
   currentUser=user;
+  const signupBtn=document.getElementById('nav-signup');
+  if(signupBtn)signupBtn.style.display='none';
   // Fetch username from profiles table
   fetch('https://ydpkyktfvpdnjjiewctf.supabase.co/rest/v1/profiles?select=username&id=eq.'+user.id,{
     headers:{'apikey':'sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD','Authorization':'Bearer sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD'}
