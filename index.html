@@ -321,6 +321,21 @@ async function loadSection(s){
     let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=eq.public&order=created_at.desc&limit=24';
     if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
     levels=await sbFetch(url);
+    // Fetch ratings for these levels
+    if(levels.length){
+      const ids=levels.map(l=>l.id).join(',');
+      const ratingsNew=await sbFetch('ratings?select=level_id,score&level_id=in.('+ids+')');
+      const rmap={};
+      if(Array.isArray(ratingsNew))ratingsNew.forEach(r=>{
+        if(!rmap[r.level_id])rmap[r.level_id]={sum:0,count:0};
+        rmap[r.level_id].sum+=r.score;rmap[r.level_id].count++;
+      });
+      levels.forEach(l=>{
+        const r=rmap[l.id];
+        l.avgRating=r?Math.round((r.sum/r.count)*100)/100:null;
+        l.ratingCount=r?r.count:0;
+      });
+    }
   }else if(s==='top'){
     let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=eq.public&order=plays.desc&limit=24';
     if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
@@ -395,7 +410,7 @@ function levelRow(l){
     <td class="lvl-td lvl-td-date">${dateStr}</td>
     <td class="lvl-td lvl-td-author">@${esc(l.username||'anonyme')}</td>
     <td class="lvl-td lvl-td-stars">${l.avgRating?`<span style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#f0e040;">★ ${l.avgRating.toFixed(2)}</span><span style="font-family:Rajdhani,sans-serif;font-size:11px;color:#6060aa;margin-left:4px;">(${l.ratingCount})</span>`:'<span style="color:#3a3a55;">—</span>'}</td>
-    <td class="lvl-td lvl-td-vis"><span class="vis-badge vis-${l.visibility||'private'}">${visLabel}</span></td>
+    ${currentSection==='mine'?`<td class="lvl-td lvl-td-vis"><span class="vis-badge vis-${l.visibility||'private'}">${visLabel}</span></td>`:''}
     <td class="lvl-td lvl-td-actions">${isOwner?`<button class="edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'">✏️ ${lang==='fr'?'ÉDITER':'EDIT'}</button>`:''}
     </td>
   </tr>`;
