@@ -1123,6 +1123,11 @@ async function openLoadModal(){
   const modal=document.getElementById('load-modal');
   const list=document.getElementById('load-list');
   modal.classList.add('show');
+  // If published level, hide close button to force selection
+  const closeBtn=modal.querySelector('.load-close');
+  if(closeBtn){
+    closeBtn.style.display=(_isPublished&&_currentLevelId&&!window._dupConfirmed)?'none':'';
+  }
   list.innerHTML='<div class="load-empty">Chargement...</div>';
 
   const{data:sess}=await _sb.auth.getSession();
@@ -1839,7 +1844,13 @@ function openPublish(){
 function closePublish(){document.getElementById('publish-modal').classList.remove('show');}
 
 document.getElementById('publish-modal').addEventListener('click',e=>{if(e.target===document.getElementById('publish-modal'))closePublish();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closePublish();if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    // Block escape for load modal when published
+    if(_isPublished&&_currentLevelId&&!window._dupConfirmed&&
+       document.getElementById('load-modal').classList.contains('show'))return;
+    closePublish();
+  }if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();});
 
 async function doPublish(){
   const t=STUDIO_T._pub||_PT[_lang()];
