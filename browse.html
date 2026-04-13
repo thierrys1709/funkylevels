@@ -77,7 +77,7 @@ td{padding:14px 16px;vertical-align:middle;}
   <div class="search-bar">
     <input type="text" class="search-input" id="search-input" placeholder="🔍 Rechercher un niveau ou un créateur..." onkeydown="if(event.key==='Enter')doSearch()">
     <button class="search-btn" onclick="doSearch()">CHERCHER</button>
-    <span class="count-info" id="count-info"></span>
+    <span class="count-info" id="count-info loaded-count"></span>
   </div>
 
   <div class="table-wrap">
@@ -186,7 +186,7 @@ async function loadPage(){
   data.forEach(l=>{
     l.username=usernameMap[l.user_id]||'anonyme';
     // Apply star filter
-    if(starFilterMin>0&&(!l.avg_rating||l.avg_rating<starFilterMin))return;
+    if(!matchesStarFilter(l.avg_rating))return;
     const tr=createRow(l);
     tbody.appendChild(tr);
   });
@@ -199,7 +199,7 @@ async function loadPage(){
 
   // Fetch records for this batch
   fetchRecords(data.map(l=>l.id));
-  document.getElementById('loaded-count').textContent=offset+' '+(T.loaded||'niveau(x) chargé(s)');
+  const lc=document.getElementById('count-info');if(lc)lc.textContent=offset+' '+(T.loaded||'niveau(x) chargé(s)');
   loading=false;
 }
 
@@ -264,16 +264,39 @@ function hideLoader(){
   if(row)row.remove();
 }
 
-let starFilterMin=0;
-function setStarFilter(min){
-  starFilterMin=min;
+let starSelected=new Set(); // empty = all
+
+function toggleStarFilter(val){
+  if(val===0){
+    // TOUS button - clear selection
+    starSelected.clear();
+  } else {
+    if(starSelected.has(val)){
+      starSelected.delete(val);
+    } else {
+      starSelected.add(val);
+    }
+  }
+  // Update button states
   document.querySelectorAll('.star-filter-btn').forEach(b=>{
-    b.classList.toggle('active',parseInt(b.dataset.min)===min);
+    const v=parseInt(b.dataset.val);
+    if(v===0){
+      b.classList.toggle('active', starSelected.size===0);
+    } else {
+      b.classList.toggle('active', starSelected.has(v));
+    }
   });
-  // Reload from page 1
+  // Reload
   offset=0;allLoaded=false;loading=false;worldBests={};myBests={};
   document.getElementById('lvl-tbody').innerHTML='';
   loadPage();
+}
+
+function matchesStarFilter(avgRating){
+  if(starSelected.size===0)return true; // TOUS
+  if(!avgRating)return false;
+  const floor=Math.floor(avgRating); // 3.2 → floor=3
+  return starSelected.has(floor);
 }
 
 function sortBy(col){
