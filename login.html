@@ -358,6 +358,8 @@ async function doSignup(){
   localStorage.setItem('fl_pending_username',pseudo);
   setLoading('btn-signup',false);
   showMsg('msg-signup','success',t.okSignup);
+  // Switch to login tab after 2 seconds
+  setTimeout(()=>switchTab('login'),2000);
 }
 
 function doGoogle(){
