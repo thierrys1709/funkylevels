@@ -752,6 +752,10 @@ function isSelected(type,idx){ return !!selection.find(s=>s.type===type&&s.idx==
 
 let undoStack=[],redoStack=[];
 function snapshot(){
+  if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
+    showDupModal();
+    return;
+  }
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
 }
 
