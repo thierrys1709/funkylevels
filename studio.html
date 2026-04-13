@@ -766,17 +766,8 @@ function snapshotWithDupCheck(){
     });
   }
   if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
-    const lang=localStorage.getItem('fl_lang')||'fr';
-    const msg=lang==='fr'?
-      '⚠️ Ce niveau est publié.\n\nIl sera dupliqué en version privée pour te permettre de modifier.\n\nContinuer ?':
-      '⚠️ This level is published.\n\nIt will be duplicated as a private version so you can edit.\n\nContinue?';
-    if(confirm(msg)){
-      duplicateLevel();
-      return;
-    }else{
-      // L'utilisateur refuse → on ne modifie pas
-      return;
-    }
+    showDupModal();
+    return;
   }
   snapshot();
 }
@@ -1909,6 +1900,35 @@ async function doPublish(){
       setTimeout(()=>closePublish(),1800);
     }
   }
+}
+</script>
+<!-- DUPLICATE MODAL -->
+<div id="dup-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
+    <div style="font-family:Orbitron,monospace;font-size:12px;color:#f0a040;text-align:center;letter-spacing:1px;">🔒 NIVEAU PUBLIÉ</div>
+    <p id="dup-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.7;text-align:center;"></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeDupModal()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;background:#12122a;border:1.5px solid #2a2a55;color:#6060aa;border-radius:6px;cursor:pointer;">ANNULER</button>
+      <button onclick="confirmDuplicate()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;background:#2a1a00;border:1.5px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;">⧉ CRÉER UNE COPIE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showDupModal(){
+  const lang=localStorage.getItem('fl_lang')||'fr';
+  const msgFr='Ce niveau est publié et a déjà été joué.<br>Tu ne peux pas le modifier directement.<br><br>Une copie privée sera créée.';
+  const msgEn='This level is published and has been played.<br>You cannot edit it directly.<br><br>A private copy will be created.';
+  document.getElementById('dup-msg').innerHTML=lang==='fr'?msgFr:msgEn;
+  document.getElementById('dup-modal').style.display='flex';
+}
+function closeDupModal(){
+  document.getElementById('dup-modal').style.display='none';
+}
+function confirmDuplicate(){
+  closeDupModal();
+  window._dupConfirmed=true;
+  duplicateLevel();
 }
 </script>
 </body>
