@@ -1206,6 +1206,10 @@ async function doLoadLevel(id,title){
   // Reset published state for new level
   _isPublished=false;
   window._dupConfirmed=false;
+  // Re-enable all buttons and canvas
+  document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
+  const cv=document.getElementById('studio-canvas');
+  if(cv)cv.style.pointerEvents='';
   snapshot();
   lv=data.data;
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
@@ -1988,6 +1992,10 @@ function showPublishedModal(title, lid){
 async function confirmDuplicateFromModal(){
   document.getElementById('published-modal').style.display='none';
   window._dupConfirmed=true;
+  // Re-enable all buttons and canvas
+  document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
+  const c=document.getElementById('studio-canvas');
+  if(c)c.style.pointerEvents='';
   await duplicateLevel();
 }
 
