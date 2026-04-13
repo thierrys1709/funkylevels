@@ -80,6 +80,17 @@ td{padding:14px 16px;vertical-align:middle;}
     <span class="count-info" id="count-info loaded-count"></span>
   </div>
 
+  <!-- Star filter -->
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0;">
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#6060aa;">NOTE :</span>
+    <button class="star-filter-btn active" data-val="0" onclick="toggleStarFilter(0)">TOUS</button>
+    <button class="star-filter-btn" data-val="1" onclick="toggleStarFilter(1)">★</button>
+    <button class="star-filter-btn" data-val="2" onclick="toggleStarFilter(2)">★★</button>
+    <button class="star-filter-btn" data-val="3" onclick="toggleStarFilter(3)">★★★</button>
+    <button class="star-filter-btn" data-val="4" onclick="toggleStarFilter(4)">★★★★</button>
+    <button class="star-filter-btn" data-val="5" onclick="toggleStarFilter(5)">★★★★★</button>
+  </div>
+
   <div class="table-wrap">
     <table id="lvl-table">
       <thead>
