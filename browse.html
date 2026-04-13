@@ -37,6 +37,9 @@ th.sorted-desc::after{content:' ▼';color:#a040f0;}
 .lvl-tr:hover{background:#0f0f20;}
 td{padding:14px 16px;vertical-align:middle;}
 .td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.star-filter-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:5px 10px;border:1.5px solid #2a2a55;background:#12122a;color:#4040aa;border-radius:4px;cursor:pointer;transition:all .15s;}
+.star-filter-btn:hover{border-color:#a040f0;color:#a040f0;}
+.star-filter-btn.active{background:#1a0d2a;border-color:#a040f0;color:#f0e040;}
 .new-badge{font-family:'Press Start 2P',monospace;font-size:6px;padding:2px 6px;background:#f0e040;color:#000;border-radius:2px;margin-left:8px;vertical-align:middle;}
 .td-date{font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;white-space:nowrap;width:110px;}
 .td-author{font-family:Rajdhani,sans-serif;font-size:13px;color:#a0a0cc;width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -182,6 +185,8 @@ async function loadPage(){
   const tbody=document.getElementById('lvl-tbody');
   data.forEach(l=>{
     l.username=usernameMap[l.user_id]||'anonyme';
+    // Apply star filter
+    if(starFilterMin>0&&(!l.avg_rating||l.avg_rating<starFilterMin))return;
     const tr=createRow(l);
     tbody.appendChild(tr);
   });
@@ -225,17 +230,18 @@ function createRow(l){
   const age=(Date.now()-new Date(l.created_at).getTime())/1000/3600;
   const isNew=age<48;
   const isOwner=currentUser&&currentUser.id===l.user_id;
-  const visLabel=l.visibility==='public'?(T.visPublic||'Public'):(T.visCode||'Invitation');
+  const ratingStars=l.avg_rating?('★ '+Number(l.avg_rating).toFixed(1)+(l.rating_count?' ('+l.rating_count+')':'')):'—';
 
   const tr=document.createElement('tr');
   tr.className='lvl-tr';
+  tr.dataset.rating=l.avg_rating||0;
   tr.innerHTML=`
     <td class="td-name">${esc(l.title||'Sans titre')}${isNew?`<span class="new-badge">NEW</span>`:''}</td>
     <td class="td-date">${fmtDate(l.created_at)}</td>
     <td class="td-author"><a href="profile.html?id=${l.user_id}" onclick="event.stopPropagation();" style="color:#a0a0cc;text-decoration:none;">@${esc(l.username)}</a></td>
     <td class="td-plays">${l.plays||0}</td>
     <td class="td-record"><span class="rec-cell" data-id="${l.id}">—</span></td>
-    <td class="td-vis"><span class="vis-badge ${l.visibility}">${visLabel}</span></td>
+    <td class="td-rating" style="font-family:Orbitron,monospace;font-size:11px;color:#f0e040;">${ratingStars}</td>
     <td class="td-edit">${isOwner?`<button class="edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'">✏️</button>`:''}</td>
   `;
   tr.onclick=()=>window.location.href='game.html?level='+l.id;
@@ -256,6 +262,18 @@ function showLoader(){
 function hideLoader(){
   const row=document.getElementById('loader-row');
   if(row)row.remove();
+}
+
+let starFilterMin=0;
+function setStarFilter(min){
+  starFilterMin=min;
+  document.querySelectorAll('.star-filter-btn').forEach(b=>{
+    b.classList.toggle('active',parseInt(b.dataset.min)===min);
+  });
+  // Reload from page 1
+  offset=0;allLoaded=false;loading=false;worldBests={};myBests={};
+  document.getElementById('lvl-tbody').innerHTML='';
+  loadPage();
 }
 
 function sortBy(col){
