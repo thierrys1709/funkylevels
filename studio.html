@@ -1147,6 +1147,10 @@ async function openLoadModal(){
 function closeLoadModal(){
   document.getElementById('load-modal').classList.remove('show');
   const s=document.getElementById('load-search');if(s)s.value='';
+  // If still on a published level, re-show the published modal
+  if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
+    setTimeout(()=>showPublishedModal('',_currentLevelId),150);
+  }
 }
 
 function renderLoadItems(data){
@@ -1955,6 +1959,13 @@ async function doPublish(){
 
 <script>
 function showPublishedModal(title, lid){
+  // Disable all toolbar buttons visually
+  document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>{
+    if(b.id!=='btn-load')b.style.opacity='0.3';
+  });
+  // Make canvas non-interactive
+  const c=document.getElementById('studio-canvas');
+  if(c)c.style.pointerEvents='none';
   const lang=localStorage.getItem('fl_lang')||'fr';
   const msg=lang==='fr'
     ?'<strong style="color:#f0e040;">'+title+'</strong><br><br>Ce niveau est publié et ne peut pas être modifié directement.<br>Crée une copie privée pour y apporter des modifications.'
