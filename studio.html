@@ -752,8 +752,8 @@ function isSelected(type,idx){ return !!selection.find(s=>s.type===type&&s.idx==
 
 let undoStack=[],redoStack=[];
 function snapshot(){
-  if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
-    showDupModal();
+  if(_isPublished&&_currentLevelId){
+    // silently block - modal already shown at load
     return;
   }
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
@@ -1545,7 +1545,22 @@ async function loadPlayerProfile(){
 
   // Check ownership
   if(data.user_id!==sess.session.user.id){
-    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 CONNEXION REQUISE</div><a href="login.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">SE CONNECTER</a></div>`;
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 ACCÈS REFUSÉ</div><a href="index.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">🏠 ACCUEIL</a></div>`;
+    return;
+  }
+
+  // If level is published (public/code), show copy modal BEFORE loading editor
+  if((data.visibility==='public'||data.visibility==='code')||data.is_published){
+    _isPublished=true;
+    _currentLevelId=lid;
+    // Load level data in memory but show modal immediately
+    lv=data.data;
+    if(!lv)lv={fixed:[],trap:[],slider:[],invis:[],bounce:[],mobile:[],push:[],gravflip:[],speed:[],start:{x:100,y:200},end:{x:800,y:200}};
+    if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
+    if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
+    if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+    // Show the modal with copy or open other option
+    showPublishedModal(data.title||'Sans titre', lid);
     return;
   }
 
@@ -1906,6 +1921,19 @@ async function doPublish(){
   }
 }
 </script>
+<!-- PUBLISHED LEVEL MODAL -->
+<div id="published-modal" style="display:none;position:fixed;inset:0;background:#000000dd;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:36px 32px;width:min(440px,90vw);display:flex;flex-direction:column;gap:20px;">
+    <div style="font-family:Orbitron,monospace;font-size:13px;color:#f0a040;text-align:center;letter-spacing:2px;">🔒 NIVEAU PUBLIÉ</div>
+    <p id="published-modal-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.8;text-align:center;"></p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onclick="confirmDuplicateFromModal()" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#2a1a00;border:2px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;letter-spacing:1px;">⧉ CRÉER UNE COPIE MODIFIABLE</button>
+      <button onclick="window.location.href='settings.html'" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">📂 OUVRIR UN AUTRE NIVEAU</button>
+      <button onclick="window.location.href='index.html'" style="font-family:Orbitron,monospace;font-size:8px;padding:10px;background:transparent;border:none;color:#4040aa;cursor:pointer;">← ACCUEIL</button>
+    </div>
+  </div>
+</div>
+
 <!-- DUPLICATE MODAL -->
 <div id="dup-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
   <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
@@ -1919,6 +1947,21 @@ async function doPublish(){
 </div>
 
 <script>
+function showPublishedModal(title, lid){
+  const lang=localStorage.getItem('fl_lang')||'fr';
+  const msg=lang==='fr'
+    ?'<strong style="color:#f0e040;">'+title+'</strong><br><br>Ce niveau est publié et ne peut pas être modifié directement.<br>Crée une copie privée pour y apporter des modifications.'
+    :'<strong style="color:#f0e040;">'+title+'</strong><br><br>This level is published and cannot be edited directly.<br>Create a private copy to make changes.';
+  document.getElementById('published-modal-msg').innerHTML=msg;
+  document.getElementById('published-modal').style.display='flex';
+}
+
+async function confirmDuplicateFromModal(){
+  document.getElementById('published-modal').style.display='none';
+  window._dupConfirmed=true;
+  await duplicateLevel();
+}
+
 function showDupModal(){
   const lang=localStorage.getItem('fl_lang')||'fr';
   const msgFr='Ce niveau est publié et a déjà été joué.<br>Tu ne peux pas le modifier directement.<br><br>Une copie privée sera créée.';
