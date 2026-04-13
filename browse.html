@@ -86,12 +86,12 @@ td{padding:14px 16px;vertical-align:middle;}
           <th>CRÉATEUR</th>
           <th class="sortable" data-col="plays" onclick="sortBy('plays')">PARTIES</th>
           <th>RECORD</th>
-          <th>ÉTAT</th>
+          <th class="sortable" data-col="avg_rating" onclick="sortBy('avg_rating')">NOTE</th>
           <th></th>
         </tr>
       </thead>
       <tbody id="lvl-tbody">
-        <tr class="loader-row"><td colspan="7"><span class="spinner"></span>Chargement...</td></tr>
+        
       </tbody>
     </table>
   </div>
@@ -103,7 +103,7 @@ const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
 const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
 const LANG_BASE='/lang/';
 
-const PAGE_SIZE=30;
+const PAGE_SIZE=100;
 let offset=0;
 let loading=false;
 let allLoaded=false;
@@ -153,6 +153,22 @@ async function loadPage(){
     }
     loading=false;
     return;
+  }
+
+  // Fetch ratings for this batch
+  const levelIds=data.map(l=>l.id);
+  if(levelIds.length){
+    const ratingsData=await sbFetch('ratings?select=level_id,score&level_id=in.('+levelIds.join(',')+')&limit=1000',token);
+    const rmap={};
+    if(Array.isArray(ratingsData))ratingsData.forEach(r=>{
+      if(!rmap[r.level_id])rmap[r.level_id]={sum:0,count:0};
+      rmap[r.level_id].sum+=r.score;rmap[r.level_id].count++;
+    });
+    data.forEach(l=>{
+      const r=rmap[l.id];
+      l.avg_rating=r?Math.round((r.sum/r.count)*100)/100:null;
+      l.rating_count=r?r.count:0;
+    });
   }
 
   // Fetch usernames for this batch
