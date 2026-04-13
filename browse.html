@@ -158,7 +158,7 @@ async function loadPage(){
   // Fetch ratings for this batch
   const levelIds=data.map(l=>l.id);
   if(levelIds.length){
-    const ratingsData=await sbFetch('ratings?select=level_id,score&level_id=in.('+levelIds.join(',')+')&limit=1000',token);
+    const ratingsData=await sbFetch('ratings?select=level_id,score&level_id=in.('+levelIds.join(',')+')&limit=1000');
     const rmap={};
     if(Array.isArray(ratingsData))ratingsData.forEach(r=>{
       if(!rmap[r.level_id])rmap[r.level_id]={sum:0,count:0};
@@ -194,7 +194,7 @@ async function loadPage(){
 
   // Fetch records for this batch
   fetchRecords(data.map(l=>l.id));
-  document.getElementById('count-info').textContent=offset+' '+(T.loaded||'niveau(x) chargé(s)');
+  document.getElementById('loaded-count').textContent=offset+' '+(T.loaded||'niveau(x) chargé(s)');
   loading=false;
 }
 
@@ -286,7 +286,7 @@ function reset(){
   myBests={};
   document.getElementById('lvl-tbody').innerHTML='';
   document.getElementById('end-msg').innerHTML='';
-  document.getElementById('count-info').textContent='';
+  document.getElementById('loaded-count').textContent='';
   loadPage();
 }
 
