@@ -62,7 +62,7 @@ body.test-mode #star-rating{display:none!important;}
 
 <div id="gwrap">
   <div id="gtopbar">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.7</span>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a2a55;margin-right:auto;">v3.8</span>
     <button class="gtop-btn" id="btn-editor" onclick="goToEditor()" style="background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;display:none;">◀ ÉDITEUR</button>
     <div id="test-mode-badge" style="display:none;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:7px 16px;background:#2a1a00;border:1.5px solid #f0a040;border-radius:4px;color:#f0a040;letter-spacing:1px;">🧪 MODE TEST</div>
     <div id="star-rating" style="display:none;align-items:center;gap:4px;">
@@ -1125,11 +1125,14 @@ function gUpdate(now){
           });
         }
 
-        // Show edit always (owner)
-        if(btnEdit)btnEdit.style.display='';
+        // Show edit only in test mode OR if level is private
+        if(isTestMode){
+          if(btnEdit)btnEdit.style.display='';
+        }
 
         // Show publish section if private
         if(lvl.visibility==='private'){
+          if(btnEdit)btnEdit.style.display=''; // allow edit from private level
           const pubSection=document.getElementById('publish-section');
           if(pubSection)pubSection.style.display='block';
         }
