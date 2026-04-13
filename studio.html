@@ -698,7 +698,7 @@ body {
   </div>
 
   <div id="cwrap"><canvas id="ecanvas" width="3200" height="640"></canvas></div>
-  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v11/04 11:44:22</div>
+  <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">v13/04 11:44:22</div>
 </div>
 
 
@@ -1194,6 +1194,9 @@ function filterLoadList(q){
 async function doLoadLevel(id,title){
   const{data,error}=await _sb.from('levels').select('*').eq('id',id).single();
   if(error||!data){alert('Erreur lors du chargement.');return;}
+  // Reset published state for new level
+  _isPublished=false;
+  window._dupConfirmed=false;
   snapshot();
   lv=data.data;
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
@@ -1572,7 +1575,12 @@ async function loadPlayerProfile(){
   _currentLevelId=lid;
   _currentVisibility=data.visibility||'private';
   _authorCompleted=data.author_completed||false;
-  _isPublished=data.is_published||false;
+  _isPublished=(data.is_published||false)||(data.visibility==='public'||data.visibility==='code');
+  if(_isPublished){
+    closeLoadModal();
+    setTimeout(()=>showPublishedModal(data.title||'',data.id),100);
+    return;
+  }
   window._authorCompletedReset=false; // Allow reset on next modification
   const _ni=document.getElementById('level-name-input');
   if(_ni)_ni.value=data.title||'';
