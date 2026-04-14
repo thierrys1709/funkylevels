@@ -43,7 +43,8 @@
     <h1>⚡ FUNKYLEVELS</h1>
     <p id="logo-sub">NOUVEAU MOT DE PASSE</p>
   </div>
-  <div class="card">
+  <div id="loading-msg" style="text-align:center;font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;padding:20px;">Chargement...</div>
+<div class="card" id="reset-card" style="display:none;">
     <h2 id="card-title">🔑 RÉINITIALISATION</h2>
     <p id="card-desc">Choisis ton nouveau mot de passe.</p>
     <div id="main-msg" class="msg"></div>
@@ -86,9 +87,32 @@ document.getElementById('submit-btn').textContent=t.btn;
 document.getElementById('back-lnk').textContent=t.back;
 
 // Vérifier qu'on a bien une session de reset
+// Handle password recovery token from URL hash
+(async()=>{
+  const hash=window.location.hash;
+  if(hash.includes('type=recovery')||hash.includes('access_token')){
+    // Supabase JS v2 handles this automatically via onAuthStateChange
+    // But we need to ensure the session is set
+    const{data,error}=await sb.auth.getSession();
+    if(!data.session){
+      // Try to exchange the token
+      const params=new URLSearchParams(hash.substring(1));
+      const accessToken=params.get('access_token');
+      const refreshToken=params.get('refresh_token');
+      if(accessToken){
+        await sb.auth.setSession({access_token:accessToken,refresh_token:refreshToken||''});
+      }
+    }
+  }
+})();
+
 sb.auth.onAuthStateChange(async(event,session)=>{
-  if(event==='PASSWORD_RECOVERY'){
-    // OK — l'utilisateur peut changer son mot de passe
+  if(event==='PASSWORD_RECOVERY'||event==='SIGNED_IN'){
+    // Session is ready, user can change password
+    const form=document.getElementById('reset-card');
+    if(form)form.style.display='flex';
+    const loading=document.getElementById('loading-msg');
+    if(loading)loading.style.display='none';
   }
 });
 
