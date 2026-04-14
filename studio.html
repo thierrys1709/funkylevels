@@ -801,7 +801,7 @@ async function duplicateLevel(){
   window._dupWarningShown=false;
   const ni=document.getElementById('level-name-input');
   if(ni)ni.value=inserted.title;
-  history.replaceState(null,'','?level='+inserted.id+'&mode=edit');
+  history.replaceState(null,'','studio.html');
   // Now do the edit
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
   status(localStorage.getItem('fl_lang')==='fr'?'Niveau dupliqué ! Tu peux maintenant éditer.':'Level duplicated! You can now edit.');
@@ -1222,7 +1222,7 @@ async function doLoadLevel(id,title){
   const nameInput=document.getElementById('level-name-input');
   if(nameInput)nameInput.value=data.title||'';
   // Met à jour l'URL sans recharger la page
-  history.replaceState(null,'','?level='+id+'&mode=edit');
+  history.replaceState(null,'','studio.html');
   // Update sessionStorage so game.html gets this version
   sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id', id);
@@ -1534,7 +1534,7 @@ async function loadPlayerProfile(){
         const savedTitle=sessionStorage.getItem('fl_preview_title');
         if(savedId){
           _currentLevelId=savedId;
-          history.replaceState(null,'','?level='+savedId+'&mode=edit');
+          history.replaceState(null,'','studio.html');
         }
         const ni=document.getElementById('level-name-input');
         if(ni&&savedTitle)ni.value=savedTitle;
@@ -1926,7 +1926,7 @@ async function doPublish(){
     error=e;
     if(!error&&inserted){
       _currentLevelId=inserted.id;
-      history.replaceState(null,'','?level='+inserted.id+'&mode=edit');
+      history.replaceState(null,'','studio.html');
     }
   }
 
