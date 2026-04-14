@@ -432,7 +432,7 @@ async function doReset(){
     return;
   }
   btn.disabled=true;btn.textContent=t.resetSending;
-  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/reset.html'});
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/reset.html',captchaToken:_resetCaptchaToken});
   btn.disabled=false;btn.textContent=t.resetOk;
   if(error){msgEl.className='msg error';msgEl.textContent=error.message;}
   else{msgEl.className='msg success';msgEl.textContent=t.resetSuccess;setTimeout(()=>closeReset(),2500);}
