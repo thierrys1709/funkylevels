@@ -2018,7 +2018,33 @@ function closeDupModal(){
 function confirmDuplicate(){
   closeDupModal();
   window._dupConfirmed=true;
+  // Re-enable all buttons and canvas
+  document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
+  const c=document.getElementById('studio-canvas');
+  if(c)c.style.pointerEvents='';
   duplicateLevel();
+}
+
+// ── Unsaved changes + navigation ─────────────────────────
+let _hasUnsavedChanges=false;
+
+window.addEventListener('beforeunload',function(e){
+  if(_hasUnsavedChanges&&_currentLevelId){
+    e.preventDefault();
+    e.returnValue='';
+    return '';
+  }
+});
+
+function goToProfile(){
+  if(_hasUnsavedChanges&&_currentLevelId){
+    if(confirm('Modifications non sauvegardées. Quitter quand même ?')){
+      _hasUnsavedChanges=false;
+      window.location.href='settings.html';
+    }
+  }else{
+    window.location.href='settings.html';
+  }
 }
 </script>
 </body>
