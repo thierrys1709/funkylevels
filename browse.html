@@ -152,13 +152,8 @@ async function loadPage(){
   let url='levels?select=id,title,plays,completions,created_at,visibility,user_id';
   url+='&visibility=in.(public,code)';
   if(searchQ){
-    // Search by title OR by creator username
-    const userIds=await searchByUsername(searchQ);
-    if(userIds.length){
-      url+='&or=(title.ilike.*'+encodeURIComponent(searchQ)+'*,user_id.in.('+userIds.join(',')+'))';
-    }else{
-      url+='&title=ilike.*'+encodeURIComponent(searchQ)+'*';
-    }
+    // Search by title only in DB, then client-filter by username after fetching
+    url+='&title=ilike.*'+encodeURIComponent(searchQ)+'*';
   }
   url+='&order='+sortCol+'.'+(sortDir)+',id.asc';
   url+='&limit='+PAGE_SIZE+'&offset='+offset;
@@ -202,6 +197,12 @@ async function loadPage(){
   }
 
   const tbody=document.getElementById('lvl-tbody');
+  // Also fetch levels by creator username match
+  let extraIds=[];
+  if(searchQ){
+    const profRes=await sbFetch('profiles?select=id&username=ilike.*'+encodeURIComponent(searchQ)+'*&limit=50');
+    if(Array.isArray(profRes))extraIds=profRes.map(p=>p.id);
+  }
   data.forEach(l=>{
     l.username=usernameMap[l.user_id]||'anonyme';
     // Apply star filter
@@ -209,6 +210,40 @@ async function loadPage(){
     const tr=createRow(l);
     tbody.appendChild(tr);
   });
+  // Fetch levels by creator username that weren't in title search
+  if(extraIds.length&&searchQ){
+    const creatorIds=extraIds.filter(id=>!data.find(l=>l.user_id===id));
+    if(creatorIds.length){
+      const creatorUrl='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=in.(public,code)&user_id=in.('+creatorIds.join(',')+')'
+        +'&order='+sortCol+'.'+sortDir+'&limit='+PAGE_SIZE;
+      const creatorData=await sbFetch(creatorUrl);
+      if(Array.isArray(creatorData)&&creatorData.length){
+        // Fetch ratings for creator levels
+        const cIds=creatorData.map(l=>l.id);
+        const cRatings=await sbFetch('ratings?select=level_id,score&level_id=in.('+cIds.join(',')+')&limit=500');
+        const crmap={};
+        if(Array.isArray(cRatings))cRatings.forEach(r=>{
+          if(!crmap[r.level_id])crmap[r.level_id]={sum:0,count:0};
+          crmap[r.level_id].sum+=r.score;crmap[r.level_id].count++;
+        });
+        // Get usernames
+        const cuids=[...new Set(creatorData.map(l=>l.user_id))];
+        const cProfiles=await sbFetch('profiles?select=id,username&id=in.('+cuids.join(',')+')')
+        const cumap={};
+        if(Array.isArray(cProfiles))cProfiles.forEach(p=>{cumap[p.id]=p.username;});
+        creatorData.forEach(l=>{
+          if(data.find(d=>d.id===l.id))return; // skip duplicates
+          l.username=cumap[l.user_id]||'anonyme';
+          const r=crmap[l.id];
+          l.avg_rating=r?Math.round((r.sum/r.count)*100)/100:null;
+          l.rating_count=r?r.count:0;
+          if(!matchesStarFilter(l.avg_rating))return;
+          const tr=createRow(l);
+          tbody.appendChild(tr);
+        });
+      }
+    }
+  }
 
   offset+=data.length;
   if(data.length<PAGE_SIZE){
@@ -316,15 +351,6 @@ function matchesStarFilter(avgRating){
   if(!avgRating)return false;
   const floor=Math.floor(avgRating); // 3.2 → floor=3
   return starSelected.has(floor);
-}
-
-async function searchByUsername(q){
-  if(!q)return[];
-  try{
-    const r=await sbFetch('profiles?select=id&username=ilike.*'+encodeURIComponent(q)+'*&limit=50');
-    if(Array.isArray(r))return r.map(p=>p.id);
-  }catch(e){}
-  return[];
 }
 
 function sortBy(col){
