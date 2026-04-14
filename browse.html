@@ -151,7 +151,15 @@ async function loadPage(){
 
   let url='levels?select=id,title,plays,completions,created_at,visibility,user_id';
   url+='&visibility=in.(public,code)';
-  if(searchQ)url+='&or=(title.ilike.*'+encodeURIComponent(searchQ)+'*)';
+  if(searchQ){
+    // Search by title OR by creator username
+    const userIds=await searchByUsername(searchQ);
+    if(userIds.length){
+      url+='&or=(title.ilike.*'+encodeURIComponent(searchQ)+'*,user_id.in.('+userIds.join(',')+'))';
+    }else{
+      url+='&title=ilike.*'+encodeURIComponent(searchQ)+'*';
+    }
+  }
   url+='&order='+sortCol+'.'+(sortDir)+',id.asc';
   url+='&limit='+PAGE_SIZE+'&offset='+offset;
 
@@ -308,6 +316,15 @@ function matchesStarFilter(avgRating){
   if(!avgRating)return false;
   const floor=Math.floor(avgRating); // 3.2 → floor=3
   return starSelected.has(floor);
+}
+
+async function searchByUsername(q){
+  if(!q)return[];
+  try{
+    const r=await sbFetch('profiles?select=id&username=ilike.*'+encodeURIComponent(q)+'*&limit=50');
+    if(Array.isArray(r))return r.map(p=>p.id);
+  }catch(e){}
+  return[];
 }
 
 function sortBy(col){
