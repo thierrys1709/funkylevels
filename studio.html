@@ -1430,6 +1430,9 @@ function playLevel(){
     window.location.href='game.html?preview=1&from=studio';
   }
 }
+
+let _hasUnsavedChanges=false;
+let _loadingLevel=false;
 </script>
 <!-- LOAD MODAL -->
 <div id="load-modal">
@@ -2067,12 +2070,12 @@ function confirmDuplicate(){
 // ── Autosave recovery ────────────────────────────────────
 (function(){
   // Check autosave on page arrival
+  _loadingLevel=false;
+  _hasUnsavedChanges=false;
   checkAutosaveOnLoad();
 })();
 
 // ── Autosave System ──────────────────────────────────────
-let _hasUnsavedChanges=false;
-let _loadingLevel=false;
 
 function autosaveSave(){
   if(_loadingLevel)return;
