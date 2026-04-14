@@ -1202,7 +1202,7 @@ function filterLoadList(q){
 
 async function doLoadLevel(id,title){
   const{data,error}=await _sb.from('levels').select('*').eq('id',id).single();
-  if(error||!data){alert('Erreur lors du chargement.');return;}
+  if(error||!data){showSaveToast('⚠️ Erreur lors du chargement');return;}
   // Reset published state for new level
   _isPublished=false;
   window._dupConfirmed=false;
@@ -1557,7 +1557,11 @@ async function loadPlayerProfile(){
   }
 
   const{data,error}=await _sb.from('levels').select('*').eq('id',lid).single();
-  if(error||!data){alert('Niveau introuvable.');return;}
+  if(error||!data){
+    showSaveToast('⚠️ Niveau introuvable — Nouveau niveau initialisé');
+    snapshot();redraw();
+    return;
+  }
 
   // Check ownership
   if(data.user_id!==sess.session.user.id){
