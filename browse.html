@@ -381,7 +381,7 @@ function reset(){
   myBests={};
   document.getElementById('lvl-tbody').innerHTML='';
   document.getElementById('end-msg').innerHTML='';
-  document.getElementById('loaded-count').textContent='';
+  const lc2=document.getElementById('loaded-count')||document.getElementById('count-info');if(lc2)lc2.textContent='';
   loadPage();
 }
 
