@@ -1211,8 +1211,14 @@ async function doLoadLevel(id,title){
   document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
   const cv=document.getElementById('studio-canvas');
   if(cv)cv.style.pointerEvents='';
-  snapshot();
-  lv=data.data;
+  // Check autosave restore
+  if(window._autosaveRestore&&window._autosaveRestore.id===lid){
+    lv=window._autosaveRestore.lv;
+    _hasUnsavedChanges=true;
+    window._autosaveRestore=null;
+  }else{
+    lv=data.data;
+  }
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
@@ -1247,7 +1253,18 @@ function loadFile(e){
   }catch(err){alert('Fichier invalide.');}};
   r.readAsText(f);e.target.value='';
 }
-function clearLevel(){if(!confirm('Vider le niveau ?'))return;
+function clearLevel(){
+  const autosave=sessionStorage.getItem('fl_autosave_level');
+  const msg=autosave
+    ?(_lang()==='fr'?'Créer un nouveau niveau ? (brouillon non sauvegardé sera perdu)':'Create new level? (unsaved draft will be lost)')
+    :(_lang()==='fr'?'Vider le niveau ?':'Clear level?');
+  if(!confirm(msg))return;
+  // Clear autosave
+  sessionStorage.removeItem('fl_autosave_level');
+  sessionStorage.removeItem('fl_autosave_id');
+  sessionStorage.removeItem('fl_autosave_name');
+  _hasUnsavedChanges=false;
+  _currentLevelId=null;
   // Don't use snapshot() here to avoid duplication warning
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
   lv=emptyLevel();selectedIdx=-1;selectedType=null;
@@ -1516,6 +1533,18 @@ async function loadPlayerProfile(){
   // Clean URL immediately
   if(lid)history.replaceState(null,'','studio.html');
 
+  // Check for autosave - restore if same level or new level
+  const _autoSavedLv=sessionStorage.getItem('fl_autosave_level');
+  const _autoSavedId=sessionStorage.getItem('fl_autosave_id')||'';
+  const _autoSavedName=sessionStorage.getItem('fl_autosave_name')||'';
+  if(_autoSavedLv&&((!lid&&!_autoSavedId)||(lid&&lid===_autoSavedId))){
+    try{
+      const _restored=JSON.parse(_autoSavedLv);
+      // Restore silently - will override level loaded from DB
+      window._autosaveRestore={lv:_restored,id:_autoSavedId,name:_autoSavedName};
+    }catch(ex){}
+  }
+
   // If no level and not coming from game → clear preview (fresh start)
   if(!lid&&!fromGame){
     sessionStorage.removeItem('fl_preview_level');
@@ -1589,8 +1618,14 @@ async function loadPlayerProfile(){
     return;
   }
 
-  snapshot();
-  lv=data.data;
+  // Check autosave restore
+  if(window._autosaveRestore&&window._autosaveRestore.id===lid){
+    lv=window._autosaveRestore.lv;
+    _hasUnsavedChanges=true;
+    window._autosaveRestore=null;
+  }else{
+    lv=data.data;
+  }
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
