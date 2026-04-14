@@ -599,7 +599,7 @@ body {
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblProfil">PROFIL</span>
     <div class="tb-group" style="gap:6px;align-items:center;">
-      <span id="current-char-display" style="font-size:16px;cursor:pointer;" onclick="window.location.href='settings.html'" title="Changer de personnage">🧑</span>
+      <button onclick="goToProfile()" style="font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 12px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;white-space:nowrap;">👤 MON PROFIL</button>
 
 
       
@@ -753,9 +753,9 @@ function isSelected(type,idx){ return !!selection.find(s=>s.type===type&&s.idx==
 let undoStack=[],redoStack=[];
 function snapshot(){
   if(_isPublished&&_currentLevelId){
-    // silently block - modal already shown at load
     return;
   }
+  _hasUnsavedChanges=true;
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
 }
 
@@ -1510,6 +1510,8 @@ async function loadPlayerProfile(){
   const params=new URLSearchParams(window.location.search);
   const lid=params.get('level');
   const fromGame=sessionStorage.getItem('fl_from_game')==='1';
+  // Clean URL immediately
+  if(lid)history.replaceState(null,'','studio.html');
 
   // If no level and not coming from game → clear preview (fresh start)
   if(!lid&&!fromGame){
