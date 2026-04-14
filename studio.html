@@ -1230,6 +1230,8 @@ async function doLoadLevel(id,title){
   sessionStorage.setItem('fl_preview_title', data.title||'');
   redraw();
   closeLoadModal();
+  _loadingLevel=false;
+  _hasUnsavedChanges=false;
   status('Niveau "'+title+'" chargé.');
 }
 function loadFile(e){
@@ -2026,10 +2028,41 @@ function confirmDuplicate(){
   duplicateLevel();
 }
 
+// ── Autosave recovery ────────────────────────────────────
+(function(){
+  const savedId=sessionStorage.getItem('fl_autosave_id');
+  const savedLv=sessionStorage.getItem('fl_autosave_level');
+  const savedName=sessionStorage.getItem('fl_autosave_name');
+  const urlId=new URLSearchParams(window.location.search).get('level');
+  // Only restore if same level (or no level = new)
+  if(savedLv&&(savedId===urlId||(savedId===''&&!urlId))){
+    try{
+      lv=JSON.parse(savedLv);
+      if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
+      if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
+      if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+      if(savedName){const ni=document.getElementById('level-name-input');if(ni)ni.value=savedName;}
+      if(savedId)_currentLevelId=savedId;
+      _hasUnsavedChanges=true;
+      redraw&&redraw();
+      status&&status('⚡ Niveau restauré depuis la dernière session');
+    }catch(ex){}
+  }
+})();
+
 // ── Unsaved changes + navigation ─────────────────────────
 let _hasUnsavedChanges=false;
+let _loadingLevel=false;
 
 window.addEventListener('beforeunload',function(e){
+  // Always save current state to sessionStorage for recovery
+  if(lv&&typeof lv==='object'){
+    try{
+      sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));
+      sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');
+      sessionStorage.setItem('fl_autosave_name',document.getElementById('level-name-input')?.value||'');
+    }catch(ex){}
+  }
   if(_hasUnsavedChanges){
     e.preventDefault();
     e.returnValue='';
