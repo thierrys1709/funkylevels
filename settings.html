@@ -212,6 +212,23 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
       <div id="pseudo-msg" class="msg" style="margin-top:10px;"></div>
     </div>
 
+    <!-- Changer mot de passe -->
+    <div class="card">
+      <div class="card-title">🔑 CHANGER MON MOT DE PASSE</div>
+      <div class="field">
+        <label style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;">NOUVEAU MOT DE PASSE</label>
+        <input type="password" id="new-pass-input" placeholder="8 caractères minimum" maxlength="60" style="width:100%;background:#0a0a18;border:1.5px solid #2a2a55;border-radius:3px;color:#e8e8ff;font-family:Rajdhani,sans-serif;font-size:14px;padding:10px 12px;outline:none;box-sizing:border-box;">
+      </div>
+      <div class="field">
+        <label style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;">CONFIRMER LE MOT DE PASSE</label>
+        <input type="password" id="confirm-pass-input" placeholder="Répète ton mot de passe" maxlength="60" style="width:100%;background:#0a0a18;border:1.5px solid #2a2a55;border-radius:3px;color:#e8e8ff;font-family:Rajdhani,sans-serif;font-size:14px;padding:10px 12px;outline:none;box-sizing:border-box;">
+      </div>
+      <div id="pass-msg" class="msg" style="margin-top:8px;"></div>
+      <div style="margin-top:12px;">
+        <button class="btn-primary" onclick="changePassword()">🔑 CHANGER LE MOT DE PASSE</button>
+      </div>
+    </div>
+
     <!-- Danger zone -->
     <div class="card danger-zone">
       <div class="card-title" id="danger-title">⚠️ ZONE DANGEREUSE</div>
@@ -955,6 +972,45 @@ function showAccountDeleteConfirm(){
   if(desc)desc.textContent=l==='fr'?'Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ?':'Are you sure you want to delete your account and all your levels?';
   modal.classList.add('show');
   _confirmCallback=async()=>{await doDelete();};
+}
+
+async function changePassword(){
+  const l=lang||'fr';
+  const newPass=document.getElementById('new-pass-input').value;
+  const confirmPass=document.getElementById('confirm-pass-input').value;
+  const msgEl=document.getElementById('pass-msg');
+  msgEl.className='msg';msgEl.textContent='';
+
+  if(!newPass||newPass.length<8){
+    msgEl.className='msg error';
+    msgEl.textContent=l==='fr'?'Mot de passe trop court (8 min).':'Password too short (8 min).';
+    return;
+  }
+  if(newPass!==confirmPass){
+    msgEl.className='msg error';
+    msgEl.textContent=l==='fr'?'Les mots de passe ne correspondent pas !':'Passwords do not match!';
+    return;
+  }
+  if(!/[a-zA-Z]/.test(newPass)||!/[0-9]/.test(newPass)){
+    msgEl.className='msg error';
+    msgEl.textContent=l==='fr'?'Le mot de passe doit contenir des lettres et des chiffres.':'Password must contain letters and digits.';
+    return;
+  }
+  const btn=event.target;
+  btn.disabled=true;btn.textContent='⏳...';
+
+  const{error}=await sb.auth.updateUser({password:newPass});
+  btn.disabled=false;btn.textContent='🔑 '+(l==='fr'?'CHANGER LE MOT DE PASSE':'CHANGE PASSWORD');
+
+  if(error){
+    msgEl.className='msg error';
+    msgEl.textContent=error.message;
+  }else{
+    msgEl.className='msg success';
+    msgEl.textContent=l==='fr'?'✅ Mot de passe changé !':'✅ Password changed!';
+    document.getElementById('new-pass-input').value='';
+    document.getElementById('confirm-pass-input').value='';
+  }
 }
 
 async function doDelete(){
