@@ -1105,6 +1105,7 @@ async function doQuickSave(){
   else{
     status('✅ Sauvegardé !');
     showSaveToast('✅ SAUVEGARDÉ !');
+    _hasUnsavedChanges=false;
     // Also update sessionStorage so game.html gets the latest version
     sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
     if(_currentLevelId)sessionStorage.setItem('fl_preview_id', _currentLevelId);
