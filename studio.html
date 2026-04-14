@@ -2029,7 +2029,7 @@ function confirmDuplicate(){
 let _hasUnsavedChanges=false;
 
 window.addEventListener('beforeunload',function(e){
-  if(_hasUnsavedChanges&&_currentLevelId){
+  if(_hasUnsavedChanges){
     e.preventDefault();
     e.returnValue='';
     return '';
@@ -2037,7 +2037,7 @@ window.addEventListener('beforeunload',function(e){
 });
 
 function goToProfile(){
-  if(_hasUnsavedChanges&&_currentLevelId){
+  if(_hasUnsavedChanges){
     if(confirm('Modifications non sauvegardées. Quitter quand même ?')){
       _hasUnsavedChanges=false;
       window.location.href='settings.html';
