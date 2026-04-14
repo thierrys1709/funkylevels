@@ -2065,29 +2065,59 @@ function confirmDuplicate(){
 
 // ── Autosave recovery ────────────────────────────────────
 (function(){
-  const savedId=sessionStorage.getItem('fl_autosave_id');
+  // Check autosave on page arrival
+  checkAutosaveOnLoad();
+})();
+
+// ── Autosave System ──────────────────────────────────────
+let _hasUnsavedChanges=false;
+let _loadingLevel=false;
+
+function autosaveSave(){
+  if(_loadingLevel)return;
+  try{
+    sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));
+    sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');
+    const ni=document.getElementById('level-name-input');
+    sessionStorage.setItem('fl_autosave_name',ni?ni.value:'');
+  }catch(ex){}
+}
+
+function autosaveClear(){
+  sessionStorage.removeItem('fl_autosave_level');
+  sessionStorage.removeItem('fl_autosave_id');
+  sessionStorage.removeItem('fl_autosave_name');
+}
+
+function checkAutosaveOnLoad(){
   const savedLv=sessionStorage.getItem('fl_autosave_level');
-  const savedName=sessionStorage.getItem('fl_autosave_name');
-  const urlId=new URLSearchParams(window.location.search).get('level');
-  // Only restore if same level (or no level = new)
-  if(savedLv&&(savedId===urlId||(savedId===''&&!urlId))){
+  if(!savedLv)return;
+  const savedName=sessionStorage.getItem('fl_autosave_name')||'Sans titre';
+  const l=localStorage.getItem('fl_lang')||'fr';
+  const msg=l==='fr'
+    ?('Brouillon: "'+savedName+'" - Restaurer ?')
+    :('Draft: "'+savedName+'" - Restore?');
+  if(confirm(msg)){
     try{
-      lv=JSON.parse(savedLv);
+      const restored=JSON.parse(savedLv);
+      lv=restored;
       if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
       if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
       if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-      if(savedName){const ni=document.getElementById('level-name-input');if(ni)ni.value=savedName;}
+      const ni=document.getElementById('level-name-input');
+      if(ni&&savedName)ni.value=savedName;
+      const savedId=sessionStorage.getItem('fl_autosave_id');
       if(savedId)_currentLevelId=savedId;
       _hasUnsavedChanges=true;
       redraw&&redraw();
-      status&&status('⚡ Niveau restauré depuis la dernière session');
+      status&&status('⚡ '+(l==='fr'?'Brouillon restauré':'Draft restored'));
     }catch(ex){}
+  }else{
+    autosaveClear();
   }
-})();
+}
 
 // ── Unsaved changes + navigation ─────────────────────────
-let _hasUnsavedChanges=false;
-let _loadingLevel=false;
 
 window.addEventListener('beforeunload',function(e){
   // Always save current state to sessionStorage for recovery
