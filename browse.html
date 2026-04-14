@@ -162,7 +162,37 @@ async function loadPage(){
 
   hideLoader();
   if(!Array.isArray(data)||data.length===0){
-    if(offset===0){
+    // No title match - but still try creator search before giving up
+    if(searchQ&&offset===0){
+      const profRes=await sbFetch('profiles?select=id&username=ilike.*'+encodeURIComponent(searchQ)+'*&limit=50');
+      const cIds=Array.isArray(profRes)?profRes.map(p=>p.id):[];
+      if(cIds.length){
+        const creatorUrl='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=in.(public,code)&user_id=in.('+cIds.join(',')+')'
+          +'&order='+sortCol+'.'+sortDir+'&limit='+PAGE_SIZE;
+        const cData=await sbFetch(creatorUrl);
+        if(Array.isArray(cData)&&cData.length){
+          // Fetch ratings
+          const cRatings=await sbFetch('ratings?select=level_id,score&level_id=in.('+cData.map(l=>l.id).join(',')+')&limit=500');
+          const crmap={};
+          if(Array.isArray(cRatings))cRatings.forEach(r=>{if(!crmap[r.level_id])crmap[r.level_id]={sum:0,count:0};crmap[r.level_id].sum+=r.score;crmap[r.level_id].count++;});
+          // Fetch usernames
+          const cuids=[...new Set(cData.map(l=>l.user_id))];
+          const cProfiles=await sbFetch('profiles?select=id,username&id=in.('+cuids.join(',')+')')
+          const cumap={};if(Array.isArray(cProfiles))cProfiles.forEach(p=>{cumap[p.id]=p.username;});
+          const tbody=document.getElementById('lvl-tbody');
+          cData.forEach(l=>{
+            l.username=cumap[l.user_id]||'anonyme';
+            const r=crmap[l.id];l.avg_rating=r?Math.round((r.sum/r.count)*100)/100:null;l.rating_count=r?r.count:0;
+            if(!matchesStarFilter(l.avg_rating))return;
+            tbody.appendChild(createRow(l));
+          });
+          fetchRecords(cData.map(l=>l.id));
+          loading=false;
+          return;
+        }
+      }
+      document.getElementById('lvl-tbody').innerHTML=`<tr><td colspan="7" class="empty-msg">${T.empty||'AUCUN NIVEAU TROUVÉ'}</td></tr>`;
+    }else if(offset===0){
       document.getElementById('lvl-tbody').innerHTML=`<tr><td colspan="7" class="empty-msg">${T.empty||'AUCUN NIVEAU TROUVÉ'}</td></tr>`;
     }else{
       document.getElementById('end-msg').innerHTML=`<p class="end-msg">— ${T.endList||'FIN DE LA LISTE'} —</p>`;
