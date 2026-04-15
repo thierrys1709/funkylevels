@@ -564,8 +564,10 @@ function doLogout(){
   setTimeout(()=>window.location.href='index.html',600);
 }
 
-// Init
-setLang(lang);
+// Init - only apply lang if already chosen, otherwise modal will show
+if(localStorage.getItem('fl_lang')){
+  setLang(lang);
+}
 loadStats();
 
 sb.auth.onAuthStateChange(async(event,session)=>{
