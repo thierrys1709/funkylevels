@@ -585,30 +585,30 @@ let _selectedLang=null;
 
 function selectLang(l){
   _selectedLang=l;
-  // Highlight selected button
+  // Highlight selected lang button
   document.getElementById('lang-btn-fr').style.borderColor=l==='fr'?'#a040f0':'#2a2a55';
   document.getElementById('lang-btn-fr').style.color=l==='fr'?'#c080ff':'#6060aa';
   document.getElementById('lang-btn-en').style.borderColor=l==='en'?'#4285f4':'#2a2a55';
   document.getElementById('lang-btn-en').style.color=l==='en'?'#6aabff':'#6060aa';
-  // Enable OK button
-  const okBtn=document.getElementById('lang-ok-btn');
-  okBtn.disabled=false;okBtn.style.opacity='1';okBtn.style.cursor='pointer';
-  okBtn.style.borderColor=l==='fr'?'#a040f0':'#4285f4';
-  okBtn.style.color=l==='fr'?'#c080ff':'#6aabff';
+  // Save lang and update UI labels
+  localStorage.setItem('fl_lang',l);
+  setLang(l);
+  const isFr=l==='fr';
+  // Enable login/signup buttons
+  const loginBtn=document.getElementById('lang-login-btn');
+  const signupBtn=document.getElementById('lang-signup-btn');
+  loginBtn.textContent=isFr?'🎮 SE CONNECTER':'🎮 LOGIN';
+  loginBtn.style.opacity='1';loginBtn.style.pointerEvents='auto';
+  loginBtn.style.borderColor='#4040aa';loginBtn.style.color='#90a0f0';
+  signupBtn.textContent=isFr?'✨ CRÉER UN COMPTE':'✨ CREATE ACCOUNT';
+  signupBtn.style.opacity='1';signupBtn.style.pointerEvents='auto';
+  signupBtn.style.borderColor='#40f090';signupBtn.style.color='#40f090';
+  signupBtn.style.background='#0d2a0d';
 }
 
 function confirmLang(){
-  if(!_selectedLang)return;
-  localStorage.setItem('fl_lang',_selectedLang);
-  setLang(_selectedLang);
-  // Show login/signup buttons in correct language
-  const isFr=_selectedLang==='fr';
-  document.getElementById('lang-login-btn').textContent=isFr?'🎮 SE CONNECTER':'🎮 LOGIN';
-  document.getElementById('lang-signup-btn').textContent=isFr?'✨ CRÉER UN COMPTE':'✨ CREATE ACCOUNT';
-  document.getElementById('lang-signup-btn').href='login.html';
-  document.getElementById('lang-action-btns').style.display='flex';
-  document.getElementById('lang-ok-btn').style.display='none';
-  document.getElementById('lang-btns').style.display='none';
+  // kept for compatibility
+  if(_selectedLang)selectLang(_selectedLang);
 }
 
 function chooseLang(lang){
@@ -654,14 +654,17 @@ if(localStorage.getItem('fl_lang')){
       <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#e8e8ff;">Choisissez votre langue</div>
       <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#a0a0cc;">Choose your language</div>
     </div>
-    <div style="display:flex;gap:16px;width:100%;justify-content:center;" id="lang-btns">
+    <!-- Language buttons -->
+    <div style="display:flex;gap:16px;width:100%;justify-content:center;">
       <button id="lang-btn-fr" onclick="selectLang('fr')" style="flex:1;max-width:140px;font-family:'Press Start 2P',monospace;font-size:10px;padding:16px;background:#12122a;border:2px solid #2a2a55;color:#6060aa;border-radius:8px;cursor:pointer;transition:all .15s;">🇫🇷 FRANÇAIS</button>
       <button id="lang-btn-en" onclick="selectLang('en')" style="flex:1;max-width:140px;font-family:'Press Start 2P',monospace;font-size:10px;padding:16px;background:#12122a;border:2px solid #2a2a55;color:#6060aa;border-radius:8px;cursor:pointer;transition:all .15s;">🇺🇸 ENGLISH</button>
     </div>
-    <button id="lang-ok-btn" onclick="confirmLang()" disabled style="width:100%;font-family:'Press Start 2P',monospace;font-size:9px;padding:14px;background:#12122a;border:2px solid #2a2a55;color:#4040aa;border-radius:6px;cursor:not-allowed;opacity:.5;transition:all .2s;">OK →</button>
-    <div id="lang-action-btns" style="display:none;flex-direction:column;gap:10px;width:100%;">
-      <a id="lang-login-btn" href="login.html" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#12122a;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;text-decoration:none;text-align:center;"></a>
-      <a id="lang-signup-btn" href="login.html" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#0d2a0d;border:1.5px solid #40f090;color:#40f090;border-radius:4px;text-decoration:none;text-align:center;"></a>
+    <!-- Divider -->
+    <div style="width:100%;height:1px;background:#1e1e35;"></div>
+    <!-- Login/Signup buttons - disabled until lang chosen -->
+    <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
+      <a id="lang-login-btn" href="login.html" onclick="return !!_selectedLang" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#12122a;border:1.5px solid #2a2a55;color:#404066;border-radius:4px;text-decoration:none;text-align:center;opacity:.4;pointer-events:none;transition:all .2s;">🎮 SE CONNECTER / LOGIN</a>
+      <a id="lang-signup-btn" href="login.html" onclick="return !!_selectedLang" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#0a1a0a;border:1.5px solid #1a3a1a;color:#206020;border-radius:4px;text-decoration:none;text-align:center;opacity:.4;pointer-events:none;transition:all .2s;">✨ S'INSCRIRE / SIGN UP</a>
     </div>
   </div>
 </div>
