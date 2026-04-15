@@ -636,9 +636,10 @@ if(!localStorage.getItem('fl_cookies')){
   cb.style.display='flex';
 }
 </script>
+
+
 <!-- LANGUAGE SELECTION MODAL -->
 <script>
-// Hide language modal if lang already set
 if(localStorage.getItem('fl_lang')){
   document.addEventListener('DOMContentLoaded',function(){
     var m=document.getElementById('lang-modal');
@@ -646,20 +647,21 @@ if(localStorage.getItem('fl_lang')){
   });
 }
 </script>
-<div id="lang-modal" style="display:flex;position:fixed;inset:0;background:#000000ee;z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
-  <div style="background:#0d0d1e;border:2px solid #2a2a55;border-radius:12px;padding:40px 32px;width:min(380px,90vw);display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;">
+<div id="lang-modal" style="display:flex;position:fixed;inset:0;background:#06060ecc;z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#0d0d1e;border:2px solid #2a2a55;border-radius:12px;padding:40px 32px;width:min(380px,90vw);display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;box-shadow:0 0 60px #00000088;">
     <div style="font-family:monospace;font-size:20px;font-weight:900;color:#f0e040;letter-spacing:3px;">✦ FUNKYLEVELS</div>
-    <div style="display:flex;flex-direction:column;gap:6px;">
-      <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:#e8e8ff;">Choisissez votre langue</div>
-      <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:#a0a0cc;">Choose your language</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#e8e8ff;">Choisissez votre langue</div>
+      <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#a0a0cc;">Choose your language</div>
     </div>
-    <div style="display:flex;gap:16px;width:100%;justify-content:center;">
-      <button onclick="chooseLang('fr')" style="flex:1;max-width:140px;font-family:'Press Start 2P',monospace;font-size:10px;padding:16px;background:#12122a;border:2px solid #a040f0;color:#c080ff;border-radius:8px;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#1a0a2a'" onmouseout="this.style.background='#12122a'">🇫🇷 FRANÇAIS</button>
-      <button onclick="chooseLang('en')" style="flex:1;max-width:140px;font-family:'Press Start 2P',monospace;font-size:10px;padding:16px;background:#12122a;border:2px solid #4285f4;color:#6aabff;border-radius:8px;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#0a1a2a'" onmouseout="this.style.background='#12122a'">🇺🇸 ENGLISH</button>
+    <div style="display:flex;gap:16px;width:100%;justify-content:center;" id="lang-btns">
+      <button id="lang-btn-fr" onclick="selectLang('fr')" style="flex:1;max-width:140px;font-family:'Press Start 2P',monospace;font-size:10px;padding:16px;background:#12122a;border:2px solid #2a2a55;color:#6060aa;border-radius:8px;cursor:pointer;transition:all .15s;">🇫🇷 FRANÇAIS</button>
+      <button id="lang-btn-en" onclick="selectLang('en')" style="flex:1;max-width:140px;font-family:'Press Start 2P',monospace;font-size:10px;padding:16px;background:#12122a;border:2px solid #2a2a55;color:#6060aa;border-radius:8px;cursor:pointer;transition:all .15s;">🇺🇸 ENGLISH</button>
     </div>
-    <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
-      <a href="login.html" id="lang-modal-login" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#12122a;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;text-decoration:none;text-align:center;">Se connecter / Login</a>
-      <a href="login.html#signup" id="lang-modal-signup" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#0d2a0d;border:1.5px solid #40f090;color:#40f090;border-radius:4px;text-decoration:none;text-align:center;">S'inscrire / Sign up</a>
+    <button id="lang-ok-btn" onclick="confirmLang()" disabled style="width:100%;font-family:'Press Start 2P',monospace;font-size:9px;padding:14px;background:#12122a;border:2px solid #2a2a55;color:#4040aa;border-radius:6px;cursor:not-allowed;opacity:.5;transition:all .2s;">OK →</button>
+    <div id="lang-action-btns" style="display:none;flex-direction:column;gap:10px;width:100%;">
+      <a id="lang-login-btn" href="login.html" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#12122a;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;text-decoration:none;text-align:center;"></a>
+      <a id="lang-signup-btn" href="login.html" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#0d2a0d;border:1.5px solid #40f090;color:#40f090;border-radius:4px;text-decoration:none;text-align:center;"></a>
     </div>
   </div>
 </div>
