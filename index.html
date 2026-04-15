@@ -631,8 +631,9 @@ function acceptCookies(){
 }
 
 // Show cookie banner if not accepted
+// Always show cookie banner on top of everything
+const cb=document.getElementById('cookie-banner');
 if(!localStorage.getItem('fl_cookies')){
-  const cb=document.getElementById('cookie-banner');
   cb.style.display='flex';
 }
 </script>
@@ -647,7 +648,7 @@ if(localStorage.getItem('fl_lang')){
   });
 }
 </script>
-<div id="lang-modal" style="display:flex;position:fixed;inset:0;background:#06060ecc;z-index:9999;align-items:center;justify-content:center;">
+<div id="lang-modal" style="display:flex;position:fixed;top:0;left:0;right:0;bottom:60px;background:#06060ecc;z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#0d0d1e;border:2px solid #2a2a55;border-radius:12px;padding:40px 32px;width:min(380px,90vw);display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;box-shadow:0 0 60px #00000088;">
     <div style="font-family:monospace;font-size:20px;font-weight:900;color:#f0e040;letter-spacing:3px;">✦ FUNKYLEVELS</div>
     <div style="display:flex;flex-direction:column;gap:8px;">
