@@ -371,6 +371,7 @@ async function checkAuth(){
   if(data.session){
     // Hide lang modal - user is logged in
     const lm=document.getElementById('lang-modal');
+    console.log('[LANG] Hiding modal - user is logged in');
     if(lm)lm.style.display='none';
     applySession(data.session.user);
     const{data:profile}=await sb.from('profiles').select('lang').eq('id',data.session.user.id).single();
@@ -380,9 +381,12 @@ async function checkAuth(){
   }else{
     // Not logged in - show language modal if no language chosen yet
     const _storedLang=localStorage.getItem('fl_lang');
+    console.log('[LANG] Not logged in, _storedLang:', _storedLang);
     if(!_storedLang){
-      document.getElementById('lang-modal').style.display='flex';
+      console.log('[LANG] Keeping modal visible');
     }else{
+      console.log('[LANG] Hiding modal - storedLang exists:', _storedLang);
+      document.getElementById('lang-modal').style.display='none';
       setLang(_storedLang);
     }
   }
@@ -608,9 +612,11 @@ if(!localStorage.getItem('fl_cookies')){
 <!-- LANGUAGE SELECTION MODAL -->
 <script>
 // Hide language modal if lang already set
+console.log('[LANG] fl_lang in localStorage:', localStorage.getItem('fl_lang'));
 if(localStorage.getItem('fl_lang')){
   document.addEventListener('DOMContentLoaded',function(){
     var m=document.getElementById('lang-modal');
+    console.log('[LANG] Hiding modal - lang already set:', localStorage.getItem('fl_lang'));
     if(m)m.style.display='none';
   });
 }
