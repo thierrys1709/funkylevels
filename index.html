@@ -376,10 +376,11 @@ async function checkAuth(){
     }
   }else{
     // Not logged in - show language modal if no language chosen yet
-    if(!localStorage.getItem('fl_lang')){
+    const _storedLang=localStorage.getItem('fl_lang');
+    if(!_storedLang){
       document.getElementById('lang-modal').style.display='flex';
     }else{
-      setLang(localStorage.getItem('fl_lang'));
+      setLang(_storedLang);
     }
   }
 }
