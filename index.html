@@ -261,23 +261,47 @@ function setLang(l){
 async function checkNeedsPseudo(user){
   if(!user)return;
   try{
+    const token=getToken();
     const r=await fetch(SUPABASE_URL+'/rest/v1/profiles?select=username&id=eq.'+user.id,{
-      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+getToken()}
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(token||SUPABASE_KEY)}
     });
     const arr=await r.json();
     if(arr&&arr[0]&&!arr[0].username){
-      // No username - show modal
-      document.getElementById('pseudo-modal').style.display='flex';
-      document.getElementById('pseudo-input').focus();
+      // Try to use pending username from signup
+      const pending=localStorage.getItem('fl_pending_username');
+      if(pending&&pending.length>=3){
+        // Auto-save the pending username
+        await fetch(SUPABASE_URL+'/rest/v1/profiles?id=eq.'+user.id,{
+          method:'PATCH',
+          headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(token||SUPABASE_KEY),'Content-Type':'application/json','Prefer':'return=minimal'},
+          body:JSON.stringify({username:pending})
+        });
+        localStorage.removeItem('fl_pending_username');
+        // Update nav
+        const navUser=document.getElementById('nav-user');
+        if(navUser)navUser.textContent='👤 '+pending;
+      }else{
+        // No pending username - show modal
+        document.getElementById('pseudo-modal').style.display='flex';
+        const input=document.getElementById('pseudo-input');
+        if(input)input.focus();
+      }
+    }else if(arr&&arr[0]&&arr[0].username){
+      // Username exists - clear pending
+      localStorage.removeItem('fl_pending_username');
     }
-  }catch(e){}
+  }catch(e){console.warn('checkNeedsPseudo error',e);}
 }
 
 async function detectAndSaveCountry(userId){
   try{
+    // Get fresh token from Supabase session
+    const{data:sess}=await sb.auth.getSession();
+    const token=sess?.session?.access_token;
+    if(!token)return;
     // Check if country already set
     const r=await fetch(SUPABASE_URL+'/rest/v1/profiles?select=country&id=eq.'+userId,{
-      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+getToken()}
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+token}
     });
     const arr=await r.json();
     if(arr&&arr[0]&&arr[0].country)return; // already set
@@ -287,11 +311,11 @@ async function detectAndSaveCountry(userId){
     if(data&&data.country_code){
       await fetch(SUPABASE_URL+'/rest/v1/profiles?id=eq.'+userId,{
         method:'PATCH',
-        headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+getToken(),'Content-Type':'application/json','Prefer':'return=minimal'},
+        headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
         body:JSON.stringify({country:data.country_code})
       });
     }
-  }catch(e){}
+  }catch(e){console.warn('country detect error',e);}
 }
 
 async function savePseudo(){
@@ -544,6 +568,21 @@ sb.auth.onAuthStateChange(async(event,session)=>{
 
 (async()=>{await checkAuth();})();
 
+function chooseLang(lang){
+  localStorage.setItem('fl_lang', lang);
+  document.getElementById('lang-modal').style.display='none';
+  // Update login/signup button labels based on language
+  setLang(lang);
+}
+
+function checkLangModal(){
+  // Only show if user is not logged in AND has no language preference
+  const hasLang=localStorage.getItem('fl_lang');
+  if(!hasLang){
+    document.getElementById('lang-modal').style.display='flex';
+  }
+}
+
 function acceptCookies(){
   localStorage.setItem('fl_cookies','1');
   document.getElementById('cookie-banner').style.display='none';
@@ -555,5 +594,24 @@ if(!localStorage.getItem('fl_cookies')){
   cb.style.display='flex';
 }
 </script>
+<!-- LANGUAGE SELECTION MODAL -->
+<div id="lang-modal" style="display:none;position:fixed;inset:0;background:#000000ee;z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div style="background:#0d0d1e;border:2px solid #2a2a55;border-radius:12px;padding:40px 32px;width:min(380px,90vw);display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;">
+    <div style="font-family:monospace;font-size:20px;font-weight:900;color:#f0e040;letter-spacing:3px;">✦ FUNKYLEVELS</div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:#e8e8ff;">Choisissez votre langue</div>
+      <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:#a0a0cc;">Choose your language</div>
+    </div>
+    <div style="display:flex;gap:16px;width:100%;justify-content:center;">
+      <button onclick="chooseLang('fr')" style="flex:1;max-width:140px;font-family:'Press Start 2P',monospace;font-size:10px;padding:16px;background:#12122a;border:2px solid #a040f0;color:#c080ff;border-radius:8px;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#1a0a2a'" onmouseout="this.style.background='#12122a'">🇫🇷 FRANÇAIS</button>
+      <button onclick="chooseLang('en')" style="flex:1;max-width:140px;font-family:'Press Start 2P',monospace;font-size:10px;padding:16px;background:#12122a;border:2px solid #4285f4;color:#6aabff;border-radius:8px;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#0a1a2a'" onmouseout="this.style.background='#12122a'">🇬🇧 ENGLISH</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
+      <a href="login.html" id="lang-modal-login" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#12122a;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;text-decoration:none;text-align:center;">Se connecter / Login</a>
+      <a href="login.html#signup" id="lang-modal-signup" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#0d2a0d;border:1.5px solid #40f090;color:#40f090;border-radius:4px;text-decoration:none;text-align:center;">S'inscrire / Sign up</a>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
