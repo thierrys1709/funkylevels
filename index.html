@@ -371,7 +371,6 @@ async function checkAuth(){
   if(data.session){
     // Hide lang modal - user is logged in
     const lm=document.getElementById('lang-modal');
-    console.log('[LANG] Hiding modal - user is logged in');
     if(lm)lm.style.display='none';
     applySession(data.session.user);
     const{data:profile}=await sb.from('profiles').select('lang').eq('id',data.session.user.id).single();
@@ -381,11 +380,8 @@ async function checkAuth(){
   }else{
     // Not logged in - show language modal if no language chosen yet
     const _storedLang=localStorage.getItem('fl_lang');
-    console.log('[LANG] Not logged in, _storedLang:', _storedLang);
     if(!_storedLang){
-      console.log('[LANG] Keeping modal visible');
     }else{
-      console.log('[LANG] Hiding modal - storedLang exists:', _storedLang);
       document.getElementById('lang-modal').style.display='none';
       setLang(_storedLang);
     }
@@ -585,10 +581,39 @@ sb.auth.onAuthStateChange(async(event,session)=>{
 
 (async()=>{await checkAuth();})();
 
+let _selectedLang=null;
+
+function selectLang(l){
+  _selectedLang=l;
+  // Highlight selected button
+  document.getElementById('lang-btn-fr').style.borderColor=l==='fr'?'#a040f0':'#2a2a55';
+  document.getElementById('lang-btn-fr').style.color=l==='fr'?'#c080ff':'#6060aa';
+  document.getElementById('lang-btn-en').style.borderColor=l==='en'?'#4285f4':'#2a2a55';
+  document.getElementById('lang-btn-en').style.color=l==='en'?'#6aabff':'#6060aa';
+  // Enable OK button
+  const okBtn=document.getElementById('lang-ok-btn');
+  okBtn.disabled=false;okBtn.style.opacity='1';okBtn.style.cursor='pointer';
+  okBtn.style.borderColor=l==='fr'?'#a040f0':'#4285f4';
+  okBtn.style.color=l==='fr'?'#c080ff':'#6aabff';
+}
+
+function confirmLang(){
+  if(!_selectedLang)return;
+  localStorage.setItem('fl_lang',_selectedLang);
+  setLang(_selectedLang);
+  // Show login/signup buttons in correct language
+  const isFr=_selectedLang==='fr';
+  document.getElementById('lang-login-btn').textContent=isFr?'🎮 SE CONNECTER':'🎮 LOGIN';
+  document.getElementById('lang-signup-btn').textContent=isFr?'✨ CRÉER UN COMPTE':'✨ CREATE ACCOUNT';
+  document.getElementById('lang-signup-btn').href='login.html';
+  document.getElementById('lang-action-btns').style.display='flex';
+  document.getElementById('lang-ok-btn').style.display='none';
+  document.getElementById('lang-btns').style.display='none';
+}
+
 function chooseLang(lang){
   localStorage.setItem('fl_lang', lang);
   document.getElementById('lang-modal').style.display='none';
-  // Update login/signup button labels based on language
   setLang(lang);
 }
 
@@ -614,11 +639,9 @@ if(!localStorage.getItem('fl_cookies')){
 <!-- LANGUAGE SELECTION MODAL -->
 <script>
 // Hide language modal if lang already set
-console.log('[LANG] fl_lang in localStorage:', localStorage.getItem('fl_lang'));
 if(localStorage.getItem('fl_lang')){
   document.addEventListener('DOMContentLoaded',function(){
     var m=document.getElementById('lang-modal');
-    console.log('[LANG] Hiding modal - lang already set:', localStorage.getItem('fl_lang'));
     if(m)m.style.display='none';
   });
 }
