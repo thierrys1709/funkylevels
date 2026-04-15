@@ -369,6 +369,9 @@ function applySession(user){
 async function checkAuth(){
   const{data}=await sb.auth.getSession();
   if(data.session){
+    // Hide lang modal - user is logged in
+    const lm=document.getElementById('lang-modal');
+    if(lm)lm.style.display='none';
     applySession(data.session.user);
     const{data:profile}=await sb.from('profiles').select('lang').eq('id',data.session.user.id).single();
     if(profile?.lang&&(profile.lang==='fr'||profile.lang==='en')&&profile.lang!==lang){
@@ -604,15 +607,15 @@ if(!localStorage.getItem('fl_cookies')){
 </script>
 <!-- LANGUAGE SELECTION MODAL -->
 <script>
-// Show language modal synchronously before anything async runs
-if(!localStorage.getItem('fl_lang')){
+// Hide language modal if lang already set
+if(localStorage.getItem('fl_lang')){
   document.addEventListener('DOMContentLoaded',function(){
     var m=document.getElementById('lang-modal');
-    if(m)m.style.display='flex';
+    if(m)m.style.display='none';
   });
 }
 </script>
-<div id="lang-modal" style="display:none;position:fixed;inset:0;background:#000000ee;z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+<div id="lang-modal" style="display:flex;position:fixed;inset:0;background:#000000ee;z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div style="background:#0d0d1e;border:2px solid #2a2a55;border-radius:12px;padding:40px 32px;width:min(380px,90vw);display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;">
     <div style="font-family:monospace;font-size:20px;font-weight:900;color:#f0e040;letter-spacing:3px;">✦ FUNKYLEVELS</div>
     <div style="display:flex;flex-direction:column;gap:6px;">
