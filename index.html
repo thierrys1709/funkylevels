@@ -220,9 +220,9 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-function setLang(l){
+function setLang(l,save=true){
   if(l!=='fr'&&l!=='en')l='en';
-  lang=l;localStorage.setItem('fl_lang',l);
+  lang=l;if(save)localStorage.setItem('fl_lang',l);
   document.getElementById('btn-fr').classList.toggle('active',l==='fr');
   document.getElementById('btn-en').classList.toggle('active',l==='en');
   const t=T[l];
@@ -563,6 +563,8 @@ function doLogout(){
 // Init - only apply lang if already chosen, otherwise modal will show
 if(localStorage.getItem('fl_lang')){
   setLang(lang);
+}else{
+  setLang('en', false); // default UI in English without storing
 }
 loadStats();
 
