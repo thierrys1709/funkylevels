@@ -374,6 +374,13 @@ async function checkAuth(){
     if(profile?.lang&&(profile.lang==='fr'||profile.lang==='en')&&profile.lang!==lang){
       lang=profile.lang;localStorage.setItem('fl_lang',lang);setLang(lang);
     }
+  }else{
+    // Not logged in - show language modal if no language chosen yet
+    if(!localStorage.getItem('fl_lang')){
+      document.getElementById('lang-modal').style.display='flex';
+    }else{
+      setLang(localStorage.getItem('fl_lang'));
+    }
   }
 }
 
