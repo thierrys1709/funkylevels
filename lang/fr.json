@@ -67,6 +67,9 @@
     "gHere": "📷 ICI",
     "gFullscreen": "⛶ PLEIN ÉCRAN",
     "ready": "Prêt. | Clic droit pour naviguer | Molette pour zoomer",
+    "navLabel": "NAVIGATION",
+    "btnProfil": "PROFIL",
+    "btnAccueil": "ACCUEIL",
     "toolNames": {
       "fixed": "FIXE",
       "trap": "PIÈGE",
