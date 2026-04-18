@@ -2149,9 +2149,12 @@ let _pendingNavUrl=null;
 history.pushState(null,'',location.href);
 window.addEventListener('popstate',function(){
   if(_hasUnsavedChanges){
-    history.pushState(null,'',location.href); // push state back so we stay
+    history.pushState(null,'',location.href);
     _pendingNavUrl='__BACK__';
     showUnsavedModal();
+  }else{
+    // No unsaved changes - clear autosave and let navigation proceed
+    autosaveClear();
   }
 });
 
