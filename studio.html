@@ -2182,6 +2182,16 @@ window.addEventListener('pagehide',function(){
   }
 });
 
+function goToHome(){
+  if(_hasUnsavedChanges){
+    _pendingNavUrl='index.html';
+    showUnsavedModal();
+  }else{
+    autosaveClear();
+    window.location.href='index.html';
+  }
+}
+
 function goToProfile(){
   if(_hasUnsavedChanges){
     _pendingNavUrl='settings.html';
