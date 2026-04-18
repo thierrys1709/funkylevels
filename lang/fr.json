@@ -70,6 +70,11 @@
     "navLabel": "NAVIGATION",
     "btnProfil": "PROFIL",
     "btnAccueil": "ACCUEIL",
+    "unsavedTitle": "MODIFICATIONS NON SAUVEGARDÉES",
+    "unsavedDesc": "Tu as des modifications non sauvegardées.<br>Que veux-tu faire ?",
+    "unsavedSave": "ENREGISTRER ET QUITTER",
+    "unsavedLeave": "QUITTER SANS ENREGISTRER",
+    "unsavedStay": "RESTER DANS LE STUDIO",
     "toolNames": {
       "fixed": "FIXE",
       "trap": "PIÈGE",
