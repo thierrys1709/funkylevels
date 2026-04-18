@@ -67,6 +67,9 @@
     "gHere": "📷 HERE",
     "gFullscreen": "⛶ FULLSCREEN",
     "ready": "Ready. | Right click to navigate | Scroll to zoom",
+    "navLabel": "NAVIGATION",
+    "btnProfil": "PROFILE",
+    "btnAccueil": "HOME",
     "toolNames": {
       "fixed": "FIXED",
       "trap": "TRAP",
