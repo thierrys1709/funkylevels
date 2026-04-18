@@ -1973,6 +1973,16 @@ async function doPublish(){
       history.replaceState(null,'','studio.html');
     }
   }
+  // Navigate after save if pending
+  if(window._afterSaveNav){
+    const url=window._afterSaveNav;
+    window._afterSaveNav=null;
+    _hasUnsavedChanges=false;
+    autosaveClear();
+    if(url==='__BACK__')history.back();
+    else window.location.href=url;
+    return;
+  }
 
   okBtn.disabled=false;okBtn.textContent=t.ok;
 
@@ -2167,6 +2177,15 @@ function showUnsavedModal(){
 
 function unsavedSave(){
   document.getElementById('unsaved-modal').style.display='none';
+  const ni=document.getElementById('level-name-input');
+  const hasName=ni&&ni.value.trim().length>0;
+  if(!_currentLevelId&&!hasName){
+    // No name yet - open publish modal to ask for name, then navigate
+    window._afterSaveNav=_pendingNavUrl;
+    _pendingNavUrl=null;
+    openPublish();
+    return;
+  }
   saveLevel().then(()=>{
     if(_pendingNavUrl==='__BACK__'){
       _pendingNavUrl=null;history.back();
@@ -2179,6 +2198,9 @@ function unsavedSave(){
 function unsavedLeave(){
   _hasUnsavedChanges=false;
   autosaveClear();
+  // Reset level state so next new level is blank
+  _currentLevelId=null;
+  lv=emptyLevel();
   document.getElementById('unsaved-modal').style.display='none';
   if(_pendingNavUrl==='__BACK__'){
     _pendingNavUrl=null;
