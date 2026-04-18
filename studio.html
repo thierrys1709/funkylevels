@@ -2153,7 +2153,14 @@ window.addEventListener('popstate',function(){
     _pendingNavUrl='__BACK__';
     showUnsavedModal();
   }else{
-    // No unsaved changes - clear autosave and let navigation proceed
+    autosaveClear();
+    // no pushState - let browser navigate normally
+  }
+});
+
+// Always clear autosave when leaving studio
+window.addEventListener('pagehide',function(){
+  if(!_hasUnsavedChanges){
     autosaveClear();
   }
 });
