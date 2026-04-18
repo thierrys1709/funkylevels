@@ -70,6 +70,11 @@
     "navLabel": "NAVIGATION",
     "btnProfil": "PROFILE",
     "btnAccueil": "HOME",
+    "unsavedTitle": "UNSAVED CHANGES",
+    "unsavedDesc": "You have unsaved changes.<br>What do you want to do?",
+    "unsavedSave": "SAVE AND LEAVE",
+    "unsavedLeave": "LEAVE WITHOUT SAVING",
+    "unsavedStay": "STAY IN STUDIO",
     "toolNames": {
       "fixed": "FIXED",
       "trap": "TRAP",
