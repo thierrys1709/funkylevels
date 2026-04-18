@@ -1743,10 +1743,12 @@ async function applyStudioLang(){
   s('btn-clear',t.btnClear);     dp('btn-clear',t.tipClear);
 
   // Nav links
-  const profil=document.querySelector('a[href="settings.html"].act-btn');
-  if(profil&&t.btnProfil)profil.textContent=t.btnProfil;
-  const accueil=document.querySelector('a[href="index.html"].act-btn');
-  if(accueil&&t.btnAccueil)accueil.textContent=t.btnAccueil;
+  const navLbl=document.getElementById('studio-nav-lbl');
+  if(navLbl)navLbl.textContent=t.navLabel||'NAVIGATION';
+  const btnProfile=document.getElementById('btn-nav-profile');
+  if(btnProfile)btnProfile.textContent='👤 '+(t.btnProfil||'PROFIL');
+  const btnHome=document.getElementById('btn-nav-home');
+  if(btnHome)btnHome.textContent='🏠 '+(t.btnAccueil||'ACCUEIL');
 
   // Grid label
   document.querySelectorAll('.tb-group span').forEach(el=>{
