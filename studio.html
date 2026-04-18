@@ -1417,13 +1417,14 @@ document.addEventListener('keydown',e=>{
 redraw();
 
 function playLevel(){
-  // Always save current level state to sessionStorage (includes unsaved changes)
+  // Save current state to sessionStorage for preview
   sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id', _currentLevelId||'');
   const titleEl=document.getElementById('level-name-input');
   sessionStorage.setItem('fl_preview_title', titleEl?titleEl.value:'');
+  // Also keep autosave so editor restores on return
+  autosaveSave();
   if(_currentLevelId){
-    // Pass level ID so game can show leaderboard, but use preview data
     window.location.href='game.html?preview=1&level='+_currentLevelId+'&from=studio';
   }else{
     window.location.href='game.html?preview=1&from=studio';
