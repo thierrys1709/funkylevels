@@ -1072,9 +1072,7 @@ document.getElementById('cwrap').addEventListener('wheel',e=>{
   zoom(d,mx,my);
 },{passive:false});
 function saveLevel(){
-  console.log('[Save] saveLevel called, _currentLevelId:', _currentLevelId);
   _sb.auth.getSession().then(async({data})=>{
-    console.log('[Save] session:', !!data.session);
     if(!data.session){
       // Pas connecté → télécharge JSON
       const a=document.createElement('a');
@@ -1107,6 +1105,7 @@ async function doQuickSave(){
     showSaveToast('✅ SAUVEGARDÉ !');
     _hasUnsavedChanges=false;
     autosaveClear();
+    doAfterSaveNav();
     // Also update sessionStorage so game.html gets the latest version
     sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
     if(_currentLevelId)sessionStorage.setItem('fl_preview_id', _currentLevelId);
@@ -1974,15 +1973,9 @@ async function doPublish(){
     }
   }
   // Navigate after save if pending
-  if(window._afterSaveNav){
-    const url=window._afterSaveNav;
-    window._afterSaveNav=null;
-    _hasUnsavedChanges=false;
-    autosaveClear();
-    if(url==='__BACK__')history.back();
-    else window.location.href=url;
-    return;
-  }
+  _hasUnsavedChanges=false;
+  autosaveClear();
+  doAfterSaveNav&&doAfterSaveNav();
 
   okBtn.disabled=false;okBtn.textContent=t.ok;
 
@@ -2179,20 +2172,22 @@ function unsavedSave(){
   document.getElementById('unsaved-modal').style.display='none';
   const ni=document.getElementById('level-name-input');
   const hasName=ni&&ni.value.trim().length>0;
+  window._afterSaveNav=_pendingNavUrl;
+  _pendingNavUrl=null;
   if(!_currentLevelId&&!hasName){
-    // No name yet - open publish modal to ask for name, then navigate
-    window._afterSaveNav=_pendingNavUrl;
-    _pendingNavUrl=null;
     openPublish();
-    return;
+  }else{
+    saveLevel();
   }
-  saveLevel().then(()=>{
-    if(_pendingNavUrl==='__BACK__'){
-      _pendingNavUrl=null;history.back();
-    }else if(_pendingNavUrl){
-      window.location.href=_pendingNavUrl;_pendingNavUrl=null;
-    }
-  });
+}
+
+function doAfterSaveNav(){
+  if(window._afterSaveNav){
+    const url=window._afterSaveNav;
+    window._afterSaveNav=null;
+    if(url==='__BACK__')history.back();
+    else window.location.href=url;
+  }
 }
 
 function unsavedLeave(){
