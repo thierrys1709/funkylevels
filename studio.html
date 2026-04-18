@@ -1973,10 +1973,9 @@ function checkAutosaveOnLoad(){
   if(!savedLv)return;
   const savedName=sessionStorage.getItem('fl_autosave_name')||'Sans titre';
   const l=localStorage.getItem('fl_lang')||'fr';
-  const msg=l==='fr'
-    ?('Brouillon: "'+savedName+'" - Restaurer ?')
-    :('Draft: "'+savedName+'" - Restore?');
-  if(confirm(msg)){
+  // Retour depuis le jeu → restauration silencieuse, pas de question
+  const fromGame=sessionStorage.getItem('fl_from_game')==='1';
+  if(fromGame||confirm(l==='fr'?('Brouillon: "'+savedName+'" - Restaurer ?'):('Draft: "'+savedName+'" - Restore?'))){
     try{
       const restored=JSON.parse(savedLv);
       lv=restored;
