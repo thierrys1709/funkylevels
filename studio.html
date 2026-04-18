@@ -2200,7 +2200,7 @@ function unsavedLeave(){
   document.getElementById('unsaved-modal').style.display='none';
   if(_pendingNavUrl==='__BACK__'){
     _pendingNavUrl=null;
-    history.back();
+    history.go(-2); // go back past our pushState + original back
   }else if(_pendingNavUrl){
     window.location.href=_pendingNavUrl;
     _pendingNavUrl=null;
