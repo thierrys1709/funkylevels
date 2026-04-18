@@ -1977,28 +1977,22 @@ function checkAutosaveOnLoad(){
   if(!savedLv)return;
   const savedName=sessionStorage.getItem('fl_autosave_name')||'Sans titre';
   const l=localStorage.getItem('fl_lang')||'fr';
-  // Retour depuis le jeu → restauration silencieuse, pas de question
-  const fromGame=sessionStorage.getItem('fl_from_game')==='1';
-  if(fromGame||confirm(l==='fr'?('Brouillon: "'+savedName+'" - Restaurer ?'):('Draft: "'+savedName+'" - Restore?'))){
-    try{
-      const restored=JSON.parse(savedLv);
-      lv=restored;
-      if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
-      if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
-      if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-      const ni=document.getElementById('level-name-input');
-      if(ni&&savedName)ni.value=savedName;
-      const savedId=sessionStorage.getItem('fl_autosave_id');
-      if(savedId)_currentLevelId=savedId;
-      _hasUnsavedChanges=true;
-      // Brouillon restauré → drapeaux considérés placés
-      _startPlaced=true;_endPlaced=true;updatePlayBtn();
-      redraw&&redraw();
-      status&&status('⚡ '+(l==='fr'?'Brouillon restauré':'Draft restored'));
-    }catch(ex){}
-  }else{
-    autosaveClear();
-  }
+  // Restauration silencieuse, sans confirmation
+  try{
+    const restored=JSON.parse(savedLv);
+    lv=restored;
+    if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
+    if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
+    if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+    const ni=document.getElementById('level-name-input');
+    if(ni&&savedName)ni.value=savedName;
+    const savedId=sessionStorage.getItem('fl_autosave_id');
+    if(savedId)_currentLevelId=savedId;
+    _hasUnsavedChanges=true;
+    _startPlaced=true;_endPlaced=true;updatePlayBtn();
+    redraw&&redraw();
+    status&&status('⚡ '+(l==='fr'?'Brouillon restauré':'Draft restored'));
+  }catch(ex){}
 }
 
 window.addEventListener('beforeunload',function(e){
