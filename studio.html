@@ -2194,9 +2194,10 @@ function doAfterSaveNav(){
 function unsavedLeave(){
   _hasUnsavedChanges=false;
   autosaveClear();
-  // Reset level state so next new level is blank
   _currentLevelId=null;
   lv=emptyLevel();
+  const ni=document.getElementById('level-name-input');
+  if(ni)ni.value='';
   document.getElementById('unsaved-modal').style.display='none';
   if(_pendingNavUrl==='__BACK__'){
     _pendingNavUrl=null;
