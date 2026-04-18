@@ -2195,7 +2195,7 @@ function doAfterSaveNav(){
   if(window._afterSaveNav){
     const url=window._afterSaveNav;
     window._afterSaveNav=null;
-    if(url==='__BACK__')history.back();
+    if(url==='__BACK__')history.go(-2); // skip past our pushState
     else window.location.href=url;
   }
 }
