@@ -327,8 +327,6 @@ body {
 #cwrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 #ecanvas { display: block; cursor: crosshair; }
 
-/* Game CSS moved to game.html */
-
 /* ─── STATUS BAR ─── */
 #statusbar {
   font-family: 'Rajdhani', sans-serif;
@@ -418,7 +416,7 @@ body {
   cursor: pointer;
   background: var(--input-bg);
   color: var(--text2);
-  transition: all .15s;
+  transition: all .15px;
   flex: 1;
   letter-spacing: 0.5px;
 }
@@ -576,14 +574,12 @@ body {
     <span class="tb-label" data-lbl="lblSave">SAUVEGARDE</span>
     <div class="tb-group">
       <button class="act-btn" id="btn-save"    onclick="saveLevel()"  data-tip="💾 SAUVEGARDER"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">💾 SAVE</button>
-
       <button class="act-btn" id="btn-load"    onclick="loadLevel()"  data-tip="📂 MES NIVEAUX"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">📂 LOAD</button>
       <button class="act-btn" id="btn-clear"   onclick="clearLevel()" data-tip="🗑 NOUVEAU"       style="background:#280d0d;border-color:#7a3a3a;color:#fc8181;">🗑 VIDER</button>
     </div>
   </div>
   <div class="sep"></div>
 
-  
   <div class="sep"></div>
 
   <!-- ══ JEUX ══ -->
@@ -600,10 +596,6 @@ body {
     <span class="tb-label" data-lbl="lblProfil">PROFIL</span>
     <div class="tb-group" style="gap:6px;align-items:center;">
       <button onclick="goToProfile()" style="font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 12px;background:#1a0a2a;border:1.5px solid #a040f0;color:#c080ff;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background='#2a1040'" onmouseout="this.style.background='#1a0a2a'">👤 MON PROFIL</button>
-
-
-      
-      
     </div>
   </div>
 
@@ -701,10 +693,6 @@ body {
   <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">V13042256</div>
 </div>
 
-
-
-
-
 <input type="file" id="fileInput" accept=".json" style="display:none" onchange="loadFile(event)">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -716,9 +704,10 @@ let _currentLevelId=null;
 let _currentVisibility='private';
 let _authorCompleted=false;
 let _isPublished=false;
-// Lang helper available globally from start
+let _startPlaced=false, _endPlaced=false;
+let _hasUnsavedChanges=false;
+let _loadingLevel=false;
 const _lang=()=>localStorage.getItem('fl_lang')||'fr';
-// STUDIO_T declared here so it's available in both scripts
 var STUDIO_T={fr:{},en:{}};
 
 const EC = document.getElementById('ecanvas');
@@ -752,21 +741,16 @@ function isSelected(type,idx){ return !!selection.find(s=>s.type===type&&s.idx==
 
 let undoStack=[],redoStack=[];
 function snapshot(){
-  if(_isPublished&&_currentLevelId){
-    return;
-  }
+  if(_isPublished&&_currentLevelId){return;}
   _hasUnsavedChanges=true;
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
 }
 
-// Appeler cette fonction uniquement quand les blocs changent vraiment (pas la sélection)
 function snapshotWithDupCheck(){
-  // Reset author_completed when level is modified
   if(_currentLevelId&&!window._authorCompletedReset){
     window._authorCompletedReset=true;
     _sb.from('levels').update({author_completed:false}).eq('id',_currentLevelId).then(()=>{
       _authorCompleted=false;
-      console.log('[Studio] author_completed reset after modification');
     });
   }
   if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
@@ -802,7 +786,6 @@ async function duplicateLevel(){
   const ni=document.getElementById('level-name-input');
   if(ni)ni.value=inserted.title;
   history.replaceState(null,'','studio.html');
-  // Now do the edit
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
   status(localStorage.getItem('fl_lang')==='fr'?'Niveau dupliqué ! Tu peux maintenant éditer.':'Level duplicated! You can now edit.');
 }
@@ -838,7 +821,6 @@ function trapReturnUI(){
   const dp=document.getElementById('tr-partial-opts');if(dp)dp.style.display=part?'':'none';
 }
 
-// ── Gravflip panel ──────────────────────────────────────────────
 const GF_ARROWS={u:'↑',d:'↓',l:'←',r:'→'};
 const GF_HINTS={u:'↑ Attire vers le haut (plafond)',d:'↓ Attire vers le bas (sol)',l:'← Attire vers la gauche (mur gauche)',r:'→ Attire vers la droite (mur droit)'};
 function gfParamChanged(){
@@ -900,7 +882,6 @@ function showSaveToast(msg){
     document.body.appendChild(toast);
   }
   toast.textContent=msg;
-  // Show
   toast.style.transform='translate(-50%,-50%) scale(1)';
   toast.style.opacity='1';
   clearTimeout(toast._timer);
@@ -911,7 +892,6 @@ function showSaveToast(msg){
 }
 
 function onLevelNameChange(){
-  // If level is already saved, update title in DB after a short delay
   clearTimeout(window._nameSaveTimer);
   if(_currentLevelId){
     window._nameSaveTimer=setTimeout(async()=>{
@@ -963,10 +943,27 @@ window.addEventListener('mouseup',e=>{
 });
 
 EC.addEventListener('mousedown',e=>{
-  if(e.button!==0)return; // Ignorer tout sauf clic gauche
+  if(e.button!==0)return;
   const{x,y}=canvasPos(e);mousePos={x,y};
-  if(currentTool==='start'){snapshot();lv.start={x:snap(x),y:snap(y)};redraw();return;}
-  if(currentTool==='end'){snapshot();lv.end={x:snap(x),y:snap(y)};redraw();return;}
+
+  // ── DÉPART & ARRIVÉE — placement + activation du bouton JOUER ──
+  if(currentTool==='start'){
+    snapshot();
+    lv.start={x:snap(x),y:snap(y)};
+    _startPlaced=true;
+    updatePlayBtn();
+    redraw();
+    return;
+  }
+  if(currentTool==='end'){
+    snapshot();
+    lv.end={x:snap(x),y:snap(y)};
+    _endPlaced=true;
+    updatePlayBtn();
+    redraw();
+    return;
+  }
+
   if(selection.length===1){
     const obj=getSelObj();
     if(obj&&selectedType==='trap'&&obj.partial&&obj.partDist>0){const ghostY=obj.y+obj.partDist+obj.h;if(Math.abs(y-ghostY)<=8&&x>=obj.x&&x<=obj.x+obj.w){dragState={mode:'partdist',sm:{x,y},orig:obj.partDist,trap:obj};return;}}
@@ -1005,7 +1002,7 @@ window.addEventListener('mousemove',e=>{
 });
 
 window.addEventListener('mouseup',e=>{
-  if(e.button!==0)return; // Ignorer tout sauf clic gauche
+  if(e.button!==0)return;
   if(dragState){snapshot();dragState=null;EC.style.cursor='crosshair';redraw();return;}
   if(rubberBand){
     const rb=rubberBand;rubberBand=null;
@@ -1048,7 +1045,6 @@ function zoom(d,cx,cy){
   const prevZoom=ZOOM;
   ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));
   if(cx!==undefined&&cy!==undefined){
-    // Zoom centré sur la position de la souris
     const wrap=document.getElementById('cwrap');
     const scrollX=wrap.scrollLeft,scrollY=wrap.scrollTop;
     const ratio=ZOOM/prevZoom;
@@ -1060,33 +1056,27 @@ function zoom(d,cx,cy){
   document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%';
 }
 
-// Zoom avec molette souris centré sur curseur
 document.getElementById('cwrap').addEventListener('wheel',e=>{
   e.preventDefault();
   const wrap=document.getElementById('cwrap');
   const rect=wrap.getBoundingClientRect();
-  // Position de la souris dans le canvas (avant zoom)
   const mx=(e.clientX-rect.left+wrap.scrollLeft);
   const my=(e.clientY-rect.top+wrap.scrollTop);
   const d=e.deltaY<0?0.15:-0.15;
   zoom(d,mx,my);
 },{passive:false});
+
 function saveLevel(){
-  console.log('[Save] saveLevel called, _currentLevelId:', _currentLevelId);
   _sb.auth.getSession().then(async({data})=>{
-    console.log('[Save] session:', !!data.session);
     if(!data.session){
-      // Pas connecté → télécharge JSON
       const a=document.createElement('a');
       a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));
       a.download='level.json';a.click();status('Sauvegardé.');
       return;
     }
     if(_currentLevelId){
-      // Niveau déjà sauvegardé → sauvegarde directe
       await doQuickSave();
     }else{
-      // Nouveau niveau → ouvre popup pour donner un nom
       openPublish();
     }
   });
@@ -1094,38 +1084,33 @@ function saveLevel(){
 
 async function doQuickSave(){
   const title=document.getElementById('level-name-input').value.trim()||'Sans titre';
-  console.log('[Save] doQuickSave, id:', _currentLevelId, 'title:', title, 'blocks:', (lv.fixed||[]).length);
   const{data,error}=await _sb.from('levels').update({
     title:title,
     data:lv,
     visibility:_currentVisibility
   }).eq('id',_currentLevelId).select();
-  console.log('[Save] result:', data, 'error:', error);
   if(error){status('Erreur : '+error.message);}
   else{
     status('✅ Sauvegardé !');
     showSaveToast('✅ SAUVEGARDÉ !');
     _hasUnsavedChanges=false;
     autosaveClear();
-    // Also update sessionStorage so game.html gets the latest version
     sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
     if(_currentLevelId)sessionStorage.setItem('fl_preview_id', _currentLevelId);
     const _t=document.getElementById('level-name-input');
     if(_t)sessionStorage.setItem('fl_preview_title', _t.value);
-    // Flash the save button
     const btn=document.getElementById('btn-save');
     if(btn){btn.style.background='#0d280d';btn.style.borderColor='#3a7a3a';btn.style.color='#68d391';
     setTimeout(()=>{btn.style.background='';btn.style.borderColor='';btn.style.color='';},1500);}
   }
 }
+
 function loadLevel(){openLoadModal();}
 
-// ── Load modal ────────────────────────────
 async function openLoadModal(){
   const modal=document.getElementById('load-modal');
   const list=document.getElementById('load-list');
   modal.classList.add('show');
-  // If published level, hide close button to force selection
   const closeBtn=modal.querySelector('.load-close');
   if(closeBtn){
     closeBtn.style.display=(_isPublished&&_currentLevelId&&!window._dupConfirmed)?'none':'';
@@ -1154,7 +1139,6 @@ async function openLoadModal(){
 function closeLoadModal(){
   document.getElementById('load-modal').classList.remove('show');
   const s=document.getElementById('load-search');if(s)s.value='';
-  // If still on a published level, re-show the published modal
   if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
     setTimeout(()=>showPublishedModal('',_currentLevelId),150);
   }
@@ -1172,7 +1156,6 @@ function renderLoadItems(data){
     public:{label:'Public',cls:'public'},
     code:{label:'Code',cls:'code'}
   };
-  // Table
   let html='<table class="load-table"><thead><tr>'+
     '<th>'+(l==='fr'?'NOM':'NAME')+'</th>'+
     '<th>'+(l==='fr'?'DERNIÈRE MODIF.':'LAST MODIFIED')+'</th>'+
@@ -1205,15 +1188,12 @@ function filterLoadList(q){
 async function doLoadLevel(id,title){
   const{data,error}=await _sb.from('levels').select('*').eq('id',id).single();
   if(error||!data){showSaveToast('⚠️ Erreur lors du chargement');return;}
-  // Reset published state for new level
   _isPublished=false;
   window._dupConfirmed=false;
-  // Re-enable all buttons and canvas
   document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
   const cv=document.getElementById('studio-canvas');
   if(cv)cv.style.pointerEvents='';
-  // Check autosave restore
-  if(window._autosaveRestore&&window._autosaveRestore.id===lid){
+  if(window._autosaveRestore&&window._autosaveRestore.id===id){
     lv=window._autosaveRestore.lv;
     _hasUnsavedChanges=true;
     window._autosaveRestore=null;
@@ -1229,18 +1209,21 @@ async function doLoadLevel(id,title){
   _isPublished=data.is_published||false;
   const nameInput=document.getElementById('level-name-input');
   if(nameInput)nameInput.value=data.title||'';
-  // Met à jour l'URL sans recharger la page
   history.replaceState(null,'','studio.html');
-  // Update sessionStorage so game.html gets this version
   sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id', id);
   sessionStorage.setItem('fl_preview_title', data.title||'');
+  // Les niveaux chargés ont toujours départ et arrivée placés
+  _startPlaced=true;
+  _endPlaced=true;
+  updatePlayBtn();
   redraw();
   closeLoadModal();
   _loadingLevel=false;
   _hasUnsavedChanges=false;
   status('Niveau "'+title+'" chargé.');
 }
+
 function loadFile(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
@@ -1250,29 +1233,31 @@ function loadFile(e){
     lv.gravflip.forEach(z=>{if(z.dir===undefined){z.dir=(z.grav??-10)<0?'u':'d';z.strength=Math.abs(z.grav??10);}});
     lv.trap.forEach(t=>{t.state='idle';t.vy=0;if(!t.oy)t.oy=t.y;if(!t.ox)t.ox=t.x;});
     if(!lv.start)lv.start={x:80,y:480};if(!lv.end)lv.end={x:3100,y:480};
+    _startPlaced=true;_endPlaced=true;updatePlayBtn();
     selectedIdx=-1;selectedType=null;redraw();status('Chargé.');
   }catch(err){alert('Fichier invalide.');}};
   r.readAsText(f);e.target.value='';
 }
+
 function clearLevel(){
   const autosave=sessionStorage.getItem('fl_autosave_level');
   const msg=autosave
     ?(_lang()==='fr'?'Créer un nouveau niveau ? (brouillon non sauvegardé sera perdu)':'Create new level? (unsaved draft will be lost)')
     :(_lang()==='fr'?'Vider le niveau ?':'Clear level?');
   if(!confirm(msg))return;
-  // Clear autosave
   sessionStorage.removeItem('fl_autosave_level');
   sessionStorage.removeItem('fl_autosave_id');
   sessionStorage.removeItem('fl_autosave_name');
   _hasUnsavedChanges=false;
   _currentLevelId=null;
-  // Don't use snapshot() here to avoid duplication warning
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
   lv=emptyLevel();selectedIdx=-1;selectedType=null;
   _currentLevelId=null;_currentVisibility='private';
   _authorCompleted=false;_isPublished=false;window._dupWarningShown=false;
   const ni=document.getElementById('level-name-input');if(ni)ni.value='';
   history.replaceState(null,'','studio.html');
+  // Réinitialise les drapeaux → bouton JOUER désactivé
+  _startPlaced=false;_endPlaced=false;updatePlayBtn();
   redraw();status('Vidé.');}
 
 // ── Editor draw ──────────────────────────────────────────────────
@@ -1289,13 +1274,11 @@ function toggleTheme(){
   localStorage.setItem('fl_theme',isLight?'light':'dark');
   redraw();
 }
-// Restore theme on load
 (()=>{
   if(localStorage.getItem('fl_theme')==='light'){
     document.body.classList.add('light');
     setTimeout(()=>{const b=document.getElementById('theme-btn');if(b)b.textContent='☀️';},100);
   }
-  // Set lang button
   const lb=document.getElementById('studio-lang-btn');
   if(lb)lb.textContent=_lang()==='fr'?'🇫🇷 FR':'🇬🇧 EN';
 })();
@@ -1368,7 +1351,6 @@ function redraw(){
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
 
-  // ── Speed zones draw ──
   (lv.speed||[]).forEach((p,i)=>{
     const isSel=isSelected('speed',i);
     const spd=p.spd??5;
@@ -1379,8 +1361,6 @@ function redraw(){
     EX.fillStyle=col.bg+'33';EX.fillRect(p.x,p.y,p.w,p.h);
     EX.strokeStyle=isSel?col.stroke+'ee':col.stroke+'66';EX.lineWidth=isSel?1.5:1;
     EX.setLineDash([4,4]);EX.strokeRect(p.x,p.y,p.w,p.h);EX.setLineDash([]);
-    // Arrows indicating speed
-    const arrow=spd===5?'→':fast?'»»':slow?'›':'>>';
     const arrowCount=Math.max(1,Math.floor(p.w/36));
     EX.fillStyle=isSel?col.light+'cc':col.light+'66';
     EX.font='11px sans-serif';EX.textAlign='center';
@@ -1395,8 +1375,12 @@ function redraw(){
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
 
+  // Drapeaux : grisés si pas encore placés manuellement
+  EX.globalAlpha = _startPlaced ? 1 : 0.3;
   eFlag(lv.start.x,lv.start.y,EC_COL.flagA,'A');
+  EX.globalAlpha = _endPlaced ? 1 : 0.3;
   eFlag(lv.end.x,lv.end.y,EC_COL.flagB,'B');
+  EX.globalAlpha = 1;
 
   if(rubberBand){const rx=Math.min(rubberBand.sx,rubberBand.ex),ry=Math.min(rubberBand.sy,rubberBand.ey),rw=Math.abs(rubberBand.ex-rubberBand.sx),rh=Math.abs(rubberBand.ey-rubberBand.sy);EX.fillStyle='#5050c022';EX.fillRect(rx,ry,rw,rh);EX.strokeStyle='#8080f0cc';EX.lineWidth=1.5;EX.setLineDash([5,3]);EX.strokeRect(rx,ry,rw,rh);EX.setLineDash([]);}
   if(selection.length>1){EX.fillStyle='#f0e040cc';EX.font='7px "Press Start 2P"';EX.fillText(`${selection.length} sélectionnés`,mousePos.x+10,mousePos.y-8);}
@@ -1404,7 +1388,6 @@ function redraw(){
   EX.strokeStyle='#ffffff12';EX.lineWidth=1;EX.beginPath();EX.moveTo(mousePos.x,0);EX.lineTo(mousePos.x,EH);EX.stroke();EX.beginPath();EX.moveTo(0,mousePos.y);EX.lineTo(EW,mousePos.y);EX.stroke();
   EX.fillStyle='#ffffff20';EX.font='6px "Press Start 2P"';EX.fillText(`${snap(mousePos.x)}, ${snap(mousePos.y)}`,mousePos.x+6,mousePos.y-4);
 }
-
 
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
@@ -1418,22 +1401,40 @@ document.addEventListener('keydown',e=>{
 redraw();
 
 function playLevel(){
-  // Always save current level state to sessionStorage (includes unsaved changes)
   sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id', _currentLevelId||'');
   const titleEl=document.getElementById('level-name-input');
   sessionStorage.setItem('fl_preview_title', titleEl?titleEl.value:'');
   if(_currentLevelId){
-    // Pass level ID so game can show leaderboard, but use preview data
     window.location.href='game.html?preview=1&level='+_currentLevelId+'&from=studio';
   }else{
     window.location.href='game.html?preview=1&from=studio';
   }
 }
 
-let _hasUnsavedChanges=false;
-let _loadingLevel=false;
+function updatePlayBtn() {
+  const btn = document.getElementById('btn-play');
+  if (!btn) return;
+  const ok = _startPlaced && _endPlaced;
+  btn.disabled = !ok;
+  btn.style.opacity = ok ? '' : '0.38';
+  btn.style.cursor = ok ? 'pointer' : 'not-allowed';
+  if (ok) {
+    btn.removeAttribute('data-tip');
+  } else {
+    const missing = [];
+    if (!_startPlaced) missing.push(_lang()==='fr' ? '🟢 Départ' : '🟢 Start');
+    if (!_endPlaced)   missing.push(_lang()==='fr' ? '🔴 Arrivée' : '🔴 End');
+    btn.setAttribute('data-tip',
+      (_lang()==='fr' ? 'Place d\'abord :\n' : 'Place first:\n') + missing.join('\n')
+    );
+  }
+}
+
+// État initial : bouton désactivé
+updatePlayBtn();
 </script>
+
 <!-- LOAD MODAL -->
 <div id="load-modal">
   <div class="load-box">
@@ -1442,10 +1443,10 @@ let _loadingLevel=false;
       <button class="load-close" onclick="closeLoadModal()">✕</button>
     </div>
     <div class="load-search-wrap">
-      <input type="text" id="load-search" placeholder="🔍 Rechercher..." 
+      <input type="text" id="load-search" placeholder="🔍 Rechercher..."
         oninput="filterLoadList(this.value)"
         style="width:100%;font-family:Rajdhani,sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:9px 14px;border-radius:5px;outline:none;"
-        onfocus="this.style.borderColor='var(--accent2)'" 
+        onfocus="this.style.borderColor='var(--accent2)'"
         onblur="this.style.borderColor='var(--border2)'">
     </div>
     <div id="load-list"></div>
@@ -1474,8 +1475,7 @@ const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
 const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
 const _sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-// ── Système de personnages externes ────────
-let _charSprite=null; // Image loaded from SVG file
+let _charSprite=null;
 let _charId='default';
 
 async function loadCharacterSprite(charId){
@@ -1505,13 +1505,11 @@ async function loadPlayerProfile(){
   await loadCharacterSprite(charId);
 }
 
-// Initialize: load profile + lang together
 (async()=>{
   console.log('[Init] Starting...');
   try{
   await loadPlayerProfile();
   console.log('[Init] Profile loaded, charId:', _charId);
-  // Update character icon
   try{
     const manifest=await fetch('characters/manifest.json').then(r=>r.json());
     const c=manifest.find(m=>m.id===_charId);
@@ -1521,7 +1519,6 @@ async function loadPlayerProfile(){
     }
   }catch(e){}
   console.log('[Init] Calling applyStudioLang...');
-  // Apply language AFTER lang file is loaded
   await applyStudioLang();
   console.log('[Init] applyStudioLang done');
   }catch(err){
@@ -1534,22 +1531,18 @@ async function loadPlayerProfile(){
   const params=new URLSearchParams(window.location.search);
   const lid=params.get('level');
   const fromGame=sessionStorage.getItem('fl_from_game')==='1';
-  // Clean URL immediately
   if(lid)history.replaceState(null,'','studio.html');
 
-  // Check for autosave - restore if same level or new level
   const _autoSavedLv=sessionStorage.getItem('fl_autosave_level');
   const _autoSavedId=sessionStorage.getItem('fl_autosave_id')||'';
   const _autoSavedName=sessionStorage.getItem('fl_autosave_name')||'';
   if(_autoSavedLv&&((!lid&&!_autoSavedId)||(lid&&lid===_autoSavedId))){
     try{
       const _restored=JSON.parse(_autoSavedLv);
-      // Restore silently - will override level loaded from DB
       window._autosaveRestore={lv:_restored,id:_autoSavedId,name:_autoSavedName};
     }catch(ex){}
   }
 
-  // If no level and not coming from game → clear preview (fresh start)
   if(!lid&&!fromGame){
     sessionStorage.removeItem('fl_preview_level');
     sessionStorage.removeItem('fl_preview_id');
@@ -1557,7 +1550,6 @@ async function loadPlayerProfile(){
   }
 
   if(fromGame){
-    // ── Retour depuis game.html → toujours utiliser sessionStorage ──
     sessionStorage.removeItem('fl_from_game');
     const raw=sessionStorage.getItem('fl_preview_level');
     if(raw){
@@ -1567,7 +1559,6 @@ async function loadPlayerProfile(){
         if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
         if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
         if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-        // Restore ID and title
         const savedId=sessionStorage.getItem('fl_preview_id');
         const savedTitle=sessionStorage.getItem('fl_preview_title');
         if(savedId){
@@ -1576,6 +1567,8 @@ async function loadPlayerProfile(){
         }
         const ni=document.getElementById('level-name-input');
         if(ni&&savedTitle)ni.value=savedTitle;
+        // Niveau venant du jeu → drapeaux considérés placés
+        _startPlaced=true;_endPlaced=true;updatePlayBtn();
         redraw();
         status('✅ Niveau restauré avec les dernières modifications.');
         return;
@@ -1583,11 +1576,9 @@ async function loadPlayerProfile(){
     }
   }
 
-  // ── Charger depuis URL ?level=id (DB) ──
   if(!lid)return;
   const mode=params.get('mode');
 
-  // Check auth first
   const{data:sess}=await _sb.auth.getSession();
   if(!sess.session){
     document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 CONNEXION REQUISE</div><a href="login.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">SE CONNECTER</a></div>`;
@@ -1601,28 +1592,25 @@ async function loadPlayerProfile(){
     return;
   }
 
-  // Check ownership
   if(data.user_id!==sess.session.user.id){
     document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 ACCÈS REFUSÉ</div><a href="index.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">🏠 ACCUEIL</a></div>`;
     return;
   }
 
-  // If level is published (public/code), show copy modal BEFORE loading editor
   if((data.visibility==='public'||data.visibility==='code')||data.is_published){
     _isPublished=true;
     _currentLevelId=lid;
-    // Load level data in memory but show modal immediately
     lv=data.data;
     if(!lv)lv={fixed:[],trap:[],slider:[],invis:[],bounce:[],mobile:[],push:[],gravflip:[],speed:[],start:{x:100,y:200},end:{x:800,y:200}};
     if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
     if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
     if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-    // Show the modal with copy or open other option
+    // Niveau publié chargé → drapeaux placés
+    _startPlaced=true;_endPlaced=true;updatePlayBtn();
     showPublishedModal(data.title||'Sans titre', lid);
     return;
   }
 
-  // Check autosave restore
   if(window._autosaveRestore&&window._autosaveRestore.id===lid){
     lv=window._autosaveRestore.lv;
     _hasUnsavedChanges=true;
@@ -1639,12 +1627,15 @@ async function loadPlayerProfile(){
   _isPublished=(data.is_published||false)||(data.visibility==='public'||data.visibility==='code');
   if(_isPublished){
     closeLoadModal();
+    _startPlaced=true;_endPlaced=true;updatePlayBtn();
     setTimeout(()=>showPublishedModal(data.title||'',data.id),100);
     return;
   }
-  window._authorCompletedReset=false; // Allow reset on next modification
+  window._authorCompletedReset=false;
   const _ni=document.getElementById('level-name-input');
   if(_ni)_ni.value=data.title||'';
+  // Niveau sauvegardé en DB → drapeaux considérés placés
+  _startPlaced=true;_endPlaced=true;updatePlayBtn();
   redraw();
   if(mode==='play'){
     await _sb.from('levels').update({plays:(data.plays||0)+1}).eq('id',lid);
@@ -1652,40 +1643,22 @@ async function loadPlayerProfile(){
   }
   status('Niveau "'+data.title+'" chargé.');
 })();
-// ── Lang (sync with rest of site) ─────────
-// _lang() is defined in the main script block above
 
-// ── Language system — loads from /lang/*.json ──
-// STUDIO_T is declared in the main script block above
+// ── Lang ─────────────────────────────────
 let _langCache={};
 
-
 async function loadLang(l){
-  console.log('[Lang] loadLang called for:', l);
-  if(_langCache[l]){
-    console.log('[Lang] Cache hit for:', l);
-    return _langCache[l];
-  }
+  if(_langCache[l])return _langCache[l];
   const url='lang/'+l+'.json';
-  console.log('[Lang] Fetching:', url);
   try{
     const r=await fetch(url);
-    console.log('[Lang] Fetch response:', r.status, r.ok);
-    if(!r.ok){
-      console.warn('[Lang] File not found ('+r.status+')');
-      if(l!=='fr')return loadLang('fr');
-      return null;
-    }
+    if(!r.ok){if(l!=='fr')return loadLang('fr');return null;}
     const text=await r.text();
-    console.log('[Lang] Raw text (first 80):', text.substring(0,80));
     let data;
-    try{data=JSON.parse(text);}
-    catch(e){console.error('[Lang] JSON parse error:',e.message);return null;}
-    console.log('[Lang] Parsed OK, sections:', Object.keys(data));
+    try{data=JSON.parse(text);}catch(e){return null;}
     _langCache[l]=data;
     return data;
   }catch(e){
-    console.error('[Lang] Fetch error:',e.message);
     if(l!=='fr')return loadLang('fr');
     return null;
   }
@@ -1693,22 +1666,15 @@ async function loadLang(l){
 
 async function applyStudioLang(){
   const l=_lang();
-  console.log('[ApplyLang] Language:', l, '| Cache:', !!_langCache[l], '| Keys:', _langCache[l]?Object.keys(_langCache[l]):[]);
   const data=await loadLang(l);
-  console.log('[ApplyLang] Data received:', !!data, '| Has studio:', !!(data&&data.studio));
   if(!data||!data.studio){
-    console.warn('[ApplyLang] Lang file not loaded. Check lang/'+l+'.json exists on server.');
-    // Show error in status bar
     const sb=document.getElementById('statusbar');
     if(sb)sb.textContent='⚠️ Fichier de langue manquant: lang/'+l+'.json';
     return;
   }
-  const studioKeys=Object.keys(data.studio);
-  console.log('[ApplyLang] Studio keys count:', studioKeys.length, '| Has tFixed:', !!data.studio.tFixed);
   const t=data.studio||{};
   const pt=data.publish||{};
 
-  // Update lang button
   const lb=document.getElementById('studio-lang-btn');
   if(lb){
     try{
@@ -1721,13 +1687,11 @@ async function applyStudioLang(){
   const s=(id,val,attr='textContent')=>{const el=document.getElementById(id);if(el&&val)el[attr]=val;};
   const dp=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.setAttribute('data-tip',val);};
 
-  // Section labels
   document.querySelectorAll('[data-lbl]').forEach(el=>{
     const key=el.getAttribute('data-lbl');
     if(t[key]&&t[key].length>0)el.textContent=t[key];
   });
 
-  // Tool buttons + tooltips
   ['fixed','invis','bounce','mobile','push','trap','slider','gravflip','speed','start','end','select'].forEach(id=>{
     const btn=document.getElementById('t-'+id);
     if(!btn)return;
@@ -1737,61 +1701,27 @@ async function applyStudioLang(){
     if(t[tipKey])btn.setAttribute('data-tip',t[tipKey]);
   });
 
-  // Action buttons
   s('btn-play',t.btnPlay);       dp('btn-play',t.tipPlay);
   s('btn-save',t.btnSave);       dp('btn-save',t.tipSave);
   s('btn-load',t.btnLoad);       dp('btn-load',t.tipLoad);
   s('btn-clear',t.btnClear);     dp('btn-clear',t.tipClear);
 
-  // Nav links
   const profil=document.querySelector('a[href="settings.html"].act-btn');
   if(profil&&t.btnProfil)profil.textContent=t.btnProfil;
   const accueil=document.querySelector('a[href="index.html"].act-btn');
   if(accueil&&t.btnAccueil)accueil.textContent=t.btnAccueil;
 
-  // Grid label
-  document.querySelectorAll('.tb-group span').forEach(el=>{
-    if(el.textContent==='GRILLE'||el.textContent==='GRID'||el.textContent===t.grille)
-      if(t.grille)el.textContent=t.grille;
-  });
-
-  // Panel tool title
   if(currentTool&&t.toolNames){
     const name=t.toolNames[currentTool]||currentTool.toUpperCase();
     s('ptitle',(t.toolPrefix||'TOOL: ')+name);
   }
 
-  // Pinfo elements
   document.querySelectorAll('[data-info]').forEach(el=>{
     const key=el.getAttribute('data-info');
     if(t&&t[key])el.innerHTML=t[key].replace(/\n/g,'<br>');
   });
 
-  // Overlays
-  const q=(sel,prop,val)=>{const el=document.querySelector(sel);if(el&&val)el[prop]=val;};
-  q('#ovStart h2','textContent',t.ovStart);
-  q('#ovStart p','innerHTML',t&&t.ovStartSub?t.ovStartSub.replace(/\n/g,'<br>'):null);
-  q('#ovStart button','textContent',t.ovStartBtn);
-  q('#ovDie h2','textContent',t.ovDie);
-  q('#ovWin h2','textContent',t.ovWin);
-  q('#ovWin button','textContent',t.ovWinBtn);
-  document.querySelectorAll('#ovDie button').forEach((btn,i)=>{
-    if(i===0&&t.ovDieBtn)btn.textContent=t.ovDieBtn;
-    if(i===1&&t.ovDieEdit)btn.textContent=t.ovDieEdit;
-  });
-
-  // Game topbar
-  document.querySelectorAll('#gtopbar button').forEach(btn=>{
-    const oc=btn.getAttribute('onclick')||'';
-    if(oc.includes('stopGame')&&t.gEditor)btn.textContent=t.gEditor;
-    if(oc.includes('testFromCamera')&&t.gHere)btn.textContent=t.gHere;
-    if(btn.id==='btn-fs'&&t.gFullscreen)btn.textContent=t.gFullscreen;
-  });
-
-  // Status bar
   s('statusbar',t.ready);
-
-  // Publish modal texts
   s('pub-title-lbl',pt.title);
   s('pub-name-lbl',pt.nameLbl);
   const pn=document.getElementById('pub-name');
@@ -1800,13 +1730,14 @@ async function applyStudioLang(){
   s('pub-cancel-btn',pt.cancel);
   s('pub-ok-btn',pt.ok);
 
-  // Store for use in JS
   STUDIO_T[l]=t;
   STUDIO_T._pub=pt;
+
+  // Rafraîchit le tooltip du bouton JOUER selon la langue
+  updatePlayBtn();
 }
 
 function cycleLang(){
-  // Load manifest to get next lang
   fetch('lang/manifest.json').then(r=>r.json()).then(manifest=>{
     const ids=manifest.map(m=>m.id);
     const cur=_lang();
@@ -1820,41 +1751,9 @@ function cycleLang(){
   });
 }
 
-
-
 const _PT={
-  fr:{
-    title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',
-    visLbl:'VISIBILITÉ',
-    hintPrivate:'🔒 Seul toi peux le voir',
-    hintPublic:'🌍 Tout le monde peut jouer',
-    hintCode:'🔑 Accessible uniquement avec le code',
-    cancel:'ANNULER',ok:'💾 SAUVER →',saving:'SAUVEGARDE...',
-    needLogin:'Tu dois être connecté !',
-    needTitle:'Donne un nom à ton niveau !',
-    needBlocks:'Ton niveau est vide !',
-    successNew:'Niveau sauvegardé !',
-    successUpdate:'Niveau mis à jour !',
-    codeMsg:'Code de partage : ',
-    codeCopied:'(copié !)',
-    errorTxt:'Erreur : '
-  },
-  en:{
-    title:'💾 SAVE',nameLbl:'LEVEL NAME',ph:'My funky level...',
-    visLbl:'VISIBILITY',
-    hintPrivate:'🔒 Only you can see it',
-    hintPublic:'🌍 Everyone can play',
-    hintCode:'🔑 Accessible with code only',
-    cancel:'CANCEL',ok:'💾 SAVE →',saving:'SAVING...',
-    needLogin:'You must be logged in!',
-    needTitle:'Give your level a name!',
-    needBlocks:'Your level is empty!',
-    successNew:'Level saved!',
-    successUpdate:'Level updated!',
-    codeMsg:'Share code: ',
-    codeCopied:'(copied!)',
-    errorTxt:'Error: '
-  }
+  fr:{title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',visLbl:'VISIBILITÉ',hintPrivate:'🔒 Seul toi peux le voir',hintPublic:'🌍 Tout le monde peut jouer',hintCode:'🔑 Accessible uniquement avec le code',cancel:'ANNULER',ok:'💾 SAUVER →',saving:'SAUVEGARDE...',needLogin:'Tu dois être connecté !',needTitle:'Donne un nom à ton niveau !',needBlocks:'Ton niveau est vide !',successNew:'Niveau sauvegardé !',successUpdate:'Niveau mis à jour !',codeMsg:'Code de partage : ',codeCopied:'(copié !)',errorTxt:'Erreur : '},
+  en:{title:'💾 SAVE',nameLbl:'LEVEL NAME',ph:'My funky level...',visLbl:'VISIBILITY',hintPrivate:'🔒 Only you can see it',hintPublic:'🌍 Everyone can play',hintCode:'🔑 Accessible with code only',cancel:'CANCEL',ok:'💾 SAVE →',saving:'SAVING...',needLogin:'You must be logged in!',needTitle:'Give your level a name!',needBlocks:'Your level is empty!',successNew:'Level saved!',successUpdate:'Level updated!',codeMsg:'Share code: ',codeCopied:'(copied!)',errorTxt:'Error: '}
 };
 
 const VIS_HINTS={
@@ -1886,7 +1785,6 @@ function _applyPubLang(){
 function openPublish(){
   _applyPubLang();
   document.getElementById('pub-msg').className='pub-msg';
-  // Pre-fill from toolbar name input
   const ni=document.getElementById('level-name-input');
   const pubName=document.getElementById('pub-name');
   if(ni&&pubName&&ni.value)pubName.value=ni.value;
@@ -1898,11 +1796,12 @@ function closePublish(){document.getElementById('publish-modal').classList.remov
 document.getElementById('publish-modal').addEventListener('click',e=>{if(e.target===document.getElementById('publish-modal'))closePublish();});
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    // Block escape for load modal when published
     if(_isPublished&&_currentLevelId&&!window._dupConfirmed&&
        document.getElementById('load-modal').classList.contains('show'))return;
     closePublish();
-  }if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();});
+  }
+  if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();
+});
 
 async function doPublish(){
   const t=STUDIO_T._pub||_PT[_lang()];
@@ -1910,25 +1809,16 @@ async function doPublish(){
   const msgEl=document.getElementById('pub-msg');
   const okBtn=document.getElementById('pub-ok-btn');
 
-  // Vérif session
   const{data:sess}=await _sb.auth.getSession();
   if(!sess.session){msgEl.className='pub-msg err';msgEl.textContent=t.needLogin;return;}
-
-  // Vérif titre
   if(!title){msgEl.className='pub-msg err';msgEl.textContent=t.needTitle;return;}
 
-  // Vérif niveau non vide
   const totalBlocks=(lv.fixed||[]).length+(lv.trap||[]).length+(lv.slider||[]).length+(lv.mobile||[]).length+(lv.bounce||[]).length+(lv.push||[]).length+(lv.invis||[]).length;
   if(totalBlocks===0){msgEl.className='pub-msg err';msgEl.textContent=t.needBlocks;return;}
 
-  // Vérif que l'auteur a terminé le niveau
   if(_currentLevelId&&!_authorCompleted){
-    // Vérifie en DB au cas où
     const{data:lvlCheck}=await _sb.from('levels').select('author_completed,is_published').eq('id',_currentLevelId).single();
-    if(lvlCheck){
-      _authorCompleted=lvlCheck.author_completed||false;
-      _isPublished=lvlCheck.is_published||false;
-    }
+    if(lvlCheck){_authorCompleted=lvlCheck.author_completed||false;_isPublished=lvlCheck.is_published||false;}
     if(!_authorCompleted){
       msgEl.className='pub-msg err';
       msgEl.textContent=_lang()==='fr'?
@@ -1942,30 +1832,20 @@ async function doPublish(){
   msgEl.className='pub-msg';
 
   const user=sess.session.user;
-  const username=user.user_metadata?.username||user.email.split('@')[0];
-
   let error,shareCode=null;
 
   if(_currentLevelId){
-    // ── UPDATE niveau existant ──
     const updates={title,data:lv,visibility:_currentVisibility};
     if(_currentVisibility!=='private')updates.is_published=true;
     const{error:e}=await _sb.from('levels').update(updates).eq('id',_currentLevelId).eq('user_id',user.id);
     if(!e&&_currentVisibility!=='private')_isPublished=true;
     error=e;
   }else{
-    // ── INSERT nouveau niveau ──
     function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
     shareCode=genCode();
     const{data:inserted,error:e}=await _sb.from('levels').insert({
-      user_id:user.id,
-      title:title,
-      data:lv,
-      plays:0,
-      visibility:_currentVisibility,
-      share_code:shareCode,
-      author_completed:_authorCompleted,
-      is_published:_currentVisibility!=='private'
+      user_id:user.id,title:title,data:lv,plays:0,visibility:_currentVisibility,share_code:shareCode,
+      author_completed:_authorCompleted,is_published:_currentVisibility!=='private'
     }).select().single();
     error=e;
     if(!error&&inserted){
@@ -1980,7 +1860,6 @@ async function doPublish(){
     msgEl.className='pub-msg err';
     msgEl.textContent=t.errorTxt+error.message;
   }else{
-    // Update name input in toolbar
     const ni=document.getElementById('level-name-input');
     if(ni)ni.value=title;
     if(shareCode&&_currentVisibility==='code'){
@@ -1996,6 +1875,7 @@ async function doPublish(){
   }
 }
 </script>
+
 <!-- PUBLISHED LEVEL MODAL -->
 <div id="published-modal" style="display:none;position:fixed;inset:0;background:#000000dd;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:36px 32px;width:min(440px,90vw);display:flex;flex-direction:column;gap:20px;">
@@ -2021,12 +1901,10 @@ async function doPublish(){
 </div>
 
 <script>
-function showPublishedModal(title, lid){
-  // Disable all toolbar buttons visually
+function showPublishedModal(title,lid){
   document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>{
     if(b.id!=='btn-load')b.style.opacity='0.3';
   });
-  // Make canvas non-interactive
   const c=document.getElementById('studio-canvas');
   if(c)c.style.pointerEvents='none';
   const lang=localStorage.getItem('fl_lang')||'fr';
@@ -2040,7 +1918,6 @@ function showPublishedModal(title, lid){
 async function confirmDuplicateFromModal(){
   document.getElementById('published-modal').style.display='none';
   window._dupConfirmed=true;
-  // Re-enable all buttons and canvas
   document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
   const c=document.getElementById('studio-canvas');
   if(c)c.style.pointerEvents='';
@@ -2054,28 +1931,22 @@ function showDupModal(){
   document.getElementById('dup-msg').innerHTML=lang==='fr'?msgFr:msgEn;
   document.getElementById('dup-modal').style.display='flex';
 }
-function closeDupModal(){
-  document.getElementById('dup-modal').style.display='none';
-}
+function closeDupModal(){document.getElementById('dup-modal').style.display='none';}
 function confirmDuplicate(){
   closeDupModal();
   window._dupConfirmed=true;
-  // Re-enable all buttons and canvas
   document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
   const c=document.getElementById('studio-canvas');
   if(c)c.style.pointerEvents='';
   duplicateLevel();
 }
 
-// ── Autosave recovery ────────────────────────────────────
+// ── Autosave ─────────────────────────────────────────────
 (function(){
-  // Check autosave on page arrival
   _loadingLevel=false;
   _hasUnsavedChanges=false;
   checkAutosaveOnLoad();
 })();
-
-// ── Autosave System ──────────────────────────────────────
 
 function autosaveSave(){
   if(_loadingLevel)return;
@@ -2113,6 +1984,8 @@ function checkAutosaveOnLoad(){
       const savedId=sessionStorage.getItem('fl_autosave_id');
       if(savedId)_currentLevelId=savedId;
       _hasUnsavedChanges=true;
+      // Brouillon restauré → drapeaux considérés placés
+      _startPlaced=true;_endPlaced=true;updatePlayBtn();
       redraw&&redraw();
       status&&status('⚡ '+(l==='fr'?'Brouillon restauré':'Draft restored'));
     }catch(ex){}
@@ -2121,10 +1994,7 @@ function checkAutosaveOnLoad(){
   }
 }
 
-// ── Unsaved changes + navigation ─────────────────────────
-
 window.addEventListener('beforeunload',function(e){
-  // Always save current state to sessionStorage for recovery
   if(lv&&typeof lv==='object'){
     try{
       sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));
