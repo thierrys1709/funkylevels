@@ -1401,10 +1401,14 @@ document.addEventListener('keydown',e=>{
 redraw();
 
 function playLevel(){
+  // Sauvegarde dans sessionStorage pour restauration au retour
   sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id', _currentLevelId||'');
   const titleEl=document.getElementById('level-name-input');
   sessionStorage.setItem('fl_preview_title', titleEl?titleEl.value:'');
+  // Désactive l'alerte "modifications non sauvegardées" :
+  // le niveau est dans sessionStorage, il sera restauré au retour.
+  _hasUnsavedChanges=false;
   if(_currentLevelId){
     window.location.href='game.html?preview=1&level='+_currentLevelId+'&from=studio';
   }else{
