@@ -1555,6 +1555,10 @@ async function loadPlayerProfile(){
 
   if(fromGame){
     sessionStorage.removeItem('fl_from_game');
+    // Efface l'autosave pour éviter le dialog "Restaurer ?" au retour du jeu
+    sessionStorage.removeItem('fl_autosave_level');
+    sessionStorage.removeItem('fl_autosave_id');
+    sessionStorage.removeItem('fl_autosave_name');
     const raw=sessionStorage.getItem('fl_preview_level');
     if(raw){
       try{
