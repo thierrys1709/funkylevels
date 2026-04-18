@@ -512,7 +512,7 @@ body {
 </head>
 <body>
 
-<div id="topbar">
+<div id="topbar" style="visibility:hidden;">
 
   <!-- ══ LOGO ══ -->
   <h1>✦ STUDIO</h1>
@@ -615,7 +615,7 @@ body {
 
 </div>
 
-<div id="layout">
+<div id="layout" style="visibility:hidden;">
   <div id="panel">
     <h2 id="ptitle">OUTIL : FIXE</h2>
 
@@ -1528,9 +1528,18 @@ async function loadPlayerProfile(){
   console.log('[Init] Calling applyStudioLang...');
   // Apply language AFTER lang file is loaded
   await applyStudioLang();
-  console.log('[Init] applyStudioLang done');
+  // Show UI now that lang is applied
+  const tb=document.getElementById('topbar');
+  const ly=document.getElementById('layout');
+  if(tb)tb.style.visibility='';
+  if(ly)ly.style.visibility='';
   }catch(err){
     console.error('[Init] FATAL ERROR:', err.message, err.stack);
+    // Show UI anyway on error
+    const tb=document.getElementById('topbar');
+    const ly=document.getElementById('layout');
+    if(tb)tb.style.visibility='';
+    if(ly)ly.style.visibility='';
   }
 })();
 
