@@ -1092,13 +1092,11 @@ function saveLevel(){
 
 async function doQuickSave(){
   const title=document.getElementById('level-name-input').value.trim()||'Sans titre';
-  console.log('[Save] doQuickSave, id:', _currentLevelId, 'title:', title, 'blocks:', (lv.fixed||[]).length);
   const{data,error}=await _sb.from('levels').update({
     title:title,
     data:lv,
     visibility:_currentVisibility
   }).eq('id',_currentLevelId).select();
-  console.log('[Save] result:', data, 'error:', error);
   if(error){status('Erreur : '+error.message);}
   else{
     status('✅ Sauvegardé !');
@@ -1238,6 +1236,7 @@ async function doLoadLevel(id,title){
   closeLoadModal();
   _loadingLevel=false;
   _hasUnsavedChanges=false;
+  autosaveClear(); // clear any stale autosave from previous session
   status('Niveau "'+title+'" chargé.');
 }
 function loadFile(e){
