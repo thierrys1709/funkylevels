@@ -1765,6 +1765,18 @@ async function applyStudioLang(){
   const btnHome=document.getElementById('btn-nav-home');
   if(btnHome)btnHome.textContent='🏠 '+(t.btnAccueil||'ACCUEIL');
 
+  // Unsaved modal
+  const uTitle=document.getElementById('unsaved-title');
+  if(uTitle)uTitle.textContent='⚠️ '+(t.unsavedTitle||'MODIFICATIONS NON SAUVEGARDÉES');
+  const uDesc=document.getElementById('unsaved-desc');
+  if(uDesc)uDesc.innerHTML=t.unsavedDesc||'Tu as des modifications non sauvegardées.<br>Que veux-tu faire ?';
+  const uSave=document.getElementById('unsaved-btn-save');
+  if(uSave)uSave.textContent='💾 '+(t.unsavedSave||'ENREGISTRER ET QUITTER');
+  const uLeave=document.getElementById('unsaved-btn-leave');
+  if(uLeave)uLeave.textContent='🚪 '+(t.unsavedLeave||'QUITTER SANS ENREGISTRER');
+  const uStay=document.getElementById('unsaved-btn-stay');
+  if(uStay)uStay.textContent='← '+(t.unsavedStay||'RESTER DANS LE STUDIO');
+
   // Grid label
   document.querySelectorAll('.tb-group span').forEach(el=>{
     if(el.textContent==='GRILLE'||el.textContent==='GRID'||el.textContent===t.grille)
@@ -2031,12 +2043,12 @@ async function doPublish(){
 <!-- UNSAVED CHANGES MODAL -->
 <div id="unsaved-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
   <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
-    <div style="font-family:Orbitron,monospace;font-size:14px;color:#f0a040;text-align:center;letter-spacing:1px;">⚠️ MODIFICATIONS NON SAUVEGARDÉES</div>
-    <p style="font-family:Rajdhani,sans-serif;font-size:17px;color:#c0c0dd;text-align:center;line-height:1.7;margin:0;">Tu as des modifications non sauvegardées.<br>Que veux-tu faire ?</p>
+    <div id="unsaved-title" style="font-family:Orbitron,monospace;font-size:14px;color:#f0a040;text-align:center;letter-spacing:1px;">⚠️ MODIFICATIONS NON SAUVEGARDÉES</div>
+    <p id="unsaved-desc" style="font-family:Rajdhani,sans-serif;font-size:17px;color:#c0c0dd;text-align:center;line-height:1.7;margin:0;">Tu as des modifications non sauvegardées.<br>Que veux-tu faire ?</p>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button onclick="unsavedSave()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#0d2a0d;border:1.5px solid #40f090;color:#40f090;border-radius:6px;cursor:pointer;">💾 ENREGISTRER ET QUITTER</button>
-      <button onclick="unsavedLeave()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#2a0a0a;border:1.5px solid #f04060;color:#f04060;border-radius:6px;cursor:pointer;">🚪 QUITTER SANS ENREGISTRER</button>
-      <button onclick="unsavedStay()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">← RESTER DANS LE STUDIO</button>
+      <button id="unsaved-btn-save" onclick="unsavedSave()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#0d2a0d;border:1.5px solid #40f090;color:#40f090;border-radius:6px;cursor:pointer;">💾 ENREGISTRER ET QUITTER</button>
+      <button id="unsaved-btn-leave" onclick="unsavedLeave()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#2a0a0a;border:1.5px solid #f04060;color:#f04060;border-radius:6px;cursor:pointer;">🚪 QUITTER SANS ENREGISTRER</button>
+      <button id="unsaved-btn-stay" onclick="unsavedStay()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">← RESTER DANS LE STUDIO</button>
     </div>
   </div>
 </div>
