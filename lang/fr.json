@@ -48,12 +48,12 @@
     "tipPublish": "🚀 PUBLIER\nChoix de la visibilité.",
     "tipLoad": "📂 MES NIVEAUX\nCharge un de tes niveaux.",
     "tipClear": "🗑 VIDER\nNouveau niveau vide.",
-    "pInfoFixed": "Sol solide.\nClic gauche pour dessiner.",
+    "pInfoFixed": "Sol solide.<br>Cliquer-glisser<br>pour dessiner.",
     "pInfoInvis": "Bloc solide invisible en jeu.",
-    "pInfoPush": "Bloc poussable. Tombe si\nrien ne le soutient.",
-    "pInfoStart": "Clic pour placer\nle point de départ.",
-    "pInfoEnd": "Clic pour placer\nl'arrivée.",
-    "pInfoSelect": "Clic = sélect.\nGlisser = déplacer.\nPoignées = redim.\n\nSuppr = effacer.\nCtrl+C/V = copier.\nCtrl+Z/Y = undo/redo.",
+    "pInfoPush": "Bloc poussable. Tombe si<br>rien ne le soutient.",
+    "pInfoStart": "Clic pour placer<br>le point de départ.",
+    "pInfoEnd": "Clic pour placer<br>l'arrivée.",
+    "pInfoSelect": "Clic = sélect.<br>Glisser = déplacer.<br>Poignées = redim.<br><br>Suppr = effacer.<br>Ctrl+C/V = copier.<br>Ctrl+Z/Y = undo/redo.",
     "ovStart": "PLATFORMER STUDIO",
     "ovStartSub": "Dessine ton niveau, puis joue-le !\n\nClic gauche = dessiner | Clic droit = naviguer\nMolette = zoom",
     "ovStartBtn": "COMMENCER",
@@ -85,7 +85,6 @@
     "toastSaved": "✅ SAUVEGARDÉ !",
     "toastLoadError": "⚠️ Erreur de chargement",
     "toastNotFound": "⚠️ Niveau introuvable — Nouveau niveau initialisé",
-    "pInfoSpeed": "Zone de vitesse.<br><br>5 = normal<br>1 = très lent<br>20 = très rapide",
     "toolNames": {
       "fixed": "FIXE",
       "trap": "PIÈGE",
@@ -99,7 +98,14 @@
       "start": "DÉPART",
       "end": "ARRIVÉE",
       "select": "SÉLECTION"
-    }
+    },
+    "pInfoTrap": "Tombe quand le joueur<br>s'approche.",
+    "pInfoSlider": "Se déplace quand le joueur<br>s'approche.",
+    "pInfoBounce": "Fait rebondir le joueur.<br>Force 1 = saut normal.",
+    "pInfoMobile": "Va et vient automatiquement.",
+    "pInfoGravflip": "Zone de gravité.<br><br>Attire le joueur vers<br>le bord indiqué.<br><br>Force 0 = apesanteur.",
+    "pInfoSpeed": "Zone de vitesse.<br><br>5 = normal<br>1 = très lent<br>20 = très rapide",
+    "untitled": "Sans titre"
   },
   "home": {
     "heroTitle": "⚡ FUNKYLEVELS",
