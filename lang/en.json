@@ -200,7 +200,13 @@
     "pseudoTitle": "✏️ CHANGE MY USERNAME",
     "pseudoLbl": "NEW USERNAME",
     "pseudoSave": "💾 SAVE",
-    "accountInfoTitle": "👤 MY ACCOUNT"
+    "accountInfoTitle": "👤 MY ACCOUNT",
+    "pwdTitle": "🔑 CHANGE MY PASSWORD",
+    "pwdNewLbl": "NEW PASSWORD",
+    "pwdConfirmLbl": "CONFIRM PASSWORD",
+    "pwdBtn": "🔑 CHANGE PASSWORD",
+    "phPassNew": "8 characters minimum",
+    "phPassConfirm": "Repeat your password"
   },
   "publish": {
     "title": "💾 SAVE",
