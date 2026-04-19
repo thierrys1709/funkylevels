@@ -1227,11 +1227,15 @@ document.addEventListener('keydown',e=>{
 redraw();
 
 function playLevel(){
-  sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
+  const lvJson=JSON.stringify(lv);
+  const titleVal=document.getElementById('level-name-input')?.value||'';
+  // Toujours persister l'état avant de partir jouer (même si save vient de vider l'autosave)
+  sessionStorage.setItem('fl_preview_level', lvJson);
   sessionStorage.setItem('fl_preview_id', _currentLevelId||'');
-  const titleEl=document.getElementById('level-name-input');
-  sessionStorage.setItem('fl_preview_title', titleEl?titleEl.value:'');
-  autosaveSave();
+  sessionStorage.setItem('fl_preview_title', titleVal);
+  sessionStorage.setItem('fl_autosave_level', lvJson);
+  sessionStorage.setItem('fl_autosave_id', _currentLevelId||'');
+  sessionStorage.setItem('fl_autosave_name', titleVal);
   if(_currentLevelId){window.location.href='game.html?preview=1&level='+_currentLevelId+'&from=studio';}
   else{window.location.href='game.html?preview=1&from=studio';}
 }
