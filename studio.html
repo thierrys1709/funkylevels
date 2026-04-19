@@ -6,9 +6,6 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
 
-/* ═══════════════════════════════════
-   VARIABLES — DARK THEME (default)
-═══════════════════════════════════ */
 :root {
   --bg:        #070710;
   --bg2:       #0d0d1e;
@@ -32,7 +29,6 @@
   --shadow:    0 4px 24px #00000099;
 }
 
-/* ─── LIGHT THEME ─── */
 body.light {
   --bg:        #f0f0fa;
   --bg2:       #e4e4f4;
@@ -64,7 +60,6 @@ body {
   transition: background .3s, color .3s;
 }
 
-/* ─── TOPBAR ─── */
 #topbar {
   display: flex;
   align-items: center;
@@ -92,7 +87,6 @@ body {
   white-space: nowrap;
 }
 
-/* ─── SEPARATOR ─── */
 .sep {
   width: 1px;
   height: 36px;
@@ -101,7 +95,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ─── SECTION LABEL ─── */
 .tb-label {
   font-family: 'Rajdhani', sans-serif;
   font-size: 9px;
@@ -113,7 +106,6 @@ body {
 
 .tb-group { display: flex; gap: 3px; align-items: center; }
 
-/* ─── TOOL BUTTONS ─── */
 .tool-btn, .act-btn, .zoom-btn { position: relative; }
 
 .tool-btn {
@@ -144,7 +136,6 @@ body {
   box-shadow: 0 0 10px #7060f044;
 }
 
-/* ─── ACTION BUTTONS ─── */
 .act-btn {
   font-family: 'Rajdhani', sans-serif;
   font-weight: 700;
@@ -159,11 +150,9 @@ body {
 .act-btn:hover { filter: brightness(1.3); transform: translateY(-1px); }
 #btn-play  { background: #0d2a0d; border: 1.5px solid #3a8a3a; color: var(--green); }
 #btn-save  { background: #0d0d2a; border: 1.5px solid #4040aa; color: #90a0f0; }
-
 #btn-load  { background: #0d0d2a; border: 1.5px solid #4040aa; color: #90a0f0; }
 #btn-clear { background: #2a0d0d; border: 1.5px solid #aa3030; color: var(--red); }
 
-/* ─── GRID SELECT ─── */
 .grid-sel {
   font-family: 'Rajdhani', sans-serif;
   font-weight: 600;
@@ -176,7 +165,6 @@ body {
   cursor: pointer;
 }
 
-/* ─── ZOOM BUTTONS ─── */
 .zoom-btn {
   font-family: 'Orbitron', monospace;
   font-size: 11px;
@@ -190,7 +178,6 @@ body {
 }
 .zoom-btn:hover { color: var(--text); border-color: var(--accent2); background: var(--tool-hover); }
 
-/* ─── ZOOM LABEL ─── */
 #zoomLbl {
   font-family: 'Orbitron', monospace;
   font-size: 10px;
@@ -199,7 +186,6 @@ body {
   text-align: center;
 }
 
-/* ─── LEVEL NAME INPUT ─── */
 #level-name-input {
   font-family: 'Orbitron', monospace;
   font-size: 9px;
@@ -220,7 +206,6 @@ body {
 }
 #level-name-input::placeholder { color: var(--muted); }
 
-/* ─── TOOLTIP ─── */
 .tool-btn[data-tip]:hover::after,
 .act-btn[data-tip]:hover::after,
 .zoom-btn[data-tip]:hover::after {
@@ -240,17 +225,14 @@ body {
   border-radius: 4px;
   white-space: pre;
   pointer-events: none;
-  z-index: 999;
+  z-index: 9999 !important;
   min-width: 140px;
   text-align: center;
   box-shadow: 0 6px 24px #00000099;
-  z-index: 9999 !important;
 }
 
-/* ─── LAYOUT ─── */
 #layout { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-/* ─── PANEL ─── */
 #panel {
   width: 200px;
   flex-shrink: 0;
@@ -320,16 +302,12 @@ body {
   text-align: right;
 }
 
-/* ─── CANVAS ─── */
 #cwrap { flex: 1; overflow: auto; position: relative; background: var(--bg); }
 #cwrap::-webkit-scrollbar { width: 6px; height: 6px; }
 #cwrap::-webkit-scrollbar-track { background: var(--bg); }
 #cwrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 #ecanvas { display: block; cursor: crosshair; }
 
-/* Game CSS moved to game.html */
-
-/* ─── STATUS BAR ─── */
 #statusbar {
   font-family: 'Rajdhani', sans-serif;
   font-size: 11px;
@@ -341,7 +319,6 @@ body {
   margin-top: 4px;
 }
 
-/* ─── PUBLISH MODAL ─── */
 #publish-modal { display:none; position:fixed; inset:0; background:#000000bb; z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
 #publish-modal.show { display: flex; }
 .pub-box {
@@ -407,7 +384,6 @@ body {
 .pub-msg.ok  { background: #40f09018; border:1px solid var(--green); color:var(--green); display:block; }
 .pub-msg.err { background: #f0406018; border:1px solid var(--red);   color:var(--red);   display:block; }
 
-/* ─── VIS BUTTONS ─── */
 .pub-vis-btn {
   font-family: 'Rajdhani', sans-serif;
   font-weight: 700;
@@ -418,14 +394,13 @@ body {
   cursor: pointer;
   background: var(--input-bg);
   color: var(--text2);
-  transition: all .15s;
+  transition: all .15px;
   flex: 1;
   letter-spacing: 0.5px;
 }
 .pub-vis-btn:hover { border-color: var(--accent2); color: var(--text); }
 .pub-vis-btn.active { border-color: var(--accent2); color: var(--accent); background: var(--tool-active); }
 
-/* ─── LOAD MODAL ─── */
 #load-modal { display:none; position:fixed; inset:0; background:#000000bb; z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
 #load-modal.show { display:flex; }
 .load-box {
@@ -507,18 +482,14 @@ body {
 .load-date { font-family:Rajdhani,sans-serif; font-size:13px; font-weight:700; color:#c0c0ee; display:block; }
 .load-time { font-family:Rajdhani,sans-serif; font-size:11px; color:#6060aa; }
 .load-col-vis { padding:14px 22px; }
-
 </style>
 </head>
 <body>
 
 <div id="topbar" style="visibility:hidden;">
-
-  <!-- ══ LOGO ══ -->
   <h1>✦ STUDIO</h1>
   <div class="sep"></div>
 
-  <!-- ══ BLOCS ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblBlocs">BLOCS</span>
     <div class="tb-group">
@@ -531,7 +502,6 @@ body {
   </div>
   <div class="sep"></div>
 
-  <!-- ══ BLOCS PIÈGE ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblPieges">PIÈGES</span>
     <div class="tb-group">
@@ -541,7 +511,6 @@ body {
   </div>
   <div class="sep"></div>
 
-  <!-- ══ ZONES ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblZones">ZONES</span>
     <div class="tb-group">
@@ -551,7 +520,6 @@ body {
   </div>
   <div class="sep"></div>
 
-  <!-- ══ NIVEAU ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblNiveau">NIVEAU</span>
     <div class="tb-group">
@@ -562,7 +530,6 @@ body {
   </div>
   <div class="sep"></div>
 
-  <!-- ══ NOM DU NIVEAU ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblNom">NOM</span>
     <input type="text" id="level-name-input" placeholder="Sans titre..."
@@ -571,22 +538,18 @@ body {
   </div>
   <div class="sep"></div>
 
-  <!-- ══ SAUVEGARDE ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblSave">SAUVEGARDE</span>
     <div class="tb-group">
-      <button class="act-btn" id="btn-save"    onclick="saveLevel()"  data-tip="💾 SAUVEGARDER"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">💾 SAVE</button>
-
-      <button class="act-btn" id="btn-load"    onclick="loadLevel()"  data-tip="📂 MES NIVEAUX"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">📂 LOAD</button>
-      <button class="act-btn" id="btn-clear"   onclick="clearLevel()" data-tip="🗑 NOUVEAU"       style="background:#280d0d;border-color:#7a3a3a;color:#fc8181;">🗑 VIDER</button>
+      <button class="act-btn" id="btn-save"  onclick="saveLevel()"  data-tip="💾 SAUVEGARDER" style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">💾 SAVE</button>
+      <button class="act-btn" id="btn-load"  onclick="loadLevel()"  data-tip="📂 MES NIVEAUX"  style="background:#0d0d28;border-color:#3a3a7a;color:#90a0f0;">📂 LOAD</button>
+      <button class="act-btn" id="btn-clear" onclick="clearLevel()" data-tip="🗑 NOUVEAU"       style="background:#280d0d;border-color:#7a3a3a;color:#fc8181;">🗑 VIDER</button>
     </div>
   </div>
   <div class="sep"></div>
 
-  
   <div class="sep"></div>
 
-  <!-- ══ JEUX ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblJeu">JEU</span>
     <div class="tb-group">
@@ -595,7 +558,6 @@ body {
   </div>
   <div class="sep"></div>
 
-  <!-- ══ PROFIL ══ -->
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblProfil">PROFIL</span>
     <div class="tb-group" style="gap:6px;align-items:center;">
@@ -606,13 +568,8 @@ body {
           <button id="btn-nav-home" onclick="goToHome()" style="font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 10px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background='#1a1a3a'" onmouseout="this.style.background='#0d0d28'">🏠 ACCUEIL</button>
         </div>
       </div>
-
-
-      
-      
     </div>
   </div>
-
 </div>
 
 <div id="layout" style="visibility:hidden;">
@@ -662,10 +619,9 @@ body {
     </div>
 
     <div id="s-start" class="psec"><div class="pinfo" data-info="pInfoStart"></div></div>
-    <div id="s-end" class="psec"><div class="pinfo" data-info="pInfoEnd">Cliquer pour placer<br>l'arrivée.</div></div>
+    <div id="s-end" class="psec"><div class="pinfo" data-info="pInfoEnd"></div></div>
     <div id="s-select" class="psec"><div class="pinfo" data-info="pInfoSelect"></div></div>
 
-    <!-- ═══ GRAVITÉ PANEL ═══ -->
     <div id="s-gravflip" class="psec">
       <div class="pinfo" data-info="pInfoGravflip"></div>
       <div class="prow">
@@ -707,13 +663,8 @@ body {
   <div style="position:fixed;top:4px;right:8px;font-family:Orbitron,monospace;font-size:8px;color:#3a3a5a;z-index:999;">V13042256</div>
 </div>
 
-
-
-
-
 <input type="file" id="fileInput" accept=".json" style="display:none" onchange="loadFile(event)">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  ÉDITEUR
@@ -722,9 +673,7 @@ let _currentLevelId=null;
 let _currentVisibility='private';
 let _authorCompleted=false;
 let _isPublished=false;
-// Lang helper available globally from start
 const _lang=()=>localStorage.getItem('fl_lang')||'fr';
-// STUDIO_T declared here so it's available in both scripts
 var STUDIO_T={fr:{},en:{}};
 
 const EC = document.getElementById('ecanvas');
@@ -758,26 +707,17 @@ function isSelected(type,idx){ return !!selection.find(s=>s.type===type&&s.idx==
 
 let undoStack=[],redoStack=[];
 function snapshot(){
-  if(_isPublished&&_currentLevelId){
-    return;
-  }
+  if(_isPublished&&_currentLevelId){return;}
   _hasUnsavedChanges=true;
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
 }
 
-// Appeler cette fonction uniquement quand les blocs changent vraiment (pas la sélection)
 function snapshotWithDupCheck(){
-  // Reset author_completed when level is modified
   if(_currentLevelId&&!window._authorCompletedReset){
     window._authorCompletedReset=true;
-    _sb.from('levels').update({author_completed:false}).eq('id',_currentLevelId).then(()=>{
-      _authorCompleted=false;
-    });
+    _sb.from('levels').update({author_completed:false}).eq('id',_currentLevelId).then(()=>{_authorCompleted=false;});
   }
-  if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
-    showDupModal();
-    return;
-  }
+  if(_isPublished&&_currentLevelId&&!window._dupConfirmed){showDupModal();return;}
   snapshot();
 }
 
@@ -790,12 +730,7 @@ async function duplicateLevel(){
   const{data:inserted,error}=await _sb.from('levels').insert({
     user_id:user.id,
     title:(document.getElementById('level-name-input')?.value||ts('untitled','Untitled'))+' (copie)',
-    data:lv,
-    plays:0,
-    visibility:'private',
-    share_code:newCode,
-    author_completed:false,
-    is_published:false
+    data:lv,plays:0,visibility:'private',share_code:newCode,author_completed:false,is_published:false
   }).select().single();
   if(error){alert('Erreur duplication: '+error.message);window._dupWarningShown=false;return;}
   _currentLevelId=inserted.id;
@@ -807,9 +742,8 @@ async function duplicateLevel(){
   const ni=document.getElementById('level-name-input');
   if(ni)ni.value=inserted.title;
   history.replaceState(null,'','studio.html');
-  // Now do the edit
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
-  status(localStorage.getItem('fl_lang')==='fr'?'Niveau dupliqué ! Tu peux maintenant éditer.':'Level duplicated! You can now edit.');
+  status(_lang()==='fr'?'Niveau dupliqué ! Tu peux maintenant éditer.':'Level duplicated! You can now edit.');
 }
 function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(lv));lv=JSON.parse(undoStack.pop());clearSel();redraw();}
 function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(lv));lv=JSON.parse(redoStack.pop());clearSel();redraw();}
@@ -843,7 +777,6 @@ function trapReturnUI(){
   const dp=document.getElementById('tr-partial-opts');if(dp)dp.style.display=part?'':'none';
 }
 
-// ── Gravflip panel ──────────────────────────────────────────────
 const GF_ARROWS={u:'↑',d:'↓',l:'←',r:'→'};
 const GF_HINTS_FR={u:'↑ Attire vers le haut (plafond)',d:'↓ Attire vers le bas (sol)',l:'← Attire vers la gauche (mur gauche)',r:'→ Attire vers la droite (mur droit)'};
 const GF_HINTS_EN={u:'↑ Pulls to ceiling',d:'↓ Pulls to floor',l:'← Pulls to left wall',r:'→ Pulls to right wall'};
@@ -875,11 +808,7 @@ function spParamChanged(){
   if(selection.length===1&&selectedType==='speed'){const z=lv.speed[selectedIdx];if(z)z.spd=val;}
   redraw();
 }
-function spPanelLoad(z){
-  document.getElementById('sp-val').value=z.spd??5;
-  document.getElementById('sp-val-v').textContent=z.spd??5;
-  spParamChanged();
-}
+function spPanelLoad(z){document.getElementById('sp-val').value=z.spd??5;document.getElementById('sp-val-v').textContent=z.spd??5;spParamChanged();}
 function showSpPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-speed').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : VITESSE';}
 
 function bounceParamChanged(){document.getElementById('bo-force-v').textContent=document.getElementById('bo-force').value;if(selection.length===1&&selectedType==='bounce'){const b=lv.bounce[selectedIdx];if(b)b.force=+document.getElementById('bo-force').value;}redraw();}
@@ -909,26 +838,18 @@ function showSaveToast(msg){
     document.body.appendChild(toast);
   }
   toast.textContent=msg;
-  // Show
   toast.style.transform='translate(-50%,-50%) scale(1)';
   toast.style.opacity='1';
   clearTimeout(toast._timer);
-  toast._timer=setTimeout(()=>{
-    toast.style.transform='translate(-50%,-50%) scale(0.8)';
-    toast.style.opacity='0';
-  },1800);
+  toast._timer=setTimeout(()=>{toast.style.transform='translate(-50%,-50%) scale(0.8)';toast.style.opacity='0';},1800);
 }
 
 function onLevelNameChange(){
-  // If level is already saved, update title in DB after a short delay
   clearTimeout(window._nameSaveTimer);
   if(_currentLevelId){
     window._nameSaveTimer=setTimeout(async()=>{
       const title=document.getElementById('level-name-input').value.trim();
-      if(title){
-        await _sb.from('levels').update({title}).eq('id',_currentLevelId);
-        status(ts('msgTitleUpdated','Title updated.'));
-      }
+      if(title){await _sb.from('levels').update({title}).eq('id',_currentLevelId);status(ts('msgTitleUpdated','Title updated.'));}
     },1000);
   }
 }
@@ -941,54 +862,28 @@ const CURSOR_MAP={nw:'nw-resize',n:'n-resize',ne:'ne-resize',e:'e-resize',se:'se
 
 function canvasPos(e){const r=EC.getBoundingClientRect();return{x:Math.max(0,Math.min(EW,(e.clientX-r.left)/ZOOM)),y:Math.max(0,Math.min(EH,(e.clientY-r.top)/ZOOM))};}
 
-// ── Right-click pan ───────────────────────
 let _panning=false,_panStart={x:0,y:0},_scrollStart={x:0,y:0};
-
 EC.addEventListener('mousedown',e=>{
-  if(e.button===2){
-    _panning=true;
-    _panStart={x:e.clientX,y:e.clientY};
-    const wrap=document.getElementById('cwrap');
-    _scrollStart={x:wrap.scrollLeft,y:wrap.scrollTop};
-    EC.style.cursor='grabbing';
-    e.preventDefault();
-  }
+  if(e.button===2){_panning=true;_panStart={x:e.clientX,y:e.clientY};const wrap=document.getElementById('cwrap');_scrollStart={x:wrap.scrollLeft,y:wrap.scrollTop};EC.style.cursor='grabbing';e.preventDefault();}
 });
-
 EC.addEventListener('contextmenu',e=>e.preventDefault());
-
 window.addEventListener('mousemove',e=>{
   if(!_panning)return;
   const wrap=document.getElementById('cwrap');
   wrap.scrollLeft=_scrollStart.x-(e.clientX-_panStart.x);
   wrap.scrollTop=_scrollStart.y-(e.clientY-_panStart.y);
 });
-
 window.addEventListener('mouseup',e=>{
-  if(e.button===2&&_panning){
-    _panning=false;
-    EC.style.cursor='crosshair';
-  }
+  if(e.button===2&&_panning){_panning=false;EC.style.cursor='crosshair';}
 });
 
 EC.addEventListener('mousedown',e=>{
-  if(e.button!==0)return; // Ignorer tout sauf clic gauche
+  if(e.button!==0)return;
   const{x,y}=canvasPos(e);mousePos={x,y};
   if(currentTool==='start'){snapshot();lv.start={x:snap(x),y:snap(y)};redraw();return;}
   if(currentTool==='end'){snapshot();lv.end={x:snap(x),y:snap(y)};redraw();return;}
-  // Allow dragging existing start/end flags with any tool
-  if(lv.start){
-    const sx=lv.start.x,sy=lv.start.y;
-    if(x>=sx&&x<=sx+40&&y>=sy-52&&y<=sy+8){
-      dragState={mode:'flag',flag:'start',sm:{x,y},orig:{x:sx,y:sy}};redraw();return;
-    }
-  }
-  if(lv.end){
-    const ex=lv.end.x,ey=lv.end.y;
-    if(x>=ex&&x<=ex+40&&y>=ey-52&&y<=ey+8){
-      dragState={mode:'flag',flag:'end',sm:{x,y},orig:{x:ex,y:ey}};redraw();return;
-    }
-  }
+  if(lv.start){const sx=lv.start.x,sy=lv.start.y;if(x>=sx&&x<=sx+40&&y>=sy-52&&y<=sy+8){dragState={mode:'flag',flag:'start',sm:{x,y},orig:{x:sx,y:sy}};redraw();return;}}
+  if(lv.end){const ex=lv.end.x,ey=lv.end.y;if(x>=ex&&x<=ex+40&&y>=ey-52&&y<=ey+8){dragState={mode:'flag',flag:'end',sm:{x,y},orig:{x:ex,y:ey}};redraw();return;}}
   if(selection.length===1){
     const obj=getSelObj();
     if(obj&&selectedType==='trap'&&obj.partial&&obj.partDist>0){const ghostY=obj.y+obj.partDist+obj.h;if(Math.abs(y-ghostY)<=8&&x>=obj.x&&x<=obj.x+obj.w){dragState={mode:'partdist',sm:{x,y},orig:obj.partDist,trap:obj};return;}}
@@ -1015,14 +910,7 @@ window.addEventListener('mousemove',e=>{
   const{x,y}=canvasPos(e);mousePos={x,y};
   if(dragState){
     const dx=x-dragState.sm.x,dy=y-dragState.sm.y;
-    if(dragState.mode==='flag'){
-      EC.style.cursor='grabbing';
-      const dx=x-dragState.sm.x,dy=y-dragState.sm.y;
-      const nx=snap(dragState.orig.x+dx),ny=snap(dragState.orig.y+dy);
-      if(dragState.flag==='start')lv.start={x:Math.max(0,Math.min(EW,nx)),y:Math.max(0,Math.min(EH,ny))};
-      else lv.end={x:Math.max(0,Math.min(EW,nx)),y:Math.max(0,Math.min(EH,ny))};
-      redraw();return;
-    }
+    if(dragState.mode==='flag'){EC.style.cursor='grabbing';const nx=snap(dragState.orig.x+dx),ny=snap(dragState.orig.y+dy);if(dragState.flag==='start')lv.start={x:Math.max(0,Math.min(EW,nx)),y:Math.max(0,Math.min(EH,ny))};else lv.end={x:Math.max(0,Math.min(EW,nx)),y:Math.max(0,Math.min(EH,ny))};redraw();return;}
     if(dragState.mode==='partdist'){dragState.trap.partDist=Math.max(GRID,snap(dragState.orig+(y-dragState.sm.y)));const sl=document.getElementById('tr-partdist'),lbl=document.getElementById('tr-partdist-v');if(sl){sl.value=dragState.trap.partDist;lbl.textContent=dragState.trap.partDist;}redraw();return;}
     if(dragState.mode==='move'){dragState.origins.forEach(o=>{const b=lv[o.type][o.idx];b.x=Math.max(0,Math.min(EW-b.w,snap(o.ox+dx)));b.y=Math.max(0,Math.min(EH-b.h,snap(o.oy+dy)));if(b.ox!==undefined)b.ox=b.x;if(b.oy!==undefined)b.oy=b.y;});}
     else if(dragState.mode==='resize'){const obj=getSelObj();if(obj){const h=dragState.handle,r=dragState.sr;let nx=r.x,ny=r.y,nw=r.w,nh=r.h;if(h.includes('e'))nw=Math.max(GRID,snap(r.w+dx));if(h.includes('s'))nh=Math.max(GRID,snap(r.h+dy));if(h.includes('w')){nx=snap(r.x+dx);nw=Math.max(GRID,r.w-snap(dx));}if(h.includes('n')){ny=snap(r.y+dy);nh=Math.max(GRID,r.h-snap(dy));}obj.x=nx;obj.y=ny;obj.w=nw;obj.h=nh;}}
@@ -1031,7 +919,6 @@ window.addEventListener('mousemove',e=>{
   if(rubberBand){rubberBand.ex=x;rubberBand.ey=y;redraw();return;}
   if(selection.length===1){const obj=getSelObj();if(obj){if(selectedType==='trap'&&obj.partial&&obj.partDist>0){const ghostY=obj.y+obj.partDist+obj.h;if(Math.abs(y-ghostY)<=8&&x>=obj.x&&x<=obj.x+obj.w){EC.style.cursor='s-resize';redraw();return;}}const h=hitHandle(obj,x,y);if(h){EC.style.cursor=CURSOR_MAP[h];redraw();return;}}}
   if(selection.length>0){const hit=findBlockAt(x,y);if(hit&&isSelected(hit.type,hit.idx)){EC.style.cursor='move';redraw();return;}}
-  // Flag hover detection
   let hovFlag=null;
   if(lv.start&&x>=lv.start.x&&x<=lv.start.x+40&&y>=lv.start.y-52&&y<=lv.start.y+8)hovFlag='start';
   else if(lv.end&&x>=lv.end.x&&x<=lv.end.x+40&&y>=lv.end.y-52&&y<=lv.end.y+8)hovFlag='end';
@@ -1042,11 +929,9 @@ window.addEventListener('mousemove',e=>{
 });
 
 window.addEventListener('mouseup',e=>{
-  if(e.button!==0)return; // Ignorer tout sauf clic gauche
+  if(e.button!==0)return;
   if(dragState){
-    if(dragState.mode==='flag'){
-      dragState=null;EC.style.cursor='crosshair';redraw();return; // already updated live
-    }
+    if(dragState.mode==='flag'){dragState=null;EC.style.cursor='crosshair';redraw();return;}
     snapshot();dragState=null;EC.style.cursor='crosshair';redraw();return;
   }
   if(rubberBand){
@@ -1067,16 +952,8 @@ window.addEventListener('mouseup',e=>{
   else if(currentTool==='push'){lv.push.push({x:rx,y:ry,w:W,h:H,ox:rx,oy:ry,fric:+document.getElementById('pu-fric').value,vx:0,vy:0});newType='push';}
   else if(currentTool==='bounce'){lv.bounce.push({x:rx,y:ry,w:W,h:H,force:+document.getElementById('bo-force').value});newType='bounce';}
   else if(currentTool==='invis'){lv.invis.push({x:rx,y:ry,w:W,h:H});newType='invis';}
-  else if(currentTool==='gravflip'){
-    lv.gravflip.push({x:rx,y:ry,w:W,h:H,
-      dir:document.getElementById('gf-dir').value,
-      strength:+document.getElementById('gf-str').value
-    });newType='gravflip';
-  }
-  else if(currentTool==='speed'){
-    lv.speed.push({x:rx,y:ry,w:W,h:H,spd:+document.getElementById('sp-val').value});
-    newType='speed';
-  }
+  else if(currentTool==='gravflip'){lv.gravflip.push({x:rx,y:ry,w:W,h:H,dir:document.getElementById('gf-dir').value,strength:+document.getElementById('gf-str').value});newType='gravflip';}
+  else if(currentTool==='speed'){lv.speed.push({x:rx,y:ry,w:W,h:H,spd:+document.getElementById('sp-val').value});newType='speed';}
   else if(currentTool==='trap'){const v=trapPanelValues();lv.trap.push({x:rx,y:ry,w:W,h:H,ox:rx,oy:ry,trigDist:v.trigDist,preDelay:v.preDelay,fallSpeed:v.fallSpeed,partial:v.partial,partDist:v.partDist,returns:v.returns,riseDelay:v.riseDelay,loop:v.loop,state:'idle',vy:0});newType='trap';}
   if(newType){clearSel();addToSel(newType,lv[newType].length-1);}
   startPt=null;redraw();
@@ -1089,56 +966,38 @@ function deleteSelected(){if(!selection.length)return;snapshotWithDupCheck();[..
 function zoom(d,cx,cy){
   const prevZoom=ZOOM;
   ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));
-  if(cx!==undefined&&cy!==undefined){
-    // Zoom centré sur la position de la souris
-    const wrap=document.getElementById('cwrap');
-    const scrollX=wrap.scrollLeft,scrollY=wrap.scrollTop;
-    const ratio=ZOOM/prevZoom;
-    wrap.scrollLeft=cx*ratio-(cx-scrollX);
-    wrap.scrollTop=cy*ratio-(cy-scrollY);
-  }
+  if(cx!==undefined&&cy!==undefined){const wrap=document.getElementById('cwrap');const scrollX=wrap.scrollLeft,scrollY=wrap.scrollTop;const ratio=ZOOM/prevZoom;wrap.scrollLeft=cx*ratio-(cx-scrollX);wrap.scrollTop=cy*ratio-(cy-scrollY);}
   EC.style.transform='scale('+ZOOM+')';
   EC.style.transformOrigin='top left';
   document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%';
 }
 
-// Zoom avec molette souris centré sur curseur
 document.getElementById('cwrap').addEventListener('wheel',e=>{
   e.preventDefault();
   const wrap=document.getElementById('cwrap');
   const rect=wrap.getBoundingClientRect();
-  // Position de la souris dans le canvas (avant zoom)
   const mx=(e.clientX-rect.left+wrap.scrollLeft);
   const my=(e.clientY-rect.top+wrap.scrollTop);
   const d=e.deltaY<0?0.15:-0.15;
   zoom(d,mx,my);
 },{passive:false});
+
 function saveLevel(){
   _sb.auth.getSession().then(async({data})=>{
     if(!data.session){
-      // Pas connecté → télécharge JSON
       const a=document.createElement('a');
       a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));
       a.download='level.json';a.click();status(ts('msgSavedShort','Saved.'));
       return;
     }
-    if(_currentLevelId){
-      // Niveau déjà sauvegardé → sauvegarde directe
-      await doQuickSave();
-    }else{
-      // Nouveau niveau → ouvre popup pour donner un nom
-      openPublish();
-    }
+    if(_currentLevelId){await doQuickSave();}
+    else{openPublish();}
   });
 }
 
 async function doQuickSave(){
   const title=document.getElementById('level-name-input').value.trim()||ts('untitled','Untitled');
-  const{data,error}=await _sb.from('levels').update({
-    title:title,
-    data:lv,
-    visibility:_currentVisibility
-  }).eq('id',_currentLevelId).select();
+  const{data,error}=await _sb.from('levels').update({title:title,data:lv,visibility:_currentVisibility}).eq('id',_currentLevelId).select();
   if(error){status('Erreur : '+error.message);}
   else{
     status(ts('msgSaved','✅ Saved!'));
@@ -1146,45 +1005,28 @@ async function doQuickSave(){
     _hasUnsavedChanges=false;
     autosaveClear();
     doAfterSaveNav();
-    // Also update sessionStorage so game.html gets the latest version
     sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
     if(_currentLevelId)sessionStorage.setItem('fl_preview_id', _currentLevelId);
     const _t=document.getElementById('level-name-input');
     if(_t)sessionStorage.setItem('fl_preview_title', _t.value);
-    // Flash the save button
     const btn=document.getElementById('btn-save');
-    if(btn){btn.style.background='#0d280d';btn.style.borderColor='#3a7a3a';btn.style.color='#68d391';
-    setTimeout(()=>{btn.style.background='';btn.style.borderColor='';btn.style.color='';},1500);}
+    if(btn){btn.style.background='#0d280d';btn.style.borderColor='#3a7a3a';btn.style.color='#68d391';setTimeout(()=>{btn.style.background='';btn.style.borderColor='';btn.style.color='';},1500);}
   }
 }
 function loadLevel(){openLoadModal();}
 
-// ── Load modal ────────────────────────────
 async function openLoadModal(){
   const modal=document.getElementById('load-modal');
   const list=document.getElementById('load-list');
   modal.classList.add('show');
-  // If published level, hide close button to force selection
   const closeBtn=modal.querySelector('.load-close');
-  if(closeBtn){
-    closeBtn.style.display=(_isPublished&&_currentLevelId&&!window._dupConfirmed)?'none':'';
-  }
+  if(closeBtn){closeBtn.style.display=(_isPublished&&_currentLevelId&&!window._dupConfirmed)?'none':'';}
   list.innerHTML='<div class="load-empty">Chargement...</div>';
-
   const{data:sess}=await _sb.auth.getSession();
-  if(!sess.session){
-    list.innerHTML='<div class="load-empty">Connecte-toi pour voir tes niveaux.</div>';
-    return;
-  }
-
-  const{data,error}=await _sb.from('levels')
-    .select('id,title,visibility,created_at,updated_at,plays,completions')
-    .eq('user_id',sess.session.user.id)
-    .order('updated_at',{ascending:false});
-
+  if(!sess.session){list.innerHTML='<div class="load-empty">Connecte-toi pour voir tes niveaux.</div>';return;}
+  const{data,error}=await _sb.from('levels').select('id,title,visibility,created_at,updated_at,plays,completions').eq('user_id',sess.session.user.id).order('updated_at',{ascending:false});
   if(error){list.innerHTML='<div class="load-empty">Erreur: '+error.message+'</div>';return;}
   if(!data||!data.length){list.innerHTML='<div class="load-empty">Aucun niveau sauvegardé.</div>';return;}
-
   window._loadData=data;
   renderLoadItems(data);
   setTimeout(()=>{const s=document.getElementById('load-search');if(s){s.value='';s.focus();}},50);
@@ -1193,7 +1035,6 @@ async function openLoadModal(){
 function closeLoadModal(){
   document.getElementById('load-modal').classList.remove('show');
   const s=document.getElementById('load-search');if(s)s.value='';
-  // If still on a published level, re-show the published modal
   if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
     setTimeout(()=>showPublishedModal('',_currentLevelId),150);
   }
@@ -1202,16 +1043,8 @@ function closeLoadModal(){
 function renderLoadItems(data){
   const list=document.getElementById('load-list');
   const l=_lang();
-  if(!data||!data.length){
-    list.innerHTML='<div class="load-empty">'+(l==='fr'?'Aucun niveau trouvé.':'No levels found.')+'</div>';
-    return;
-  }
-  const VIS={
-    private:{label:l==='fr'?'Privé':'Private',cls:'private'},
-    public:{label:'Public',cls:'public'},
-    code:{label:'Code',cls:'code'}
-  };
-  // Table
+  if(!data||!data.length){list.innerHTML='<div class="load-empty">'+(l==='fr'?'Aucun niveau trouvé.':'No levels found.')+'</div>';return;}
+  const VIS={private:{label:l==='fr'?'Privé':'Private',cls:'private'},public:{label:'Public',cls:'public'},code:{label:'Code',cls:'code'}};
   let html='<table class="load-table"><thead><tr>'+
     '<th>'+(l==='fr'?'NOM':'NAME')+'</th>'+
     '<th>'+(l==='fr'?'DERNIÈRE MODIF.':'LAST MODIFIED')+'</th>'+
@@ -1223,8 +1056,8 @@ function renderLoadItems(data){
     const dateStr=d.toLocaleDateString(l==='fr'?'fr-FR':'en-GB');
     const timeStr=d.toLocaleTimeString(l==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'});
     const vis=VIS[lvl.visibility||'private'];
-    html+=`<tr class="load-row" onclick="doLoadLevel('${lvl.id}','${(lvl.title||ts('untitled','Untitled')).replace(/'/g,"\'")}')">
-      <td class="load-col-name">${lvl.title||ts('untitled','Untitled')}</td>
+    html+=`<tr class="load-row" onclick="doLoadLevel('${lvl.id}','${(lvl.title||'').replace(/'/g,"\'")}')">
+      <td class="load-col-name">${lvl.title||''}</td>
       <td class="load-col-date"><span class="load-date">${dateStr}</span><span class="load-time">${timeStr}</span></td>
       <td class="load-col-vis"><span class="load-item-vis ${vis.cls}">${vis.label}</span></td>
     </tr>`;
@@ -1235,32 +1068,21 @@ function renderLoadItems(data){
 
 function filterLoadList(q){
   if(!window._loadData)return;
-  const filtered=q.trim()
-    ?window._loadData.filter(l=>(l.title||'').toLowerCase().includes(q.toLowerCase()))
-    :window._loadData;
+  const filtered=q.trim()?window._loadData.filter(l=>(l.title||'').toLowerCase().includes(q.toLowerCase())):window._loadData;
   renderLoadItems(filtered);
 }
 
 async function doLoadLevel(id,title){
   const{data,error}=await _sb.from('levels').select('*').eq('id',id).single();
   if(error||!data){showSaveToast(ts('toastLoadError','⚠️ Load error'));return;}
-  // Reset published state for new level
   _isPublished=false;
   window._dupConfirmed=false;
-  // Re-enable all buttons and canvas
   document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
-  const cv=document.getElementById('studio-canvas');
-  if(cv)cv.style.pointerEvents='';
-  // Check autosave restore - use if same level ID OR coming from game
+  const cv=document.getElementById('studio-canvas');if(cv)cv.style.pointerEvents='';
   const _fromGame=sessionStorage.getItem('fl_from_game')==='1';
   if(window._autosaveRestore&&(window._autosaveRestore.id===id||_fromGame)){
-    lv=window._autosaveRestore.lv;
-    _hasUnsavedChanges=false;
-    window._autosaveRestore=null;
-    autosaveClear();
-  }else{
-    lv=data.data;
-  }
+    lv=window._autosaveRestore.lv;_hasUnsavedChanges=false;window._autosaveRestore=null;autosaveClear();
+  }else{lv=data.data;}
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
@@ -1270,19 +1092,15 @@ async function doLoadLevel(id,title){
   _isPublished=data.is_published||false;
   const nameInput=document.getElementById('level-name-input');
   if(nameInput)nameInput.value=data.title||'';
-  // Met à jour l'URL sans recharger la page
   history.replaceState(null,'','studio.html');
-  // Update sessionStorage so game.html gets this version
   sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id', id);
   sessionStorage.setItem('fl_preview_title', data.title||'');
-  redraw();
-  closeLoadModal();
-  _loadingLevel=false;
-  _hasUnsavedChanges=false;
-  autosaveClear(); // clear any stale autosave from previous session
+  redraw();closeLoadModal();
+  _loadingLevel=false;_hasUnsavedChanges=false;autosaveClear();
   status('Niveau "'+title+'" chargé.');
 }
+
 function loadFile(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
@@ -1296,28 +1114,23 @@ function loadFile(e){
   }catch(err){alert('Fichier invalide.');}};
   r.readAsText(f);e.target.value='';
 }
+
 function clearLevel(){
   const autosave=sessionStorage.getItem('fl_autosave_level');
   const msg=autosave
     ?(_lang()==='fr'?'Créer un nouveau niveau ? (brouillon non sauvegardé sera perdu)':'Create new level? (unsaved draft will be lost)')
     :(_lang()==='fr'?'Vider le niveau ?':'Clear level?');
   if(!confirm(msg))return;
-  // Clear autosave
-  sessionStorage.removeItem('fl_autosave_level');
-  sessionStorage.removeItem('fl_autosave_id');
-  sessionStorage.removeItem('fl_autosave_name');
-  _hasUnsavedChanges=false;
-  _currentLevelId=null;
-  // Don't use snapshot() here to avoid duplication warning
+  sessionStorage.removeItem('fl_autosave_level');sessionStorage.removeItem('fl_autosave_id');sessionStorage.removeItem('fl_autosave_name');
+  _hasUnsavedChanges=false;_currentLevelId=null;
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
   lv=emptyLevel();selectedIdx=-1;selectedType=null;
-  _currentLevelId=null;_currentVisibility='private';
-  _authorCompleted=false;_isPublished=false;window._dupWarningShown=false;
+  _currentLevelId=null;_currentVisibility='private';_authorCompleted=false;_isPublished=false;window._dupWarningShown=false;
   const ni=document.getElementById('level-name-input');if(ni)ni.value='';
   history.replaceState(null,'','studio.html');
-  redraw();status(ts('msgCleared','Cleared.'));}
+  redraw();status(ts('msgCleared','Cleared.'));
+}
 
-// ── Editor draw ──────────────────────────────────────────────────
 const EC_COL={bg:'#0c0c1a',grid:'#12122a',fixed:{b:'#4a5568',t:'#718096',s:'#a0aec0'},trap:{b:'#4a5568',t:'#718096',s:'#a0aec0'},flagA:'#68d391',flagB:'#fc8181',sel:'#f0e040',ghost:'#ffffff18'};
 function ePlatform(p,c){EX.fillStyle=c.b;EX.fillRect(p.x,p.y,p.w,p.h);EX.fillStyle=c.t;EX.fillRect(p.x,p.y,p.w,4);EX.fillStyle=c.s;for(let i=p.x+7;i<p.x+p.w-4;i+=9)EX.fillRect(i,p.y+1,3,2);}
 function eFlag(x,y,col,lbl){EX.fillStyle='#888';EX.fillRect(x+12,y-48,3,48);EX.fillStyle=col;EX.beginPath();EX.moveTo(x+15,y-48);EX.lineTo(x+36,y-36);EX.lineTo(x+15,y-24);EX.closePath();EX.fill();EX.fillStyle=col;EX.font='bold 7px "Press Start 2P"';EX.textAlign='center';EX.fillText(lbl,x+13,y+5);EX.textAlign='left';}
@@ -1331,13 +1144,8 @@ function toggleTheme(){
   localStorage.setItem('fl_theme',isLight?'light':'dark');
   redraw();
 }
-// Restore theme on load
 (()=>{
-  if(localStorage.getItem('fl_theme')==='light'){
-    document.body.classList.add('light');
-    setTimeout(()=>{const b=document.getElementById('theme-btn');if(b)b.textContent='☀️';},100);
-  }
-  // Set lang button
+  if(localStorage.getItem('fl_theme')==='light'){document.body.classList.add('light');setTimeout(()=>{const b=document.getElementById('theme-btn');if(b)b.textContent='☀️';},100);}
   const lb=document.getElementById('studio-lang-btn');
   if(lb)lb.textContent=_lang()==='fr'?'🇫🇷 FR':'🇬🇧 EN';
 })();
@@ -1347,9 +1155,7 @@ function redraw(){
   EX.strokeStyle=EC_COL.grid;EX.lineWidth=1;
   for(let x=0;x<EW;x+=GRID){EX.beginPath();EX.moveTo(x,0);EX.lineTo(x,EH);EX.stroke();}
   for(let y=0;y<EH;y+=GRID){EX.beginPath();EX.moveTo(0,y);EX.lineTo(EW,y);EX.stroke();}
-
   lv.fixed.forEach((p,i)=>{ePlatform(p,EC_COL.fixed);if(isSelected('fixed',i)){if(selection.length===1&&selectedType==='fixed'&&selectedIdx===i)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}});
-
   (lv.trap||[]).forEach((p,i)=>{
     const isSel=isSelected('trap',i),d=p.trigDist||0;
     if(d>0){EX.save();EX.beginPath();EX.rect(0,0,EW,EH);EX.clip();EX.strokeStyle=isSel?'#ff9020ff':'#ff902055';EX.lineWidth=isSel?1.5:1;EX.setLineDash([6,4]);EX.strokeRect(p.x-d,p.y-d,p.w+d*2,p.h+d*2);EX.setLineDash([]);EX.fillStyle=isSel?'#ff9020cc':'#ff902077';EX.font='6px "Press Start 2P"';EX.fillText(`${d}px`,p.x-d+2,p.y-d-3);EX.restore();}
@@ -1357,7 +1163,6 @@ function redraw(){
     ePlatform(p,EC_COL.trap);EX.fillStyle='#ff9020cc';EX.font='8px sans-serif';EX.textAlign='center';EX.fillText('⚠',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';
     if(isSel){if(selection.length===1&&selectedType==='trap'&&selectedIdx===i)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
-
   const SL_DIRS={r:[1,0,'→'],l:[-1,0,'←'],u:[0,-1,'↑'],d:[0,1,'↓']};
   (lv.slider||[]).forEach((p,i)=>{
     const isSel=isSelected('slider',i),d=p.trigDist||48,[dx,dy,arrow]=SL_DIRS[p.dir||'r'],md=p.maxDist||160;
@@ -1366,7 +1171,6 @@ function redraw(){
     ePlatform(p,EC_COL.fixed);EX.fillStyle='#20c0f0cc';EX.font='8px sans-serif';EX.textAlign='center';EX.fillText(arrow,p.x+p.w/2,p.y+p.h/2+4);EX.textAlign='left';
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
-
   const MO_DIRS={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1]};
   (lv.mobile||[]).forEach((p,i)=>{
     const isSel=isSelected('mobile',i),[dx,dy]=MO_DIRS[p.dir||'r'],gx=p.ox+dx*(p.dist||160),gy=p.oy+dy*(p.dist||160);
@@ -1374,89 +1178,41 @@ function redraw(){
     EX.fillStyle='#1a3060';EX.fillRect(p.x,p.y,p.w,p.h);EX.fillStyle='#4090f0';EX.fillRect(p.x,p.y,p.w,4);EX.fillStyle='#80c0ffcc';EX.font='6px "Press Start 2P"';EX.textAlign='center';EX.fillText('AUTO',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
-
   (lv.push||[]).forEach((p,i)=>{const isSel=isSelected('push',i);EX.fillStyle='#3d2b1a';EX.fillRect(p.x,p.y,p.w,p.h);EX.fillStyle='#8b6340';EX.fillRect(p.x,p.y,p.w,4);EX.fillStyle='#c49a6ccc';EX.font='7px sans-serif';EX.textAlign='center';EX.fillText('PUSH',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}});
-
   (lv.bounce||[]).forEach((p,i)=>{
     const isSel=isSelected('bounce',i),col={b:'#8b6914',t:'#f0c040',s:'#fde68a'};ePlatform(p,col);
     EX.strokeStyle=isSel?'#f0c040cc':'#f0c04088';EX.lineWidth=2;const cx=p.x+p.w/2;EX.beginPath();for(let i=0;i<5;i++){const sy=p.y+2+i*3,sx=i%2===0?cx-6:cx+6;i===0?EX.moveTo(cx,p.y+2):EX.lineTo(sx,sy);}EX.stroke();
     EX.fillStyle='#f0c040cc';EX.font='6px "Press Start 2P"';EX.textAlign='center';EX.fillText(`x${p.force}`,p.x+p.w/2,p.y+p.h-4);EX.textAlign='left';
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
-
   (lv.invis||[]).forEach((p,i)=>{const isSel=isSelected('invis',i);EX.fillStyle=isSel?'#ffffff12':'#ffffff07';EX.fillRect(p.x,p.y,p.w,p.h);EX.strokeStyle=isSel?'#ffffffcc':'#ffffff44';EX.lineWidth=isSel?1.5:1;EX.setLineDash([5,5]);EX.strokeRect(p.x,p.y,p.w,p.h);EX.setLineDash([]);EX.fillStyle='#ffffff55';EX.font='6px "Press Start 2P"';EX.textAlign='center';EX.fillText('INV',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}});
-
   (lv.gravflip||[]).forEach((p,i)=>{
-    const isSel=isSelected('gravflip',i);
-    const dir=p.dir??'u';
-    const str=p.strength??Math.abs(p.grav??10);
-    const c=GF_COLS[dir]||GF_COLS.u;
-    EX.fillStyle=c.bg+'22';EX.fillRect(p.x,p.y,p.w,p.h);
-    EX.strokeStyle=isSel?c.stroke+'ee':c.stroke+'66';EX.lineWidth=isSel?1.5:1;
-    EX.setLineDash([6,3]);EX.strokeRect(p.x,p.y,p.w,p.h);EX.setLineDash([]);
-    EX.fillStyle=isSel?c.stroke+'cc':c.stroke+'55';
-    if(dir==='u')EX.fillRect(p.x,p.y,p.w,4);
-    else if(dir==='d')EX.fillRect(p.x,p.y+p.h-4,p.w,4);
-    else if(dir==='l')EX.fillRect(p.x,p.y,4,p.h);
-    else if(dir==='r')EX.fillRect(p.x+p.w-4,p.y,4,p.h);
-    const arrow=str===0?'○':c.arrow;
-    EX.fillStyle=isSel?c.light+'cc':c.light+'55';
-    EX.font='13px sans-serif';EX.textAlign='center';
+    const isSel=isSelected('gravflip',i);const dir=p.dir??'u';const str=p.strength??Math.abs(p.grav??10);const c=GF_COLS[dir]||GF_COLS.u;
+    EX.fillStyle=c.bg+'22';EX.fillRect(p.x,p.y,p.w,p.h);EX.strokeStyle=isSel?c.stroke+'ee':c.stroke+'66';EX.lineWidth=isSel?1.5:1;EX.setLineDash([6,3]);EX.strokeRect(p.x,p.y,p.w,p.h);EX.setLineDash([]);EX.fillStyle=isSel?c.stroke+'cc':c.stroke+'55';
+    if(dir==='u')EX.fillRect(p.x,p.y,p.w,4);else if(dir==='d')EX.fillRect(p.x,p.y+p.h-4,p.w,4);else if(dir==='l')EX.fillRect(p.x,p.y,4,p.h);else if(dir==='r')EX.fillRect(p.x+p.w-4,p.y,4,p.h);
+    const arrow=str===0?'○':c.arrow;EX.fillStyle=isSel?c.light+'cc':c.light+'55';EX.font='13px sans-serif';EX.textAlign='center';
     const cols=Math.max(1,Math.floor(p.w/40)),rows=Math.max(1,Math.floor(p.h/36));
     for(let ci=0;ci<cols;ci++)for(let ri=0;ri<rows;ri++)EX.fillText(arrow,p.x+(ci+0.5)*(p.w/cols),p.y+(ri+0.5)*(p.h/rows)+5);
-    EX.textAlign='left';
-    EX.fillStyle=isSel?c.stroke+'cc':c.stroke+'88';EX.font='6px "Press Start 2P"';
-    EX.fillText(str===0?`○ apes.`:`${c.arrow} f=${str}`,p.x+4,p.y+p.h-4);
+    EX.textAlign='left';EX.fillStyle=isSel?c.stroke+'cc':c.stroke+'88';EX.font='6px "Press Start 2P"';EX.fillText(str===0?`○ apes.`:`${c.arrow} f=${str}`,p.x+4,p.y+p.h-4);
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
-
-  // ── Speed zones draw ──
   (lv.speed||[]).forEach((p,i)=>{
-    const isSel=isSelected('speed',i);
-    const spd=p.spd??5;
-    const fast=spd>5,slow=spd<5;
-    const col=spd===5?{bg:'#1a3a1a',stroke:'#40c040',light:'#80ff80'}:
-              fast?{bg:'#1a1a3a',stroke:'#4040f0',light:'#8080ff'}:
-                   {bg:'#3a1a1a',stroke:'#f04040',light:'#ff8080'};
-    EX.fillStyle=col.bg+'33';EX.fillRect(p.x,p.y,p.w,p.h);
-    EX.strokeStyle=isSel?col.stroke+'ee':col.stroke+'66';EX.lineWidth=isSel?1.5:1;
-    EX.setLineDash([4,4]);EX.strokeRect(p.x,p.y,p.w,p.h);EX.setLineDash([]);
-    // Arrows indicating speed
-    const arrow=spd===5?'→':fast?'»»':slow?'›':'>>';
-    const arrowCount=Math.max(1,Math.floor(p.w/36));
-    EX.fillStyle=isSel?col.light+'cc':col.light+'66';
-    EX.font='11px sans-serif';EX.textAlign='center';
-    for(let ci=0;ci<arrowCount;ci++){
-      const rows=Math.max(1,Math.floor(p.h/32));
-      for(let ri=0;ri<rows;ri++)
-        EX.fillText(fast?'⚡':'🐌',p.x+(ci+0.5)*(p.w/arrowCount),p.y+(ri+0.5)*(p.h/rows)+5);
-    }
-    EX.textAlign='left';
-    EX.fillStyle=isSel?col.stroke+'cc':col.stroke+'99';EX.font='6px "Press Start 2P"';
-    EX.fillText(`spd=${spd}`,p.x+4,p.y+p.h-4);
+    const isSel=isSelected('speed',i);const spd=p.spd??5;const fast=spd>5,slow=spd<5;
+    const col=spd===5?{bg:'#1a3a1a',stroke:'#40c040',light:'#80ff80'}:fast?{bg:'#1a1a3a',stroke:'#4040f0',light:'#8080ff'}:{bg:'#3a1a1a',stroke:'#f04040',light:'#ff8080'};
+    EX.fillStyle=col.bg+'33';EX.fillRect(p.x,p.y,p.w,p.h);EX.strokeStyle=isSel?col.stroke+'ee':col.stroke+'66';EX.lineWidth=isSel?1.5:1;EX.setLineDash([4,4]);EX.strokeRect(p.x,p.y,p.w,p.h);EX.setLineDash([]);
+    const arrowCount=Math.max(1,Math.floor(p.w/36));EX.fillStyle=isSel?col.light+'cc':col.light+'66';EX.font='11px sans-serif';EX.textAlign='center';
+    for(let ci=0;ci<arrowCount;ci++){const rows=Math.max(1,Math.floor(p.h/32));for(let ri=0;ri<rows;ri++)EX.fillText(fast?'⚡':'🐌',p.x+(ci+0.5)*(p.w/arrowCount),p.y+(ri+0.5)*(p.h/rows)+5);}
+    EX.textAlign='left';EX.fillStyle=isSel?col.stroke+'cc':col.stroke+'99';EX.font='6px "Press Start 2P"';EX.fillText(`spd=${spd}`,p.x+4,p.y+p.h-4);
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
-
-  if(lv.start){
-    eFlag(lv.start.x,lv.start.y,EC_COL.flagA,'A');
-    if(window._hovFlag==='start'||dragState?.flag==='start'){
-      EX.strokeStyle=EC_COL.flagA;EX.lineWidth=1.5;EX.strokeRect(lv.start.x-2,lv.start.y-54,44,62);
-    }
-  }
-  if(lv.end){
-    eFlag(lv.end.x,lv.end.y,EC_COL.flagB,'B');
-    if(window._hovFlag==='end'||dragState?.flag==='end'){
-      EX.strokeStyle=EC_COL.flagB;EX.lineWidth=1.5;EX.strokeRect(lv.end.x-2,lv.end.y-54,44,62);
-    }
-  }
-
+  if(lv.start){eFlag(lv.start.x,lv.start.y,EC_COL.flagA,'A');if(window._hovFlag==='start'||dragState?.flag==='start'){EX.strokeStyle=EC_COL.flagA;EX.lineWidth=1.5;EX.strokeRect(lv.start.x-2,lv.start.y-54,44,62);}}
+  if(lv.end){eFlag(lv.end.x,lv.end.y,EC_COL.flagB,'B');if(window._hovFlag==='end'||dragState?.flag==='end'){EX.strokeStyle=EC_COL.flagB;EX.lineWidth=1.5;EX.strokeRect(lv.end.x-2,lv.end.y-54,44,62);}}
   if(rubberBand){const rx=Math.min(rubberBand.sx,rubberBand.ex),ry=Math.min(rubberBand.sy,rubberBand.ey),rw=Math.abs(rubberBand.ex-rubberBand.sx),rh=Math.abs(rubberBand.ey-rubberBand.sy);EX.fillStyle='#5050c022';EX.fillRect(rx,ry,rw,rh);EX.strokeStyle='#8080f0cc';EX.lineWidth=1.5;EX.setLineDash([5,3]);EX.strokeRect(rx,ry,rw,rh);EX.setLineDash([]);}
   if(selection.length>1){EX.fillStyle='#f0e040cc';EX.font='7px "Press Start 2P"';EX.fillText(`${selection.length} sélectionnés`,mousePos.x+10,mousePos.y-8);}
   if(drawing&&startPt){const x=snap(mousePos.x),y=snap(mousePos.y),rx=Math.min(startPt.x,x),ry=Math.min(startPt.y,y),rw=Math.abs(x-startPt.x),rh=Math.abs(y-startPt.y);EX.fillStyle=EC_COL.ghost;EX.fillRect(rx,ry,rw,rh);EX.strokeStyle='#ffffff44';EX.lineWidth=1;EX.strokeRect(rx,ry,rw,rh);}
   EX.strokeStyle='#ffffff12';EX.lineWidth=1;EX.beginPath();EX.moveTo(mousePos.x,0);EX.lineTo(mousePos.x,EH);EX.stroke();EX.beginPath();EX.moveTo(0,mousePos.y);EX.lineTo(EW,mousePos.y);EX.stroke();
   EX.fillStyle='#ffffff20';EX.font='6px "Press Start 2P"';EX.fillText(`${snap(mousePos.x)}, ${snap(mousePos.y)}`,mousePos.x+6,mousePos.y-4);
 }
-
 
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
@@ -1470,23 +1226,19 @@ document.addEventListener('keydown',e=>{
 redraw();
 
 function playLevel(){
-  // Save current state to sessionStorage for preview
   sessionStorage.setItem('fl_preview_level', JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id', _currentLevelId||'');
   const titleEl=document.getElementById('level-name-input');
   sessionStorage.setItem('fl_preview_title', titleEl?titleEl.value:'');
-  // Also keep autosave so editor restores on return
   autosaveSave();
-  if(_currentLevelId){
-    window.location.href='game.html?preview=1&level='+_currentLevelId+'&from=studio';
-  }else{
-    window.location.href='game.html?preview=1&from=studio';
-  }
+  if(_currentLevelId){window.location.href='game.html?preview=1&level='+_currentLevelId+'&from=studio';}
+  else{window.location.href='game.html?preview=1&from=studio';}
 }
 
 let _hasUnsavedChanges=false;
 let _loadingLevel=false;
 </script>
+
 <!-- LOAD MODAL -->
 <div id="load-modal">
   <div class="load-box">
@@ -1495,10 +1247,10 @@ let _loadingLevel=false;
       <button class="load-close" onclick="closeLoadModal()">✕</button>
     </div>
     <div class="load-search-wrap">
-      <input type="text" id="load-search" placeholder="🔍 Rechercher..." 
+      <input type="text" id="load-search" placeholder="🔍 Rechercher..."
         oninput="filterLoadList(this.value)"
         style="width:100%;font-family:Rajdhani,sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:9px 14px;border-radius:5px;outline:none;"
-        onfocus="this.style.borderColor='var(--accent2)'" 
+        onfocus="this.style.borderColor='var(--accent2)'"
         onblur="this.style.borderColor='var(--border2)'">
     </div>
     <div id="load-list"></div>
@@ -1527,8 +1279,7 @@ const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
 const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
 const _sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-// ── Système de personnages externes ────────
-let _charSprite=null; // Image loaded from SVG file
+let _charSprite=null;
 let _charId='default';
 
 async function loadCharacterSprite(charId){
@@ -1546,292 +1297,161 @@ async function loadPlayerProfile(){
     const{data:sess}=await _sb.auth.getSession();
     if(sess.session){
       const{data:profile}=await _sb.from('profiles').select('character,lang').eq('id',sess.session.user.id).single();
-      if(profile){
-        if(profile.character)charId=profile.character;
-        if(profile.lang)localStorage.setItem('fl_lang',profile.lang);
-      }
-    }else{
-      charId=localStorage.getItem('fl_char')||'default';
-    }
+      if(profile){if(profile.character)charId=profile.character;if(profile.lang)localStorage.setItem('fl_lang',profile.lang);}
+    }else{charId=localStorage.getItem('fl_char')||'default';}
   }catch(e){charId=localStorage.getItem('fl_char')||'default';}
   _charId=charId;
   await loadCharacterSprite(charId);
 }
 
-// Initialize: load profile + lang together
 (async()=>{
   try{
-  await loadPlayerProfile();
-  // Update character icon
-  try{
-    const manifest=await fetch('characters/manifest.json').then(r=>r.json());
-    const c=manifest.find(m=>m.id===_charId);
-    if(c){
-      const el=document.getElementById('current-char-display');
-      if(el)el.textContent=c.icon;
-    }
-  }catch(e){}
-  // Apply language AFTER lang file is loaded
-  await applyStudioLang();
-  // Show UI now that lang is applied
-  const tb=document.getElementById('topbar');
-  const ly=document.getElementById('layout');
-  if(tb)tb.style.visibility='';
-  if(ly)ly.style.visibility='';
+    await loadPlayerProfile();
+    try{
+      const manifest=await fetch('characters/manifest.json').then(r=>r.json());
+      const c=manifest.find(m=>m.id===_charId);
+      if(c){const el=document.getElementById('current-char-display');if(el)el.textContent=c.icon;}
+    }catch(e){}
+    await applyStudioLang();
+    const tb=document.getElementById('topbar');const ly=document.getElementById('layout');
+    if(tb)tb.style.visibility='';if(ly)ly.style.visibility='';
   }catch(err){
-    // Show UI anyway on error
-    const tb=document.getElementById('topbar');
-    const ly=document.getElementById('layout');
-    if(tb)tb.style.visibility='';
-    if(ly)ly.style.visibility='';
+    const tb=document.getElementById('topbar');const ly=document.getElementById('layout');
+    if(tb)tb.style.visibility='';if(ly)ly.style.visibility='';
   }
 })();
 
-// ── Chargement du niveau ─────────────────────────────────
 (async()=>{
   const params=new URLSearchParams(window.location.search);
   const lid=params.get('level');
   const fromGame=sessionStorage.getItem('fl_from_game')==='1';
-  // Clean URL immediately
   if(lid)history.replaceState(null,'','studio.html');
 
-  // Check for autosave - restore if same level or new level
   const _autoSavedLv=sessionStorage.getItem('fl_autosave_level');
   const _autoSavedId=sessionStorage.getItem('fl_autosave_id')||'';
   const _autoSavedName=sessionStorage.getItem('fl_autosave_name')||'';
   if(_autoSavedLv&&((!lid&&!_autoSavedId)||(lid&&lid===_autoSavedId))){
-    try{
-      const _restored=JSON.parse(_autoSavedLv);
-      // Restore silently - will override level loaded from DB
-      window._autosaveRestore={lv:_restored,id:_autoSavedId,name:_autoSavedName};
-    }catch(ex){}
+    try{const _restored=JSON.parse(_autoSavedLv);window._autosaveRestore={lv:_restored,id:_autoSavedId,name:_autoSavedName};}catch(ex){}
   }
 
-  // If no level and not coming from game → clear preview (fresh start)
   if(!lid&&!fromGame){
-    sessionStorage.removeItem('fl_preview_level');
-    sessionStorage.removeItem('fl_preview_id');
-    sessionStorage.removeItem('fl_preview_title');
+    sessionStorage.removeItem('fl_preview_level');sessionStorage.removeItem('fl_preview_id');sessionStorage.removeItem('fl_preview_title');
   }
 
   if(fromGame){
-    // ── Retour depuis game.html → toujours utiliser sessionStorage ──
     sessionStorage.removeItem('fl_from_game');
     const raw=sessionStorage.getItem('fl_preview_level');
     if(raw){
       try{
-        const saved=JSON.parse(raw);
-        lv=saved;
+        const saved=JSON.parse(raw);lv=saved;
         if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
         if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
         if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-        // Restore ID and title
         const savedId=sessionStorage.getItem('fl_preview_id');
         const savedTitle=sessionStorage.getItem('fl_preview_title');
-        if(savedId){
-          _currentLevelId=savedId;
-          history.replaceState(null,'','studio.html');
-        }
-        const ni=document.getElementById('level-name-input');
-        if(ni&&savedTitle)ni.value=savedTitle;
-        redraw();
-        status(ts('msgRestored','✅ Level restored.'));
-        return;
+        if(savedId){_currentLevelId=savedId;history.replaceState(null,'','studio.html');}
+        const ni=document.getElementById('level-name-input');if(ni&&savedTitle)ni.value=savedTitle;
+        redraw();status(ts('msgRestored','✅ Level restored.'));return;
       }catch(e){console.error('Restore error:',e);}
     }
   }
 
-  // ── Charger depuis URL ?level=id (DB) ──
   if(!lid)return;
   const mode=params.get('mode');
-
-  // Check auth first
   const{data:sess}=await _sb.auth.getSession();
   if(!sess.session){
     document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 CONNEXION REQUISE</div><a href="login.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">SE CONNECTER</a></div>`;
     return;
   }
-
   const{data,error}=await _sb.from('levels').select('*').eq('id',lid).single();
-  if(error||!data){
-    showSaveToast(ts('toastNotFound','⚠️ Level not found — New level started'));
-    snapshot();redraw();
-    return;
-  }
-
-  // Check ownership
+  if(error||!data){showSaveToast(ts('toastNotFound','⚠️ Level not found — New level started'));snapshot();redraw();return;}
   if(data.user_id!==sess.session.user.id){
     document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 ACCÈS REFUSÉ</div><a href="index.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">🏠 ACCUEIL</a></div>`;
     return;
   }
-
-  // If level is published (public/code), show copy modal BEFORE loading editor
   if((data.visibility==='public'||data.visibility==='code')||data.is_published){
-    _isPublished=true;
-    _currentLevelId=lid;
-    // Load level data in memory but show modal immediately
+    _isPublished=true;_currentLevelId=lid;
     lv=data.data;
     if(!lv)lv={fixed:[],trap:[],slider:[],invis:[],bounce:[],mobile:[],push:[],gravflip:[],speed:[],start:{x:100,y:200},end:{x:800,y:200}};
     if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
     if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
     if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-    // Show the modal with copy or open other option
     showPublishedModal(data.title||ts('untitled','Untitled'), lid);
     return;
   }
-
-  // Check autosave restore - use if same level ID OR coming from game
   const _fromGame=sessionStorage.getItem('fl_from_game')==='1';
-  if(window._autosaveRestore&&(window._autosaveRestore.id===id||_fromGame)){
-    lv=window._autosaveRestore.lv;
-    _hasUnsavedChanges=false;
-    window._autosaveRestore=null;
-    autosaveClear();
-  }else{
-    lv=data.data;
-  }
+  if(window._autosaveRestore&&(window._autosaveRestore.id===lid||_fromGame)){
+    lv=window._autosaveRestore.lv;_hasUnsavedChanges=false;window._autosaveRestore=null;autosaveClear();
+  }else{lv=data.data;}
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-  _currentLevelId=lid;
-  _currentVisibility=data.visibility||'private';
+  _currentLevelId=lid;_currentVisibility=data.visibility||'private';
   _authorCompleted=data.author_completed||false;
   _isPublished=(data.is_published||false)||(data.visibility==='public'||data.visibility==='code');
-  if(_isPublished){
-    closeLoadModal();
-    setTimeout(()=>showPublishedModal(data.title||'',data.id),100);
-    return;
-  }
-  window._authorCompletedReset=false; // Allow reset on next modification
-  const _ni=document.getElementById('level-name-input');
-  if(_ni)_ni.value=data.title||'';
+  if(_isPublished){closeLoadModal();setTimeout(()=>showPublishedModal(data.title||'',data.id),100);return;}
+  window._authorCompletedReset=false;
+  const _ni=document.getElementById('level-name-input');if(_ni)_ni.value=data.title||'';
   redraw();
-  if(mode==='play'){
-    await _sb.from('levels').update({plays:(data.plays||0)+1}).eq('id',lid);
-    setTimeout(()=>playLevel(),300);
-  }
+  if(mode==='play'){await _sb.from('levels').update({plays:(data.plays||0)+1}).eq('id',lid);setTimeout(()=>playLevel(),300);}
   status('Niveau "'+data.title+'" chargé.');
 })();
-// ── Lang (sync with rest of site) ─────────
-// _lang() is defined in the main script block above
 
-// ── Language system — loads from /lang/*.json ──
-// STUDIO_T is declared in the main script block above
+var STUDIO_T={fr:{},en:{}};
 let _langCache={};
 
-
 async function loadLang(l){
-  if(_langCache[l]){
-    return _langCache[l];
-  }
-  const url='lang/'+l+'.json';
+  if(_langCache[l])return _langCache[l];
   try{
-    const r=await fetch(url);
-    if(!r.ok){
-      console.warn('[Lang] File not found ('+r.status+')');
-      if(l!=='fr')return loadLang('fr');
-      return null;
-    }
-    const text=await r.text();
-    let data;
-    try{data=JSON.parse(text);}
-    catch(e){console.error('[Lang] JSON parse error:',e.message);return null;}
-    _langCache[l]=data;
-    return data;
-  }catch(e){
-    console.error('[Lang] Fetch error:',e.message);
-    if(l!=='fr')return loadLang('fr');
-    return null;
-  }
+    const r=await fetch('lang/'+l+'.json');
+    if(!r.ok){if(l!=='fr')return loadLang('fr');return null;}
+    const data=await r.json();_langCache[l]=data;return data;
+  }catch(e){if(l!=='fr')return loadLang('fr');return null;}
 }
 
 async function applyStudioLang(){
   const l=_lang();
   const data=await loadLang(l);
-  if(!data||!data.studio){
-    // Show error in status bar
-    const sb=document.getElementById('statusbar');
-    if(sb)sb.textContent='⚠️ Fichier de langue manquant: lang/'+l+'.json';
-    return;
-  }
-  const studioKeys=Object.keys(data.studio);
+  if(!data||!data.studio){const sb=document.getElementById('statusbar');if(sb)sb.textContent='⚠️ Fichier de langue manquant: lang/'+l+'.json';return;}
   const t=data.studio||{};
   const pt=data.publish||{};
 
-  // Update lang button
   const lb=document.getElementById('studio-lang-btn');
   if(lb){
-    try{
-      const manifest=await fetch('lang/manifest.json').then(r=>r.json());
-      const entry=manifest.find(m=>m.id===l);
-      if(entry&&lb)lb.textContent=entry.flag+' '+entry.id.toUpperCase();
-    }catch(e){}
+    try{const manifest=await fetch('lang/manifest.json').then(r=>r.json());const entry=manifest.find(m=>m.id===l);if(entry&&lb)lb.textContent=entry.flag+' '+entry.id.toUpperCase();}catch(e){}
   }
 
   const s=(id,val,attr='textContent')=>{const el=document.getElementById(id);if(el&&val)el[attr]=val;};
   const dp=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.setAttribute('data-tip',val);};
 
-  // Section labels
-  document.querySelectorAll('[data-lbl]').forEach(el=>{
-    const key=el.getAttribute('data-lbl');
-    if(t[key]&&t[key].length>0)el.textContent=t[key];
-  });
+  document.querySelectorAll('[data-lbl]').forEach(el=>{const key=el.getAttribute('data-lbl');if(t[key]&&t[key].length>0)el.textContent=t[key];});
 
-  // Tool buttons + tooltips
   ['fixed','invis','bounce','mobile','push','trap','slider','gravflip','speed','start','end','select'].forEach(id=>{
-    const btn=document.getElementById('t-'+id);
-    if(!btn)return;
+    const btn=document.getElementById('t-'+id);if(!btn)return;
     const tKey='t'+id.charAt(0).toUpperCase()+id.slice(1);
     const tipKey='tip'+id.charAt(0).toUpperCase()+id.slice(1);
-    if(t[tKey])btn.textContent=t[tKey];
-    if(t[tipKey])btn.setAttribute('data-tip',t[tipKey]);
+    if(t[tKey])btn.textContent=t[tKey];if(t[tipKey])btn.setAttribute('data-tip',t[tipKey]);
   });
 
-  // Action buttons
-  s('btn-play',t.btnPlay);       dp('btn-play',t.tipPlay);
-  s('btn-save',t.btnSave);       dp('btn-save',t.tipSave);
-  s('btn-load',t.btnLoad);       dp('btn-load',t.tipLoad);
-  s('btn-clear',t.btnClear);     dp('btn-clear',t.tipClear);
+  s('btn-play',t.btnPlay);dp('btn-play',t.tipPlay);
+  s('btn-save',t.btnSave);dp('btn-save',t.tipSave);
+  s('btn-load',t.btnLoad);dp('btn-load',t.tipLoad);
+  s('btn-clear',t.btnClear);dp('btn-clear',t.tipClear);
 
-  // Nav links
-  const navLbl=document.getElementById('studio-nav-lbl');
-  if(navLbl)navLbl.textContent=t.navLabel||'NAVIGATION';
-  const btnProfile=document.getElementById('btn-nav-profile');
-  if(btnProfile)btnProfile.textContent='👤 '+(t.btnProfil||'PROFIL');
-  const btnHome=document.getElementById('btn-nav-home');
-  if(btnHome)btnHome.textContent='🏠 '+(t.btnAccueil||'ACCUEIL');
+  const navLbl=document.getElementById('studio-nav-lbl');if(navLbl)navLbl.textContent=t.navLabel||'NAVIGATION';
+  const btnProfile=document.getElementById('btn-nav-profile');if(btnProfile)btnProfile.textContent='👤 '+(t.btnProfil||'PROFIL');
+  const btnHome=document.getElementById('btn-nav-home');if(btnHome)btnHome.textContent='🏠 '+(t.btnAccueil||'ACCUEIL');
 
-  // Unsaved modal
-  const uTitle=document.getElementById('unsaved-title');
-  if(uTitle)uTitle.textContent='⚠️ '+(t.unsavedTitle||'MODIFICATIONS NON SAUVEGARDÉES');
-  const uDesc=document.getElementById('unsaved-desc');
-  if(uDesc)uDesc.innerHTML=t.unsavedDesc||'Tu as des modifications non sauvegardées.<br>Que veux-tu faire ?';
-  const uSave=document.getElementById('unsaved-btn-save');
-  if(uSave)uSave.textContent='💾 '+(t.unsavedSave||'ENREGISTRER ET QUITTER');
-  const uLeave=document.getElementById('unsaved-btn-leave');
-  if(uLeave)uLeave.textContent='🚪 '+(t.unsavedLeave||'QUITTER SANS ENREGISTRER');
-  const uStay=document.getElementById('unsaved-btn-stay');
-  if(uStay)uStay.textContent='← '+(t.unsavedStay||'RESTER DANS LE STUDIO');
+  const uTitle=document.getElementById('unsaved-title');if(uTitle)uTitle.textContent='⚠️ '+(t.unsavedTitle||'MODIFICATIONS NON SAUVEGARDÉES');
+  const uDesc=document.getElementById('unsaved-desc');if(uDesc)uDesc.innerHTML=t.unsavedDesc||'Tu as des modifications non sauvegardées.<br>Que veux-tu faire ?';
+  const uSave=document.getElementById('unsaved-btn-save');if(uSave)uSave.textContent='💾 '+(t.unsavedSave||'ENREGISTRER ET QUITTER');
+  const uLeave=document.getElementById('unsaved-btn-leave');if(uLeave)uLeave.textContent='🚪 '+(t.unsavedLeave||'QUITTER SANS ENREGISTRER');
+  const uStay=document.getElementById('unsaved-btn-stay');if(uStay)uStay.textContent='← '+(t.unsavedStay||'RESTER DANS LE STUDIO');
 
-  // Grid label
-  document.querySelectorAll('.tb-group span').forEach(el=>{
-    if(el.textContent==='GRILLE'||el.textContent==='GRID'||el.textContent===t.grille)
-      if(t.grille)el.textContent=t.grille;
-  });
+  if(currentTool&&t.toolNames){const name=t.toolNames[currentTool]||currentTool.toUpperCase();s('ptitle',(t.toolPrefix||'TOOL: ')+name);}
 
-  // Panel tool title
-  if(currentTool&&t.toolNames){
-    const name=t.toolNames[currentTool]||currentTool.toUpperCase();
-    s('ptitle',(t.toolPrefix||'TOOL: ')+name);
-  }
+  document.querySelectorAll('[data-info]').forEach(el=>{const key=el.getAttribute('data-info');if(t&&t[key])el.innerHTML=t[key].replace(/\n/g,'<br>');});
 
-  // Pinfo elements
-  document.querySelectorAll('[data-info]').forEach(el=>{
-    const key=el.getAttribute('data-info');
-    if(t&&t[key])el.innerHTML=t[key].replace(/\n/g,'<br>');
-  });
-
-  // Overlays
   const q=(sel,prop,val)=>{const el=document.querySelector(sel);if(el&&val)el[prop]=val;};
   q('#ovStart h2','textContent',t.ovStart);
   q('#ovStart p','innerHTML',t&&t.ovStartSub?t.ovStartSub.replace(/\n/g,'<br>'):null);
@@ -1839,86 +1459,35 @@ async function applyStudioLang(){
   q('#ovDie h2','textContent',t.ovDie);
   q('#ovWin h2','textContent',t.ovWin);
   q('#ovWin button','textContent',t.ovWinBtn);
-  document.querySelectorAll('#ovDie button').forEach((btn,i)=>{
-    if(i===0&&t.ovDieBtn)btn.textContent=t.ovDieBtn;
-    if(i===1&&t.ovDieEdit)btn.textContent=t.ovDieEdit;
-  });
+  document.querySelectorAll('#ovDie button').forEach((btn,i)=>{if(i===0&&t.ovDieBtn)btn.textContent=t.ovDieBtn;if(i===1&&t.ovDieEdit)btn.textContent=t.ovDieEdit;});
+  document.querySelectorAll('#gtopbar button').forEach(btn=>{const oc=btn.getAttribute('onclick')||'';if(oc.includes('stopGame')&&t.gEditor)btn.textContent=t.gEditor;if(oc.includes('testFromCamera')&&t.gHere)btn.textContent=t.gHere;if(btn.id==='btn-fs'&&t.gFullscreen)btn.textContent=t.gFullscreen;});
 
-  // Game topbar
-  document.querySelectorAll('#gtopbar button').forEach(btn=>{
-    const oc=btn.getAttribute('onclick')||'';
-    if(oc.includes('stopGame')&&t.gEditor)btn.textContent=t.gEditor;
-    if(oc.includes('testFromCamera')&&t.gHere)btn.textContent=t.gHere;
-    if(btn.id==='btn-fs'&&t.gFullscreen)btn.textContent=t.gFullscreen;
-  });
-
-  // Status bar
   s('statusbar',t.ready);
-
-  // Publish modal texts
   s('pub-title-lbl',pt.title);
   s('pub-name-lbl',pt.nameLbl);
-  const pn=document.getElementById('pub-name');
-  if(pn&&pt.ph)pn.placeholder=pt.ph;
-  s('pub-vis-lbl',pt.visLbl);
+  const pn=document.getElementById('pub-name');if(pn&&pt.ph)pn.placeholder=pt.ph;
   s('pub-cancel-btn',pt.cancel);
   s('pub-ok-btn',pt.ok);
 
-  // Store for use in JS
+  // ── Published modal translation ──────────────────────────
+  s('pub-lock-title', '🔒 '+(t.publishedLockTitle||(l==='fr'?'NIVEAU PUBLIÉ':'PUBLISHED LEVEL')));
+  s('pub-lock-copy-btn', t.publishedLockCopy||(l==='fr'?'⧉ CRÉER UNE COPIE MODIFIABLE':'⧉ CREATE AN EDITABLE COPY'));
+  s('pub-lock-load-btn', t.publishedLockLoad||(l==='fr'?'📂 CHARGER UN AUTRE NIVEAU':'📂 LOAD ANOTHER LEVEL'));
+
   STUDIO_T[l]=t;
   STUDIO_T._pub=pt;
 }
 
 function cycleLang(){
-  // Load manifest to get next lang
   fetch('lang/manifest.json').then(r=>r.json()).then(manifest=>{
-    const ids=manifest.map(m=>m.id);
-    const cur=_lang();
-    const next=ids[(ids.indexOf(cur)+1)%ids.length];
-    localStorage.setItem('fl_lang',next);
-    applyStudioLang();
-  }).catch(()=>{
-    const next=_lang()==='fr'?'en':'fr';
-    localStorage.setItem('fl_lang',next);
-    applyStudioLang();
-  });
+    const ids=manifest.map(m=>m.id);const cur=_lang();const next=ids[(ids.indexOf(cur)+1)%ids.length];
+    localStorage.setItem('fl_lang',next);applyStudioLang();
+  }).catch(()=>{const next=_lang()==='fr'?'en':'fr';localStorage.setItem('fl_lang',next);applyStudioLang();});
 }
 
-
-
 const _PT={
-  fr:{
-    title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',
-    visLbl:'VISIBILITÉ',
-    hintPrivate:'🔒 Seul toi peux le voir',
-    hintPublic:'🌍 Tout le monde peut jouer',
-    hintCode:'🔑 Accessible uniquement avec le code',
-    cancel:'ANNULER',ok:'💾 SAUVER →',saving:'SAUVEGARDE...',
-    needLogin:'Tu dois être connecté !',
-    needTitle:'Donne un nom à ton niveau !',
-    needBlocks:'Ton niveau est vide !',
-    successNew:'Niveau sauvegardé !',
-    successUpdate:'Niveau mis à jour !',
-    codeMsg:'Code de partage : ',
-    codeCopied:'(copié !)',
-    errorTxt:'Erreur : '
-  },
-  en:{
-    title:'💾 SAVE',nameLbl:'LEVEL NAME',ph:'My funky level...',
-    visLbl:'VISIBILITY',
-    hintPrivate:'🔒 Only you can see it',
-    hintPublic:'🌍 Everyone can play',
-    hintCode:'🔑 Accessible with code only',
-    cancel:'CANCEL',ok:'💾 SAVE →',saving:'SAVING...',
-    needLogin:'You must be logged in!',
-    needTitle:'Give your level a name!',
-    needBlocks:'Your level is empty!',
-    successNew:'Level saved!',
-    successUpdate:'Level updated!',
-    codeMsg:'Share code: ',
-    codeCopied:'(copied!)',
-    errorTxt:'Error: '
-  }
+  fr:{title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',visLbl:'VISIBILITÉ',hintPrivate:'🔒 Seul toi peux le voir',hintPublic:'🌍 Tout le monde peut jouer',hintCode:'🔑 Accessible uniquement avec le code',cancel:'ANNULER',ok:'💾 SAUVER →',saving:'SAUVEGARDE...',needLogin:'Tu dois être connecté !',needTitle:'Donne un nom à ton niveau !',needBlocks:'Ton niveau est vide !',successNew:'Niveau sauvegardé !',successUpdate:'Niveau mis à jour !',codeMsg:'Code de partage : ',codeCopied:'(copié !)',errorTxt:'Erreur : '},
+  en:{title:'💾 SAVE',nameLbl:'LEVEL NAME',ph:'My funky level...',visLbl:'VISIBILITY',hintPrivate:'🔒 Only you can see it',hintPublic:'🌍 Everyone can play',hintCode:'🔑 Accessible with code only',cancel:'CANCEL',ok:'💾 SAVE →',saving:'SAVING...',needLogin:'You must be logged in!',needTitle:'Give your level a name!',needBlocks:'Your level is empty!',successNew:'Level saved!',successUpdate:'Level updated!',codeMsg:'Share code: ',codeCopied:'(copied!)',errorTxt:'Error: '}
 };
 
 const VIS_HINTS={
@@ -1929,149 +1498,86 @@ const VIS_HINTS={
 function setVis(v){
   _currentVisibility=v;
   document.querySelectorAll('.pub-vis-btn').forEach(b=>b.classList.remove('active'));
-  const btn=document.getElementById('vis-'+v);
-  if(btn)btn.classList.add('active');
-  const hint=document.getElementById('pub-vis-hint');
-  if(hint)hint.textContent=VIS_HINTS[_lang()][v]||'';
+  const btn=document.getElementById('vis-'+v);if(btn)btn.classList.add('active');
+  const hint=document.getElementById('pub-vis-hint');if(hint)hint.textContent=VIS_HINTS[_lang()][v]||'';
 }
 
 function _applyPubLang(){
   const t=STUDIO_T._pub||_PT[_lang()];
   const s=(id,val,prop='textContent')=>{const el=document.getElementById(id);if(el&&val)el[prop]=val;};
-  s('pub-title-lbl',t.title);
-  s('pub-name-lbl',t.nameLbl);
-  s('pub-name',t.ph,'placeholder');
-  s('pub-vis-lbl',t.visLbl);
-  s('pub-cancel-btn',t.cancel);
-  s('pub-ok-btn',t.ok);
+  s('pub-title-lbl',t.title);s('pub-name-lbl',t.nameLbl);s('pub-name',t.ph,'placeholder');s('pub-vis-lbl',t.visLbl);s('pub-cancel-btn',t.cancel);s('pub-ok-btn',t.ok);
   setVis(_currentVisibility);
 }
 
 function openPublish(){
   _applyPubLang();
   document.getElementById('pub-msg').className='pub-msg';
-  // Pre-fill from toolbar name input
-  const ni=document.getElementById('level-name-input');
-  const pubName=document.getElementById('pub-name');
+  const ni=document.getElementById('level-name-input');const pubName=document.getElementById('pub-name');
   if(ni&&pubName&&ni.value)pubName.value=ni.value;
   document.getElementById('publish-modal').classList.add('show');
   if(pubName)pubName.focus();
 }
 function closePublish(){document.getElementById('publish-modal').classList.remove('show');}
 
-// publish-modal: no backdrop close
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    // Block escape for load modal when published
-    if(_isPublished&&_currentLevelId&&!window._dupConfirmed&&
-       document.getElementById('load-modal').classList.contains('show'))return;
-    // Escape no longer closes publish modal
-  }if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();});
+    if(_isPublished&&_currentLevelId&&!window._dupConfirmed&&document.getElementById('load-modal').classList.contains('show'))return;
+  }
+  if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();
+});
 
 async function doPublish(){
   const t=STUDIO_T._pub||_PT[_lang()];
   const title=document.getElementById('pub-name').value.trim();
   const msgEl=document.getElementById('pub-msg');
   const okBtn=document.getElementById('pub-ok-btn');
-
-  // Vérif session
   const{data:sess}=await _sb.auth.getSession();
   if(!sess.session){msgEl.className='pub-msg err';msgEl.textContent=t.needLogin;return;}
-
-  // Vérif titre
   if(!title){msgEl.className='pub-msg err';msgEl.textContent=t.needTitle;return;}
-
-  // Vérif niveau non vide
   const totalBlocks=(lv.fixed||[]).length+(lv.trap||[]).length+(lv.slider||[]).length+(lv.mobile||[]).length+(lv.bounce||[]).length+(lv.push||[]).length+(lv.invis||[]).length;
   if(totalBlocks===0){msgEl.className='pub-msg err';msgEl.textContent=t.needBlocks;return;}
-
-  // Vérif que l'auteur a terminé le niveau
   if(_currentLevelId&&!_authorCompleted){
-    // Vérifie en DB au cas où
     const{data:lvlCheck}=await _sb.from('levels').select('author_completed,is_published').eq('id',_currentLevelId).single();
-    if(lvlCheck){
-      _authorCompleted=lvlCheck.author_completed||false;
-      _isPublished=lvlCheck.is_published||false;
-    }
-    if(!_authorCompleted){
-      msgEl.className='pub-msg err';
-      msgEl.textContent=_lang()==='fr'?
-        "🎮 Tu dois d'abord terminer le niveau toi-même !":
-        '🎮 You must complete the level yourself first!';
-      return;
-    }
+    if(lvlCheck){_authorCompleted=lvlCheck.author_completed||false;_isPublished=lvlCheck.is_published||false;}
+    if(!_authorCompleted){msgEl.className='pub-msg err';msgEl.textContent=_lang()==='fr'?"🎮 Tu dois d'abord terminer le niveau toi-même !":'🎮 You must complete the level yourself first!';return;}
   }
-
-  okBtn.disabled=true;okBtn.textContent=t.saving;
-  msgEl.className='pub-msg';
-
+  okBtn.disabled=true;okBtn.textContent=t.saving;msgEl.className='pub-msg';
   const user=sess.session.user;
-  const username=user.user_metadata?.username||user.email.split('@')[0];
-
   let error,shareCode=null;
-
   if(_currentLevelId){
-    // ── UPDATE niveau existant ──
     const updates={title,data:lv,visibility:_currentVisibility};
     if(_currentVisibility!=='private')updates.is_published=true;
     const{error:e}=await _sb.from('levels').update(updates).eq('id',_currentLevelId).eq('user_id',user.id);
-    if(!e&&_currentVisibility!=='private')_isPublished=true;
-    error=e;
+    if(!e&&_currentVisibility!=='private')_isPublished=true;error=e;
   }else{
-    // ── INSERT nouveau niveau ──
     function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
     shareCode=genCode();
-    const{data:inserted,error:e}=await _sb.from('levels').insert({
-      user_id:user.id,
-      title:title,
-      data:lv,
-      plays:0,
-      visibility:_currentVisibility,
-      share_code:shareCode,
-      author_completed:_authorCompleted,
-      is_published:_currentVisibility!=='private'
-    }).select().single();
+    const{data:inserted,error:e}=await _sb.from('levels').insert({user_id:user.id,title:title,data:lv,plays:0,visibility:_currentVisibility,share_code:shareCode,author_completed:_authorCompleted,is_published:_currentVisibility!=='private'}).select().single();
     error=e;
-    if(!error&&inserted){
-      _currentLevelId=inserted.id;
-      history.replaceState(null,'','studio.html');
-    }
+    if(!error&&inserted){_currentLevelId=inserted.id;history.replaceState(null,'','studio.html');}
   }
-  // Navigate after save if pending
-  _hasUnsavedChanges=false;
-  autosaveClear();
-  doAfterSaveNav&&doAfterSaveNav();
-
+  _hasUnsavedChanges=false;autosaveClear();doAfterSaveNav&&doAfterSaveNav();
   okBtn.disabled=false;okBtn.textContent=t.ok;
-
-  if(error){
-    msgEl.className='pub-msg err';
-    msgEl.textContent=t.errorTxt+error.message;
-  }else{
-    // Update name input in toolbar
-    const ni=document.getElementById('level-name-input');
-    if(ni)ni.value=title;
+  if(error){msgEl.className='pub-msg err';msgEl.textContent=t.errorTxt+error.message;}
+  else{
+    const ni=document.getElementById('level-name-input');if(ni)ni.value=title;
     if(shareCode&&_currentVisibility==='code'){
       navigator.clipboard?.writeText(shareCode).catch(()=>{});
-      msgEl.className='pub-msg ok';
-      msgEl.innerHTML=t.successNew+'<br>'+t.codeMsg+'<b>'+shareCode+'</b><br><span style="font-size:5px;color:#40f090aa;">'+t.codeCopied+'</span>';
+      msgEl.className='pub-msg ok';msgEl.innerHTML=t.successNew+'<br>'+t.codeMsg+'<b>'+shareCode+'</b><br><span style="font-size:5px;color:#40f090aa;">'+t.codeCopied+'</span>';
       setTimeout(()=>closePublish(),4000);
-    }else{
-      msgEl.className='pub-msg ok';
-      msgEl.textContent=shareCode?t.successNew:t.successUpdate;
-      setTimeout(()=>closePublish(),1800);
-    }
+    }else{msgEl.className='pub-msg ok';msgEl.textContent=shareCode?t.successNew:t.successUpdate;setTimeout(()=>closePublish(),1800);}
   }
 }
 </script>
-<!-- PUBLISHED LEVEL MODAL -->
+
+<!-- PUBLISHED LEVEL MODAL — IDs added for translation -->
 <div id="published-modal" style="display:none;position:fixed;inset:0;background:#000000dd;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:36px 32px;width:min(440px,90vw);display:flex;flex-direction:column;gap:20px;">
-    <div style="font-family:Orbitron,monospace;font-size:13px;color:#f0a040;text-align:center;letter-spacing:2px;">🔒 NIVEAU PUBLIÉ</div>
+    <div id="pub-lock-title" style="font-family:Orbitron,monospace;font-size:13px;color:#f0a040;text-align:center;letter-spacing:2px;">🔒 NIVEAU PUBLIÉ</div>
     <p id="published-modal-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.8;text-align:center;"></p>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button onclick="confirmDuplicateFromModal()" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#2a1a00;border:2px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;letter-spacing:1px;">⧉ CRÉER UNE COPIE MODIFIABLE</button>
-      <button onclick="document.getElementById('published-modal').style.display='none';openLoadModal();" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">📂 CHARGER UN AUTRE NIVEAU</button>
+      <button id="pub-lock-copy-btn" onclick="confirmDuplicateFromModal()" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#2a1a00;border:2px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;letter-spacing:1px;">⧉ CRÉER UNE COPIE MODIFIABLE</button>
+      <button id="pub-lock-load-btn" onclick="document.getElementById('published-modal').style.display='none';openLoadModal();" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">📂 CHARGER UN AUTRE NIVEAU</button>
     </div>
   </div>
 </div>
@@ -2103,60 +1609,52 @@ async function doPublish(){
 
 <script>
 function showPublishedModal(title, lid){
-  // Disable all toolbar buttons visually
-  document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>{
-    if(b.id!=='btn-load')b.style.opacity='0.3';
-  });
-  // Make canvas non-interactive
-  const c=document.getElementById('studio-canvas');
-  if(c)c.style.pointerEvents='none';
+  document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>{if(b.id!=='btn-load')b.style.opacity='0.3';});
+  const c=document.getElementById('studio-canvas');if(c)c.style.pointerEvents='none';
+
+  // Use lang system for all text
   const lang=localStorage.getItem('fl_lang')||'fr';
-  const msg=lang==='fr'
-    ?'<strong style="color:#f0e040;">'+title+'</strong><br><br>Ce niveau est publié et ne peut pas être modifié directement.<br>Crée une copie privée pour y apporter des modifications.'
-    :'<strong style="color:#f0e040;">'+title+'</strong><br><br>This level is published and cannot be edited directly.<br>Create a private copy to make changes.';
+  const _t=STUDIO_T[lang]||{};
+  const descTpl=_t.publishedLockDesc||
+    (lang==='fr'
+      ?'Ce niveau est publié et ne peut pas être modifié directement.\nCrée une copie privée pour y apporter des modifications.'
+      :'This level is published and cannot be edited directly.\nCreate a private copy to make changes.');
+  const msg='<strong style="color:#f0e040;">'+title+'</strong><br><br>'+descTpl.replace(/\n/g,'<br>');
   document.getElementById('published-modal-msg').innerHTML=msg;
+
+  // Translate title and buttons
+  const _s=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.textContent=val;};
+  _s('pub-lock-title','🔒 '+(_t.publishedLockTitle||(lang==='fr'?'NIVEAU PUBLIÉ':'PUBLISHED LEVEL')));
+  _s('pub-lock-copy-btn',_t.publishedLockCopy||(lang==='fr'?'⧉ CRÉER UNE COPIE MODIFIABLE':'⧉ CREATE AN EDITABLE COPY'));
+  _s('pub-lock-load-btn',_t.publishedLockLoad||(lang==='fr'?'📂 CHARGER UN AUTRE NIVEAU':'📂 LOAD ANOTHER LEVEL'));
+
   document.getElementById('published-modal').style.display='flex';
 }
 
 async function confirmDuplicateFromModal(){
   document.getElementById('published-modal').style.display='none';
   window._dupConfirmed=true;
-  // Re-enable all buttons and canvas
   document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
-  const c=document.getElementById('studio-canvas');
-  if(c)c.style.pointerEvents='';
+  const c=document.getElementById('studio-canvas');if(c)c.style.pointerEvents='';
   await duplicateLevel();
 }
 
 function showDupModal(){
   const lang=localStorage.getItem('fl_lang')||'fr';
-  const msgFr=l==='fr'?'Ce niveau est publié et a déjà été joué.<br>Tu ne peux pas le modifier directement.<br><br>Une copie privée sera créée.':'This level is published.<br>You cannot edit it directly.<br><br>A private copy will be created.';
-  const msgEn='This level is published and has been played.<br>You cannot edit it directly.<br><br>A private copy will be created.';
+  const msgFr='Ce niveau est publié et a déjà été joué.<br>Tu ne peux pas le modifier directement.<br><br>Une copie privée sera créée.';
+  const msgEn='This level is published.<br>You cannot edit it directly.<br><br>A private copy will be created.';
   document.getElementById('dup-msg').innerHTML=lang==='fr'?msgFr:msgEn;
   document.getElementById('dup-modal').style.display='flex';
 }
-function closeDupModal(){
-  document.getElementById('dup-modal').style.display='none';
-}
+function closeDupModal(){document.getElementById('dup-modal').style.display='none';}
 function confirmDuplicate(){
-  closeDupModal();
-  window._dupConfirmed=true;
-  // Re-enable all buttons and canvas
+  closeDupModal();window._dupConfirmed=true;
   document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
-  const c=document.getElementById('studio-canvas');
-  if(c)c.style.pointerEvents='';
+  const c=document.getElementById('studio-canvas');if(c)c.style.pointerEvents='';
   duplicateLevel();
 }
 
-// ── Autosave recovery ────────────────────────────────────
-(function(){
-  // Check autosave on page arrival
-  _loadingLevel=false;
-  _hasUnsavedChanges=false;
-  checkAutosaveOnLoad();
-})();
-
-// ── Autosave System ──────────────────────────────────────
+(function(){_loadingLevel=false;_hasUnsavedChanges=false;checkAutosaveOnLoad();})();
 
 function autosaveSave(){
   if(_loadingLevel)return;
@@ -2167,135 +1665,59 @@ function autosaveSave(){
     sessionStorage.setItem('fl_autosave_name',ni?ni.value:'');
   }catch(ex){}
 }
-
-function autosaveClear(){
-  sessionStorage.removeItem('fl_autosave_level');
-  sessionStorage.removeItem('fl_autosave_id');
-  sessionStorage.removeItem('fl_autosave_name');
-}
+function autosaveClear(){sessionStorage.removeItem('fl_autosave_level');sessionStorage.removeItem('fl_autosave_id');sessionStorage.removeItem('fl_autosave_name');}
 
 function checkAutosaveOnLoad(){
-  const savedLv=sessionStorage.getItem('fl_autosave_level');
-  if(!savedLv)return;
+  const savedLv=sessionStorage.getItem('fl_autosave_level');if(!savedLv)return;
   const savedName=sessionStorage.getItem('fl_autosave_name')||ts('untitled','Untitled');
   try{
-    const restored=JSON.parse(savedLv);
-    lv=restored;
+    const restored=JSON.parse(savedLv);lv=restored;
     if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
     if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
     if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-    const ni=document.getElementById('level-name-input');
-    if(ni&&savedName)ni.value=savedName;
-    const savedId=sessionStorage.getItem('fl_autosave_id');
-    if(savedId)_currentLevelId=savedId;
-    _hasUnsavedChanges=true;
-    redraw&&redraw();
-    status&&status(ts('msgDraftRestored','⚡ Draft restored'));
+    const ni=document.getElementById('level-name-input');if(ni&&savedName)ni.value=savedName;
+    const savedId=sessionStorage.getItem('fl_autosave_id');if(savedId)_currentLevelId=savedId;
+    _hasUnsavedChanges=true;redraw&&redraw();status&&status(ts('msgDraftRestored','⚡ Draft restored'));
   }catch(ex){}
 }
 
-// ── Unsaved changes + navigation ─────────────────────────
-
 window.addEventListener('beforeunload',function(e){
-  // Always save current state to sessionStorage for recovery
   if(lv&&typeof lv==='object'){
-    try{
-      sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));
-      sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');
-      sessionStorage.setItem('fl_autosave_name',document.getElementById('level-name-input')?.value||'');
-    }catch(ex){}
+    try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');sessionStorage.setItem('fl_autosave_name',document.getElementById('level-name-input')?.value||'');}catch(ex){}
   }
-  // No browser dialog - custom modal handles this
 });
 
 let _pendingNavUrl=null;
-
-// Intercept browser back button
 history.pushState(null,'',location.href);
 window.addEventListener('popstate',function(){
-  if(_hasUnsavedChanges){
-    history.pushState(null,'',location.href);
-    _pendingNavUrl='__BACK__';
-    showUnsavedModal();
-  }else{
-    autosaveClear();
-    // no pushState - let browser navigate normally
-  }
+  if(_hasUnsavedChanges){history.pushState(null,'',location.href);_pendingNavUrl='__BACK__';showUnsavedModal();}
+  else{autosaveClear();}
 });
+window.addEventListener('pagehide',function(){if(!_hasUnsavedChanges)autosaveClear();});
 
-// Always clear autosave when leaving studio
-window.addEventListener('pagehide',function(){
-  if(!_hasUnsavedChanges){
-    autosaveClear();
-  }
-});
-
-function goToHome(){
-  if(_hasUnsavedChanges){
-    _pendingNavUrl='index.html';
-    showUnsavedModal();
-  }else{
-    autosaveClear();
-    window.location.href='index.html';
-  }
-}
-
-function goToProfile(){
-  if(_hasUnsavedChanges){
-    _pendingNavUrl='settings.html';
-    showUnsavedModal();
-  }else{
-    window.location.href='settings.html';
-  }
-}
-
-function showUnsavedModal(){
-  document.getElementById('unsaved-modal').style.display='flex';
-}
+function goToHome(){if(_hasUnsavedChanges){_pendingNavUrl='index.html';showUnsavedModal();}else{autosaveClear();window.location.href='index.html';}}
+function goToProfile(){if(_hasUnsavedChanges){_pendingNavUrl='settings.html';showUnsavedModal();}else{window.location.href='settings.html';}}
+function showUnsavedModal(){document.getElementById('unsaved-modal').style.display='flex';}
 
 function unsavedSave(){
   document.getElementById('unsaved-modal').style.display='none';
-  const ni=document.getElementById('level-name-input');
-  const hasName=ni&&ni.value.trim().length>0;
-  window._afterSaveNav=_pendingNavUrl;
-  _pendingNavUrl=null;
-  if(!_currentLevelId&&!hasName){
-    openPublish();
-  }else{
-    saveLevel();
-  }
+  const ni=document.getElementById('level-name-input');const hasName=ni&&ni.value.trim().length>0;
+  window._afterSaveNav=_pendingNavUrl;_pendingNavUrl=null;
+  if(!_currentLevelId&&!hasName)openPublish();else saveLevel();
 }
-
 function doAfterSaveNav(){
-  if(window._afterSaveNav){
-    const url=window._afterSaveNav;
-    window._afterSaveNav=null;
-    if(url==='__BACK__')history.go(-2); // skip past our pushState
-    else window.location.href=url;
-  }
+  if(window._afterSaveNav){const url=window._afterSaveNav;window._afterSaveNav=null;if(url==='__BACK__')history.go(-2);else window.location.href=url;}
 }
-
 function unsavedLeave(){
-  _hasUnsavedChanges=false;
-  autosaveClear();
-  _currentLevelId=null;
-  lv=emptyLevel();
-  const ni=document.getElementById('level-name-input');
-  if(ni)ni.value='';
+  _hasUnsavedChanges=false;autosaveClear();_currentLevelId=null;lv=emptyLevel();
+  const ni=document.getElementById('level-name-input');if(ni)ni.value='';
   document.getElementById('unsaved-modal').style.display='none';
-  if(_pendingNavUrl==='__BACK__'){
-    _pendingNavUrl=null;
-    history.go(-2); // go back past our pushState + original back
-  }else if(_pendingNavUrl){
-    window.location.href=_pendingNavUrl;
-    _pendingNavUrl=null;
-  }
+  if(_pendingNavUrl==='__BACK__'){_pendingNavUrl=null;history.go(-2);}
+  else if(_pendingNavUrl){window.location.href=_pendingNavUrl;_pendingNavUrl=null;}
 }
-
-function unsavedStay(){
-  document.getElementById('unsaved-modal').style.display='none';
-  _pendingNavUrl=null;
-}
+function unsavedStay(){document.getElementById('unsaved-modal').style.display='none';_pendingNavUrl=null;}
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
