@@ -48,12 +48,12 @@
     "tipPublish": "🚀 PUBLISH\nChoose visibility.",
     "tipLoad": "📂 MY LEVELS\nLoad one of your levels.",
     "tipClear": "🗑 CLEAR\nStart a new empty level.",
-    "pInfoFixed": "Solid floor.\nLeft click to draw.",
+    "pInfoFixed": "Solid floor.<br>Click and drag<br>to draw.",
     "pInfoInvis": "Solid but invisible in game.",
-    "pInfoPush": "Pushable block. Falls if\nnothing supports it.",
-    "pInfoStart": "Click to place\nthe start point.",
-    "pInfoEnd": "Click to place\nthe goal.",
-    "pInfoSelect": "Click = select.\nDrag = move.\nHandles = resize.\n\nDel = delete.\nCtrl+C/V = copy.\nCtrl+Z/Y = undo/redo.",
+    "pInfoPush": "Pushable block. Falls if<br>nothing supports it.",
+    "pInfoStart": "Click to place<br>the start point.",
+    "pInfoEnd": "Click to place<br>the goal.",
+    "pInfoSelect": "Click = select.<br>Drag = move.<br>Handles = resize.<br><br>Del = delete.<br>Ctrl+C/V = copy.<br>Ctrl+Z/Y = undo/redo.",
     "ovStart": "PLATFORMER STUDIO",
     "ovStartSub": "Build your level, then play it!\n\nLeft click = draw | Right click = navigate\nScroll = zoom",
     "ovStartBtn": "START",
@@ -85,7 +85,6 @@
     "toastSaved": "✅ SAVED!",
     "toastLoadError": "⚠️ Load error",
     "toastNotFound": "⚠️ Level not found — New level started",
-    "pInfoSpeed": "Speed zone.<br><br>5 = normal<br>1 = very slow<br>20 = very fast",
     "toolNames": {
       "fixed": "FIXED",
       "trap": "TRAP",
@@ -99,7 +98,14 @@
       "start": "START",
       "end": "END",
       "select": "SELECTION"
-    }
+    },
+    "pInfoTrap": "Falls when player<br>approaches.",
+    "pInfoSlider": "Slides when player<br>approaches.",
+    "pInfoBounce": "Bounces the player.<br>Force 1 = normal jump.",
+    "pInfoMobile": "Goes back and forth.",
+    "pInfoGravflip": "Gravity zone.<br><br>Pulls player toward<br>the indicated edge.<br><br>Force 0 = weightless.",
+    "pInfoSpeed": "Speed zone.<br><br>5 = normal<br>1 = very slow<br>20 = very fast",
+    "untitled": "Untitled"
   },
   "home": {
     "heroTitle": "⚡ FUNKYLEVELS",
