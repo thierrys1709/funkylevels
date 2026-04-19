@@ -85,6 +85,7 @@
     "toastSaved": "✅ SAUVEGARDÉ !",
     "toastLoadError": "⚠️ Erreur de chargement",
     "toastNotFound": "⚠️ Niveau introuvable — Nouveau niveau initialisé",
+    "pInfoSpeed": "Zone de vitesse.<br><br>5 = normal<br>1 = très lent<br>20 = très rapide",
     "toolNames": {
       "fixed": "FIXE",
       "trap": "PIÈGE",
