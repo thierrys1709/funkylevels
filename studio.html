@@ -772,7 +772,6 @@ function snapshotWithDupCheck(){
     window._authorCompletedReset=true;
     _sb.from('levels').update({author_completed:false}).eq('id',_currentLevelId).then(()=>{
       _authorCompleted=false;
-      console.log('[Studio] author_completed reset after modification');
     });
   }
   if(_isPublished&&_currentLevelId&&!window._dupConfirmed){
@@ -1254,9 +1253,6 @@ async function doLoadLevel(id,title){
   if(cv)cv.style.pointerEvents='';
   // Check autosave restore - use if same level ID OR coming from game
   const _fromGame=sessionStorage.getItem('fl_from_game')==='1';
-  const _autoId=window._autosaveRestore?.id||'null';
-  const _autoHas=!!window._autosaveRestore;
-  alert('DEBUG\nfl_from_game: '+_fromGame+'\nautosaveRestore exists: '+_autoHas+'\nautosave.id: '+_autoId+'\nlevel id: '+id+'\nautosave level blocks: '+(window._autosaveRestore?.lv?.fixed?.length||0));
   if(window._autosaveRestore&&(window._autosaveRestore.id===id||_fromGame)){
     lv=window._autosaveRestore.lv;
     _hasUnsavedChanges=false;
@@ -1264,7 +1260,6 @@ async function doLoadLevel(id,title){
     autosaveClear();
   }else{
     lv=data.data;
-    alert('DEBUG: using DB data, blocks: '+(lv?.fixed?.length||0));
   }
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
@@ -1565,10 +1560,8 @@ async function loadPlayerProfile(){
 
 // Initialize: load profile + lang together
 (async()=>{
-  console.log('[Init] Starting...');
   try{
   await loadPlayerProfile();
-  console.log('[Init] Profile loaded, charId:', _charId);
   // Update character icon
   try{
     const manifest=await fetch('characters/manifest.json').then(r=>r.json());
@@ -1578,7 +1571,6 @@ async function loadPlayerProfile(){
       if(el)el.textContent=c.icon;
     }
   }catch(e){}
-  console.log('[Init] Calling applyStudioLang...');
   // Apply language AFTER lang file is loaded
   await applyStudioLang();
   // Show UI now that lang is applied
@@ -1587,7 +1579,6 @@ async function loadPlayerProfile(){
   if(tb)tb.style.visibility='';
   if(ly)ly.style.visibility='';
   }catch(err){
-    console.error('[Init] FATAL ERROR:', err.message, err.stack);
     // Show UI anyway on error
     const tb=document.getElementById('topbar');
     const ly=document.getElementById('layout');
@@ -1691,9 +1682,6 @@ async function loadPlayerProfile(){
 
   // Check autosave restore - use if same level ID OR coming from game
   const _fromGame=sessionStorage.getItem('fl_from_game')==='1';
-  const _autoId=window._autosaveRestore?.id||'null';
-  const _autoHas=!!window._autosaveRestore;
-  alert('DEBUG\nfl_from_game: '+_fromGame+'\nautosaveRestore exists: '+_autoHas+'\nautosave.id: '+_autoId+'\nlevel id: '+id+'\nautosave level blocks: '+(window._autosaveRestore?.lv?.fixed?.length||0));
   if(window._autosaveRestore&&(window._autosaveRestore.id===id||_fromGame)){
     lv=window._autosaveRestore.lv;
     _hasUnsavedChanges=false;
@@ -1701,7 +1689,6 @@ async function loadPlayerProfile(){
     autosaveClear();
   }else{
     lv=data.data;
-    alert('DEBUG: using DB data, blocks: '+(lv?.fixed?.length||0));
   }
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
@@ -1734,27 +1721,21 @@ let _langCache={};
 
 
 async function loadLang(l){
-  console.log('[Lang] loadLang called for:', l);
   if(_langCache[l]){
-    console.log('[Lang] Cache hit for:', l);
     return _langCache[l];
   }
   const url='lang/'+l+'.json';
-  console.log('[Lang] Fetching:', url);
   try{
     const r=await fetch(url);
-    console.log('[Lang] Fetch response:', r.status, r.ok);
     if(!r.ok){
       console.warn('[Lang] File not found ('+r.status+')');
       if(l!=='fr')return loadLang('fr');
       return null;
     }
     const text=await r.text();
-    console.log('[Lang] Raw text (first 80):', text.substring(0,80));
     let data;
     try{data=JSON.parse(text);}
     catch(e){console.error('[Lang] JSON parse error:',e.message);return null;}
-    console.log('[Lang] Parsed OK, sections:', Object.keys(data));
     _langCache[l]=data;
     return data;
   }catch(e){
@@ -1766,18 +1747,14 @@ async function loadLang(l){
 
 async function applyStudioLang(){
   const l=_lang();
-  console.log('[ApplyLang] Language:', l, '| Cache:', !!_langCache[l], '| Keys:', _langCache[l]?Object.keys(_langCache[l]):[]);
   const data=await loadLang(l);
-  console.log('[ApplyLang] Data received:', !!data, '| Has studio:', !!(data&&data.studio));
   if(!data||!data.studio){
-    console.warn('[ApplyLang] Lang file not loaded. Check lang/'+l+'.json exists on server.');
     // Show error in status bar
     const sb=document.getElementById('statusbar');
     if(sb)sb.textContent='⚠️ Fichier de langue manquant: lang/'+l+'.json';
     return;
   }
   const studioKeys=Object.keys(data.studio);
-  console.log('[ApplyLang] Studio keys count:', studioKeys.length, '| Has tFixed:', !!data.studio.tFixed);
   const t=data.studio||{};
   const pt=data.publish||{};
 
