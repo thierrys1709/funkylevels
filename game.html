@@ -511,6 +511,7 @@ async function init(){
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+  if(!lv.dark)lv.dark=[];
 
   if(_currentLevelId&&_levelData){_sb.from('levels').update({plays:(_levelData.plays||0)+1}).eq('id',_currentLevelId).then(()=>{});}
   if(_currentLevelId)await loadBestTime();
@@ -535,6 +536,7 @@ function startGameFrom(sx,sy){
   (gLv.mobile||[]).forEach(m=>{m.x=m.ox;m.y=m.oy;m.t=0;m.going=true;});
   (gLv.push||[]).forEach(p=>{p.x=p.ox;p.y=p.oy;p.vx=0;p.vy=0;});
   (gLv.gravflip||[]).forEach(z=>{if(z.dir===undefined){z.dir=(z.grav??-10)<0?'u':'d';z.strength=Math.abs(z.grav??10);}});
+  if(!gLv.dark)gLv.dark=[];
   gParts=[];gBullets=[];gLives=3;gElapsed=0;gWon=false;gRunning=false;gDeadPending=false;
   gStartTime=performance.now();
   if(!lv.end)lv.end=null;
@@ -1037,6 +1039,38 @@ function gDraw(){
 
   // ── Player ──
   if(!gPlayer.dead)gDrawPlayer();
+
+  // ── Darkness zones — overlay noir avec halo autour du joueur ──
+  if(gPlayer&&!gPlayer.dead&&(gLv.dark||[]).length>0){
+    const px=gPlayer.x+gPlayer.w/2;
+    const py=gPlayer.y+gPlayer.h/2;
+    (gLv.dark||[]).forEach(z=>{
+      if(!ov(gPlayer,z))return;
+      const MIN_R=48; // minimum même à lightRadius=0
+      const r=Math.max(MIN_R,(z.lightRadius??80));
+      // Clipper sur la zone dark uniquement
+      GX.save();
+      GX.beginPath();
+      GX.rect(z.x,z.y,z.w,z.h);
+      GX.clip();
+      // Gradient radial : transparent au centre, noir vers les bords
+      const grad=GX.createRadialGradient(px,py,r*0.3,px,py,r);
+      grad.addColorStop(0,'rgba(0,0,0,0)');
+      grad.addColorStop(1,'rgba(0,0,0,1)');
+      // Remplir d'abord tout en noir, puis découper avec le gradient
+      GX.fillStyle='rgba(0,0,0,0.97)';
+      GX.fillRect(z.x,z.y,z.w,z.h);
+      // Percer un trou avec le gradient en mode destination-out
+      GX.globalCompositeOperation='destination-out';
+      GX.fillStyle=grad;
+      GX.beginPath();
+      GX.arc(px,py,r,0,Math.PI*2);
+      GX.fill();
+      GX.globalCompositeOperation='source-over';
+      GX.restore();
+    });
+  }
+
   GX.restore();
 
   // ── Gravity direction HUD indicator ──
