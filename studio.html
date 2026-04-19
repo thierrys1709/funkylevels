@@ -817,7 +817,7 @@ function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(lv));l
 
 let clipboard=null;
 function copySelected(){if(!selection.length)return;clipboard=selection.map(s=>({type:s.type,data:JSON.parse(JSON.stringify(lv[s.type][s.idx]))}));status(`Copié (${clipboard.length} bloc${clipboard.length>1?'s':''}).`);}
-function pasteClip(){if(!clipboard||!clipboard.length)return;snapshot();clearSel();clipboard.forEach(c=>{const d=JSON.parse(JSON.stringify(c.data));d.x+=GRID*2;d.y+=GRID*2;lv[c.type].push(d);addToSel(c.type,lv[c.type].length-1);});redraw();status('Collé.');}
+function pasteClip(){if(!clipboard||!clipboard.length)return;snapshot();clearSel();clipboard.forEach(c=>{const d=JSON.parse(JSON.stringify(c.data));d.x+=GRID*2;d.y+=GRID*2;lv[c.type].push(d);addToSel(c.type,lv[c.type].length-1);});redraw();status(ts('msgPaste','Pasted.'));}
 
 let lv=emptyLevel();
 function emptyLevel(){return{fixed:[],trap:[],slider:[],invis:[],bounce:[],mobile:[],push:[],gravflip:[],speed:[],start:{x:80,y:480},end:null};}
@@ -896,6 +896,7 @@ function trapPanelLoad(p){document.getElementById('tr-dist').value=p.trigDist??4
 function showTrapPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-trap').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : PIÈGE';}
 
 function status(s){document.getElementById('statusbar').textContent=s;}
+function ts(frKey,enKey){const l=_lang();const t=STUDIO_T[l]||{};return t[frKey]||(l==='fr'?frKey:enKey);}
 
 function showSaveToast(msg){
   let toast=document.getElementById('save-toast');
@@ -924,7 +925,7 @@ function onLevelNameChange(){
       const title=document.getElementById('level-name-input').value.trim();
       if(title){
         await _sb.from('levels').update({title}).eq('id',_currentLevelId);
-        status('Titre mis à jour.');
+        status(ts('msgTitleUpdated','Title updated.'));
       }
     },1000);
   }
@@ -1082,7 +1083,7 @@ window.addEventListener('mouseup',e=>{
 EC.addEventListener('mouseleave',()=>{rubberBand=null;redraw();});
 
 function findBlockAt(x,y){const types=['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
-function deleteSelected(){if(!selection.length)return;snapshotWithDupCheck();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
+function deleteSelected(){if(!selection.length)return;snapshotWithDupCheck();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status(ts('msgDeleted','Deleted.'));}
 function zoom(d,cx,cy){
   const prevZoom=ZOOM;
   ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));
@@ -1116,7 +1117,7 @@ function saveLevel(){
       // Pas connecté → télécharge JSON
       const a=document.createElement('a');
       a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));
-      a.download='level.json';a.click();status('Sauvegardé.');
+      a.download='level.json';a.click();status(ts('msgSavedShort','Saved.'));
       return;
     }
     if(_currentLevelId){
@@ -1138,8 +1139,8 @@ async function doQuickSave(){
   }).eq('id',_currentLevelId).select();
   if(error){status('Erreur : '+error.message);}
   else{
-    status('✅ Sauvegardé !');
-    showSaveToast('✅ SAUVEGARDÉ !');
+    status(ts('msgSaved','✅ Saved!'));
+    showSaveToast(ts('toastSaved','✅ SAVED!'));
     _hasUnsavedChanges=false;
     autosaveClear();
     doAfterSaveNav();
@@ -1240,7 +1241,7 @@ function filterLoadList(q){
 
 async function doLoadLevel(id,title){
   const{data,error}=await _sb.from('levels').select('*').eq('id',id).single();
-  if(error||!data){showSaveToast('⚠️ Erreur lors du chargement');return;}
+  if(error||!data){showSaveToast(ts('toastLoadError','⚠️ Load error'));return;}
   // Reset published state for new level
   _isPublished=false;
   window._dupConfirmed=false;
@@ -1287,7 +1288,7 @@ function loadFile(e){
     lv.gravflip.forEach(z=>{if(z.dir===undefined){z.dir=(z.grav??-10)<0?'u':'d';z.strength=Math.abs(z.grav??10);}});
     lv.trap.forEach(t=>{t.state='idle';t.vy=0;if(!t.oy)t.oy=t.y;if(!t.ox)t.ox=t.x;});
     if(!lv.start)lv.start={x:80,y:480};if(!lv.end)lv.end={x:3100,y:480};
-    selectedIdx=-1;selectedType=null;redraw();status('Chargé.');
+    selectedIdx=-1;selectedType=null;redraw();status(ts('msgLoaded','Loaded.'));
   }catch(err){alert('Fichier invalide.');}};
   r.readAsText(f);e.target.value='';
 }
@@ -1310,7 +1311,7 @@ function clearLevel(){
   _authorCompleted=false;_isPublished=false;window._dupWarningShown=false;
   const ni=document.getElementById('level-name-input');if(ni)ni.value='';
   history.replaceState(null,'','studio.html');
-  redraw();status('Vidé.');}
+  redraw();status(ts('msgCleared','Cleared.'));}
 
 // ── Editor draw ──────────────────────────────────────────────────
 const EC_COL={bg:'#0c0c1a',grid:'#12122a',fixed:{b:'#4a5568',t:'#718096',s:'#a0aec0'},trap:{b:'#4a5568',t:'#718096',s:'#a0aec0'},flagA:'#68d391',flagB:'#fc8181',sel:'#f0e040',ghost:'#ffffff18'};
@@ -1634,7 +1635,7 @@ async function loadPlayerProfile(){
         const ni=document.getElementById('level-name-input');
         if(ni&&savedTitle)ni.value=savedTitle;
         redraw();
-        status('✅ Niveau restauré avec les dernières modifications.');
+        status(ts('msgRestored','✅ Level restored.'));
         return;
       }catch(e){console.error('Restore error:',e);}
     }
@@ -1653,7 +1654,7 @@ async function loadPlayerProfile(){
 
   const{data,error}=await _sb.from('levels').select('*').eq('id',lid).single();
   if(error||!data){
-    showSaveToast('⚠️ Niveau introuvable — Nouveau niveau initialisé');
+    showSaveToast(ts('toastNotFound','⚠️ Level not found — New level started'));
     snapshot();redraw();
     return;
   }
@@ -2137,7 +2138,7 @@ async function confirmDuplicateFromModal(){
 
 function showDupModal(){
   const lang=localStorage.getItem('fl_lang')||'fr';
-  const msgFr='Ce niveau est publié et a déjà été joué.<br>Tu ne peux pas le modifier directement.<br><br>Une copie privée sera créée.';
+  const msgFr=l==='fr'?'Ce niveau est publié et a déjà été joué.<br>Tu ne peux pas le modifier directement.<br><br>Une copie privée sera créée.':'This level is published.<br>You cannot edit it directly.<br><br>A private copy will be created.';
   const msgEn='This level is published and has been played.<br>You cannot edit it directly.<br><br>A private copy will be created.';
   document.getElementById('dup-msg').innerHTML=lang==='fr'?msgFr:msgEn;
   document.getElementById('dup-modal').style.display='flex';
@@ -2197,7 +2198,7 @@ function checkAutosaveOnLoad(){
     if(savedId)_currentLevelId=savedId;
     _hasUnsavedChanges=true;
     redraw&&redraw();
-    status&&status('⚡ Brouillon restauré');
+    status&&status(ts('msgDraftRestored','⚡ Draft restored'));
   }catch(ex){}
 }
 
