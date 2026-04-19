@@ -85,6 +85,9 @@
     "toastSaved": "✅ SAVED!",
     "toastLoadError": "⚠️ Load error",
     "toastNotFound": "⚠️ Level not found — New level started",
+    "publishedLockDesc": "This level is published and cannot be edited directly.\nCreate a private copy to make changes.",
+    "publishedLockCopy": "🖊 CREATE AN EDITABLE COPY",
+    "publishedLockLoad": "📂 LOAD ANOTHER LEVEL",
     "toolNames": {
       "fixed": "FIXED",
       "trap": "TRAP",
