@@ -85,6 +85,7 @@
     "toastSaved": "✅ SAVED!",
     "toastLoadError": "⚠️ Load error",
     "toastNotFound": "⚠️ Level not found — New level started",
+    "pInfoSpeed": "Speed zone.<br><br>5 = normal<br>1 = very slow<br>20 = very fast",
     "toolNames": {
       "fixed": "FIXED",
       "trap": "TRAP",
