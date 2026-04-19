@@ -366,6 +366,7 @@ function goToEditor(){
       sessionStorage.setItem('fl_autosave_id', _currentLevelId);
       const title=_levelData?.title||'';
       sessionStorage.setItem('fl_autosave_name', title);
+      sessionStorage.setItem('fl_from_game', '1'); // tell studio we're coming from game
     }
     window.location.href='studio.html?level='+_currentLevelId+'&mode=edit';
   }else{
