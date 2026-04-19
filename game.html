@@ -884,8 +884,8 @@ function res(p){
   const oT=(gPlayer.y+gPlayer.h)-p.y,oB=(p.y+p.h)-gPlayer.y;
   const m=Math.min(oL,oR,oT,oB);
   const gd=gPlayer.gravDir;
-  if(m===oT){if(gd==='d'){gPlayer.y=p.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;gPlayer.sq=1.15;return true;}else{gPlayer.y=p.y-gPlayer.h;gPlayer.vy=Math.min(gPlayer.vy,0);}}
-  else if(m===oB){if(gd==='u'){gPlayer.y=p.y+p.h;gPlayer.vy=0;gPlayer.onGround=true;gPlayer.sq=1.15;return true;}else{gPlayer.y=p.y+p.h;gPlayer.vy=Math.max(gPlayer.vy,0);}}
+  if(m===oT){if(gd==='d'){gPlayer.y=p.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;gPlayer.sq=1.15;gPlayer._jumpWasHeld=false;return true;}else{gPlayer.y=p.y-gPlayer.h;gPlayer.vy=Math.min(gPlayer.vy,0);}}
+  else if(m===oB){if(gd==='u'){gPlayer.y=p.y+p.h;gPlayer.vy=0;gPlayer.onGround=true;gPlayer.sq=1.15;gPlayer._jumpWasHeld=false;return true;}else{gPlayer.y=p.y+p.h;gPlayer.vy=Math.max(gPlayer.vy,0);}}
   else if(m===oL){if(gd==='r'){gPlayer.x=p.x-gPlayer.w;gPlayer.vx=0;gPlayer.onGround=true;gPlayer.sq=1.15;return true;}else{gPlayer.x=p.x-gPlayer.w;}}
   else if(m===oR){if(gd==='l'){gPlayer.x=p.x+p.w;gPlayer.vx=0;gPlayer.onGround=true;gPlayer.sq=1.15;return true;}else{gPlayer.x=p.x+p.w;}}
   return false;
@@ -919,7 +919,9 @@ function gUpdate(now){
 
   const left=gKeys['ArrowLeft']||gKeys['KeyA']||gpL;
   const right=gKeys['ArrowRight']||gKeys['KeyD']||gpR;
-  const jump=gKeys['Space']||gKeys['ArrowUp']||gKeys['KeyW']||gpJ;
+  const jumpHeld=gKeys['Space']||gKeys['ArrowUp']||gKeys['KeyW']||gpJ;
+  const jump=jumpHeld&&!gPlayer._jumpWasHeld;
+  gPlayer._jumpWasHeld=jumpHeld;
 
   let activeDir='d',activeStr=GRAV,inGravZone=false;
   const prevGravDir=gPlayer.gravDir;
