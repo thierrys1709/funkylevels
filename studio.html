@@ -976,13 +976,13 @@ EC.addEventListener('mousedown',e=>{
   // Allow dragging existing start/end flags with any tool
   if(lv.start){
     const sx=lv.start.x,sy=lv.start.y;
-    if(Math.abs(x-sx)<24&&Math.abs(y-sy)<32){
+    if(x>=sx&&x<=sx+40&&y>=sy-52&&y<=sy+8){
       dragState={mode:'flag',flag:'start',sm:{x,y},orig:{x:sx,y:sy}};redraw();return;
     }
   }
   if(lv.end){
     const ex=lv.end.x,ey=lv.end.y;
-    if(Math.abs(x-ex)<24&&Math.abs(y-ey)<32){
+    if(x>=ex&&x<=ex+40&&y>=ey-52&&y<=ey+8){
       dragState={mode:'flag',flag:'end',sm:{x,y},orig:{x:ex,y:ey}};redraw();return;
     }
   }
@@ -1013,6 +1013,7 @@ window.addEventListener('mousemove',e=>{
   if(dragState){
     const dx=x-dragState.sm.x,dy=y-dragState.sm.y;
     if(dragState.mode==='flag'){
+      EC.style.cursor='grabbing';
       const dx=x-dragState.sm.x,dy=y-dragState.sm.y;
       const nx=snap(dragState.orig.x+dx),ny=snap(dragState.orig.y+dy);
       if(dragState.flag==='start')lv.start={x:Math.max(0,Math.min(EW,nx)),y:Math.max(0,Math.min(EH,ny))};
@@ -1027,6 +1028,13 @@ window.addEventListener('mousemove',e=>{
   if(rubberBand){rubberBand.ex=x;rubberBand.ey=y;redraw();return;}
   if(selection.length===1){const obj=getSelObj();if(obj){if(selectedType==='trap'&&obj.partial&&obj.partDist>0){const ghostY=obj.y+obj.partDist+obj.h;if(Math.abs(y-ghostY)<=8&&x>=obj.x&&x<=obj.x+obj.w){EC.style.cursor='s-resize';redraw();return;}}const h=hitHandle(obj,x,y);if(h){EC.style.cursor=CURSOR_MAP[h];redraw();return;}}}
   if(selection.length>0){const hit=findBlockAt(x,y);if(hit&&isSelected(hit.type,hit.idx)){EC.style.cursor='move';redraw();return;}}
+  // Flag hover detection
+  let hovFlag=null;
+  if(lv.start&&x>=lv.start.x&&x<=lv.start.x+40&&y>=lv.start.y-52&&y<=lv.start.y+8)hovFlag='start';
+  else if(lv.end&&x>=lv.end.x&&x<=lv.end.x+40&&y>=lv.end.y-52&&y<=lv.end.y+8)hovFlag='end';
+  if(hovFlag!==window._hovFlag){window._hovFlag=hovFlag;redraw();}
+  if(hovFlag){EC.style.cursor='grab';return;}
+  window._hovFlag=null;
   EC.style.cursor='crosshair';redraw();
 });
 
@@ -1424,8 +1432,18 @@ function redraw(){
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
 
-  if(lv.start)eFlag(lv.start.x,lv.start.y,EC_COL.flagA,'A');
-  if(lv.end)eFlag(lv.end.x,lv.end.y,EC_COL.flagB,'B');
+  if(lv.start){
+    eFlag(lv.start.x,lv.start.y,EC_COL.flagA,'A');
+    if(window._hovFlag==='start'||dragState?.flag==='start'){
+      EX.strokeStyle=EC_COL.flagA;EX.lineWidth=1.5;EX.strokeRect(lv.start.x-2,lv.start.y-54,44,62);
+    }
+  }
+  if(lv.end){
+    eFlag(lv.end.x,lv.end.y,EC_COL.flagB,'B');
+    if(window._hovFlag==='end'||dragState?.flag==='end'){
+      EX.strokeStyle=EC_COL.flagB;EX.lineWidth=1.5;EX.strokeRect(lv.end.x-2,lv.end.y-54,44,62);
+    }
+  }
 
   if(rubberBand){const rx=Math.min(rubberBand.sx,rubberBand.ex),ry=Math.min(rubberBand.sy,rubberBand.ey),rw=Math.abs(rubberBand.ex-rubberBand.sx),rh=Math.abs(rubberBand.ey-rubberBand.sy);EX.fillStyle='#5050c022';EX.fillRect(rx,ry,rw,rh);EX.strokeStyle='#8080f0cc';EX.lineWidth=1.5;EX.setLineDash([5,3]);EX.strokeRect(rx,ry,rw,rh);EX.setLineDash([]);}
   if(selection.length>1){EX.fillStyle='#f0e040cc';EX.font='7px "Press Start 2P"';EX.fillText(`${selection.length} sélectionnés`,mousePos.x+10,mousePos.y-8);}
