@@ -684,11 +684,11 @@ body {
           <span class="pval" id="gf-str-v">10</span>
         </div>
       </div>
-      <div style="font-size:6px;color:#a040f0;margin-top:2px;padding:4px;background:#0a0a16;border-radius:2px;" id="gf-hint">↑ Attire vers le haut</div>
+      <div style="font-size:6px;color:#a040f0;margin-top:2px;padding:4px;background:#0a0a16;border-radius:2px;" id="gf-hint"></div>
     </div>
 
     <div id="s-speed" class="psec">
-      <div class="pinfo">Zone de vitesse.<br><br>5 = normal<br>1 = très lent<br>20 = très rapide</div>
+      <div class="pinfo" data-info="pInfoSpeed">Zone de vitesse.<br><br>5 = normal<br>1 = très lent<br>20 = très rapide</div>
       <div class="prow">
         <label>VITESSE (1 – 20)</label>
         <div style="display:flex;gap:4px;align-items:center">
@@ -846,12 +846,14 @@ function trapReturnUI(){
 
 // ── Gravflip panel ──────────────────────────────────────────────
 const GF_ARROWS={u:'↑',d:'↓',l:'←',r:'→'};
-const GF_HINTS={u:'↑ Attire vers le haut (plafond)',d:'↓ Attire vers le bas (sol)',l:'← Attire vers la gauche (mur gauche)',r:'→ Attire vers la droite (mur droit)'};
+const GF_HINTS_FR={u:'↑ Attire vers le haut (plafond)',d:'↓ Attire vers le bas (sol)',l:'← Attire vers la gauche (mur gauche)',r:'→ Attire vers la droite (mur droit)'};
+const GF_HINTS_EN={u:'↑ Pulls to ceiling',d:'↓ Pulls to floor',l:'← Pulls to left wall',r:'→ Pulls to right wall'};
+const GF_HINTS=()=>_lang()==='fr'?GF_HINTS_FR:GF_HINTS_EN;
 function gfParamChanged(){
   const dir=document.getElementById('gf-dir').value;
   const str=+document.getElementById('gf-str').value;
   document.getElementById('gf-str-v').textContent=str;
-  document.getElementById('gf-hint').textContent=str===0?'○ Apesanteur':GF_HINTS[dir];
+  document.getElementById('gf-hint').textContent=str===0?(_lang()==='fr'?'○ Apesanteur':'○ Weightless'):GF_HINTS()[dir];
   if(selection.length===1&&selectedType==='gravflip'){const z=lv.gravflip[selectedIdx];if(z){z.dir=dir;z.strength=str;}}
   redraw();
 }
@@ -861,14 +863,15 @@ function gfPanelLoad(z){
   document.getElementById('gf-dir').value=dir;
   document.getElementById('gf-str').value=str;
   document.getElementById('gf-str-v').textContent=str;
-  document.getElementById('gf-hint').textContent=str===0?'○ Apesanteur':GF_HINTS[dir];
+  document.getElementById('gf-hint').textContent=str===0?(_lang()==='fr'?'○ Apesanteur':'○ Weightless'):GF_HINTS()[dir];
 }
 function showGfPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-gravflip').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : GRAVITÉ';}
 
 function spParamChanged(){
   const val=+document.getElementById('sp-val').value;
   document.getElementById('sp-val-v').textContent=val;
-  const hint=val<3?'⬇ très lent':val<5?'⬇ lent':val===5?'= normal':val<10?'⬆ rapide':val<15?'⬆⬆ très rapide':'⚡ turbo';
+  const isFr=_lang()==='fr';
+  const hint=val<3?(isFr?'⬇ très lent':'⬇ very slow'):val<5?(isFr?'⬇ lent':'⬇ slow'):val===5?'= normal':val<10?(isFr?'⬆ rapide':'⬆ fast'):val<15?(isFr?'⬆⬆ très rapide':'⬆⬆ very fast'):'⚡ turbo';
   document.getElementById('sp-hint').textContent=hint;
   if(selection.length===1&&selectedType==='speed'){const z=lv.speed[selectedIdx];if(z)z.spd=val;}
   redraw();
