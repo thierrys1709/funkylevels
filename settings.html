@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FunkyLevels — Paramètres</title>
+<title>FunkyLevels — Settings</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -214,18 +214,18 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 
     <!-- Changer mot de passe -->
     <div class="card">
-      <div class="card-title">🔑 CHANGER MON MOT DE PASSE</div>
+      <div class="card-title" id="pwd-title">🔑 CHANGER MON MOT DE PASSE</div>
       <div class="field">
-        <label style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;">NOUVEAU MOT DE PASSE</label>
+        <label style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;" id="pwd-new-lbl">NOUVEAU MOT DE PASSE</label>
         <input type="password" id="new-pass-input" placeholder="8 caractères minimum" maxlength="60" style="width:100%;background:#0a0a18;border:1.5px solid #2a2a55;border-radius:3px;color:#e8e8ff;font-family:Rajdhani,sans-serif;font-size:14px;padding:10px 12px;outline:none;box-sizing:border-box;">
       </div>
       <div class="field">
-        <label style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;">CONFIRMER LE MOT DE PASSE</label>
+        <label style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;" id="pwd-confirm-lbl">CONFIRMER LE MOT DE PASSE</label>
         <input type="password" id="confirm-pass-input" placeholder="Répète ton mot de passe" maxlength="60" style="width:100%;background:#0a0a18;border:1.5px solid #2a2a55;border-radius:3px;color:#e8e8ff;font-family:Rajdhani,sans-serif;font-size:14px;padding:10px 12px;outline:none;box-sizing:border-box;">
       </div>
       <div id="pass-msg" class="msg" style="margin-top:8px;"></div>
       <div style="margin-top:12px;">
-        <button class="btn-primary" onclick="changePassword()">🔑 CHANGER LE MOT DE PASSE</button>
+        <button class="btn-primary" onclick="changePassword()" id="btn-change-pwd">🔑 CHANGER LE MOT DE PASSE</button>
       </div>
     </div>
 
@@ -349,6 +349,17 @@ async function applyLang(l){
   s('confirm-no',t.confirmNo);
   s('confirm-yes',t.confirmYes);
   s('stats-loading',t.statsLoading);
+  // Password section
+  s('pwd-title',t.pwdTitle);
+  s('pwd-new-lbl',t.pwdNewLbl);
+  s('pwd-confirm-lbl',t.pwdConfirmLbl);
+  const bcp=document.getElementById('btn-change-pwd');
+  if(bcp&&t.pwdBtn)bcp.textContent=t.pwdBtn;
+  // Placeholder translations
+  const np=document.getElementById('new-pass-input');
+  if(np&&t.phPassNew)np.placeholder=t.phPassNew;
+  const cp=document.getElementById('confirm-pass-input');
+  if(cp&&t.phPassConfirm)cp.placeholder=t.phPassConfirm;
 }
 
 function buildCharGrid(){
@@ -1054,4 +1065,4 @@ async function deleteLevelSettings(id, title, tr){
 
 </script>
 </body>
-</html>
+</html>s
