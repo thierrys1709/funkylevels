@@ -1966,13 +1966,13 @@ function openPublish(){
 }
 function closePublish(){document.getElementById('publish-modal').classList.remove('show');}
 
-document.getElementById('publish-modal').addEventListener('click',e=>{if(e.target===document.getElementById('publish-modal'))closePublish();});
+// publish-modal: no backdrop close
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     // Block escape for load modal when published
     if(_isPublished&&_currentLevelId&&!window._dupConfirmed&&
        document.getElementById('load-modal').classList.contains('show'))return;
-    closePublish();
+    // Escape no longer closes publish modal
   }if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();});
 
 async function doPublish(){
