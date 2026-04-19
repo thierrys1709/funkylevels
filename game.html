@@ -884,8 +884,8 @@ function res(p){
   const oT=(gPlayer.y+gPlayer.h)-p.y,oB=(p.y+p.h)-gPlayer.y;
   const m=Math.min(oL,oR,oT,oB);
   const gd=gPlayer.gravDir;
-  if(m===oT){if(gd==='d'){gPlayer.y=p.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;gPlayer.sq=1.15;gPlayer._jumpWasHeld=false;return true;}else{gPlayer.y=p.y-gPlayer.h;gPlayer.vy=Math.min(gPlayer.vy,0);}}
-  else if(m===oB){if(gd==='u'){gPlayer.y=p.y+p.h;gPlayer.vy=0;gPlayer.onGround=true;gPlayer.sq=1.15;gPlayer._jumpWasHeld=false;return true;}else{gPlayer.y=p.y+p.h;gPlayer.vy=Math.max(gPlayer.vy,0);}}
+  if(m===oT){if(gd==='d'){gPlayer.y=p.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;gPlayer.sq=1.15;return true;}else{gPlayer.y=p.y-gPlayer.h;gPlayer.vy=Math.min(gPlayer.vy,0);}}
+  else if(m===oB){if(gd==='u'){gPlayer.y=p.y+p.h;gPlayer.vy=0;gPlayer.onGround=true;gPlayer.sq=1.15;return true;}else{gPlayer.y=p.y+p.h;gPlayer.vy=Math.max(gPlayer.vy,0);}}
   else if(m===oL){if(gd==='r'){gPlayer.x=p.x-gPlayer.w;gPlayer.vx=0;gPlayer.onGround=true;gPlayer.sq=1.15;return true;}else{gPlayer.x=p.x-gPlayer.w;}}
   else if(m===oR){if(gd==='l'){gPlayer.x=p.x+p.w;gPlayer.vx=0;gPlayer.onGround=true;gPlayer.sq=1.15;return true;}else{gPlayer.x=p.x+p.w;}}
   return false;
@@ -920,8 +920,8 @@ function gUpdate(now){
   const left=gKeys['ArrowLeft']||gKeys['KeyA']||gpL;
   const right=gKeys['ArrowRight']||gKeys['KeyD']||gpR;
   const jumpHeld=gKeys['Space']||gKeys['ArrowUp']||gKeys['KeyW']||gpJ;
-  const jump=jumpHeld&&!gPlayer._jumpWasHeld;
-  gPlayer._jumpWasHeld=jumpHeld;
+  if(!jumpHeld)_jumpReady=true; // also reset when gamepad releases
+  const jump=jumpHeld&&_jumpReady;
 
   let activeDir='d',activeStr=GRAV,inGravZone=false;
   const prevGravDir=gPlayer.gravDir;
@@ -942,12 +942,12 @@ function gUpdate(now){
     if(left){gPlayer.vy=(gd==='r')?-zoneSpd:zoneSpd;gPlayer.facing=1;}
     else if(right){gPlayer.vy=(gd==='r')?zoneSpd:-zoneSpd;gPlayer.facing=-1;}
     else gPlayer.vy*=0.75;
-    if(jump&&gPlayer.onGround){gPlayer.vx=(gd==='r')?-zoneJspd:zoneJspd;gPlayer.onGround=false;gPlayer.sq=0.6;spawnP(gPlayer.x+(gd==='r'?gPlayer.w:0),gPlayer.y+gPlayer.h/2,'#ffffff20',5);}
+    if(jump&&gPlayer.onGround){gPlayer.vx=(gd==='r')?-zoneJspd:zoneJspd;gPlayer.onGround=false;gPlayer.sq=0.6;spawnP(gPlayer.x+(gd==='r'?gPlayer.w:0),gPlayer.y+gPlayer.h/2,'#ffffff20',5);_jumpReady=false;}
   }else{
     if(left){gPlayer.vx=-zoneSpd;gPlayer.facing=-1;}
     else if(right){gPlayer.vx=zoneSpd;gPlayer.facing=1;}
     else gPlayer.vx*=0.75;
-    if(jump&&gPlayer.onGround){gPlayer.vy=(gd==='d')?-zoneJspd:zoneJspd;gPlayer.onGround=false;gPlayer.sq=0.6;spawnP(gPlayer.x+11,gPlayer.y+(gd==='d'?32:0),'#ffffff20',5);}
+    if(jump&&gPlayer.onGround){gPlayer.vy=(gd==='d')?-zoneJspd:zoneJspd;gPlayer.onGround=false;gPlayer.sq=0.6;spawnP(gPlayer.x+11,gPlayer.y+(gd==='d'?32:0),'#ffffff20',5);_jumpReady=false;}
   }
 
   const moveSpd=isHorizGrav?Math.abs(gPlayer.vy):Math.abs(gPlayer.vx);
@@ -1281,12 +1281,18 @@ function gLoop(now){
 }
 
 // ── Keys ──────────────────────────────────────────────────
+const JUMP_KEYS=['Space','ArrowUp','KeyW'];
+let _jumpReady=true; // true = allowed to jump
+
 document.addEventListener('keydown',e=>{
   gKeys[e.code]=true;
   if(['Space','ArrowUp','ArrowLeft','ArrowRight','ArrowDown'].includes(e.code))e.preventDefault();
   if(e.code==='Escape')goToIndex();
 });
-document.addEventListener('keyup',e=>gKeys[e.code]=false);
+document.addEventListener('keyup',e=>{
+  gKeys[e.code]=false;
+  if(JUMP_KEYS.includes(e.code))_jumpReady=true; // re-enable jump on key release
+});
 
 // ── Sound System (Web Audio API) ─────────────────────────
 let _audioCtx=null;
