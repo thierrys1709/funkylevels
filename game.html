@@ -993,12 +993,11 @@ function gDraw(){
     }
   });
 
-  // ── Bounce blocks — trampoline visual ──
+  // ── Bounce blocks — normal au repos, trampoline à l'impact ──
   (gLv.bounce||[]).forEach((p,i)=>{
     const anim=_bounceAnim[i];
-    const bounceT=anim?anim.t:undefined;
-    gDrawTrampoline(p,bounceT);
-    if(anim){anim.t++;if(anim.t>30)delete _bounceAnim[i];}
+    if(anim){gDrawTrampoline(p,anim.t);anim.t++;if(anim.t>30)delete _bounceAnim[i];}
+    else{gPlatform(p);}
   });
 
   // ── Slider blocks ──
@@ -1011,23 +1010,20 @@ function gDraw(){
     else gPlatform(t);
   });
 
-  // ── Invisible blocks — gradient reveal under player's feet ──
+  // ── Invisible blocks — cercle de révélation uniquement autour des pieds ──
   if(gPlayer&&!gPlayer.dead){
-    const REVEAL_R=140;
+    const REVEAL_R=38;
     const footX=gPlayer.x+gPlayer.w/2;
     const footY=gPlayer.y+gPlayer.h;
     (gLv.invis||[]).forEach(p=>{
-      // Distance from foot to nearest point on block
-      const cx=Math.max(p.x,Math.min(p.x+p.w,footX));
-      const cy=Math.max(p.y,Math.min(p.y+p.h,footY));
-      const dist=Math.hypot(footX-cx,footY-cy);
-      if(dist>=REVEAL_R)return;
-      // Quadratic falloff: full visibility at 0, fades to 0 at REVEAL_R
-      const t2=(1-dist/REVEAL_R);
-      const alpha=t2*t2;
-      GX.globalAlpha=alpha;
+      if(footX+REVEAL_R<p.x||footX-REVEAL_R>p.x+p.w)return;
+      if(footY+REVEAL_R<p.y||footY-REVEAL_R>p.y+p.h)return;
+      GX.save();
+      GX.beginPath();
+      GX.arc(footX,footY,REVEAL_R,0,Math.PI*2);
+      GX.clip();
       gPlatform(p);
-      GX.globalAlpha=1;
+      GX.restore();
     });
   }
 
