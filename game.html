@@ -144,10 +144,9 @@ body.test-mode #star-rating{display:none!important;}
   <!-- Meilleur temps -->
   <div id="win-best-display" style="font-family:Orbitron,monospace;font-size:13px;color:#8080aa;letter-spacing:1px;"></div>
 
-  <!-- Boutons -->
   <!-- Titre + boutons publier (cachés par défaut) -->
   <div id="publish-section" style="display:none;text-align:center;margin-top:8px;">
-    <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#f0e040;letter-spacing:2px;margin-bottom:10px;">🚀 PUBLIER CE NIVEAU</div>
+    <div id="pub-section-title" style="font-family:'Press Start 2P',monospace;font-size:9px;color:#f0e040;letter-spacing:2px;margin-bottom:10px;">🚀 PUBLIER CE NIVEAU</div>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
       <button onclick="publishAsPublic()" id="btn-pub-public" style="background:#0d2a1a;color:#40f090;border:2px solid #40f090;font-size:11px;padding:12px 20px;">🌍 RENDRE PUBLIC</button>
       <button onclick="publishAsCode()" id="btn-pub-code" style="background:#1a0d2a;color:#c090f0;border:2px solid #c090f0;font-size:11px;padding:12px 20px;">🔑 PAR CODE</button>
@@ -262,8 +261,6 @@ function showWinScreen(ms, prevBest, isNewRecord, l){
       ?(l==='fr'?'MON RECORD : ':'MY BEST: ')+fmtTimeFull(_bestTime)
       :'';
   }
-
-  // Edit button is handled in the async block below (only for test mode / private levels)
 }
 
 let _pendingVisibility=null;
@@ -315,7 +312,6 @@ async function confirmPublish(){
   let ok=false;
 
   if(_currentLevelId){
-    // Level already exists in DB — just update
     const r=await fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{
       method:'PATCH',
       headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
@@ -323,7 +319,6 @@ async function confirmPublish(){
     });
     ok=r.ok;
   }else{
-    // Level not saved yet (preview mode) — create + publish in one step
     const levelData=lv||JSON.parse(sessionStorage.getItem('fl_preview_level')||'null');
     if(!levelData){alert('Données du niveau introuvables');return;}
     function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
@@ -451,7 +446,6 @@ async function loadBestTime(){
     .order('time_ms',{ascending:true}).limit(1).maybeSingle();
 
   if(global){
-    // Get username
     const{data:profile}=await _sb.from('profiles')
       .select('username').eq('id',global.user_id).single();
     const username=profile?.username||'???';
@@ -483,12 +477,10 @@ function initStarRating(){
   if(!container)return;
   const stars=container.querySelectorAll('.star-btn');
 
-  // Load existing rating
   loadUserRating();
 
   stars.forEach(star=>{
     const val=parseInt(star.dataset.val);
-
     star.onmouseenter=()=>{
       stars.forEach(s=>{
         s.classList.toggle('hover',parseInt(s.dataset.val)<=val);
@@ -513,7 +505,6 @@ function updateStarDisplay(rating){
     const v=parseInt(s.dataset.val);
     s.classList.toggle('filled',v<=rating);
   });
-  // Also update overlay stars
   const ovStars=document.querySelectorAll('.ovstar');
   ovStars.forEach(s=>{
     const v=parseInt(s.dataset.val);
@@ -527,26 +518,21 @@ function showRatingOverlay(containerId){
   if(!container)return;
   container.style.display='flex';
 
-  // Init stars in this container
   const ovStars=container.querySelectorAll('.ovstar');
   const msgId=containerId==='rating-inline-win'?'rating-win-msg':'rating-die-msg';
 
-  // Show current rating
   ovStars.forEach(s=>s.style.color=parseInt(s.dataset.val)<=_userRating?'#f0e040':'#2a2a55');
 
   ovStars.forEach(star=>{
     const val=parseInt(star.dataset.val);
     star.onmouseenter=()=>{
-      // Show hover state only - don't show previous rating
       ovStars.forEach(s=>s.style.color=parseInt(s.dataset.val)<=val?'#f0c040':'#2a2a55');
     };
     star.onmouseleave=()=>{
-      // On leave: show current saved rating
       ovStars.forEach(s=>s.style.color=parseInt(s.dataset.val)<=_userRating?'#f0e040':'#2a2a55');
     };
     star.onclick=async()=>{
       await saveRating(val);
-      // Update all stars in this container immediately
       ovStars.forEach(s=>{
         s.style.color=parseInt(s.dataset.val)<=val?'#f0e040':'#2a2a55';
         if(parseInt(s.dataset.val)<=val){
@@ -586,7 +572,6 @@ async function saveRating(score){
   if(!token)return;
   _userRating=score;
   updateStarDisplay(score);
-  // Show brief feedback
   const container=document.getElementById('star-rating');
   if(container){
     const old=container.title;
@@ -595,12 +580,10 @@ async function saveRating(score){
   }
   try{
     const uid=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub;
-    // Delete existing rating first
     await fetch(_sbUrl+'/rest/v1/ratings?level_id=eq.'+_currentLevelId+'&user_id=eq.'+uid,{
       method:'DELETE',
       headers:{'apikey':_sbKey,'Authorization':'Bearer '+token}
     });
-    // Then insert new one
     await fetch(_sbUrl+'/rest/v1/ratings',{
       method:'POST',
       headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
@@ -618,7 +601,6 @@ function updateAttemptDisplay(){
 async function saveTime(ms){
   const{data:sess}=await _sb.auth.getSession();
   if(!sess.session||!_currentLevelId)return false;
-  // Only save score if level is published (public or code)
   const{data:lvl}=await _sb.from('levels').select('visibility').eq('id',_currentLevelId).single();
   if(!lvl||lvl.visibility==='private')return false;
   const isNewRecord=(_bestTime===null||ms<_bestTime);
@@ -667,6 +649,8 @@ async function init(){
   const langData=await loadLang(l);
   const t=langData.studio||{};
   const s=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.textContent=val;};
+
+  // Standard UI strings
   s('ov-die-title',t.ovDie);
   s('ov-win-title',t.ovWin);
   s('btn-retry',t.ovDieBtn);
@@ -674,7 +658,17 @@ async function init(){
   s('btn-editor',t.gEditor);
   s('btn-fs',t.gFullscreen);
   if(t.ovDieEdit){s('btn-quit',t.ovDieEdit);}
-  if(t.ovWinBtn){s('btn-back',l==='fr'?'ACCUEIL':'HOME');}
+  if(t.ovWinBtn){s('btn-back',l==='fr'?'🏠 ACCUEIL':'🏠 HOME');}
+
+  // ── Publish section translations ──────────────────────
+  s('pub-section-title', t.publishSectionTitle);
+  s('btn-pub-public',    t.publishBtnPublic);
+  s('btn-pub-code',      t.publishBtnCode);
+  s('pub-name-lbl',      t.publishNameLbl);
+  s('pub-cancel-btn',    t.publishCancel);
+  // btn-edit-win
+  const btnEditWin=document.getElementById('btn-edit-win');
+  if(btnEditWin&&t.publishBtnEdit)btnEditWin.textContent=t.publishBtnEdit;
 
   // Level
   const params=new URLSearchParams(window.location.search);
@@ -682,7 +676,6 @@ async function init(){
   const preview=params.get('preview')==='1';
   const fromStudio=params.get('from')==='studio';
 
-  // Show "back to studio" button if coming from studio
   const _edBtn=document.getElementById('btn-editor');
   if(fromStudio&&_edBtn){
     _edBtn.style.display='';
@@ -690,10 +683,8 @@ async function init(){
       sessionStorage.setItem('fl_from_game','1');
       window.location.href='studio.html';
     };
-    // Show TEST MODE badge
     const badge=document.getElementById('test-mode-badge');
     if(badge)badge.style.display='';
-    // Hide record elements immediately and permanently
     document.body.classList.add('test-mode');
     const _rm=document.getElementById('win-record-msg');
     const _bm=document.getElementById('win-best-display');
@@ -702,14 +693,12 @@ async function init(){
   }
 
   if(preview){
-    // Load from sessionStorage (current editor state — may have unsaved changes)
     const raw=sessionStorage.getItem('fl_preview_level');
     if(!raw){
       document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Orbitron,monospace;font-size:14px;color:#f04060;">Aucun niveau en prévisualisation.</div>';
       return;
     }
     lv=JSON.parse(raw);
-    // Keep level ID for leaderboard if available, but don't increment plays
     _currentLevelId=lid||sessionStorage.getItem('fl_preview_id')||null;
     _levelData=null;
   }else{
@@ -730,28 +719,18 @@ async function init(){
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
 
-
-
-  // Increment plays only for saved levels
   if(_currentLevelId&&_levelData){
     _sb.from('levels').update({plays:(_levelData.plays||0)+1}).eq('id',_currentLevelId).then(()=>{});
   }
 
-  // Load best time only for saved levels
   if(_currentLevelId)await loadBestTime();
   _attempt=0;
 
-  // Init star rating (only for published levels, not test mode, not own level)
   _isOwner=!!(sess.session&&_levelData&&sess.session.user.id===_levelData.user_id);
-  const isOwner=_isOwner;
   if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')&&!_isOwner){
     initStarRating();
   }
 
-  // Show HUD
-  
-
-  // Check end point exists
   if(!lv.end){
     const l=_lang();
     document.getElementById('gwrap').classList.add('show');
@@ -765,13 +744,11 @@ async function init(){
     return;
   }
 
-  // Start
   startGameFrom(lv.start.x,lv.start.y);
 }
 
 // ── Game stubs for startGameFrom compatibility ────────────
 function startGameFrom(sx,sy){
-  // Ensure canvas has correct size
   if(GC.width<10||GC.height<10)resizeGameCanvas();
   gLv=JSON.parse(JSON.stringify(lv));
   (gLv.trap||[]).forEach(t=>{t.state='idle';t.vy=0;t.y=t.oy;t._carryingPlayer=false;});
@@ -781,7 +758,7 @@ function startGameFrom(sx,sy){
   (gLv.gravflip||[]).forEach(z=>{if(z.dir===undefined){z.dir=(z.grav??-10)<0?'u':'d';z.strength=Math.abs(z.grav??10);}});
   gParts=[];gBullets=[];gLives=3;gElapsed=0;gWon=false;gRunning=false;gDeadPending=false;
   gStartTime=performance.now();
-  if(!lv.end)lv.end=null; // end may be null
+  if(!lv.end)lv.end=null;
   gCamX=Math.max(0,sx-GW()*0.32);
   gCamY=Math.max(0,Math.min(EH-GH(),(sy-36)-GH()*0.25));
   initPlayer(sx,sy);
@@ -790,9 +767,7 @@ function startGameFrom(sx,sy){
   _attempt++;
   updateAttemptDisplay();
   resetTimer();
-  // Cancel any running loop first
   if(gRafId){cancelAnimationFrame(gRafId);gRafId=null;}
-  // Draw level immediately so it's visible
   requestAnimationFrame(()=>{
     gDraw();
     if(_attempt===1){
@@ -808,7 +783,6 @@ function gameRespawn(){
   document.getElementById('ovWin').classList.remove('show');
   closeRatingOverlay();
   gDeadPending=false;
-  // Short pause before restarting
   setTimeout(()=>startGameFrom(gLv.start.x,gLv.start.y), 800);
 }
 
@@ -845,17 +819,16 @@ document.addEventListener('fullscreenchange',()=>{
 });
 
 function resizeGameCanvas(){
-  const HUD_H=90; // fixed HUD height estimate
-  const BAR_H=48; // fixed topbar height
+  const HUD_H=90;
+  const BAR_H=48;
   const RESERVED=HUD_H+BAR_H+4;
   const vw=window.innerWidth;
   const vh=window.innerHeight-RESERVED;
-  // 16:9 fit
   let w,h;
   if(vw/vh>16/9){h=vh;w=Math.round(h*(16/9));}
   else{w=vw;h=Math.round(w/(16/9));}
   w=Math.max(320,w);h=Math.max(180,h);
-  if(GC.width===w&&GC.height===h)return; // No change needed
+  if(GC.width===w&&GC.height===h)return;
   GC.width=w;GC.height=h;
   GC.style.width=w+'px';GC.style.height=h+'px';
 }
@@ -920,7 +893,7 @@ function gUpdate(now){
   const left=gKeys['ArrowLeft']||gKeys['KeyA']||gpL;
   const right=gKeys['ArrowRight']||gKeys['KeyD']||gpR;
   const jumpHeld=gKeys['Space']||gKeys['ArrowUp']||gKeys['KeyW']||gpJ;
-  if(!jumpHeld)_jumpReady=true; // also reset when gamepad releases
+  if(!jumpHeld)_jumpReady=true;
   const jump=jumpHeld&&_jumpReady;
 
   let activeDir='d',activeStr=GRAV,inGravZone=false;
@@ -1074,7 +1047,7 @@ function gUpdate(now){
   if(gPlayer.gravDir==='r'&&gPlayer.x>EW+200)killPlayer();
 
   // ── Win ───────────────────────────────────────────────
-  if(!gLv.end)return; // no end point placed yet
+  if(!gLv.end)return;
   const ed=Math.hypot(gPlayer.x+11-gLv.end.x,gPlayer.y+16-gLv.end.y);
   if(ed<40){
     gWon=true;gRunning=false;
@@ -1086,7 +1059,6 @@ function gUpdate(now){
     saveTime(winTime).then(isNewRecord=>{
       showWinScreen(winTime,prevBest,isNewRecord,l);
     });
-    // Increment completions via direct fetch (avoid SB client hanging)
     if(_currentLevelId){
       const token=_getToken();
       fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{
@@ -1095,7 +1067,6 @@ function gUpdate(now){
         body:JSON.stringify({completions:(_levelData?.completions||0)+1})
       });
     }
-    // Show buttons + mark author_completed (direct fetch, no hanging)
     (async()=>{
       const isTestMode=new URLSearchParams(window.location.search).get('from')==='studio';
       const btnPub=document.getElementById('btn-pub-public');
@@ -1103,7 +1074,6 @@ function gUpdate(now){
       const btnEdit=document.getElementById('btn-edit-win');
 
       if(!_currentLevelId){
-        // No saved level yet — still show publish + edit buttons in test mode
         if(isTestMode){
           const pubSection=document.getElementById('publish-section');
           if(pubSection)pubSection.style.display='block';
@@ -1124,12 +1094,10 @@ function gUpdate(now){
         const lvl=arr&&arr[0];
         if(!lvl)return;
 
-        // Check ownership via JWT
         let uid=null;
         try{uid=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub;}catch(e){}
         if(!uid||lvl.user_id!==uid)return;
 
-        // Mark author_completed
         if(!lvl.author_completed){
           fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{
             method:'PATCH',
@@ -1138,14 +1106,12 @@ function gUpdate(now){
           });
         }
 
-        // Show edit only in test mode OR if level is private
         if(isTestMode){
           if(btnEdit)btnEdit.style.display='';
         }
 
-        // Show publish section if private
         if(lvl.visibility==='private'){
-          if(btnEdit)btnEdit.style.display=''; // allow edit from private level
+          if(btnEdit)btnEdit.style.display='';
           const pubSection=document.getElementById('publish-section');
           if(pubSection)pubSection.style.display='block';
         }
@@ -1179,42 +1145,33 @@ function gDrawPlayer(){
   if(_charSprite&&_charSprite.complete&&_charSprite.naturalWidth>0){
     GX.drawImage(_charSprite,px,py-13,pw,ph+13);
   }else{
-    // Legs
     const ls=onGround?(wf?3:-3):0;
     GX.fillStyle=PCOL.pDark;
     GX.fillRect(px+3,py+ph-10,7,10+(ls>0?ls:0));
     GX.fillRect(px+pw-10,py+ph-10,7,10+(ls<0?-ls:0));
-    // Body
     GX.fillStyle=PCOL.pDark;GX.fillRect(px-1,py-1,pw+2,ph-10);
     GX.fillStyle=PCOL.player;GX.fillRect(px,py,pw,ph-10);
-    // Arms
     if(jumping){
-      // Arms up
       GX.fillStyle=PCOL.pDark;
-      GX.fillRect(px-5,py-2,5,8); // left arm up
-      GX.fillRect(px+pw,py-2,5,8); // right arm up
+      GX.fillRect(px-5,py-2,5,8);
+      GX.fillRect(px+pw,py-2,5,8);
     }else if(falling){
-      // Arms out wide
       GX.fillStyle=PCOL.pDark;
-      GX.fillRect(px-6,py+4,6,5); // left arm out
-      GX.fillRect(px+pw,py+4,6,5); // right arm out
+      GX.fillRect(px-6,py+4,6,5);
+      GX.fillRect(px+pw,py+4,6,5);
     }else if(onGround&&Math.abs(gPlayer.vx||0)>0.5){
-      // Running: swing arms
       const swing=wf?4:-4;
       GX.fillStyle=PCOL.pDark;
       GX.fillRect(px-4,py+4+swing,4,7);
       GX.fillRect(px+pw,py+4-swing,4,7);
     }else{
-      // Idle: arms down
       GX.fillStyle=PCOL.pDark;
       GX.fillRect(px-4,py+6,4,8);
       GX.fillRect(px+pw,py+6,4,8);
     }
-    // Head
     const hx=px-1,hy=py-13,hw=pw+2,hh=14;
     GX.fillStyle=PCOL.pDark;GX.fillRect(hx,hy,hw,hh);
     GX.fillStyle=PCOL.player;GX.fillRect(hx+1,hy+1,hw-2,hh-2);
-    // Eye
     const eo=pw-9;
     GX.fillStyle='#fff';GX.fillRect(hx+2+eo,hy+3,5,5);
     GX.fillStyle='#222';GX.fillRect(hx+2+eo+2,hy+5,2,2);
@@ -1268,10 +1225,8 @@ const FRAME_MS=1000/TARGET_FPS;
 
 function gLoop(now){
   const delta=now-_lastFrameTime;
-  // Cap delta to avoid huge jumps after tab switch
   const clampedDelta=Math.min(delta, FRAME_MS*3);
   _lastFrameTime=now;
-  // Run fixed number of substeps based on elapsed time
   const steps=Math.round(clampedDelta/FRAME_MS);
   for(let i=0;i<Math.max(1,steps);i++){
     gUpdate(now);
@@ -1282,7 +1237,7 @@ function gLoop(now){
 
 // ── Keys ──────────────────────────────────────────────────
 const JUMP_KEYS=['Space','ArrowUp','KeyW'];
-let _jumpReady=true; // true = allowed to jump
+let _jumpReady=true;
 
 document.addEventListener('keydown',e=>{
   gKeys[e.code]=true;
@@ -1291,7 +1246,7 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('keyup',e=>{
   gKeys[e.code]=false;
-  if(JUMP_KEYS.includes(e.code))_jumpReady=true; // re-enable jump on key release
+  if(JUMP_KEYS.includes(e.code))_jumpReady=true;
 });
 
 // ── Sound System (Web Audio API) ─────────────────────────
@@ -1342,7 +1297,6 @@ function playSound(type){
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime+0.4);
     }else if(type==='win'){
-      // Petit jingle de victoire
       const notes=[523,659,784,1047];
       notes.forEach((freq,i)=>{
         const o=ctx.createOscillator(),g=ctx.createGain();
@@ -1374,12 +1328,8 @@ gUpdate=function(now){
   const wasGround=gPlayer?.onGround;
   _origGUpdate2(now);
   if(!gPlayer||gPlayer.dead)return;
-
-  // Landing sound
   if(!_wasOnGround&&gPlayer.onGround)playSound('land');
   _wasOnGround=gPlayer.onGround;
-
-  // Step sound
   if(gPlayer.onGround){
     const moving=Math.abs(gPlayer.vx)>1||Math.abs(gPlayer.vy)>1;
     if(moving){
@@ -1391,8 +1341,6 @@ gUpdate=function(now){
   }
 };
 
-// Hook jump sound
-const _origKeys=gKeys;
 let _jumpSounded=false;
 const _checkJump=setInterval(()=>{
   if(!gRunning)return;
@@ -1401,21 +1349,18 @@ const _checkJump=setInterval(()=>{
   if(!jump)_jumpSounded=false;
 },16);
 
-// Hook die sound
 const _origKillPlayer=killPlayer;
 killPlayer=function(){
   _origKillPlayer();
   if(gPlayer?.dead)playSound('die');
 };
 
-// Hook win sound
 const _origShowWin=showWinScreen;
 showWinScreen=function(ms,prevBest,isNewRecord,l){
   _origShowWin(ms,prevBest,isNewRecord,l);
   playSound('win');
 };
 
-// Unlock audio on first interaction
 document.addEventListener('click',()=>{
   if(_audioCtx&&_audioCtx.state==='suspended')_audioCtx.resume();
 },{once:true});
@@ -1425,7 +1370,7 @@ document.addEventListener('keydown',()=>{
 },{once:true});
 
 // ── Start ─────────────────────────────────────────────────
-resizeGameCanvas(); // Size canvas immediately on load
+resizeGameCanvas();
 init();
 </script>
 
@@ -1434,11 +1379,11 @@ init();
   <div style="background:#0d0d1e;border:2px solid #2a2a55;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:20px;">
     <div id="pub-modal-title" style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#f0e040;text-align:center;letter-spacing:1px;">🚀 PUBLIER LE NIVEAU</div>
     <div>
-      <label style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;letter-spacing:1px;display:block;margin-bottom:8px;">NOM DU NIVEAU</label>
+      <label id="pub-name-lbl" style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;letter-spacing:1px;display:block;margin-bottom:8px;">NOM DU NIVEAU</label>
       <input id="pub-name-input" type="text" maxlength="60" style="width:100%;background:#12122a;border:1.5px solid #a040f0;border-radius:4px;color:#e8e8ff;font-family:Orbitron,monospace;font-size:12px;padding:12px 14px;outline:none;box-sizing:border-box;">
     </div>
     <div style="display:flex;gap:10px;">
-      <button onclick="cancelPublish()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;border-radius:6px;cursor:pointer;background:#12122a;border:1.5px solid #2a2a55;color:#a0a0cc;">ANNULER</button>
+      <button id="pub-cancel-btn" onclick="cancelPublish()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;border-radius:6px;cursor:pointer;background:#12122a;border:1.5px solid #2a2a55;color:#a0a0cc;">ANNULER</button>
       <button id="pub-confirm-btn" onclick="confirmPublish()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;border-radius:6px;cursor:pointer;background:#0d2a1a;border:1.5px solid #40f090;color:#40f090;">🚀 PUBLIER</button>
     </div>
   </div>
@@ -1447,15 +1392,12 @@ init();
 
 <!-- MOBILE CONTROLS -->
 <div id="mobile-controls" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;pointer-events:none;padding:0 20px 24px;user-select:none;">
-  <!-- Left button -->
   <div style="position:absolute;bottom:24px;left:20px;pointer-events:auto;">
     <button id="mb-left" class="mb-btn" onpointerdown="mbDown('left')" onpointerup="mbUp('left')" onpointercancel="mbUp('left')">◀</button>
   </div>
-  <!-- Right button -->
   <div style="position:absolute;bottom:24px;left:100px;pointer-events:auto;">
     <button id="mb-right" class="mb-btn" onpointerdown="mbDown('right')" onpointerup="mbUp('right')" onpointercancel="mbUp('right')">▶</button>
   </div>
-  <!-- Jump button -->
   <div style="position:absolute;bottom:24px;right:20px;pointer-events:auto;">
     <button id="mb-jump" class="mb-btn mb-jump" onpointerdown="mbDown('jump')" onpointerup="mbUp('jump')" onpointercancel="mbUp('jump')">⬆</button>
   </div>
@@ -1482,26 +1424,22 @@ init();
 </style>
 
 <script>
-// Mobile detection
 const isMobile=/Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent)||('ontouchstart' in window);
 if(isMobile){
   document.getElementById('mobile-controls').style.display='block';
-  // Prevent default touch scroll on canvas
   document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 }
 
-// Mobile button handlers - map to gKeys
 const mbMap={
   left:'ArrowLeft',
   right:'ArrowRight',
   jump:'Space'
 };
 
-// Fix speed consistency - use a Set to track active mobile keys
 const mbActive=new Set();
 
 function mbDown(dir){
-  if(mbActive.has(dir))return; // prevent duplicate fires
+  if(mbActive.has(dir))return;
   mbActive.add(dir);
   const key=mbMap[dir];
   if(key)gKeys[key]=true;
@@ -1516,9 +1454,7 @@ function mbUp(dir){
   if(btn)btn.classList.remove('pressed');
 }
 
-// Also show controls button in HUD on mobile
 if(isMobile){
-  // Hide controls when overlay is shown
   const observer=new MutationObserver(()=>{
     const anyOv=document.querySelector('.ov.show');
     document.getElementById('mobile-controls').style.display=anyOv?'none':'block';
