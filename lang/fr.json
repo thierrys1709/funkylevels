@@ -200,7 +200,13 @@
     "pseudoTitle": "✏️ CHANGER MON PSEUDO",
     "pseudoLbl": "NOUVEAU PSEUDO",
     "pseudoSave": "💾 SAUVEGARDER",
-    "accountInfoTitle": "👤 MON COMPTE"
+    "accountInfoTitle": "👤 MON COMPTE",
+    "pwdTitle": "🔑 CHANGER MON MOT DE PASSE",
+    "pwdNewLbl": "NOUVEAU MOT DE PASSE",
+    "pwdConfirmLbl": "CONFIRMER LE MOT DE PASSE",
+    "pwdBtn": "🔑 CHANGER LE MOT DE PASSE",
+    "phPassNew": "8 caractères minimum",
+    "phPassConfirm": "Répète ton mot de passe"
   },
   "publish": {
     "title": "💾 SAUVEGARDER",
