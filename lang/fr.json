@@ -85,6 +85,9 @@
     "toastSaved": "✅ SAUVEGARDÉ !",
     "toastLoadError": "⚠️ Erreur de chargement",
     "toastNotFound": "⚠️ Niveau introuvable — Nouveau niveau initialisé",
+    "publishedLockDesc": "Ce niveau est publié et ne peut pas être édité directement.\nCrée une copie privée pour le modifier.",
+    "publishedLockCopy": "🖊 CRÉER UNE COPIE MODIFIABLE",
+    "publishedLockLoad": "📂 CHARGER UN AUTRE NIVEAU",
     "toolNames": {
       "fixed": "FIXE",
       "trap": "PIÈGE",
