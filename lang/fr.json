@@ -105,7 +105,13 @@
     "pInfoMobile": "Va et vient automatiquement.",
     "pInfoGravflip": "Zone de gravité.<br><br>Attire le joueur vers<br>le bord indiqué.<br><br>Force 0 = apesanteur.",
     "pInfoSpeed": "Zone de vitesse.<br><br>5 = normal<br>1 = très lent<br>20 = très rapide",
-    "untitled": "Sans titre"
+    "untitled": "Sans titre",
+    "publishSectionTitle": "🚀 PUBLIER CE NIVEAU",
+    "publishBtnPublic": "🌍 RENDRE PUBLIC",
+    "publishBtnCode": "🔑 PAR CODE",
+    "publishBtnEdit": "✏️ ÉDITER",
+    "publishNameLbl": "NOM DU NIVEAU",
+    "publishCancel": "ANNULER"
   },
   "home": {
     "heroTitle": "⚡ FUNKYLEVELS",
