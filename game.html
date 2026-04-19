@@ -359,6 +359,7 @@ async function confirmPublish(){
 }
 
 function goToEditor(){
+  alert('DEBUG goToEditor: _currentLevelId='+_currentLevelId);
   if(_currentLevelId){
     // Save current level data to sessionStorage so studio can restore it
     if(lv){
