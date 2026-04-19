@@ -105,7 +105,13 @@
     "pInfoMobile": "Goes back and forth.",
     "pInfoGravflip": "Gravity zone.<br><br>Pulls player toward<br>the indicated edge.<br><br>Force 0 = weightless.",
     "pInfoSpeed": "Speed zone.<br><br>5 = normal<br>1 = very slow<br>20 = very fast",
-    "untitled": "Untitled"
+    "untitled": "Untitled",
+    "publishSectionTitle": "🚀 PUBLISH THIS LEVEL",
+    "publishBtnPublic": "🌍 MAKE PUBLIC",
+    "publishBtnCode": "🔑 BY CODE",
+    "publishBtnEdit": "✏️ EDIT",
+    "publishNameLbl": "LEVEL NAME",
+    "publishCancel": "CANCEL"
   },
   "home": {
     "heroTitle": "⚡ FUNKYLEVELS",
