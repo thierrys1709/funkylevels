@@ -1375,12 +1375,12 @@ gUpdate=function(now){
   _origGUpdate2(now);
   if(!gPlayer||gPlayer.dead)return;
 
-  // Landing sound
-  if(!_wasOnGround&&gPlayer.onGround)playSound('land');
+  // Landing sound - stop when won
+  if(!gWon&&!_wasOnGround&&gPlayer.onGround)playSound('land');
   _wasOnGround=gPlayer.onGround;
 
-  // Step sound
-  if(gPlayer.onGround){
+  // Step sound - stop when won
+  if(!gWon&&gPlayer.onGround){
     const moving=Math.abs(gPlayer.vx)>1||Math.abs(gPlayer.vy)>1;
     if(moving){
       _stepTimer++;
