@@ -619,10 +619,10 @@ body {
   <div id="panel">
     <h2 id="ptitle">OUTIL : FIXE</h2>
 
-    <div id="s-fixed" class="psec show"><div class="pinfo" data-info="pInfoFixed">Sol solide.<br>Cliquer-glisser<br>pour dessiner.</div></div>
+    <div id="s-fixed" class="psec show"><div class="pinfo" data-info="pInfoFixed"></div></div>
 
     <div id="s-trap" class="psec">
-      <div class="pinfo">Tombe quand le joueur<br>s'approche. Cliquer-glisser.</div>
+      <div class="pinfo" data-info="pInfoTrap"></div>
       <div class="prow"><label>ZONE DÉCLENCHEMENT (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="tr-dist" min="0" max="200" step="8" value="48" oninput="trapParamChanged()"><span class="pval" id="tr-dist-v">48</span></div></div>
       <div class="prow"><label>DÉLAI AVANT CHUTE (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="tr-predelay" min="0" max="5" step="0.25" value="0" oninput="trapParamChanged()"><span class="pval" id="tr-predelay-v">0</span></div></div>
       <div class="prow"><label>VITESSE DE CHUTE</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="tr-fall" min="0.2" max="4" step="0.1" value="1" oninput="trapParamChanged()"><span class="pval" id="tr-fall-v">1</span></div></div>
@@ -633,7 +633,7 @@ body {
     </div>
 
     <div id="s-slider" class="psec">
-      <div class="pinfo">Se déplace quand le joueur<br>s'approche. Cliquer-glisser.</div>
+      <div class="pinfo" data-info="pInfoSlider"></div>
       <div class="prow"><label>DIRECTION</label><select id="sl-dir" onchange="slParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%"><option value="r">→ Droite</option><option value="l">← Gauche</option><option value="u">↑ Haut</option><option value="d">↓ Bas</option></select></div>
       <div class="prow"><label>ZONE DÉCLENCHEMENT (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sl-dist" min="0" max="200" step="8" value="48" oninput="slParamChanged()"><span class="pval" id="sl-dist-v">48</span></div></div>
       <div class="prow"><label>VITESSE</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sl-spd" min="1" max="12" step="0.5" value="4" oninput="slParamChanged()"><span class="pval" id="sl-spd-v">4</span></div></div>
@@ -643,31 +643,31 @@ body {
     </div>
 
     <div id="s-bounce" class="psec">
-      <div class="pinfo">Fait rebondir le joueur.<br>Force 1 = saut normal.</div>
+      <div class="pinfo" data-info="pInfoBounce"></div>
       <div class="prow"><label>FORCE (1 - 10)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="bo-force" min="1" max="10" step="0.5" value="2" oninput="bounceParamChanged()"><span class="pval" id="bo-force-v">2</span></div></div>
     </div>
 
-    <div id="s-invis" class="psec"><div class="pinfo" data-info="pInfoInvis">Bloc solide invisible en jeu.</div></div>
+    <div id="s-invis" class="psec"><div class="pinfo" data-info="pInfoInvis"></div></div>
 
     <div id="s-mobile" class="psec">
-      <div class="pinfo">Va et vient automatiquement.</div>
+      <div class="pinfo" data-info="pInfoMobile"></div>
       <div class="prow"><label>DIRECTION</label><select id="mo-dir" onchange="moParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%"><option value="r">→ Droite</option><option value="l">← Gauche</option><option value="u">↑ Haut</option><option value="d">↓ Bas</option></select></div>
       <div class="prow"><label>DISTANCE (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-dist" min="16" max="600" step="8" value="160" oninput="moParamChanged()"><span class="pval" id="mo-dist-v">160</span></div></div>
       <div class="prow"><label>VITESSE</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-spd" min="0.5" max="8" step="0.5" value="2" oninput="moParamChanged()"><span class="pval" id="mo-spd-v">2</span></div></div>
     </div>
 
     <div id="s-push" class="psec">
-      <div class="pinfo" data-info="pInfoPush">Bloc poussable. Tombe si<br>rien ne le soutient.</div>
+      <div class="pinfo" data-info="pInfoPush"></div>
       <div class="prow"><label>FRICTION</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="pu-fric" min="0.5" max="0.99" step="0.01" value="0.8" oninput="document.getElementById('pu-fric-v').textContent=this.value"><span class="pval" id="pu-fric-v">0.8</span></div></div>
     </div>
 
-    <div id="s-start" class="psec"><div class="pinfo" data-info="pInfoStart">Cliquer pour placer<br>le point de départ.</div></div>
+    <div id="s-start" class="psec"><div class="pinfo" data-info="pInfoStart"></div></div>
     <div id="s-end" class="psec"><div class="pinfo" data-info="pInfoEnd">Cliquer pour placer<br>l'arrivée.</div></div>
-    <div id="s-select" class="psec"><div class="pinfo" data-info="pInfoSelect">Cliquer = sélect.<br>Glisser = déplacer.<br>Poignées = redim.<br><br>Suppr = effacer.<br>Ctrl+C/V = copier.<br>Ctrl+Z/Y = undo/redo.</div></div>
+    <div id="s-select" class="psec"><div class="pinfo" data-info="pInfoSelect"></div></div>
 
     <!-- ═══ GRAVITÉ PANEL ═══ -->
     <div id="s-gravflip" class="psec">
-      <div class="pinfo">Zone de gravité directionnelle.<br><br>Le joueur est attiré vers<br>le bord indiqué.<br><br>Force 0 = apesanteur.<br><br>Contrôles dans la zone :<br>← → = bouger / sauter<br>(pivoté selon direction)</div>
+      <div class="pinfo" data-info="pInfoGravflip"></div>
       <div class="prow">
         <label>DIRECTION</label>
         <select id="gf-dir" onchange="gfParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
@@ -688,7 +688,7 @@ body {
     </div>
 
     <div id="s-speed" class="psec">
-      <div class="pinfo" data-info="pInfoSpeed">Zone de vitesse.<br><br>5 = normal<br>1 = très lent<br>20 = très rapide</div>
+      <div class="pinfo" data-info="pInfoSpeed"></div>
       <div class="prow">
         <label>VITESSE (1 – 20)</label>
         <div style="display:flex;gap:4px;align-items:center">
@@ -790,7 +790,7 @@ async function duplicateLevel(){
   const newCode=genCode();
   const{data:inserted,error}=await _sb.from('levels').insert({
     user_id:user.id,
-    title:(document.getElementById('level-name-input')?.value||'Sans titre')+' (copie)',
+    title:(document.getElementById('level-name-input')?.value||ts('untitled','Untitled'))+' (copie)',
     data:lv,
     plays:0,
     visibility:'private',
@@ -1134,7 +1134,7 @@ function saveLevel(){
 }
 
 async function doQuickSave(){
-  const title=document.getElementById('level-name-input').value.trim()||'Sans titre';
+  const title=document.getElementById('level-name-input').value.trim()||ts('untitled','Untitled');
   const{data,error}=await _sb.from('levels').update({
     title:title,
     data:lv,
@@ -1224,8 +1224,8 @@ function renderLoadItems(data){
     const dateStr=d.toLocaleDateString(l==='fr'?'fr-FR':'en-GB');
     const timeStr=d.toLocaleTimeString(l==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'});
     const vis=VIS[lvl.visibility||'private'];
-    html+=`<tr class="load-row" onclick="doLoadLevel('${lvl.id}','${(lvl.title||'Sans titre').replace(/'/g,"\'")}')">
-      <td class="load-col-name">${lvl.title||'Sans titre'}</td>
+    html+=`<tr class="load-row" onclick="doLoadLevel('${lvl.id}','${(lvl.title||ts('untitled','Untitled')).replace(/'/g,"\'")}')">
+      <td class="load-col-name">${lvl.title||ts('untitled','Untitled')}</td>
       <td class="load-col-date"><span class="load-date">${dateStr}</span><span class="load-time">${timeStr}</span></td>
       <td class="load-col-vis"><span class="load-item-vis ${vis.cls}">${vis.label}</span></td>
     </tr>`;
@@ -1679,7 +1679,7 @@ async function loadPlayerProfile(){
     if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
     if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
     // Show the modal with copy or open other option
-    showPublishedModal(data.title||'Sans titre', lid);
+    showPublishedModal(data.title||ts('untitled','Untitled'), lid);
     return;
   }
 
@@ -2188,7 +2188,7 @@ function autosaveClear(){
 function checkAutosaveOnLoad(){
   const savedLv=sessionStorage.getItem('fl_autosave_level');
   if(!savedLv)return;
-  const savedName=sessionStorage.getItem('fl_autosave_name')||'Sans titre';
+  const savedName=sessionStorage.getItem('fl_autosave_name')||ts('untitled','Untitled');
   try{
     const restored=JSON.parse(savedLv);
     lv=restored;
