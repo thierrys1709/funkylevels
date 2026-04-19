@@ -820,7 +820,7 @@ function copySelected(){if(!selection.length)return;clipboard=selection.map(s=>(
 function pasteClip(){if(!clipboard||!clipboard.length)return;snapshot();clearSel();clipboard.forEach(c=>{const d=JSON.parse(JSON.stringify(c.data));d.x+=GRID*2;d.y+=GRID*2;lv[c.type].push(d);addToSel(c.type,lv[c.type].length-1);});redraw();status('Collé.');}
 
 let lv=emptyLevel();
-function emptyLevel(){return{fixed:[],trap:[],slider:[],invis:[],bounce:[],mobile:[],push:[],gravflip:[],speed:[],start:{x:80,y:480},end:{x:3100,y:480}};}
+function emptyLevel(){return{fixed:[],trap:[],slider:[],invis:[],bounce:[],mobile:[],push:[],gravflip:[],speed:[],start:{x:80,y:480},end:null};}
 
 const TOOL_NAMES={fixed:'FIXE',trap:'PIÈGE',slider:'GLISSEUR',invis:'INVISIBLE',bounce:'REBOND',mobile:'MOBILE',push:'POUSSABLE',gravflip:'GRAVITÉ',speed:'VITESSE',start:'DÉPART',end:'ARRIVÉE',select:'SÉLECTION'};
 function T(t){
@@ -973,6 +973,19 @@ EC.addEventListener('mousedown',e=>{
   const{x,y}=canvasPos(e);mousePos={x,y};
   if(currentTool==='start'){snapshot();lv.start={x:snap(x),y:snap(y)};redraw();return;}
   if(currentTool==='end'){snapshot();lv.end={x:snap(x),y:snap(y)};redraw();return;}
+  // Allow dragging existing start/end flags with any tool
+  if(lv.start){
+    const sx=lv.start.x,sy=lv.start.y;
+    if(Math.abs(x-sx)<24&&Math.abs(y-sy)<32){
+      dragState={mode:'flag',flag:'start',sm:{x,y},orig:{x:sx,y:sy}};redraw();return;
+    }
+  }
+  if(lv.end){
+    const ex=lv.end.x,ey=lv.end.y;
+    if(Math.abs(x-ex)<24&&Math.abs(y-ey)<32){
+      dragState={mode:'flag',flag:'end',sm:{x,y},orig:{x:ex,y:ey}};redraw();return;
+    }
+  }
   if(selection.length===1){
     const obj=getSelObj();
     if(obj&&selectedType==='trap'&&obj.partial&&obj.partDist>0){const ghostY=obj.y+obj.partDist+obj.h;if(Math.abs(y-ghostY)<=8&&x>=obj.x&&x<=obj.x+obj.w){dragState={mode:'partdist',sm:{x,y},orig:obj.partDist,trap:obj};return;}}
@@ -999,6 +1012,13 @@ window.addEventListener('mousemove',e=>{
   const{x,y}=canvasPos(e);mousePos={x,y};
   if(dragState){
     const dx=x-dragState.sm.x,dy=y-dragState.sm.y;
+    if(dragState.mode==='flag'){
+      const dx=x-dragState.sm.x,dy=y-dragState.sm.y;
+      const nx=snap(dragState.orig.x+dx),ny=snap(dragState.orig.y+dy);
+      if(dragState.flag==='start')lv.start={x:Math.max(0,Math.min(EW,nx)),y:Math.max(0,Math.min(EH,ny))};
+      else lv.end={x:Math.max(0,Math.min(EW,nx)),y:Math.max(0,Math.min(EH,ny))};
+      redraw();return;
+    }
     if(dragState.mode==='partdist'){dragState.trap.partDist=Math.max(GRID,snap(dragState.orig+(y-dragState.sm.y)));const sl=document.getElementById('tr-partdist'),lbl=document.getElementById('tr-partdist-v');if(sl){sl.value=dragState.trap.partDist;lbl.textContent=dragState.trap.partDist;}redraw();return;}
     if(dragState.mode==='move'){dragState.origins.forEach(o=>{const b=lv[o.type][o.idx];b.x=Math.max(0,Math.min(EW-b.w,snap(o.ox+dx)));b.y=Math.max(0,Math.min(EH-b.h,snap(o.oy+dy)));if(b.ox!==undefined)b.ox=b.x;if(b.oy!==undefined)b.oy=b.y;});}
     else if(dragState.mode==='resize'){const obj=getSelObj();if(obj){const h=dragState.handle,r=dragState.sr;let nx=r.x,ny=r.y,nw=r.w,nh=r.h;if(h.includes('e'))nw=Math.max(GRID,snap(r.w+dx));if(h.includes('s'))nh=Math.max(GRID,snap(r.h+dy));if(h.includes('w')){nx=snap(r.x+dx);nw=Math.max(GRID,r.w-snap(dx));}if(h.includes('n')){ny=snap(r.y+dy);nh=Math.max(GRID,r.h-snap(dy));}obj.x=nx;obj.y=ny;obj.w=nw;obj.h=nh;}}
@@ -1012,7 +1032,12 @@ window.addEventListener('mousemove',e=>{
 
 window.addEventListener('mouseup',e=>{
   if(e.button!==0)return; // Ignorer tout sauf clic gauche
-  if(dragState){snapshot();dragState=null;EC.style.cursor='crosshair';redraw();return;}
+  if(dragState){
+    if(dragState.mode==='flag'){
+      dragState=null;EC.style.cursor='crosshair';redraw();return; // already updated live
+    }
+    snapshot();dragState=null;EC.style.cursor='crosshair';redraw();return;
+  }
   if(rubberBand){
     const rb=rubberBand;rubberBand=null;
     const rx=Math.min(rb.sx,rb.ex),ry=Math.min(rb.sy,rb.ey),rw=Math.abs(rb.ex-rb.sx),rh=Math.abs(rb.ey-rb.sy);
@@ -1399,8 +1424,8 @@ function redraw(){
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
 
-  eFlag(lv.start.x,lv.start.y,EC_COL.flagA,'A');
-  eFlag(lv.end.x,lv.end.y,EC_COL.flagB,'B');
+  if(lv.start)eFlag(lv.start.x,lv.start.y,EC_COL.flagA,'A');
+  if(lv.end)eFlag(lv.end.x,lv.end.y,EC_COL.flagB,'B');
 
   if(rubberBand){const rx=Math.min(rubberBand.sx,rubberBand.ex),ry=Math.min(rubberBand.sy,rubberBand.ey),rw=Math.abs(rubberBand.ex-rubberBand.sx),rh=Math.abs(rubberBand.ey-rubberBand.sy);EX.fillStyle='#5050c022';EX.fillRect(rx,ry,rw,rh);EX.strokeStyle='#8080f0cc';EX.lineWidth=1.5;EX.setLineDash([5,3]);EX.strokeRect(rx,ry,rw,rh);EX.setLineDash([]);}
   if(selection.length>1){EX.fillStyle='#f0e040cc';EX.font='7px "Press Start 2P"';EX.fillText(`${selection.length} sélectionnés`,mousePos.x+10,mousePos.y-8);}
