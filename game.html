@@ -359,8 +359,18 @@ async function confirmPublish(){
 }
 
 function goToEditor(){
-  if(_currentLevelId)window.location.href='studio.html?level='+_currentLevelId+'&mode=edit';
-  else window.history.back();
+  if(_currentLevelId){
+    // Save current level data to sessionStorage so studio can restore it
+    if(lv){
+      sessionStorage.setItem('fl_autosave_level', JSON.stringify(lv));
+      sessionStorage.setItem('fl_autosave_id', _currentLevelId);
+      const title=_levelData?.title||'';
+      sessionStorage.setItem('fl_autosave_name', title);
+    }
+    window.location.href='studio.html?level='+_currentLevelId+'&mode=edit';
+  }else{
+    window.history.back();
+  }
 }
 function goToIndex(){
   stopTimer();
