@@ -1254,13 +1254,17 @@ async function doLoadLevel(id,title){
   if(cv)cv.style.pointerEvents='';
   // Check autosave restore - use if same level ID OR coming from game
   const _fromGame=sessionStorage.getItem('fl_from_game')==='1';
+  const _autoId=window._autosaveRestore?.id||'null';
+  const _autoHas=!!window._autosaveRestore;
+  alert('DEBUG\nfl_from_game: '+_fromGame+'\nautosaveRestore exists: '+_autoHas+'\nautosave.id: '+_autoId+'\nlevel id: '+id+'\nautosave level blocks: '+(window._autosaveRestore?.lv?.fixed?.length||0));
   if(window._autosaveRestore&&(window._autosaveRestore.id===id||_fromGame)){
     lv=window._autosaveRestore.lv;
-    _hasUnsavedChanges=false; // came from game, no unsaved changes
+    _hasUnsavedChanges=false;
     window._autosaveRestore=null;
     autosaveClear();
   }else{
     lv=data.data;
+    alert('DEBUG: using DB data, blocks: '+(lv?.fixed?.length||0));
   }
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
@@ -1687,13 +1691,17 @@ async function loadPlayerProfile(){
 
   // Check autosave restore - use if same level ID OR coming from game
   const _fromGame=sessionStorage.getItem('fl_from_game')==='1';
+  const _autoId=window._autosaveRestore?.id||'null';
+  const _autoHas=!!window._autosaveRestore;
+  alert('DEBUG\nfl_from_game: '+_fromGame+'\nautosaveRestore exists: '+_autoHas+'\nautosave.id: '+_autoId+'\nlevel id: '+id+'\nautosave level blocks: '+(window._autosaveRestore?.lv?.fixed?.length||0));
   if(window._autosaveRestore&&(window._autosaveRestore.id===id||_fromGame)){
     lv=window._autosaveRestore.lv;
-    _hasUnsavedChanges=false; // came from game, no unsaved changes
+    _hasUnsavedChanges=false;
     window._autosaveRestore=null;
     autosaveClear();
   }else{
     lv=data.data;
+    alert('DEBUG: using DB data, blocks: '+(lv?.fixed?.length||0));
   }
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
