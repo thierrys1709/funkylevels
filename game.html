@@ -682,19 +682,28 @@ async function init(){
 
   const _edBtn=document.getElementById('btn-editor');
   if(fromStudio&&_edBtn){
-    _edBtn.style.display='';
-    _edBtn.onclick=()=>{
+  _edBtn.style.display='';
+  _edBtn.onclick=()=>{
+    sessionStorage.setItem('fl_from_game','1');
+    window.location.href='studio.html';
+  };
+  const badge=document.getElementById('test-mode-badge');
+  if(badge)badge.style.display='';
+  document.body.classList.add('test-mode');
+  const _rm=document.getElementById('win-record-msg');
+  const _bm=document.getElementById('win-best-display');
+  if(_rm)_rm.style.cssText='display:none!important';
+  if(_bm)_bm.style.cssText='display:none!important';
+
+  // ← AJOUTER CES LIGNES :
+  const btnQuit=document.getElementById('btn-quit');
+  if(btnQuit){
+    btnQuit.onclick=()=>{
       sessionStorage.setItem('fl_from_game','1');
       window.location.href='studio.html';
     };
-    const badge=document.getElementById('test-mode-badge');
-    if(badge)badge.style.display='';
-    document.body.classList.add('test-mode');
-    const _rm=document.getElementById('win-record-msg');
-    const _bm=document.getElementById('win-best-display');
-    if(_rm)_rm.style.cssText='display:none!important';
-    if(_bm)_bm.style.cssText='display:none!important';
   }
+}
 
   if(preview){
     const raw=sessionStorage.getItem('fl_preview_level');
