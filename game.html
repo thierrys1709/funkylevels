@@ -759,7 +759,7 @@ async function init(){
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;font-family:Orbitron,monospace;text-align:center;padding:24px;">
         <div style="font-size:32px;">🏁</div>
         <div style="font-size:12px;color:#f0a040;letter-spacing:2px;">${l==='fr'?'ARRIVÉE MANQUANTE':'NO END POINT'}</div>
-        <div style="font-size:10px;color:#6060aa;max-width:280px;line-height:1.8;font-family:Rajdhani,sans-serif;">${l==='fr'?'Ce niveau n'a pas d'arrivée. Place une arrivée dans le studio avant de jouer.':'This level has no end point. Place an end point in the studio before playing.'}</div>
+        <div style="font-size:10px;color:#6060aa;max-width:280px;line-height:1.8;font-family:Rajdhani,sans-serif;">${l==='fr'?"Ce niveau n'a pas d'arrivée.":"This level has no end point."}</div>
         <button onclick="window.history.back()" style="font-family:Orbitron,monospace;font-size:9px;padding:12px 20px;background:#12122a;border:1.5px solid #a040f0;color:#c080ff;border-radius:4px;cursor:pointer;">← ${l==='fr'?'RETOUR AU STUDIO':'BACK TO STUDIO'}</button>
       </div>`;
     return;
