@@ -933,87 +933,117 @@ function gDraw(){
   GX.fillStyle=PCOL.bg;GX.fillRect(0,0,GW(),GH());
   GX.save();GX.translate(-Math.round(gCamX),-Math.round(gCamY));
 
-  // Fixed blocks
+  // ── Speed zones — fully invisible, reveal only when player inside ──
+  if(gPlayer&&!gPlayer.dead){
+    (gLv.speed||[]).forEach(p=>{
+      if(!ov(gPlayer,p))return;
+      const spd=p.spd??5,fast=spd>5;
+      const col=spd===5?'#40c040':fast?'#4040f0':'#f04040';
+      const x=Math.round(p.x),y=Math.round(p.y),w=Math.round(p.w),h=Math.round(p.h);
+      GX.fillStyle=col+'38';GX.fillRect(x,y,w,h);
+      GX.strokeStyle=col+'99';GX.lineWidth=1.5;GX.strokeRect(x,y,w,h);
+      const cols=Math.max(1,Math.floor(w/44)),rows=Math.max(1,Math.floor(h/36));
+      GX.fillStyle=col+'cc';GX.font='15px sans-serif';GX.textAlign='center';
+      for(let ci=0;ci<cols;ci++)for(let ri=0;ri<rows;ri++)
+        GX.fillText(fast?'⚡':'🐌',p.x+(ci+.5)*(w/cols),p.y+(ri+.5)*(h/rows)+5);
+      GX.textAlign='left';
+    });
+  }
+
+  // ── Gravflip zones — fully invisible, reveal only when player inside ──
+  if(gPlayer&&!gPlayer.dead){
+    (gLv.gravflip||[]).forEach(p=>{
+      if(!ov(gPlayer,p))return;
+      const dir=p.dir??'u',c=GF_COLS[dir]||GF_COLS.u;
+      const x=Math.round(p.x),y=Math.round(p.y),w=Math.round(p.w),h=Math.round(p.h);
+      GX.fillStyle=c.bg+'38';GX.fillRect(x,y,w,h);
+      GX.strokeStyle=c.stroke+'99';GX.lineWidth=1.5;GX.strokeRect(x,y,w,h);
+      const cols=Math.max(1,Math.floor(w/44)),rows=Math.max(1,Math.floor(h/36));
+      GX.fillStyle=c.stroke+'cc';GX.font='17px sans-serif';GX.textAlign='center';
+      for(let ci=0;ci<cols;ci++)for(let ri=0;ri<rows;ri++)
+        GX.fillText(c.arrow,p.x+(ci+.5)*(w/cols),p.y+(ri+.5)*(h/rows)+5);
+      GX.textAlign='left';
+    });
+  }
+
+  // ── Fixed blocks ──
   gLv.fixed.forEach(p=>gPlatform(p));
 
-  // Mobile blocks
-  (gLv.mobile||[]).forEach(t=>{
-    const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);
-    GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);GX.fillStyle='#4090f0';GX.fillRect(x,y,w,4);
-  });
+  // ── Mobile blocks — normal block appearance ──
+  (gLv.mobile||[]).forEach(t=>gPlatform(t));
 
-  // Push blocks
+  // ── Push blocks — normal block + dust effect when moving ──
   (gLv.push||[]).forEach(t=>{
-    const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);
-    GX.fillStyle='#3d2b1a';GX.fillRect(x,y,w,h);GX.fillStyle='#8b6340';GX.fillRect(x,y,w,4);
+    gPlatform(t);
+    const spd=Math.abs(t.vx||0);
+    if(spd>0.5){
+      const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);
+      const ratio=Math.min(1,spd/6);
+      const dir=t.vx>0?-1:1; // trailing side
+      // Motion streak lines on trailing side
+      GX.strokeStyle=`rgba(180,160,120,${ratio*0.7})`;GX.lineWidth=1.5;
+      for(let i=0;i<4;i++){
+        const ly=y+Math.round(h*(0.2+i*0.2));
+        const len=Math.round((3+i*2+ratio*10));
+        const lx=dir>0?x+w:x;
+        GX.beginPath();GX.moveTo(lx,ly);GX.lineTo(lx+dir*len,ly);GX.stroke();
+      }
+      // Subtle warm tint overlay
+      GX.fillStyle=`rgba(220,180,80,${ratio*0.18})`;GX.fillRect(x,y,w,h);
+    }
   });
 
-  // ── Bounce blocks — trampoline visual ──────────────────
+  // ── Bounce blocks — trampoline visual ──
   (gLv.bounce||[]).forEach((p,i)=>{
     const anim=_bounceAnim[i];
     const bounceT=anim?anim.t:undefined;
     gDrawTrampoline(p,bounceT);
-    // Advance animation timer
-    if(anim){
-      anim.t++;
-      if(anim.t>30)delete _bounceAnim[i];
-    }
+    if(anim){anim.t++;if(anim.t>30)delete _bounceAnim[i];}
   });
 
-  // Slider blocks
+  // ── Slider blocks ──
   (gLv.slider||[]).forEach(t=>{if(t.state!=='done')gPlatform(t);});
 
-  // Trap blocks
+  // ── Trap blocks ──
   (gLv.trap||[]).forEach(t=>{
     if(t.state==='gone')return;
     if(t.state==='predelay'){const shakeAmt=1+((t.preTimer||0)/Math.max(1,(t.preDelay||0)*60))*2,ox=t.x;t.x+=(Math.random()-0.5)*shakeAmt*2;gPlatform(t);t.x=ox;}
     else gPlatform(t);
   });
 
-  // ── Speed zones — look like fixed blocks, effect only when touching ──
-  (gLv.speed||[]).forEach((p,i)=>{
-    gPlatform(p);
-    if(gPlayer&&!gPlayer.dead&&ov(gPlayer,p)){
-      const spd=p.spd??5,fast=spd>5;
-      const col=spd===5?'#40c040':fast?'#4040f0':'#f04040';
-      GX.fillStyle=col+'50';
-      GX.fillRect(Math.round(p.x),Math.round(p.y),Math.round(p.w),Math.round(p.h));
-      const cols=Math.max(1,Math.floor(p.w/40)),rows=Math.max(1,Math.floor(p.h/36));
-      GX.fillStyle=col+'dd';GX.font='14px sans-serif';GX.textAlign='center';
-      for(let ci=0;ci<cols;ci++)for(let ri=0;ri<rows;ri++)
-        GX.fillText(fast?'⚡':'🐌',p.x+(ci+.5)*(p.w/cols),p.y+(ri+.5)*(p.h/rows)+5);
-      GX.textAlign='left';
-    }
-  });
+  // ── Invisible blocks — gradient reveal under player's feet ──
+  if(gPlayer&&!gPlayer.dead){
+    const REVEAL_R=140;
+    const footX=gPlayer.x+gPlayer.w/2;
+    const footY=gPlayer.y+gPlayer.h;
+    (gLv.invis||[]).forEach(p=>{
+      // Distance from foot to nearest point on block
+      const cx=Math.max(p.x,Math.min(p.x+p.w,footX));
+      const cy=Math.max(p.y,Math.min(p.y+p.h,footY));
+      const dist=Math.hypot(footX-cx,footY-cy);
+      if(dist>=REVEAL_R)return;
+      // Quadratic falloff: full visibility at 0, fades to 0 at REVEAL_R
+      const t2=(1-dist/REVEAL_R);
+      const alpha=t2*t2;
+      GX.globalAlpha=alpha;
+      gPlatform(p);
+      GX.globalAlpha=1;
+    });
+  }
 
-  // ── Gravflip zones — look like fixed blocks, effect only when touching ──
-  (gLv.gravflip||[]).forEach((p,i)=>{
-    gPlatform(p);
-    if(gPlayer&&!gPlayer.dead&&ov(gPlayer,p)){
-      const dir=p.dir??'u',c=GF_COLS[dir]||GF_COLS.u;
-      GX.fillStyle=c.bg+'50';
-      GX.fillRect(Math.round(p.x),Math.round(p.y),Math.round(p.w),Math.round(p.h));
-      const cols=Math.max(1,Math.floor(p.w/40)),rows=Math.max(1,Math.floor(p.h/36));
-      GX.fillStyle=c.stroke+'dd';GX.font='16px sans-serif';GX.textAlign='center';
-      for(let ci=0;ci<cols;ci++)for(let ri=0;ri<rows;ri++)
-        GX.fillText(c.arrow,p.x+(ci+.5)*(p.w/cols),p.y+(ri+.5)*(p.h/rows)+5);
-      GX.textAlign='left';
-    }
-  });
-
-  // Flags
+  // ── Flags ──
   if(gLv.start)gFlag(gLv.start,PCOL.flagA,'A');
   if(gLv.end)gFlag(gLv.end,PCOL.flagB,'B');
 
-  // Particles
+  // ── Particles ──
   gParts.forEach(p=>{GX.globalAlpha=Math.max(0,p.life);GX.fillStyle=p.col;GX.beginPath();GX.arc(p.x,p.y,Math.max(0,p.r*p.life),0,Math.PI*2);GX.fill();});
   GX.globalAlpha=1;
 
-  // Player
+  // ── Player ──
   if(!gPlayer.dead)gDrawPlayer();
   GX.restore();
 
-  // Gravity indicator HUD
+  // ── Gravity direction HUD indicator ──
   if(gPlayer&&gPlayer.gravDir!=='d'){
     const c=GF_COLS[gPlayer.gravDir];
     GX.fillStyle=c.stroke+'aa';GX.font='10px "Press Start 2P"';GX.fillText('G '+c.arrow,8,20);
