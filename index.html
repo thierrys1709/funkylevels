@@ -267,27 +267,22 @@ async function checkNeedsPseudo(user){
     });
     const arr=await r.json();
     if(arr&&arr[0]&&!arr[0].username){
-      // Try to use pending username from signup
       const pending=localStorage.getItem('fl_pending_username');
       if(pending&&pending.length>=3){
-        // Auto-save the pending username
         await fetch(SUPABASE_URL+'/rest/v1/profiles?id=eq.'+user.id,{
           method:'PATCH',
           headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(token||SUPABASE_KEY),'Content-Type':'application/json','Prefer':'return=minimal'},
           body:JSON.stringify({username:pending})
         });
         localStorage.removeItem('fl_pending_username');
-        // Update nav
         const navUser=document.getElementById('nav-user');
         if(navUser)navUser.textContent='👤 '+pending;
       }else{
-        // No pending username - show modal
         document.getElementById('pseudo-modal').style.display='flex';
         const input=document.getElementById('pseudo-input');
         if(input)input.focus();
       }
     }else if(arr&&arr[0]&&arr[0].username){
-      // Username exists - clear pending
       localStorage.removeItem('fl_pending_username');
     }
   }catch(e){console.warn('checkNeedsPseudo error',e);}
@@ -295,17 +290,14 @@ async function checkNeedsPseudo(user){
 
 async function detectAndSaveCountry(userId){
   try{
-    // Get fresh token from Supabase session
     const{data:sess}=await sb.auth.getSession();
     const token=sess?.session?.access_token;
     if(!token)return;
-    // Check if country already set
     const r=await fetch(SUPABASE_URL+'/rest/v1/profiles?select=country&id=eq.'+userId,{
       headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+token}
     });
     const arr=await r.json();
-    if(arr&&arr[0]&&arr[0].country)return; // already set
-    // Detect via IP
+    if(arr&&arr[0]&&arr[0].country)return;
     const geo=await fetch('https://ipapi.co/json/');
     const data=await geo.json();
     if(data&&data.country_code){
@@ -325,13 +317,11 @@ async function savePseudo(){
   if(!pseudo||pseudo.length<3){msg.textContent='Pseudo trop court (3 min) !';return;}
   if(!/^[a-zA-Z0-9_]+$/.test(pseudo)){msg.textContent='Lettres, chiffres et _ seulement.';return;}
   btn.disabled=true;btn.textContent='...';
-  // Check availability
   const r=await fetch(SUPABASE_URL+'/rest/v1/profiles?select=id&username=ilike.'+encodeURIComponent(pseudo),{
     headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+getToken()}
   });
   const arr=await r.json();
   if(arr&&arr.length>0){msg.textContent='Ce pseudo est déjà pris !';btn.disabled=false;btn.textContent='✓ CONFIRMER';return;}
-  // Save
   await fetch(SUPABASE_URL+'/rest/v1/profiles?id=eq.'+currentUser.id,{
     method:'PATCH',
     headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+getToken(),'Content-Type':'application/json','Prefer':'return=minimal'},
@@ -347,11 +337,8 @@ function applySession(user){
   currentUser=user;
   const signupBtn=document.getElementById('nav-signup');
   if(signupBtn)signupBtn.style.display='none';
-  // Check if user needs to choose a pseudo (Google signup)
   checkNeedsPseudo(user);
-  // Detect and save country if not already set
   detectAndSaveCountry(user.id);
-  // Fetch username from profiles table
   fetch('https://ydpkyktfvpdnjjiewctf.supabase.co/rest/v1/profiles?select=username&id=eq.'+user.id,{
     headers:{'apikey':'sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD','Authorization':'Bearer sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD'}
   }).then(r=>r.json()).then(data=>{
@@ -364,12 +351,14 @@ function applySession(user){
   document.getElementById('nav-create').style.display='';
   const hbc=document.getElementById('hero-btn-create');
   if(hbc)hbc.style.display='';
+  // Hide language switcher — language is managed via profile settings
+  const lb=document.querySelector('.lang-bar');
+  if(lb)lb.style.display='none';
 }
 
 async function checkAuth(){
   const{data}=await sb.auth.getSession();
   if(data.session){
-    // Hide lang modal - user is logged in
     const lm=document.getElementById('lang-modal');
     if(lm)lm.style.display='none';
     applySession(data.session.user);
@@ -378,7 +367,6 @@ async function checkAuth(){
       lang=profile.lang;localStorage.setItem('fl_lang',lang);setLang(lang);
     }
   }else{
-    // Not logged in - show language modal if no language chosen yet
     const _storedLang=localStorage.getItem('fl_lang');
     if(!_storedLang){
     }else{
@@ -388,7 +376,6 @@ async function checkAuth(){
   }
 }
 
-// Get auth token from localStorage without calling sb.auth
 function getToken(){
   try{
     const key=Object.keys(localStorage).find(k=>k.includes('auth-token'));
@@ -398,7 +385,6 @@ function getToken(){
   }catch(e){return null;}
 }
 
-// Direct fetch helper (avoids Supabase JS client hanging)
 async function sbFetch(path,token){
   const headers={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(token||SUPABASE_KEY)};
   const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{headers});
@@ -434,7 +420,6 @@ async function loadSection(s){
     let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=eq.public&order=created_at.desc&limit=24';
     if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
     levels=await sbFetch(url);
-    // Fetch ratings for these levels
     if(levels.length){
       const ids=levels.map(l=>l.id).join(',');
       const ratingsNew=await sbFetch('ratings?select=level_id,score&level_id=in.('+ids+')');
@@ -450,10 +435,8 @@ async function loadSection(s){
       });
     }
   }else if(s==='top'){
-    // 1. Get all ratings
     const allRatings=await sbFetch('ratings?select=level_id,score&limit=2000');
     if(!Array.isArray(allRatings)||!allRatings.length){levels=[];}
-    // 2. Compute avg per level
     const rmap={};
     allRatings.forEach(r=>{
       if(!rmap[r.level_id])rmap[r.level_id]={sum:0,count:0};
@@ -462,11 +445,9 @@ async function loadSection(s){
     });
     const ratedIds=Object.keys(rmap);
     if(!ratedIds.length){levels=[];}
-    // 3. Fetch only rated public levels
     let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=eq.public&id=in.('+ratedIds.join(',')+')';
     if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
     levels=await sbFetch(url);
-    // 4. Attach avg and sort descending
     levels.forEach(l=>{
       const r=rmap[l.id];
       l.avgRating=r?(Math.round((r.sum/r.count)*100)/100):null;
@@ -477,7 +458,6 @@ async function loadSection(s){
     levels=levels.slice(0,24);
   }else if(s==='mine'){
     if(!currentUser){grid.innerHTML=`<div class="empty"><div class="icon">🔒</div><p>${t.notLogged}</p></div>`;return;}
-    // Get token from localStorage directly without using sb.auth
     const token=getToken();
     let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&user_id=eq.'+currentUser.id+'&order=created_at.desc';
     if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
@@ -490,7 +470,6 @@ async function loadSection(s){
     return;
   }
 
-  const t2=T[lang]||T['fr'];
   const thead=`<thead><tr>
     <th>${lang==='fr'?'NOM':'NAME'}</th>
     <th>${lang==='fr'?'DATE':'DATE'}</th>
@@ -499,7 +478,6 @@ async function loadSection(s){
     ${s==='mine'?`<th>${lang==='fr'?'ÉTAT':'STATUS'}</th>`:''}
     <th></th>
   </tr></thead>`;
-  // Fetch usernames for creators
   const uids=[...new Set(levels.map(l=>l.user_id).filter(Boolean))];
   if(uids.length){
     const profiles=await sbFetch('profiles?select=id,username&id=in.('+uids.join(',')+')')
@@ -509,7 +487,6 @@ async function loadSection(s){
   }
   grid.innerHTML=`<table class="lvl-table">${thead}<tbody>${levels.map(l=>levelRow(l)).join('')}</tbody></table>`;
 
-  // Fetch leaderboard times
   const ids=levels.map(l=>l.id);
   const records=await sbFetch('leaderboard?select=level_id,time_ms&level_id=in.('+ids.join(',')+')'+'&order=time_ms.asc');
   const worldBests={};
@@ -539,7 +516,6 @@ function levelRow(l){
   const d=new Date(l.created_at);
   const dateStr=d.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
   const visLabel=l.visibility==='public'?(lang==='fr'?'Public':'Public'):l.visibility==='code'?(lang==='fr'?'Invitation':'Invite'):(lang==='fr'?'Privé':'Private');
-  const stars=l.avg_rating?'⭐ '+Number(l.avg_rating).toFixed(1):'—';
   return`<tr class="lvl-tr" data-id="${l.id}" onclick="window.location.href='game.html?level=${l.id}'">
     <td class="lvl-td lvl-td-name">${esc(l.title||'Sans titre')}${isNew?`<span class="new-badge">${t.new}</span>`:''}</td>
     <td class="lvl-td lvl-td-date">${dateStr}</td>
@@ -556,15 +532,17 @@ function doLogout(){
     if(k.startsWith('sb-')||k.includes('supabase'))localStorage.removeItem(k);
   });
   currentUser=null;
+  // Restore language switcher
+  const lb=document.querySelector('.lang-bar');
+  if(lb)lb.style.display='';
   showToast((T[lang]||T['fr']).logoutOk);
   setTimeout(()=>window.location.href='index.html',600);
 }
 
-// Init - only apply lang if already chosen, otherwise modal will show
 if(localStorage.getItem('fl_lang')){
   setLang(lang);
 }else{
-  setLang('en', false); // default UI in English without storing
+  setLang('en', false);
 }
 loadStats();
 
@@ -587,16 +565,13 @@ let _selectedLang=null;
 
 function selectLang(l){
   _selectedLang=l;
-  // Highlight selected lang button
   document.getElementById('lang-btn-fr').style.borderColor=l==='fr'?'#a040f0':'#2a2a55';
   document.getElementById('lang-btn-fr').style.color=l==='fr'?'#c080ff':'#6060aa';
   document.getElementById('lang-btn-en').style.borderColor=l==='en'?'#4285f4':'#2a2a55';
   document.getElementById('lang-btn-en').style.color=l==='en'?'#6aabff':'#6060aa';
-  // Save lang and update UI labels
   localStorage.setItem('fl_lang',l);
   setLang(l);
   const isFr=l==='fr';
-  // Enable login/signup buttons
   const loginBtn=document.getElementById('lang-login-btn');
   const signupBtn=document.getElementById('lang-signup-btn');
   loginBtn.textContent=isFr?'🎮 SE CONNECTER':'🎮 LOGIN';
@@ -609,7 +584,6 @@ function selectLang(l){
 }
 
 function confirmLang(){
-  // kept for compatibility
   if(_selectedLang)selectLang(_selectedLang);
 }
 
@@ -620,7 +594,6 @@ function chooseLang(lang){
 }
 
 function checkLangModal(){
-  // Only show if user is not logged in AND has no language preference
   const hasLang=localStorage.getItem('fl_lang');
   if(!hasLang){
     document.getElementById('lang-modal').style.display='flex';
@@ -632,14 +605,11 @@ function acceptCookies(){
   document.getElementById('cookie-banner').style.display='none';
 }
 
-// Show cookie banner if not accepted
-// Always show cookie banner on top of everything
 const cb=document.getElementById('cookie-banner');
 if(!localStorage.getItem('fl_cookies')){
   cb.style.display='flex';
 }
 </script>
-
 
 <!-- LANGUAGE SELECTION MODAL -->
 <script>
@@ -660,14 +630,11 @@ if(localStorage.getItem('fl_lang')){
       <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#e8e8ff;">Choisissez votre langue</div>
       <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:#a0a0cc;">Choose your language</div>
     </div>
-    <!-- Language buttons -->
     <div style="display:flex;gap:16px;width:100%;justify-content:center;">
       <button id="lang-btn-fr" onclick="selectLang('fr')" style="flex:1;max-width:140px;font-family:'Press Start 2P',monospace;font-size:10px;padding:16px;background:#12122a;border:2px solid #2a2a55;color:#6060aa;border-radius:8px;cursor:pointer;transition:all .15s;">🇫🇷 FRANÇAIS</button>
       <button id="lang-btn-en" onclick="selectLang('en')" style="flex:1;max-width:140px;font-family:'Press Start 2P',monospace;font-size:10px;padding:16px;background:#12122a;border:2px solid #2a2a55;color:#6060aa;border-radius:8px;cursor:pointer;transition:all .15s;">🇺🇸 ENGLISH</button>
     </div>
-    <!-- Divider -->
     <div style="width:100%;height:1px;background:#1e1e35;"></div>
-    <!-- Login/Signup buttons - disabled until lang chosen -->
     <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
       <a id="lang-login-btn" href="login.html" onclick="return !!_selectedLang" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#12122a;border:1.5px solid #2a2a55;color:#404066;border-radius:4px;text-decoration:none;text-align:center;opacity:.4;pointer-events:none;transition:all .2s;">🎮 SE CONNECTER / LOGIN</a>
       <a id="lang-signup-btn" href="login.html" onclick="return !!_selectedLang" style="display:block;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px;background:#0a1a0a;border:1.5px solid #1a3a1a;color:#206020;border-radius:4px;text-decoration:none;text-align:center;opacity:.4;pointer-events:none;transition:all .2s;">✨ S'INSCRIRE / SIGN UP</a>
