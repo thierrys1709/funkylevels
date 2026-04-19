@@ -312,10 +312,14 @@ async function confirmPublish(){
   let ok=false;
 
   if(_currentLevelId){
+    // Always include the latest level data so the published version matches what was just played
+    const latestData=lv||JSON.parse(sessionStorage.getItem('fl_preview_level')||'null');
+    const patchBody={title:newTitle,visibility:_pendingVisibility,is_published:true,author_completed:true};
+    if(latestData)patchBody.data=latestData;
     const r=await fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{
       method:'PATCH',
       headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({title:newTitle,visibility:_pendingVisibility,is_published:true,author_completed:true})
+      body:JSON.stringify(patchBody)
     });
     ok=r.ok;
   }else{
