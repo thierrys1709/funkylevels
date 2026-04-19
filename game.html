@@ -1321,6 +1321,21 @@ function playSound(type){
 }
 
 // Hook sounds into game events
+let _soundEnabled=true;
+
+function _playSoundGated(type){
+  if(!_soundEnabled)return;
+  playSound(type);
+}
+
+function stopAllSounds(){
+  _soundEnabled=false;
+  // Suspend the audio context so any currently-playing nodes go silent immediately
+  if(_audioCtx&&_audioCtx.state==='running'){
+    _audioCtx.suspend();
+  }
+}
+
 let _wasOnGround=false;
 let _stepTimer=0;
 const _origGUpdate2=gUpdate;
@@ -1328,13 +1343,13 @@ gUpdate=function(now){
   const wasGround=gPlayer?.onGround;
   _origGUpdate2(now);
   if(!gPlayer||gPlayer.dead)return;
-  if(!_wasOnGround&&gPlayer.onGround)playSound('land');
+  if(!_wasOnGround&&gPlayer.onGround)_playSoundGated('land');
   _wasOnGround=gPlayer.onGround;
   if(gPlayer.onGround){
     const moving=Math.abs(gPlayer.vx)>1||Math.abs(gPlayer.vy)>1;
     if(moving){
       _stepTimer++;
-      if(_stepTimer>=12){playSound('step');_stepTimer=0;}
+      if(_stepTimer>=12){_playSoundGated('step');_stepTimer=0;}
     }else{
       _stepTimer=0;
     }
@@ -1345,20 +1360,33 @@ let _jumpSounded=false;
 const _checkJump=setInterval(()=>{
   if(!gRunning)return;
   const jump=gKeys['Space']||gKeys['ArrowUp']||gKeys['KeyW'];
-  if(jump&&!_jumpSounded&&gPlayer?.onGround){playSound('jump');_jumpSounded=true;}
+  if(jump&&!_jumpSounded&&gPlayer?.onGround){_playSoundGated('jump');_jumpSounded=true;}
   if(!jump)_jumpSounded=false;
 },16);
 
 const _origKillPlayer=killPlayer;
 killPlayer=function(){
   _origKillPlayer();
-  if(gPlayer?.dead)playSound('die');
+  if(gPlayer?.dead){
+    stopAllSounds();
+    // Re-enable after the die sound finishes (~400ms) so respawn sounds work
+    setTimeout(()=>{
+      _soundEnabled=true;
+      if(_audioCtx&&_audioCtx.state==='suspended')_audioCtx.resume();
+      playSound('die');
+    },0);
+  }
 };
 
 const _origShowWin=showWinScreen;
 showWinScreen=function(ms,prevBest,isNewRecord,l){
+  stopAllSounds();
   _origShowWin(ms,prevBest,isNewRecord,l);
-  playSound('win');
+  // Play win jingle once after silence
+  setTimeout(()=>{
+    if(_audioCtx&&_audioCtx.state==='suspended')_audioCtx.resume();
+    playSound('win');
+  },0);
 };
 
 document.addEventListener('click',()=>{
