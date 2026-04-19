@@ -1252,11 +1252,13 @@ async function doLoadLevel(id,title){
   document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
   const cv=document.getElementById('studio-canvas');
   if(cv)cv.style.pointerEvents='';
-  // Check autosave restore
-  if(window._autosaveRestore&&window._autosaveRestore.id===id){
+  // Check autosave restore - use if same level ID OR coming from game
+  const _fromGame=sessionStorage.getItem('fl_from_game')==='1';
+  if(window._autosaveRestore&&(window._autosaveRestore.id===id||_fromGame)){
     lv=window._autosaveRestore.lv;
-    _hasUnsavedChanges=true;
+    _hasUnsavedChanges=false; // came from game, no unsaved changes
     window._autosaveRestore=null;
+    autosaveClear();
   }else{
     lv=data.data;
   }
@@ -1683,11 +1685,13 @@ async function loadPlayerProfile(){
     return;
   }
 
-  // Check autosave restore
-  if(window._autosaveRestore&&window._autosaveRestore.id===id){
+  // Check autosave restore - use if same level ID OR coming from game
+  const _fromGame=sessionStorage.getItem('fl_from_game')==='1';
+  if(window._autosaveRestore&&(window._autosaveRestore.id===id||_fromGame)){
     lv=window._autosaveRestore.lv;
-    _hasUnsavedChanges=true;
+    _hasUnsavedChanges=false; // came from game, no unsaved changes
     window._autosaveRestore=null;
+    autosaveClear();
   }else{
     lv=data.data;
   }
