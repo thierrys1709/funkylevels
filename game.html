@@ -565,9 +565,8 @@ function startGameFrom(sx,sy){
   (gLv.gravflip||[]).forEach(z=>{if(z.dir===undefined){z.dir=(z.grav??-10)<0?'u':'d';z.strength=Math.abs(z.grav??10);}});
   (gLv.spike||[]).forEach(s=>{s.state='idle';s.timer=0;});
   (gLv.gblock||[]).forEach(g=>{g._attached=false;g._justJumped=false;});
-  // ── CORRECTION : initialiser les blocs flash ──────────
   (gLv.flash||[]).forEach(f=>{f._visible=true;f._timer=0;});
-  gParts=[];gBullets=[];gLives=3;gElapsed=0;gWon=false;gRunning=false;gDeadPending=false;
+  gParts=[];gBullets=[];gBounceEffects=[];gLives=3;gElapsed=0;gWon=false;gRunning=false;gDeadPending=false;
   gStartTime=performance.now();
   gCamX=Math.max(0,sx-GW()*0.32);
   gCamY=Math.max(0,Math.min(EH-GH(),(sy-36)-GH()*0.25));
@@ -608,6 +607,7 @@ let gLv,gPlayer,gParts=[],gCamX=0,gCamY=0,gKeys={};
 let gRafId=null;
 let gLives=3,gElapsed=0,gWon=false,gRunning=false,gDeadPending=false,gStartTime=0;
 let gBullets=[];
+let gBounceEffects=[];
 
 function gLoopStart(){if(gRafId)cancelAnimationFrame(gRafId);gRafId=requestAnimationFrame(gLoop);}
 
@@ -702,50 +702,33 @@ function gUpdate(now){
     const margin=4,tz={x:z.x+margin,y:z.y+margin,w:z.w-margin*2,h:z.h-margin*2};
     if(tz.w>0&&tz.h>0&&ov(gPlayer,tz)){activeDir=z.dir??'u';activeStr=(z.strength??10)*GRAV/10;inGravZone=true;}
   });
-  // ── Gblock: planet surface gravity ──────────────────────
   if(!inGravZone){
     const spd=Math.abs(gPlayer.vx||0)+Math.abs(gPlayer.vy||0);
     const STICK=Math.max(16,spd*2+8);
     (gLv.gblock||[]).forEach(g=>{
       const halo={x:g.x-STICK,y:g.y-STICK,w:g.w+STICK*2,h:g.h+STICK*2};
       if(!ov(gPlayer,halo))return;
-
       const px=gPlayer.x,py=gPlayer.y,pw=gPlayer.w,ph=gPlayer.h;
       const pcx=px+pw/2,pcy=py+ph/2;
-
-      // Distance entre le joueur et chaque face (positif = hors du bloc)
-      const dTop    = g.y       - (py+ph); // joueur au-dessus du bloc
+      const dTop    = g.y       - (py+ph);
       const dBottom = py        - (g.y+g.h);
-      const dLeft   = g.x       - (px+pw); // joueur à gauche du bloc
+      const dLeft   = g.x       - (px+pw);
       const dRight  = px        - (g.x+g.w);
-
-      // Alignement : le joueur doit être "en face" de la face
-      // On utilise un overlap strict sur l'axe perpendiculaire
-      const alignH = pcx > g.x && pcx < g.x+g.w; // centré horizontalement
-      const alignV = pcy > g.y && pcy < g.y+g.h; // centré verticalement
-      // Version relâchée pour les coins (joueur presque aligné)
+      const alignH = pcx > g.x && pcx < g.x+g.w;
+      const alignV = pcy > g.y && pcy < g.y+g.h;
       const alignHsoft = pcx > g.x-pw*0.5 && pcx < g.x+g.w+pw*0.5;
       const alignVsoft = pcy > g.y-ph*0.5 && pcy < g.y+g.h+ph*0.5;
-
       const candidates=[];
       if(alignHsoft && dTop>=-STICK    && dTop<=STICK)    candidates.push({dir:'d',d:Math.abs(dTop),    strict:alignH});
       if(alignHsoft && dBottom>=-STICK && dBottom<=STICK)  candidates.push({dir:'u',d:Math.abs(dBottom), strict:alignH});
       if(alignVsoft && dLeft>=-STICK   && dLeft<=STICK)    candidates.push({dir:'r',d:Math.abs(dLeft),   strict:alignV});
       if(alignVsoft && dRight>=-STICK  && dRight<=STICK)   candidates.push({dir:'l',d:Math.abs(dRight),  strict:alignV});
-
       if(candidates.length===0)return;
-
-      // Priorité 1 : faces strictement alignées (joueur bien en face)
-      // Priorité 2 : face correspondant à la gravité courante (pas de changement inutile)
-      // Priorité 3 : face la plus proche
       const strict=candidates.filter(c=>c.strict);
       const pool=strict.length>0?strict:candidates;
-
-      // Parmi le pool, favoriser la direction de gravité déjà active
       const current=pool.find(c=>c.dir===gPlayer.gravDir);
       if(current){activeDir=current.dir;}
       else{pool.sort((a,b)=>a.d-b.d);activeDir=pool[0].dir;}
-
       activeStr=GRAV;
       inGravZone=true;
     });
@@ -816,7 +799,6 @@ function gUpdate(now){
   (gLv.invis||[]).forEach(p=>res(p));
   (gLv.gblock||[]).forEach(g=>res(g));
 
-  // ── CORRECTION : blocs flash — clignotement + collision ──
   (gLv.flash||[]).forEach(f=>{
     f._timer=(f._timer||0)+1;
     const period=Math.round((f.freq||1)*60);
@@ -858,15 +840,16 @@ function gUpdate(now){
     if(t.y>EH+200){t.x=t.ox;t.y=t.oy;t.vx=0;t.vy=0;}
   });
 
+  // ── Bounce ─────────────────────────────────────────────
   (gLv.bounce||[]).forEach(p=>{
     if(!ov(gPlayer,p))return;
     const oL=(gPlayer.x+gPlayer.w)-p.x,oR=(p.x+p.w)-gPlayer.x,oT=(gPlayer.y+gPlayer.h)-p.y,oB=(p.y+p.h)-gPlayer.y,m=Math.min(oL,oR,oT,oB);
     const bf=JSPD*(1+(p.force-1)*0.15);
     const gd2=gPlayer.gravDir;
-    if(m===oT&&gd2==='d'){gPlayer.y=p.y-gPlayer.h;gPlayer.vy=-bf;gPlayer.onGround=false;gPlayer.sq=0.5;spawnP(gPlayer.x+11,gPlayer.y+gPlayer.h,'#f0c040',8);}
-    else if(m===oB&&gd2==='u'){gPlayer.y=p.y+p.h;gPlayer.vy=bf;gPlayer.onGround=false;gPlayer.sq=0.5;spawnP(gPlayer.x+11,gPlayer.y,'#f0c040',8);}
-    else if(m===oL&&gd2==='r'){gPlayer.x=p.x-gPlayer.w;gPlayer.vx=-bf;gPlayer.onGround=false;spawnP(gPlayer.x+gPlayer.w,gPlayer.y+11,'#f0c040',8);}
-    else if(m===oR&&gd2==='l'){gPlayer.x=p.x+p.w;gPlayer.vx=bf;gPlayer.onGround=false;spawnP(gPlayer.x,gPlayer.y+11,'#f0c040',8);}
+    if(m===oT&&gd2==='d'){gPlayer.y=p.y-gPlayer.h;gPlayer.vy=-bf;gPlayer.onGround=false;gPlayer.sq=0.5;spawnP(gPlayer.x+11,gPlayer.y+gPlayer.h,'#f0c040',8);gBounceEffects.push({x:p.x,y:p.y,w:p.w,h:p.h,life:1,r:0});}
+    else if(m===oB&&gd2==='u'){gPlayer.y=p.y+p.h;gPlayer.vy=bf;gPlayer.onGround=false;gPlayer.sq=0.5;spawnP(gPlayer.x+11,gPlayer.y,'#f0c040',8);gBounceEffects.push({x:p.x,y:p.y,w:p.w,h:p.h,life:1,r:0});}
+    else if(m===oL&&gd2==='r'){gPlayer.x=p.x-gPlayer.w;gPlayer.vx=-bf;gPlayer.onGround=false;spawnP(gPlayer.x+gPlayer.w,gPlayer.y+11,'#f0c040',8);gBounceEffects.push({x:p.x,y:p.y,w:p.w,h:p.h,life:1,r:0});}
+    else if(m===oR&&gd2==='l'){gPlayer.x=p.x+p.w;gPlayer.vx=bf;gPlayer.onGround=false;spawnP(gPlayer.x,gPlayer.y+11,'#f0c040',8);gBounceEffects.push({x:p.x,y:p.y,w:p.w,h:p.h,life:1,r:0});}
     else if(m===oL)gPlayer.x=p.x-gPlayer.w;else if(m===oR)gPlayer.x=p.x+p.w;
     else if(m===oT)gPlayer.y=p.y-gPlayer.h;else if(m===oB)gPlayer.y=p.y+p.h;
   });
@@ -989,7 +972,25 @@ function gDraw(){
   gLv.fixed.forEach(p=>gPlatform(p));
   (gLv.mobile||[]).forEach(t=>{const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);GX.fillStyle='#4090f0';GX.fillRect(x,y,w,4);});
   (gLv.push||[]).forEach(t=>{const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);GX.fillStyle='#3d2b1a';GX.fillRect(x,y,w,h);GX.fillStyle='#8b6340';GX.fillRect(x,y,w,4);});
-  (gLv.bounce||[]).forEach(p=>{const x=Math.round(p.x),y=Math.round(p.y),w=Math.round(p.w),h=Math.round(p.h);GX.fillStyle='#4a5568';GX.fillRect(x,y,w,h);GX.fillStyle='#f0c040';GX.fillRect(x,y,w,4);});
+
+  // ── Bounce : dessiné comme un bloc statique + effet au rebond ──
+  (gLv.bounce||[]).forEach(p=>gPlatform(p));
+  gBounceEffects=gBounceEffects.filter(e=>e.life>0);
+  gBounceEffects.forEach(e=>{
+    e.life-=0.055;
+    const a=Math.max(0,e.life);
+    const expand=(1-e.life)*14;
+    GX.save();
+    GX.globalAlpha=a*0.65;
+    GX.strokeStyle='#f0c040';
+    GX.lineWidth=2;
+    GX.strokeRect(e.x-expand,e.y-expand,e.w+expand*2,e.h+expand*2);
+    GX.globalAlpha=a*0.18;
+    GX.fillStyle='#f0c040';
+    GX.fillRect(e.x-expand,e.y-expand,e.w+expand*2,e.h+expand*2);
+    GX.restore();
+  });
+
   (gLv.slider||[]).forEach(t=>{if(t.state!=='done')gPlatform(t);});
   (gLv.trap||[]).forEach(t=>{
     if(t.state==='gone')return;
