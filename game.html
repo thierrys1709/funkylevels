@@ -703,10 +703,9 @@ function gUpdate(now){
     if(tz.w>0&&tz.h>0&&ov(gPlayer,tz)){activeDir=z.dir??'u';activeStr=(z.strength??10)*GRAV/10;inGravZone=true;}
   });
   // ── Gblock: planet surface gravity ──────────────────────
-  // On prédit la position du joueur APRÈS son déplacement pour détecter
-  // la face même à grande vitesse. Le halo large absorbe les grands pas.
   if(!inGravZone){
-    const STICK=Math.max(20,Math.abs(gPlayer.vx||0)*2+Math.abs(gPlayer.vy||0)*2+8);
+    const spd=Math.abs(gPlayer.vx||0)+Math.abs(gPlayer.vy||0);
+    const STICK=Math.max(16,spd*2+8);
     (gLv.gblock||[]).forEach(g=>{
       const halo={x:g.x-STICK,y:g.y-STICK,w:g.w+STICK*2,h:g.h+STICK*2};
       if(!ov(gPlayer,halo))return;
@@ -714,26 +713,39 @@ function gUpdate(now){
       const px=gPlayer.x,py=gPlayer.y,pw=gPlayer.w,ph=gPlayer.h;
       const pcx=px+pw/2,pcy=py+ph/2;
 
-      // Distance signée de chaque face (négatif = joueur de ce côté)
-      const dTop    = g.y       - (py+ph);  // >0 : joueur au-dessus
-      const dBottom = py        - (g.y+g.h);// >0 : joueur en dessous
-      const dLeft   = g.x       - (px+pw);  // >0 : joueur à gauche
-      const dRight  = px        - (g.x+g.w);// >0 : joueur à droite
+      // Distance entre le joueur et chaque face (positif = hors du bloc)
+      const dTop    = g.y       - (py+ph); // joueur au-dessus du bloc
+      const dBottom = py        - (g.y+g.h);
+      const dLeft   = g.x       - (px+pw); // joueur à gauche du bloc
+      const dRight  = px        - (g.x+g.w);
 
-      // Candidats : faces dont le joueur est proche (distance < STICK)
-      // et devant lesquelles il est bien "en face" (aligné sur l'axe)
+      // Alignement : le joueur doit être "en face" de la face
+      // On utilise un overlap strict sur l'axe perpendiculaire
+      const alignH = pcx > g.x && pcx < g.x+g.w; // centré horizontalement
+      const alignV = pcy > g.y && pcy < g.y+g.h; // centré verticalement
+      // Version relâchée pour les coins (joueur presque aligné)
+      const alignHsoft = pcx > g.x-pw*0.5 && pcx < g.x+g.w+pw*0.5;
+      const alignVsoft = pcy > g.y-ph*0.5 && pcy < g.y+g.h+ph*0.5;
+
       const candidates=[];
-      const overlapH = pcx>g.x-pw && pcx<g.x+g.w+pw;
-      const overlapV = pcy>g.y-ph && pcy<g.y+g.h+ph;
-
-      if(overlapH && dTop>=-STICK    && dTop<=STICK)   candidates.push({dir:'d',d:Math.abs(dTop)});
-      if(overlapH && dBottom>=-STICK && dBottom<=STICK) candidates.push({dir:'u',d:Math.abs(dBottom)});
-      if(overlapV && dLeft>=-STICK   && dLeft<=STICK)   candidates.push({dir:'r',d:Math.abs(dLeft)});
-      if(overlapV && dRight>=-STICK  && dRight<=STICK)  candidates.push({dir:'l',d:Math.abs(dRight)});
+      if(alignHsoft && dTop>=-STICK    && dTop<=STICK)    candidates.push({dir:'d',d:Math.abs(dTop),    strict:alignH});
+      if(alignHsoft && dBottom>=-STICK && dBottom<=STICK)  candidates.push({dir:'u',d:Math.abs(dBottom), strict:alignH});
+      if(alignVsoft && dLeft>=-STICK   && dLeft<=STICK)    candidates.push({dir:'r',d:Math.abs(dLeft),   strict:alignV});
+      if(alignVsoft && dRight>=-STICK  && dRight<=STICK)   candidates.push({dir:'l',d:Math.abs(dRight),  strict:alignV});
 
       if(candidates.length===0)return;
-      candidates.sort((a,b)=>a.d-b.d);
-      activeDir=candidates[0].dir;
+
+      // Priorité 1 : faces strictement alignées (joueur bien en face)
+      // Priorité 2 : face correspondant à la gravité courante (pas de changement inutile)
+      // Priorité 3 : face la plus proche
+      const strict=candidates.filter(c=>c.strict);
+      const pool=strict.length>0?strict:candidates;
+
+      // Parmi le pool, favoriser la direction de gravité déjà active
+      const current=pool.find(c=>c.dir===gPlayer.gravDir);
+      if(current){activeDir=current.dir;}
+      else{pool.sort((a,b)=>a.d-b.d);activeDir=pool[0].dir;}
+
       activeStr=GRAV;
       inGravZone=true;
     });
