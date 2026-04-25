@@ -231,7 +231,6 @@ function showWinScreen(ms,prevBest,isNewRecord,l){
   if(bestEl2){
     bestEl2.textContent=_bestTime!==null?(l==='fr'?'MON RECORD : ':'MY BEST: ')+fmtTimeFull(_bestTime):'';
   }
-  // Edit button - handled in async block
 }
 
 let _pendingVisibility=null;
@@ -449,7 +448,6 @@ async function saveRating(score){
 function updateAttemptDisplay(){
   const el=document.getElementById('hud-attempt');
   if(!el)return;
-  const l=_lang();
   el.textContent=_attempt;
 }
 async function saveTime(ms){
@@ -545,7 +543,6 @@ async function init(){
   _attempt=0;
   _isOwner=!!(sess.session&&_levelData&&sess.session.user.id===_levelData.user_id);
   if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')&&!_isOwner){initStarRating();}
-  // Check if level has end point
   if(!lv.end){
     document.getElementById('gwrap').classList.add('show');
     const _noEndMsg=l==='fr'?'Ajoute une arrivée dans le studio.':'Add an end point in the studio.';
@@ -703,29 +700,24 @@ function gUpdate(now){
     const margin=4,tz={x:z.x+margin,y:z.y+margin,w:z.w-margin*2,h:z.h-margin*2};
     if(tz.w>0&&tz.h>0&&ov(gPlayer,tz)){activeDir=z.dir??'u';activeStr=(z.strength??10)*GRAV/10;inGravZone=true;}
   });
-  // ── Gblock: planet surface gravity (BEFORE movement) ──────
-  // When player is near/touching a planet block, gravity pulls toward nearest face.
-  // No radius, no force param: same strength as normal gravity, stays on all 4 faces.
+  // ── Gblock: planet surface gravity ──────────────────────
   if(!inGravZone){
     (gLv.gblock||[]).forEach(g=>{
-      // Extended hitbox — trigger slightly before player leaves edge
       const buf=Math.max(gPlayer.w,gPlayer.h)+4;
       const near={x:g.x-buf,y:g.y-buf,w:g.w+buf*2,h:g.h+buf*2};
       if(!ov(gPlayer,near))return;
       const pcx=gPlayer.x+gPlayer.w/2,pcy=gPlayer.y+gPlayer.h/2;
-      // Determine which face the player is on/approaching
-      if(pcx<g.x){activeDir='r';} // left of block → pull right
-      else if(pcx>g.x+g.w){activeDir='l';} // right of block → pull left
-      else if(pcy<g.y){activeDir='d';} // above block → pull down
-      else if(pcy>g.y+g.h){activeDir='u';} // below block → pull up
+      if(pcx<g.x){activeDir='r';}
+      else if(pcx>g.x+g.w){activeDir='l';}
+      else if(pcy<g.y){activeDir='d';}
+      else if(pcy>g.y+g.h){activeDir='u';}
       else{
-        // Inside block: push toward nearest face
         const dt=pcy-g.y,db=(g.y+g.h)-pcy,dl=pcx-g.x,dr=(g.x+g.w)-pcx;
         const mn=Math.min(dt,db,dl,dr);
         if(mn===dt)activeDir='d';else if(mn===db)activeDir='u';
         else if(mn===dl)activeDir='r';else activeDir='l';
       }
-      activeStr=GRAV; // same as normal gravity
+      activeStr=GRAV;
       inGravZone=true;
     });
   }
@@ -861,6 +853,12 @@ function gUpdate(now){
     if(t.state!=='done')res(t);
   });
 
+  // ── Spike collision ──────────────────────────────────────
+  (gLv.spike||[]).forEach(sp=>{
+    const isActive=(sp.mode||'always')==='always'||sp.state==='active';
+    if(isActive&&ov(gPlayer,sp))killPlayer();
+  });
+
   if(gPlayer.y>EH+100)killPlayer();
   if(gPlayer.gravDir==='u'&&gPlayer.y<-200)killPlayer();
   if(gPlayer.gravDir==='l'&&gPlayer.x<-200)killPlayer();
@@ -879,11 +877,9 @@ function gUpdate(now){
     saveTime(winTime).then(isNewRecord=>{
       showWinScreen(winTime,prevBest,isNewRecord,l);
     });
-    // Increment completions
     if(_currentLevelId){
       fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{method:'PATCH',headers:{'apikey':_sbKey,'Authorization':'Bearer '+(_getToken()||_sbKey),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({completions:(_levelData?.completions||0)+1})});
     }
-    // Show buttons
     (async()=>{
       const isTestMode=new URLSearchParams(window.location.search).get('from')==='studio';
       const btnEdit=document.getElementById('btn-edit-win');
@@ -979,7 +975,7 @@ function gDraw(){
   });
   // ── Flash blocks draw ──
   (gLv.flash||[]).forEach(f=>{
-    if(!f._visible)return; // invisible = skip
+    if(!f._visible)return;
     const x=Math.round(f.x),y=Math.round(f.y),w=Math.round(f.w),h=Math.round(f.h);
     GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);
     GX.fillStyle='#40c0f0';GX.fillRect(x,y,w,4);
@@ -1021,7 +1017,6 @@ function gDraw(){
     const x=Math.round(g.x),y=Math.round(g.y),w=Math.round(g.w),h=Math.round(g.h);
     GX.fillStyle='#1a3a1a';GX.fillRect(x,y,w,h);
     GX.fillStyle='#40c060';GX.fillRect(x,y,w,4);
-    // Subtle radius indicator
     const cx=x+w/2,cy=y+h/2,rad=g.radius||120;
     GX.strokeStyle='#40c06018';GX.lineWidth=1;
     GX.beginPath();GX.arc(cx,cy,rad,0,Math.PI*2);GX.stroke();
