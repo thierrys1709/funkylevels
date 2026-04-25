@@ -85,9 +85,6 @@
     "toastSaved": "✅ SAUVEGARDÉ !",
     "toastLoadError": "⚠️ Erreur de chargement",
     "toastNotFound": "⚠️ Niveau introuvable — Nouveau niveau initialisé",
-    "publishedLockDesc": "Ce niveau est publié et ne peut pas être édité directement.\nCrée une copie privée pour le modifier.",
-    "publishedLockCopy": "🖊 CRÉER UNE COPIE MODIFIABLE",
-    "publishedLockLoad": "📂 CHARGER UN AUTRE NIVEAU",
     "toolNames": {
       "fixed": "FIXE",
       "trap": "PIÈGE",
@@ -100,7 +97,10 @@
       "speed": "VITESSE",
       "start": "DÉPART",
       "end": "ARRIVÉE",
-      "select": "SÉLECTION"
+      "select": "SÉLECTION",
+      "flash": "FLASH",
+      "spike": "PIQUES",
+      "gblock": "PLANÈTE"
     },
     "pInfoTrap": "Tombe quand le joueur<br>s'approche.",
     "pInfoSlider": "Se déplace quand le joueur<br>s'approche.",
@@ -109,12 +109,15 @@
     "pInfoGravflip": "Zone de gravité.<br><br>Attire le joueur vers<br>le bord indiqué.<br><br>Force 0 = apesanteur.",
     "pInfoSpeed": "Zone de vitesse.<br><br>5 = normal<br>1 = très lent<br>20 = très rapide",
     "untitled": "Sans titre",
-    "publishSectionTitle": "🚀 PUBLIER CE NIVEAU",
-    "publishBtnPublic": "🌍 RENDRE PUBLIC",
-    "publishBtnCode": "🔑 PAR CODE",
-    "publishBtnEdit": "✏️ ÉDITER",
-    "publishNameLbl": "NOM DU NIVEAU",
-    "publishCancel": "ANNULER"
+    "tFlash": "⚡ FLASH",
+    "tSpike": "🗡 PIQUES",
+    "tGblock": "🌍 PLANÈTE",
+    "tipFlash": "⚡ FLASH\nApparaît/disparaît en boucle.\nRègle les temps ON/OFF en cs.",
+    "tipSpike": "🗡 PIQUES\nTue le joueur au contact.\nToujours actif ou au toucher.",
+    "tipGblock": "🌍 PLANÈTE\nAttire le joueur vers sa surface.\nSauter annule la gravité locale.",
+    "pInfoFlash": "Bloc qui clignote.\n\nRègle le temps visible\net le temps caché en centièmes\nde seconde.",
+    "pInfoSpike": "Piques qui tuent le joueur.\n\nTOUJOURS : toujours actif.\nTOUCHER : s'active au contact.",
+    "pInfoGblock": "Bloc planète.\n\nLe joueur est attiré vers\nla surface du bloc.\nSauter annule la gravité locale."
   },
   "home": {
     "heroTitle": "⚡ FUNKYLEVELS",
