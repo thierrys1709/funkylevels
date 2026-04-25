@@ -85,9 +85,6 @@
     "toastSaved": "✅ SAVED!",
     "toastLoadError": "⚠️ Load error",
     "toastNotFound": "⚠️ Level not found — New level started",
-    "publishedLockDesc": "This level is published and cannot be edited directly.\nCreate a private copy to make changes.",
-    "publishedLockCopy": "🖊 CREATE AN EDITABLE COPY",
-    "publishedLockLoad": "📂 LOAD ANOTHER LEVEL",
     "toolNames": {
       "fixed": "FIXED",
       "trap": "TRAP",
@@ -100,7 +97,10 @@
       "speed": "SPEED",
       "start": "START",
       "end": "END",
-      "select": "SELECTION"
+      "select": "SELECTION",
+      "flash": "FLASH",
+      "spike": "SPIKES",
+      "gblock": "PLANET"
     },
     "pInfoTrap": "Falls when player<br>approaches.",
     "pInfoSlider": "Slides when player<br>approaches.",
@@ -109,12 +109,15 @@
     "pInfoGravflip": "Gravity zone.<br><br>Pulls player toward<br>the indicated edge.<br><br>Force 0 = weightless.",
     "pInfoSpeed": "Speed zone.<br><br>5 = normal<br>1 = very slow<br>20 = very fast",
     "untitled": "Untitled",
-    "publishSectionTitle": "🚀 PUBLISH THIS LEVEL",
-    "publishBtnPublic": "🌍 MAKE PUBLIC",
-    "publishBtnCode": "🔑 BY CODE",
-    "publishBtnEdit": "✏️ EDIT",
-    "publishNameLbl": "LEVEL NAME",
-    "publishCancel": "CANCEL"
+    "tFlash": "⚡ FLASH",
+    "tSpike": "🗡 SPIKES",
+    "tGblock": "🌍 PLANET",
+    "tipFlash": "⚡ FLASH\nAppears/disappears in a loop.\nSet ON/OFF times in cs.",
+    "tipSpike": "🗡 SPIKES\nKills player on contact.\nAlways active or on touch.",
+    "tipGblock": "🌍 PLANET\nAttracts player to its surface.\nJumping cancels local gravity.",
+    "pInfoFlash": "Blinking block.\n\nSet the visible time\nand hidden time in centiseconds\n(1 cs = 10ms).",
+    "pInfoSpike": "Spikes that kill the player.\n\nALWAYS: always active.\nTOUCH: activates on contact.",
+    "pInfoGblock": "Planet block.\n\nThe player is attracted\nto the block surface.\nJumping cancels local gravity."
   },
   "home": {
     "heroTitle": "⚡ FUNKYLEVELS",
