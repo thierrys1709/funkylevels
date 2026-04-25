@@ -565,6 +565,8 @@ function startGameFrom(sx,sy){
   (gLv.gravflip||[]).forEach(z=>{if(z.dir===undefined){z.dir=(z.grav??-10)<0?'u':'d';z.strength=Math.abs(z.grav??10);}});
   (gLv.spike||[]).forEach(s=>{s.state='idle';s.timer=0;});
   (gLv.gblock||[]).forEach(g=>{g._attached=false;g._justJumped=false;});
+  // ── CORRECTION : initialiser les blocs flash ──────────
+  (gLv.flash||[]).forEach(f=>{f._visible=true;f._timer=0;});
   gParts=[];gBullets=[];gLives=3;gElapsed=0;gWon=false;gRunning=false;gDeadPending=false;
   gStartTime=performance.now();
   gCamX=Math.max(0,sx-GW()*0.32);
@@ -786,6 +788,14 @@ function gUpdate(now){
   gLv.fixed.forEach(p=>res(p));
   (gLv.invis||[]).forEach(p=>res(p));
 
+  // ── CORRECTION : blocs flash — clignotement + collision ──
+  (gLv.flash||[]).forEach(f=>{
+    f._timer=(f._timer||0)+1;
+    const period=Math.round((f.freq||1)*60);
+    if(f._timer>=period){f._timer=0;f._visible=!f._visible;}
+    if(f._visible)res(f);
+  });
+
   const MO_VEC={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1]};
   (gLv.mobile||[]).forEach(t=>{
     const[dx,dy]=MO_VEC[t.dir||'r'],spd=t.speed||2,prevX=t.x,prevY=t.y;
@@ -973,6 +983,7 @@ function gDraw(){
     else if(dir==='l')GX.fillRect(z.x,z.y,3,z.h);
     else if(dir==='r')GX.fillRect(z.x+z.w-3,z.y,3,z.h);
   });
+
   // ── Flash blocks draw ──
   (gLv.flash||[]).forEach(f=>{
     if(!f._visible)return;
