@@ -721,20 +721,6 @@ body {
     <!-- ═══ GBLOCK PANEL ═══ -->
     <div id="s-gblock" class="psec">
       <div class="pinfo" data-info="pInfoGblock"></div>
-      <div class="prow">
-        <label>FORCE D'ATTRACTION</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="gb-str" min="1" max="30" step="1" value="10" oninput="gblockParamChanged()">
-          <span class="pval" id="gb-str-v">10</span>
-        </div>
-      </div>
-      <div class="prow">
-        <label>RAYON D'ATTRACTION (px)</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="gb-rad" min="32" max="400" step="16" value="120" oninput="gblockParamChanged()">
-          <span class="pval" id="gb-rad-v">120</span>
-        </div>
-      </div>
     </div>
 
     <div id="s-start" class="psec"><div class="pinfo" data-info="pInfoStart"></div></div>
@@ -1026,23 +1012,9 @@ function showSpikePanel(){
   document.getElementById('ptitle').textContent='PARAMÈTRES : PIQUES';
 }
 
-// ── Gblock params ──────────────────────────────────────────
-function gblockParamChanged(){
-  const str=+document.getElementById('gb-str').value;
-  const rad=+document.getElementById('gb-rad').value;
-  document.getElementById('gb-str-v').textContent=str;
-  document.getElementById('gb-rad-v').textContent=rad;
-  if(selection.length===1&&selectedType==='gblock'){
-    const g=lv.gblock[selectedIdx];if(g){g.strength=str;g.radius=rad;}
-  }
-  redraw();
-}
-function gblockPanelLoad(g){
-  document.getElementById('gb-str').value=g.strength||10;
-  document.getElementById('gb-rad').value=g.radius||120;
-  document.getElementById('gb-str-v').textContent=g.strength||10;
-  document.getElementById('gb-rad-v').textContent=g.radius||120;
-}
+// ── Gblock params (planet block - no params) ───────────────
+function gblockParamChanged(){redraw();}
+function gblockPanelLoad(g){}
 function showGblockPanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-gblock').classList.add('show');
@@ -1244,10 +1216,7 @@ window.addEventListener('mouseup',e=>{
     newType='spike';
   }
   else if(currentTool==='gblock'){
-    lv.gblock.push({x:rx,y:ry,w:W,h:H,
-      strength:+document.getElementById('gb-str').value,
-      radius:+document.getElementById('gb-rad').value
-    });
+    lv.gblock.push({x:rx,y:ry,w:W,h:H});
     newType='gblock';
   }
   else if(currentTool==='trap'){const v=trapPanelValues();lv.trap.push({x:rx,y:ry,w:W,h:H,ox:rx,oy:ry,trigDist:v.trigDist,preDelay:v.preDelay,fallSpeed:v.fallSpeed,partial:v.partial,partDist:v.partDist,returns:v.returns,riseDelay:v.riseDelay,loop:v.loop,state:'idle',vy:0});newType='trap';}
