@@ -803,6 +803,7 @@ function gUpdate(now){
 
   gLv.fixed.forEach(p=>res(p));
   (gLv.invis||[]).forEach(p=>res(p));
+  (gLv.gblock||[]).forEach(g=>res(g));
 
   // ── CORRECTION : blocs flash — clignotement + collision ──
   (gLv.flash||[]).forEach(f=>{
