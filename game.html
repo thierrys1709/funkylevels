@@ -703,22 +703,38 @@ function gUpdate(now){
     if(tz.w>0&&tz.h>0&&ov(gPlayer,tz)){activeDir=z.dir??'u';activeStr=(z.strength??10)*GRAV/10;inGravZone=true;}
   });
   // ── Gblock: planet surface gravity ──────────────────────
+  // La gravité suit la dernière face du gblock sur laquelle le joueur
+  // s'est posé ou longe actuellement. Elle reste active tant que le joueur
+  // est collé à une face (dans un mince halo de STICK pixels).
   if(!inGravZone){
+    const STICK=6; // pixels de halo de "contact" autour du gblock
     (gLv.gblock||[]).forEach(g=>{
-      const buf=Math.max(gPlayer.w,gPlayer.h)+4;
-      const near={x:g.x-buf,y:g.y-buf,w:g.w+buf*2,h:g.h+buf*2};
-      if(!ov(gPlayer,near))return;
-      const pcx=gPlayer.x+gPlayer.w/2,pcy=gPlayer.y+gPlayer.h/2;
-      if(pcx<g.x){activeDir='r';}
-      else if(pcx>g.x+g.w){activeDir='l';}
-      else if(pcy<g.y){activeDir='d';}
-      else if(pcy>g.y+g.h){activeDir='u';}
-      else{
-        const dt=pcy-g.y,db=(g.y+g.h)-pcy,dl=pcx-g.x,dr=(g.x+g.w)-pcx;
-        const mn=Math.min(dt,db,dl,dr);
-        if(mn===dt)activeDir='d';else if(mn===db)activeDir='u';
-        else if(mn===dl)activeDir='r';else activeDir='l';
-      }
+      // Zone étendue d'un halo autour du bloc
+      const halo={x:g.x-STICK,y:g.y-STICK,w:g.w+STICK*2,h:g.h+STICK*2};
+      if(!ov(gPlayer,halo))return;
+
+      // Le joueur est dans le halo — on détermine la face la plus proche
+      // en mesurant la pénétration de chaque côté dans le halo
+      const px=gPlayer.x,py=gPlayer.y,pw=gPlayer.w,ph=gPlayer.h;
+      // Distances entre le joueur et chaque face du bloc
+      const dTop    = Math.abs((py+ph) - g.y);        // bas joueur vs haut bloc
+      const dBottom = Math.abs(py      - (g.y+g.h));  // haut joueur vs bas bloc
+      const dLeft   = Math.abs((px+pw) - g.x);        // droite joueur vs gauche bloc
+      const dRight  = Math.abs(px      - (g.x+g.w));  // gauche joueur vs droite bloc
+
+      // On ignore les faces où le joueur est clairement à l'opposé
+      // (centre joueur doit être "en face" de la face pour qu'elle compte)
+      const pcx=px+pw/2,pcy=py+ph/2;
+      const candidates=[];
+      if(pcy<=g.y+g.h && pcy>=g.y-ph)    candidates.push({dir:'d',d:dTop});     // posé sur le dessus → gravité vers le bas
+      if(pcy>=g.y     && pcy<=g.y+g.h+ph) candidates.push({dir:'u',d:dBottom});  // accroché en dessous → gravité vers le haut
+      if(pcx<=g.x+g.w && pcx>=g.x-pw)    candidates.push({dir:'r',d:dLeft});    // longe la face gauche → gravité vers la droite
+      if(pcx>=g.x     && pcx<=g.x+g.w+pw) candidates.push({dir:'l',d:dRight});   // longe la face droite → gravité vers la gauche
+
+      if(candidates.length===0)return;
+      // Prendre la face la plus proche
+      candidates.sort((a,b)=>a.d-b.d);
+      activeDir=candidates[0].dir;
       activeStr=GRAV;
       inGravZone=true;
     });
