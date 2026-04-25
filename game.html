@@ -703,45 +703,31 @@ function gUpdate(now){
     const margin=4,tz={x:z.x+margin,y:z.y+margin,w:z.w-margin*2,h:z.h-margin*2};
     if(tz.w>0&&tz.h>0&&ov(gPlayer,tz)){activeDir=z.dir??'u';activeStr=(z.strength??10)*GRAV/10;inGravZone=true;}
   });
-  // ── Gblock gravity detection (BEFORE movement) ──────────
-  // Only if not already in a gravflip zone and not jumped off block
+  // ── Gblock: planet surface gravity (BEFORE movement) ──────
+  // When player is near/touching a planet block, gravity pulls toward nearest face.
+  // No radius, no force param: same strength as normal gravity, stays on all 4 faces.
   if(!inGravZone){
     (gLv.gblock||[]).forEach(g=>{
-      const rad=g.radius||120;
-      const px=gPlayer.x+gPlayer.w/2,py=gPlayer.y+gPlayer.h/2;
-      const cx=g.x+g.w/2,cy=g.y+g.h/2;
-      const dist=Math.sqrt((px-cx)**2+(py-cy)**2);
-      // Detach when jump is pressed and player leaves the surface
-      if(g._attached&&jump&&!gPlayer.onGround){g._attached=false;g._justJumped=true;}
-      if(g._justJumped){
-        // Stay detached until player is far enough
-        if(dist>rad*0.7)g._justJumped=false;
-        return;
-      }
-      // Attach when close enough
-      if(dist<=rad)g._attached=true;
-      if(!g._attached)return;
-      // Determine gravity direction toward nearest face
-      let attractDir='d';
-      if(px<g.x)attractDir='r';       // player is left of block → pull right
-      else if(px>g.x+g.w)attractDir='l'; // player is right → pull left
-      else if(py<g.y)attractDir='d';   // player is above → pull down
-      else if(py>g.y+g.h)attractDir='u'; // player is below → pull up
+      // Extended hitbox — trigger slightly before player leaves edge
+      const buf=Math.max(gPlayer.w,gPlayer.h)+4;
+      const near={x:g.x-buf,y:g.y-buf,w:g.w+buf*2,h:g.h+buf*2};
+      if(!ov(gPlayer,near))return;
+      const pcx=gPlayer.x+gPlayer.w/2,pcy=gPlayer.y+gPlayer.h/2;
+      // Determine which face the player is on/approaching
+      if(pcx<g.x){activeDir='r';} // left of block → pull right
+      else if(pcx>g.x+g.w){activeDir='l';} // right of block → pull left
+      else if(pcy<g.y){activeDir='d';} // above block → pull down
+      else if(pcy>g.y+g.h){activeDir='u';} // below block → pull up
       else{
-        // Player inside block: find nearest face
-        const dt=py-g.y,db=(g.y+g.h)-py,dl=px-g.x,dr=(g.x+g.w)-px;
+        // Inside block: push toward nearest face
+        const dt=pcy-g.y,db=(g.y+g.h)-pcy,dl=pcx-g.x,dr=(g.x+g.w)-pcx;
         const mn=Math.min(dt,db,dl,dr);
-        if(mn===dt)attractDir='d';
-        else if(mn===db)attractDir='u';
-        else if(mn===dl)attractDir='r';
-        else attractDir='l';
+        if(mn===dt)activeDir='d';else if(mn===db)activeDir='u';
+        else if(mn===dl)activeDir='r';else activeDir='l';
       }
-      activeDir=attractDir;
-      activeStr=(g.strength||10)*GRAV/10;
+      activeStr=GRAV; // same as normal gravity
+      inGravZone=true;
     });
-  }else{
-    // In a gravflip zone: detach all gblocks
-    (gLv.gblock||[]).forEach(g=>{g._attached=false;g._justJumped=false;});
   }
   gPlayer.gravDir=activeDir;
 
