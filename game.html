@@ -497,6 +497,9 @@ function startGameFrom(sx,sy){
   (gLv.push||[]).forEach(p=>{p.x=p.ox;p.y=p.oy;p.vx=0;p.vy=0;});
   (gLv.gravflip||[]).forEach(z=>{if(z.dir===undefined){z.dir=(z.grav??-10)<0?'u':'d';z.strength=Math.abs(z.grav??10);}});
   (gLv.spike||[]).forEach(s=>{s.state='idle';s.timer=0;s._touched=false;s._delayTimer=0;});
+  // Reset spike state sur tous les autres types de blocs
+  const _spikeTypes=['fixed','invis','bounce','mobile','push','flash','trap','slider','gblock'];
+  _spikeTypes.forEach(k=>{(gLv[k]||[]).forEach(b=>{if(b.spikes){b.spikes._touched=false;b.spikes._delayTimer=0;}});});
   (gLv.gblock||[]).forEach(g=>{g._attached=false;g._justJumped=false;});
   (gLv.flash||[]).forEach(f=>{f._visible=true;f._timer=0;});
   gParts=[];gBullets=[];gBounceEffects=[];gGravEffects=[];gPushEffects=[];
@@ -593,6 +596,61 @@ function res(p){
 }
 
 function killPlayer(){if(gPlayer.dead)return;gPlayer.dead=true;gPlayer.dT=0;spawnP(gPlayer.x+11,gPlayer.y+16,PCOL.player,20);}
+
+// ── Spike check universel pour tous les types de blocs ──
+function checkBlockSpikes(b){
+  if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return false;
+  if(!ov(gPlayer,b))return false;
+  const sp=b.spikes;
+  const hidden=sp.hidden||false;
+  const delay=(sp.delay||0)*60;
+  // Timer tourne en permanence dès le premier contact
+  if(hidden&&sp._touched&&sp._delayTimer<delay)sp._delayTimer++;
+  const oL=(gPlayer.x+gPlayer.w)-b.x,oR=(b.x+b.w)-gPlayer.x;
+  const oT=(gPlayer.y+gPlayer.h)-b.y,oB=(b.y+b.h)-gPlayer.y;
+  const m=Math.min(oL,oR,oT,oB);
+  const dirs=sp.dirs;
+  const faceHasSpike=
+    (m===oT&&dirs.includes('u'))||
+    (m===oB&&dirs.includes('d'))||
+    (m===oL&&dirs.includes('r'))||
+    (m===oR&&dirs.includes('l'));
+  if(!faceHasSpike)return false;
+  if(!hidden){killPlayer();return true;}
+  // hidden : déclencher délai au premier contact
+  if(!sp._touched)sp._touched=true;
+  const delayDone=delay===0||sp._delayTimer>=delay;
+  if(delayDone){killPlayer();return true;}
+  return false;
+}
+
+// ── Rendu des piques sur un bloc quelconque ──
+function drawBlockSpikes(b){
+  if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return;
+  const sp=b.spikes;
+  const hidden=sp.hidden||false;
+  const delay=(sp.delay||0)*60;
+  const activated=hidden?(sp._delayTimer>=delay):true;
+  if(!hidden||activated){
+    const x=Math.round(b.x),y=Math.round(b.y),w=Math.round(b.w),h=Math.round(b.h);
+    GX.fillStyle='#ff4060';
+    const sz=10;
+    sp.dirs.forEach(dir=>{
+      const horiz=(dir==='u'||dir==='d');
+      const count=Math.max(1,Math.floor((horiz?w:h)/sz));
+      const gap=(horiz?w:h)/count;
+      for(let k=0;k<count;k++){
+        const cx=horiz?x+gap*(k+0.5):x;const cy=horiz?y:y+gap*(k+0.5);
+        GX.beginPath();
+        if(dir==='u'){GX.moveTo(cx-sz/2,y);GX.lineTo(cx+sz/2,y);GX.lineTo(cx,y-sz);}
+        else if(dir==='d'){GX.moveTo(cx-sz/2,y+h);GX.lineTo(cx+sz/2,y+h);GX.lineTo(cx,y+h+sz);}
+        else if(dir==='l'){GX.moveTo(x,cy-sz/2);GX.lineTo(x,cy+sz/2);GX.lineTo(x-sz,cy);}
+        else if(dir==='r'){GX.moveTo(x+w,cy-sz/2);GX.lineTo(x+w,cy+sz/2);GX.lineTo(x+w+sz,cy);}
+        GX.closePath();GX.fill();
+      }
+    });
+  }
+}
 
 const JUMP_KEYS=['Space','ArrowUp','KeyW'];
 let _jumpReady=true;
@@ -728,17 +786,19 @@ function gUpdate(now){
         else if(m===oL){gPlayer.x=t.x-gPlayer.w;}else if(m===oR){gPlayer.x=t.x+t.w;}
       }
     }
+    checkBlockSpikes(t);
   });
 
-  gLv.fixed.forEach(p=>res(p));
-  (gLv.invis||[]).forEach(p=>res(p));
-  (gLv.gblock||[]).forEach(g=>res(g));
+  gLv.fixed.forEach(p=>{res(p);checkBlockSpikes(p);});
+  (gLv.invis||[]).forEach(p=>{res(p);checkBlockSpikes(p);});
+  (gLv.gblock||[]).forEach(g=>{res(g);checkBlockSpikes(g);});
 
   (gLv.flash||[]).forEach(f=>{
     f._timer=(f._timer||0)+1;
     const period=Math.round((f.freq||1)*60);
     if(f._timer>=period){f._timer=0;f._visible=!f._visible;}
-    if(f._visible)res(f);
+    if(f._visible){res(f);checkBlockSpikes(f);}
+    else checkBlockSpikes(f);
   });
 
   const MO_VEC={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1]};
@@ -746,7 +806,7 @@ function gUpdate(now){
     const[dx,dy]=MO_VEC[t.dir||'r'],spd=t.speed||2,prevX=t.x,prevY=t.y;
     if(t.going){t.x+=dx*spd;t.y+=dy*spd;t.t=(t.t||0)+spd;if(t.t>=(t.dist||160)){t.t=t.dist||160;t.going=false;}}
     else{t.x-=dx*spd;t.y-=dy*spd;t.t=(t.t||0)-spd;if(t.t<=0){t.t=0;t.x=t.ox;t.y=t.oy;t.going=true;}}
-    if(ov(gPlayer,t)){const oT=(gPlayer.y+gPlayer.h)-t.y;if(oT>0&&oT<20&&gPlayer.vy>=0){gPlayer.x+=t.x-prevX;gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}else res(t);}
+    if(ov(gPlayer,t)){const oT=(gPlayer.y+gPlayer.h)-t.y;if(oT>0&&oT<20&&gPlayer.vy>=0){gPlayer.x+=t.x-prevX;gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}else res(t);checkBlockSpikes(t);}
   });
 
   (gLv.push||[]).forEach(t=>{
@@ -766,6 +826,7 @@ function gUpdate(now){
       else if(m===oL){t.vx=Math.max(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x-gPlayer.w;gPushEffects.push({x:t.x,y:t.y,w:t.w,h:t.h,life:1});}
       else if(m===oR){t.vx=Math.min(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x+t.w;gPushEffects.push({x:t.x,y:t.y,w:t.w,h:t.h,life:1});}
     }
+    checkBlockSpikes(t);
     if(t.y>EH+200){t.x=t.ox;t.y=t.oy;t.vx=0;t.vy=0;}
   });
 
@@ -781,6 +842,7 @@ function gUpdate(now){
     else if(m===oR&&gd2==='l'){gPlayer.x=p.x+p.w;gPlayer.vx=bf;gPlayer.onGround=false;spawnP(gPlayer.x,gPlayer.y+11,'#f0c040',8);}
     else if(m===oL)gPlayer.x=p.x-gPlayer.w;else if(m===oR)gPlayer.x=p.x+p.w;
     else if(m===oT)gPlayer.y=p.y-gPlayer.h;else if(m===oB)gPlayer.y=p.y+p.h;
+    checkBlockSpikes(p);
   });
 
   const SDIRS={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1]};
@@ -800,7 +862,7 @@ function gUpdate(now){
       if(ov(gPlayer,t)){const oT=(gPlayer.y+gPlayer.h)-t.y;if(oT>0&&oT<22&&gPlayer.vy>=0){gPlayer.x+=t.x-prevX;gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}}
       if(len<=step){t.x=t.ox;t.y=t.oy;t.traveled=0;t.state=t.loop?'cooldown':'locked';}
     }else if(t.state==='cooldown'){if(!t.loop){t.state='locked';}else{const d2=Math.max(0,t.ox-(gPlayer.x+gPlayer.w),gPlayer.x-(t.ox+t.w),t.oy-(gPlayer.y+gPlayer.h),gPlayer.y-(t.oy+t.h));if(d2>(t.trigDist||48))t.state='idle';}}
-    if(t.state!=='done')res(t);
+    if(t.state!=='done'){res(t);checkBlockSpikes(t);}
   });
 
   (gLv.spike||[]).forEach(sp=>{
@@ -934,9 +996,9 @@ function gDraw(){
   GX.fillStyle=PCOL.bg;GX.fillRect(0,0,GW(),GH());
   GX.save();GX.translate(-Math.round(gCamX),-Math.round(gCamY));
 
-  gLv.fixed.forEach(p=>gPlatform(p));
-  (gLv.mobile||[]).forEach(t=>{const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);GX.fillStyle='#4090f0';GX.fillRect(x,y,w,4);});
-  (gLv.push||[]).forEach(t=>gPlatform(t));
+  gLv.fixed.forEach(p=>{gPlatform(p);drawBlockSpikes(p);});
+  (gLv.mobile||[]).forEach(t=>{const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);GX.fillStyle='#4090f0';GX.fillRect(x,y,w,4);drawBlockSpikes(t);});
+  (gLv.push||[]).forEach(t=>{gPlatform(t);drawBlockSpikes(t);});
   gPushEffects=gPushEffects.filter(e=>e.life>0);
   gPushEffects.forEach(e=>{
     e.life-=0.07;
@@ -950,8 +1012,10 @@ function gDraw(){
     GX.restore();
   });
 
+  (gLv.invis||[]).forEach(p=>drawBlockSpikes(p));
+
   // ── Bounce : dessiné comme un bloc statique + effet au rebond ──
-  (gLv.bounce||[]).forEach(p=>gPlatform(p));
+  (gLv.bounce||[]).forEach(p=>{gPlatform(p);drawBlockSpikes(p);});
   gBounceEffects=gBounceEffects.filter(e=>e.life>0);
   gBounceEffects.forEach(e=>{
     e.life-=0.055;
@@ -968,11 +1032,11 @@ function gDraw(){
     GX.restore();
   });
 
-  (gLv.slider||[]).forEach(t=>{if(t.state!=='done')gPlatform(t);});
+  (gLv.slider||[]).forEach(t=>{if(t.state!=='done'){gPlatform(t);drawBlockSpikes(t);}});
   (gLv.trap||[]).forEach(t=>{
     if(t.state==='gone')return;
-    if(t.state==='predelay'){const shakeAmt=1+((t.preTimer||0)/Math.max(1,(t.preDelay||0)*60))*2,ox=t.x;t.x+=(Math.random()-0.5)*shakeAmt*2;gPlatform(t);t.x=ox;}
-    else gPlatform(t);
+    if(t.state==='predelay'){const shakeAmt=1+((t.preTimer||0)/Math.max(1,(t.preDelay||0)*60))*2,ox=t.x;t.x+=(Math.random()-0.5)*shakeAmt*2;gPlatform(t);t.x=ox;drawBlockSpikes(t);}
+    else{gPlatform(t);drawBlockSpikes(t);}
   });
   (gLv.speed||[]).forEach(z=>{
     const spd=z.spd??5,fast=spd>5;
@@ -990,6 +1054,7 @@ function gDraw(){
     GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);GX.fillStyle='#40c0f0';GX.fillRect(x,y,w,4);
     GX.fillStyle='#80e0ff88';GX.font='6px "Press Start 2P"';GX.textAlign='center';
     GX.fillText('⚡',x+w/2,y+h/2+3);GX.textAlign='left';
+    drawBlockSpikes(f);
   });
 
   // ── Spike blocks draw ──
@@ -1035,6 +1100,7 @@ function gDraw(){
     GX.fillStyle='#1a3a1a';GX.fillRect(x,y,w,h);GX.fillStyle='#40c060';GX.fillRect(x,y,w,4);
     const cx=x+w/2,cy=y+h/2,rad=g.radius||120;
     GX.strokeStyle='#40c06018';GX.lineWidth=1;GX.beginPath();GX.arc(cx,cy,rad,0,Math.PI*2);GX.stroke();
+    drawBlockSpikes(g);
   });
 
   if(gLv.start)gFlag(gLv.start,PCOL.flagA,'A');
