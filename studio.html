@@ -694,30 +694,43 @@ body {
     </div>
 
     <!-- ═══ SPIKE PANEL ═══ -->
-    <div id="s-spike" class="psec">
-      <div class="pinfo" data-info="pInfoSpike"></div>
-      <div class="prow">
-        <label>DIRECTION DES PIQUES</label>
-        <select id="sp2-dir" onchange="spikeParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
-          <option value="u">↑ Vers le HAUT</option>
-          <option value="d">↓ Vers le BAS</option>
-          <option value="l">← Vers la GAUCHE</option>
-          <option value="r">→ Vers la DROITE</option>
-          <option value="all">✦ TOUS LES CÔTÉS</option>
-        </select>
-      </div>
-      <div class="prow">
-        <label>MODE</label>
-        <select id="sp2-mode" onchange="spikeParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
-          <option value="always">☠ TOUJOURS ACTIF</option>
-          <option value="touch">⚡ ACTIVÉ AU TOUCHER</option>
-        </select>
-      </div>
-      <div id="sp2-touch-opts" style="display:none;">
-        <div class="prow"><label>DÉLAI ACTIVATION (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sp2-delay" min="0" max="3" step="0.1" value="0" oninput="spikeParamChanged()"><span class="pval" id="sp2-delay-v">0</span></div></div>
-      </div>
+   <!-- ═══ SPIKE PANEL ═══ -->
+<div id="s-spike" class="psec">
+  <div class="pinfo" data-info="pInfoSpike"></div>
+  <div class="prow">
+    <label>DIRECTION DES PIQUES</label>
+    <select id="sp2-dir" onchange="spikeParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
+      <option value="u">↑ Vers le HAUT</option>
+      <option value="d">↓ Vers le BAS</option>
+      <option value="l">← Vers la GAUCHE</option>
+      <option value="r">→ Vers la DROITE</option>
+      <option value="all">✦ TOUS LES CÔTÉS</option>
+    </select>
+  </div>
+  <div class="prow">
+    <label>MODE</label>
+    <select id="sp2-mode" onchange="spikeParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
+      <option value="always">☠ TOUJOURS ACTIF</option>
+      <option value="touch">⚡ ACTIVÉ AU TOUCHER</option>
+    </select>
+  </div>
+  <div id="sp2-touch-opts" style="display:none;">
+    <div class="prow"><label>DÉLAI ACTIVATION (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sp2-delay" min="0" max="5" step="0.1" value="0" oninput="spikeParamChanged()"><span class="pval" id="sp2-delay-v">0</span></div></div>
+  </div>
+  <!-- ══ NOUVEAUX PARAMÈTRES ══ -->
+  <div class="prow" style="margin-top:6px;padding-top:8px;border-top:1px solid var(--border);">
+    <div class="crow"><input type="checkbox" id="sp2-hidden" onchange="spikeParamChanged()"><label for="sp2-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
+    <div style="font-size:10px;color:var(--muted);margin-top:2px;padding-left:20px;">Caché jusqu'à activation</div>
+  </div>
+  <div class="prow">
+    <label>DÉLAI AVANT ACTIVATION (s)</label>
+    <div style="display:flex;gap:4px;align-items:center">
+      <input type="range" id="sp2-act-delay" min="0" max="10" step="0.5" value="0" oninput="spikeParamChanged()">
+      <span class="pval" id="sp2-act-delay-v">0</span>
     </div>
-
+    <div style="font-size:10px;color:var(--muted);margin-top:2px;">Compte depuis le 1er contact</div>
+  </div>
+</div>
     <!-- ═══ GBLOCK PANEL ═══ -->
     <div id="s-gblock" class="psec">
       <div class="pinfo" data-info="pInfoGblock"></div>
@@ -992,10 +1005,14 @@ function spikeParamChanged(){
   const dir=document.getElementById('sp2-dir').value;
   const mode=document.getElementById('sp2-mode').value;
   const delay=+document.getElementById('sp2-delay').value;
+  const hidden=document.getElementById('sp2-hidden').checked;
+  const activationDelay=+document.getElementById('sp2-act-delay').value;
   document.getElementById('sp2-delay-v').textContent=delay;
+  document.getElementById('sp2-act-delay-v').textContent=activationDelay;
   document.getElementById('sp2-touch-opts').style.display=mode==='touch'?'':'none';
   if(selection.length===1&&selectedType==='spike'){
-    const s=lv.spike[selectedIdx];if(s){s.dir=dir;s.mode=mode;s.delay=delay;}
+    const s=lv.spike[selectedIdx];
+    if(s){s.dir=dir;s.mode=mode;s.delay=delay;s.hidden=hidden;s.activationDelay=activationDelay;}
   }
   redraw();
 }
@@ -1004,6 +1021,9 @@ function spikePanelLoad(s){
   document.getElementById('sp2-mode').value=s.mode||'always';
   document.getElementById('sp2-delay').value=s.delay||0;
   document.getElementById('sp2-delay-v').textContent=s.delay||0;
+  document.getElementById('sp2-hidden').checked=s.hidden||false;
+  document.getElementById('sp2-act-delay').value=s.activationDelay||0;
+  document.getElementById('sp2-act-delay-v').textContent=s.activationDelay||0;
   document.getElementById('sp2-touch-opts').style.display=(s.mode==='touch')?'':'none';
 }
 function showSpikePanel(){
@@ -1207,14 +1227,16 @@ window.addEventListener('mouseup',e=>{
     newType='flash';
   }
   else if(currentTool==='spike'){
-    lv.spike.push({x:rx,y:ry,w:W,h:H,
-      dir:document.getElementById('sp2-dir').value,
-      mode:document.getElementById('sp2-mode').value,
-      delay:+document.getElementById('sp2-delay').value,
-      state:'idle',timer:0
-    });
-    newType='spike';
-  }
+  lv.spike.push({x:rx,y:ry,w:W,h:H,
+    dir:document.getElementById('sp2-dir').value,
+    mode:document.getElementById('sp2-mode').value,
+    delay:+document.getElementById('sp2-delay').value,
+    hidden:document.getElementById('sp2-hidden').checked,
+    activationDelay:+document.getElementById('sp2-act-delay').value,
+    state:'idle',timer:0
+  });
+  newType='spike';
+}
   else if(currentTool==='gblock'){
     lv.gblock.push({x:rx,y:ry,w:W,h:H});
     newType='gblock';
