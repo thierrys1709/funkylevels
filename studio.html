@@ -370,7 +370,7 @@ body {
       <button class="tool-btn active" id="t-fixed"  onclick="T('fixed')"  data-tip="🟫 FIXE&#10;Sol solide, ne bouge jamais.">🟫 FIXE</button>
       <button class="tool-btn"        id="t-invis"  onclick="T('invis')"  data-tip="👁 INVISIBLE&#10;Bloc solide invisible en jeu.">👁 INVIS</button>
       <button class="tool-btn"        id="t-bounce" onclick="T('bounce')" data-tip="🟡 REBOND&#10;Fait rebondir le joueur.">🟡 REBOND</button>
-      <button class="tool-btn"        id="t-mobile" onclick="T('mobile')" data-tip="🔵 MOBILE&#10;Va et vient entre deux points.">🔵 MOBILE</button>
+      <button class="tool-btn"        id="t-mobile" onclick="T('mobile')" data-tip="🔵 MOBILE&#10;Bloc mobile configurable.&#10;Continu ou déclenché par le joueur.">🔵 MOBILE</button>
       <button class="tool-btn"        id="t-push"   onclick="T('push')"   data-tip="🪨 POUSSABLE&#10;Le joueur peut pousser ce bloc.">🪨 PUSH</button>
       <button class="tool-btn"        id="t-flash"  onclick="T('flash')"  data-tip="⚡ FLASH&#10;Apparaît/disparaît en boucle.">⚡ FLASH</button>
     </div>
@@ -381,7 +381,6 @@ body {
     <span class="tb-label" data-lbl="lblPieges">PIÈGES</span>
     <div class="tb-group">
       <button class="tool-btn" id="t-trap"   onclick="T('trap')"   data-tip="⚠ PIÈGE&#10;Tombe quand le joueur approche.">⚠ PIÈGE</button>
-      <button class="tool-btn" id="t-slider" onclick="T('slider')" data-tip="➡ GLISSEUR&#10;Se déplace quand le joueur s'approche.">➡ GLISSEUR</button>
       <button class="tool-btn" id="t-gblock" onclick="T('gblock')" data-tip="🌍 PLANÈTE&#10;Attire le joueur vers sa surface.">🌍 PLANÈTE</button>
     </div>
   </div>
@@ -519,17 +518,7 @@ body {
       <div id="tr-returns-opts"><div class="prow"><label>DÉLAI REMONTÉE (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="tr-rise" min="0" max="10" step="0.5" value="2" oninput="trapParamChanged()"><span class="pval" id="tr-rise-v">2</span></div></div><div class="prow"><div class="crow"><input type="checkbox" id="tr-loop" onchange="trapParamChanged()"><label for="tr-loop">RETOMBE SI APPROCHE</label></div></div></div>
     </div>
 
-    <div id="s-slider" class="psec">
-      <div class="pinfo" data-info="pInfoSlider"></div>
-      <div class="prow"><label>DIRECTION</label><select id="sl-dir" onchange="slParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%"><option value="r">→ Droite</option><option value="l">← Gauche</option><option value="u">↑ Haut</option><option value="d">↓ Bas</option></select></div>
-      <div class="prow"><label>ZONE DÉCLENCHEMENT (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sl-dist" min="0" max="200" step="8" value="48" oninput="slParamChanged()"><span class="pval" id="sl-dist-v">48</span></div></div>
-      <div class="prow"><label>VITESSE</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sl-spd" min="1" max="12" step="0.5" value="4" oninput="slParamChanged()"><span class="pval" id="sl-spd-v">4</span></div></div>
-      <div class="prow"><label>DISTANCE MAX (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sl-maxd" min="16" max="600" step="8" value="160" oninput="slParamChanged()"><span class="pval" id="sl-maxd-v">160</span></div></div>
-      <div class="prow"><div class="crow"><input type="checkbox" id="sl-ret" checked onchange="slParamChanged()"><label for="sl-ret">REVIENT</label></div></div>
-      <div id="sl-ret-opts"><div class="prow"><label>DÉLAI RETOUR (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sl-retd" min="0" max="10" step="0.5" value="1" oninput="slParamChanged()"><span class="pval" id="sl-retd-v">1</span></div></div><div class="prow"><div class="crow"><input type="checkbox" id="sl-loop" onchange="slParamChanged()"><label for="sl-loop">REPART SI APPROCHE</label></div></div></div>
-    </div>
-
-    <div id="s-bounce" class="psec">
+        <div id="s-bounce" class="psec">
       <div class="pinfo" data-info="pInfoBounce"></div>
       <div class="prow"><label>FORCE (1 - 10)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="bo-force" min="1" max="10" step="0.5" value="2" oninput="bounceParamChanged()"><span class="pval" id="bo-force-v">2</span></div></div>
 <!-- ── SOUS-PANEL SPIKE (commun) ── -->
@@ -588,9 +577,65 @@ body {
 
     <div id="s-mobile" class="psec">
       <div class="pinfo" data-info="pInfoMobile"></div>
-      <div class="prow"><label>DIRECTION</label><select id="mo-dir" onchange="moParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%"><option value="r">→ Droite</option><option value="l">← Gauche</option><option value="u">↑ Haut</option><option value="d">↓ Bas</option></select></div>
-      <div class="prow"><label>DISTANCE (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-dist" min="16" max="600" step="8" value="160" oninput="moParamChanged()"><span class="pval" id="mo-dist-v">160</span></div></div>
-      <div class="prow"><label>VITESSE</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-spd" min="0.5" max="8" step="0.5" value="2" oninput="moParamChanged()"><span class="pval" id="mo-spd-v">2</span></div></div>
+
+      <div class="prow">
+        <label>DÉCLENCHEMENT</label>
+        <select id="mo-trigger" onchange="moParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:14px;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
+          <option value="continuous">↺ EN CONTINU</option>
+          <option value="approach">👁 À L'APPROCHE</option>
+        </select>
+      </div>
+
+      <div class="prow" id="mo-trig-dist-row" style="display:none">
+        <label>DISTANCE DE DÉCLENCHEMENT (px)</label>
+        <div style="display:flex;gap:4px;align-items:center">
+          <input type="range" id="mo-trig-dist" min="8" max="300" step="8" value="80" oninput="moParamChanged()">
+          <span class="pval" id="mo-trig-dist-v">80</span>
+        </div>
+      </div>
+
+      <div class="prow">
+        <label>DIRECTION</label>
+        <select id="mo-dir" onchange="moParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:14px;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
+          <option value="r">→ DROITE</option>
+          <option value="l">← GAUCHE</option>
+          <option value="u">↑ HAUT</option>
+          <option value="d">↓ BAS</option>
+          <option value="omni">⊕ OMNIDIRECTIONNEL</option>
+          <option value="fall">⬇ CHUTE</option>
+        </select>
+      </div>
+
+      <div class="prow">
+        <label>VITESSE</label>
+        <div style="display:flex;gap:4px;align-items:center">
+          <input type="range" id="mo-spd" min="0.5" max="12" step="0.5" value="2" oninput="moParamChanged()">
+          <span class="pval" id="mo-spd-v">2</span>
+        </div>
+      </div>
+
+      <div class="prow" id="mo-dist-row">
+        <label>DISTANCE (px)</label>
+        <div style="display:flex;gap:4px;align-items:center">
+          <input type="range" id="mo-dist" min="16" max="800" step="8" value="160" oninput="moParamChanged()">
+          <span class="pval" id="mo-dist-v">160</span>
+        </div>
+      </div>
+
+      <div class="prow" id="mo-loop-row">
+        <div class="crow">
+          <input type="checkbox" id="mo-loop" checked onchange="moParamChanged()">
+          <label for="mo-loop" style="cursor:pointer;">ALLER-RETOUR EN BOUCLE</label>
+        </div>
+      </div>
+
+      <div class="prow" id="mo-wait-row">
+        <label>ATTENTE AVANT RETOUR (s)</label>
+        <div style="display:flex;gap:4px;align-items:center">
+          <input type="range" id="mo-wait" min="0" max="10" step="0.5" value="0" oninput="moParamChanged()">
+          <span class="pval" id="mo-wait-v">0</span>
+        </div>
+      </div>
 <!-- ── SOUS-PANEL SPIKE (commun) ── -->
 <div class="spike-sub" id="mobile-spike-sub">
   <button class="spike-toggle" id="mobile-spike-toggle" onclick="toggleSpikeOpts('mobile')">🗡 PIQUES ▸</button>
@@ -864,7 +909,7 @@ function addToSel(type,idx){
   syncLegacy();
   if(selection.length===1&&type==='fixed'){const b=lv.fixed[idx];if(b)blockSpikePanelLoad('fixed',b);}
   if(selection.length===1&&type==='trap'){const p=lv.trap[idx];if(p){trapPanelLoad(p);blockSpikePanelLoad('trap',p);showTrapPanel();}}
-  if(selection.length===1&&type==='slider'){const s=lv.slider[idx];if(s){slPanelLoad(s);blockSpikePanelLoad('slider',s);showSlPanel();}}
+  if(selection.length===1&&type==='slider'){const m=lv.mobile[idx];if(m){moPanelLoad(m);blockSpikePanelLoad('mobile',m);showMoPanel();}}
   if(selection.length===1&&type==='invis'){const b=lv.invis[idx];if(b)blockSpikePanelLoad('invis',b);}
   if(selection.length===1&&type==='bounce'){const b=lv.bounce[idx];if(b){bouncePanelLoad(b);blockSpikePanelLoad('bounce',b);showBouncePanel();}}
   if(selection.length===1&&type==='mobile'){const m=lv.mobile[idx];if(m){moPanelLoad(m);blockSpikePanelLoad('mobile',m);showMoPanel();}}
@@ -976,14 +1021,50 @@ function bounceParamChanged(){document.getElementById('bo-force-v').textContent=
 function bouncePanelLoad(b){document.getElementById('bo-force').value=b.force??2;document.getElementById('bo-force-v').textContent=b.force??2;}
 function showBouncePanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-bounce').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : REBOND';}
 
-function moParamChanged(){document.getElementById('mo-dist-v').textContent=document.getElementById('mo-dist').value;document.getElementById('mo-spd-v').textContent=document.getElementById('mo-spd').value;if(selection.length===1&&selectedType==='mobile'){const m=lv.mobile[selectedIdx];if(m){m.dist=+document.getElementById('mo-dist').value;m.speed=+document.getElementById('mo-spd').value;m.dir=document.getElementById('mo-dir').value;}}redraw();}
-function moPanelLoad(m){document.getElementById('mo-dir').value=m.dir??'r';document.getElementById('mo-dist').value=m.dist??160;document.getElementById('mo-spd').value=m.speed??2;document.getElementById('mo-dist-v').textContent=m.dist??160;document.getElementById('mo-spd-v').textContent=m.speed??2;}
+function moParamChanged(){
+  const trigger=document.getElementById('mo-trigger').value;
+  const dir=document.getElementById('mo-dir').value;
+  const spd=+document.getElementById('mo-spd').value;
+  const dist=+document.getElementById('mo-dist').value;
+  const loop=document.getElementById('mo-loop').checked;
+  const wait=+document.getElementById('mo-wait').value;
+  const trigDist=+document.getElementById('mo-trig-dist').value;
+  document.getElementById('mo-spd-v').textContent=spd;
+  document.getElementById('mo-dist-v').textContent=dist;
+  document.getElementById('mo-wait-v').textContent=wait;
+  document.getElementById('mo-trig-dist-v').textContent=trigDist;
+  const isFall=dir==='fall';
+  const isApproach=trigger==='approach';
+  document.getElementById('mo-trig-dist-row').style.display=isApproach?'':'none';
+  document.getElementById('mo-dist-row').style.display=isFall?'none':'';
+  document.getElementById('mo-loop-row').style.display=isFall?'none':'';
+  document.getElementById('mo-wait-row').style.display=(isFall||!loop)?'none':'';
+  if(selection.length===1&&selectedType==='mobile'){
+    const m=lv.mobile[selectedIdx];
+    if(m){m.trigger=trigger;m.dir=dir;m.speed=spd;m.dist=dist;m.loop=loop;m.waitDelay=wait;m.trigDist=trigDist;}
+  }
+  redraw();
+}
+function moPanelLoad(m){
+  document.getElementById('mo-trigger').value=m.trigger||'continuous';
+  document.getElementById('mo-dir').value=m.dir||'r';
+  document.getElementById('mo-spd').value=m.speed??2;
+  document.getElementById('mo-dist').value=m.dist??160;
+  document.getElementById('mo-loop').checked=m.loop??true;
+  document.getElementById('mo-wait').value=m.waitDelay??0;
+  document.getElementById('mo-trig-dist').value=m.trigDist??80;
+  document.getElementById('mo-spd-v').textContent=m.speed??2;
+  document.getElementById('mo-dist-v').textContent=m.dist??160;
+  document.getElementById('mo-wait-v').textContent=m.waitDelay??0;
+  document.getElementById('mo-trig-dist-v').textContent=m.trigDist??80;
+  moParamChanged();
+}
 function showMoPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-mobile').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : MOBILE';}
-
-function slPanelValues(){return{dir:document.getElementById('sl-dir').value,trigDist:+document.getElementById('sl-dist').value,speed:+document.getElementById('sl-spd').value,maxDist:+document.getElementById('sl-maxd').value,returns:document.getElementById('sl-ret').checked,retDelay:+document.getElementById('sl-retd').value,loop:document.getElementById('sl-loop').checked};}
-function slParamChanged(){document.getElementById('sl-dist-v').textContent=document.getElementById('sl-dist').value;document.getElementById('sl-spd-v').textContent=document.getElementById('sl-spd').value;document.getElementById('sl-maxd-v').textContent=document.getElementById('sl-maxd').value;document.getElementById('sl-retd-v').textContent=document.getElementById('sl-retd').value;document.getElementById('sl-ret-opts').style.display=document.getElementById('sl-ret').checked?'':'none';if(selection.length===1&&selectedType==='slider'){const s=lv.slider[selectedIdx];if(s)Object.assign(s,slPanelValues());}redraw();}
-function slPanelLoad(s){document.getElementById('sl-dir').value=s.dir??'r';document.getElementById('sl-dist').value=s.trigDist??48;document.getElementById('sl-spd').value=s.speed??4;document.getElementById('sl-maxd').value=s.maxDist??160;document.getElementById('sl-ret').checked=s.returns??true;document.getElementById('sl-retd').value=s.retDelay??1;document.getElementById('sl-loop').checked=s.loop??false;slParamChanged();}
-function showSlPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-slider').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : GLISSEUR';}
+function getMoValues(){return{trigger:document.getElementById('mo-trigger').value,dir:document.getElementById('mo-dir').value,speed:+document.getElementById('mo-spd').value,dist:+document.getElementById('mo-dist').value,loop:document.getElementById('mo-loop').checked,waitDelay:+document.getElementById('mo-wait').value,trigDist:+document.getElementById('mo-trig-dist').value};}
+function showSlPanel(){showMoPanel();}
+function slPanelValues(){return getMoValues();}
+function slParamChanged(){moParamChanged();}
+function slPanelLoad(s){moPanelLoad(s);}
 
 function trapPanelValues(){return{trigDist:+document.getElementById('tr-dist').value,preDelay:+document.getElementById('tr-predelay').value,fallSpeed:+document.getElementById('tr-fall').value,partial:document.getElementById('tr-partial').checked,partDist:+document.getElementById('tr-partdist').value,returns:document.getElementById('tr-returns').checked,riseDelay:+document.getElementById('tr-rise').value,loop:document.getElementById('tr-loop').checked};}
 function trapParamChanged(){document.getElementById('tr-dist-v').textContent=document.getElementById('tr-dist').value;document.getElementById('tr-predelay-v').textContent=document.getElementById('tr-predelay').value;document.getElementById('tr-fall-v').textContent=document.getElementById('tr-fall').value;document.getElementById('tr-partdist-v').textContent=document.getElementById('tr-partdist').value;document.getElementById('tr-rise-v').textContent=document.getElementById('tr-rise').value;trapReturnUI();if(selection.length===1&&selectedType==='trap'){const p=lv.trap[selectedIdx];if(p)Object.assign(p,trapPanelValues());}redraw();}
@@ -1170,7 +1251,7 @@ window.addEventListener('mouseup',e=>{
   if(rubberBand){
     const rb=rubberBand;rubberBand=null;
     const rx=Math.min(rb.sx,rb.ex),ry=Math.min(rb.sy,rb.ey),rw=Math.abs(rb.ex-rb.sx),rh=Math.abs(rb.ey-rb.sy);
-    if(rw>4&&rh>4){if(!e.shiftKey)clearSel();['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','gblock'].forEach(k=>{(lv[k]||[]).forEach((p,i)=>{if(p.x<rx+rw&&p.x+p.w>rx&&p.y<ry+rh&&p.y+p.h>ry)addToSel(k,i);});});if(selection.length)status(`${selection.length} bloc${selection.length>1?'s':''} sélectionné${selection.length>1?'s':''}.`);}
+    if(rw>4&&rh>4){if(!e.shiftKey)clearSel();['fixed','trap','invis','bounce','mobile','push','gravflip','speed','flash','gblock'].forEach(k=>{(lv[k]||[]).forEach((p,i)=>{if(p.x<rx+rw&&p.x+p.w>rx&&p.y<ry+rh&&p.y+p.h>ry)addToSel(k,i);});});if(selection.length)status(`${selection.length} bloc${selection.length>1?'s':''} sélectionné${selection.length>1?'s':''}.`);}
     redraw();return;
   }
   if(!drawing)return;drawing=false;
@@ -1180,8 +1261,8 @@ window.addEventListener('mouseup',e=>{
   snapshotWithDupCheck();
   const W=rw,H=Math.max(GRID,rh);let newType=null;
   if(currentTool==='fixed'){const _sp=getSpikeFromPanel('fixed');const _b={x:rx,y:ry,w:W,h:H};if(_sp)_b.spikes=_sp;lv.fixed.push(_b);newType='fixed';}
-  else if(currentTool==='slider'){const v=slPanelValues();const _sp=getSpikeFromPanel('slider');const _b={x:rx,y:ry,w:W,h:H,ox:rx,oy:ry,dir:v.dir,trigDist:v.trigDist,speed:v.speed,maxDist:v.maxDist,returns:v.returns,retDelay:v.retDelay,loop:v.loop,state:'idle',traveled:0,waitTimer:0};if(_sp)_b.spikes=_sp;lv.slider.push(_b);newType='slider';}
-  else if(currentTool==='mobile'){const _sp=getSpikeFromPanel('mobile');const _b={x:rx,y:ry,w:W,h:H,ox:rx,oy:ry,dir:document.getElementById('mo-dir').value,dist:+document.getElementById('mo-dist').value,speed:+document.getElementById('mo-spd').value,t:0,going:true};if(_sp)_b.spikes=_sp;lv.mobile.push(_b);newType='mobile';}
+
+  else if(currentTool==='mobile'){const v=getMoValues();const _sp=getSpikeFromPanel('mobile');const _b={x:rx,y:ry,w:W,h:H,ox:rx,oy:ry,trigger:v.trigger,dir:v.dir,speed:v.speed,dist:v.dist,loop:v.loop,waitDelay:v.waitDelay,trigDist:v.trigDist,state:'idle',t:0,going:true,waitTimer:0};if(_sp)_b.spikes=_sp;lv.mobile.push(_b);newType='mobile';}
   else if(currentTool==='push'){const _sp=getSpikeFromPanel('push');const _b={x:rx,y:ry,w:W,h:H,ox:rx,oy:ry,fric:+document.getElementById('pu-fric').value,vx:0,vy:0};if(_sp)_b.spikes=_sp;lv.push.push(_b);newType='push';}
   else if(currentTool==='bounce'){const _sp=getSpikeFromPanel('bounce');const _b={x:rx,y:ry,w:W,h:H,force:+document.getElementById('bo-force').value};if(_sp)_b.spikes=_sp;lv.bounce.push(_b);newType='bounce';}
   else if(currentTool==='invis'){const _sp=getSpikeFromPanel('invis');const _b={x:rx,y:ry,w:W,h:H};if(_sp)_b.spikes=_sp;lv.invis.push(_b);newType='invis';}
@@ -1196,7 +1277,7 @@ window.addEventListener('mouseup',e=>{
 
 EC.addEventListener('mouseleave',()=>{rubberBand=null;redraw();});
 
-function findBlockAt(x,y){const types=['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','gblock'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
+function findBlockAt(x,y){const types=['fixed','trap','invis','bounce','mobile','push','gravflip','speed','flash','gblock'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
 function deleteSelected(){if(!selection.length)return;snapshotWithDupCheck();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
 function zoom(d,cx,cy){
   const prevZoom=ZOOM;ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));
@@ -1333,18 +1414,26 @@ function redraw(){
     if(isSel){if(selection.length===1&&selectedType==='trap'&&selectedIdx===i)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
 
-  const SL_DIRS={r:[1,0,'→'],l:[-1,0,'←'],u:[0,-1,'↑'],d:[0,1,'↓']};
-  (lv.slider||[]).forEach((p,i)=>{
-    const isSel=isSelected('slider',i),d=p.trigDist||48,[dx,dy,arrow]=SL_DIRS[p.dir||'r'],md=p.maxDist||160;
-    EX.save();EX.strokeStyle=isSel?'#20c0f0ff':'#20c0f055';EX.lineWidth=isSel?1.5:1;EX.setLineDash([6,4]);EX.strokeRect(p.x-d,p.y-d,p.w+d*2,p.h+d*2);EX.setLineDash([]);EX.restore();
-    ePlatform(p,EC_COL.fixed);EX.fillStyle='#20c0f0cc';EX.font='8px sans-serif';EX.textAlign='center';EX.fillText(arrow,p.x+p.w/2,p.y+p.h/2+4);EX.textAlign='left';eDrawSpikes(p);
-    if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
-  });
 
-  const MO_DIRS={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1]};
+
   (lv.mobile||[]).forEach((p,i)=>{
     const isSel=isSelected('mobile',i);
-    EX.fillStyle='#1a3060';EX.fillRect(p.x,p.y,p.w,p.h);EX.fillStyle='#4090f0';EX.fillRect(p.x,p.y,p.w,4);EX.fillStyle='#80c0ffcc';EX.font='6px "Press Start 2P"';EX.textAlign='center';EX.fillText('AUTO',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';eDrawSpikes(p);
+    const trigger=p.trigger||'continuous';
+    const dir=p.dir||'r';
+    const ARROWS={r:'→',l:'←',u:'↑',d:'↓',omni:'⊕',fall:'⬇'};
+    const arrow=ARROWS[dir]||'→';
+    // Zone de déclenchement si approche
+    if(trigger==='approach'){
+      const td=p.trigDist||80;
+      EX.strokeStyle=isSel?'#20c0f0cc':'#20c0f044';EX.lineWidth=1;EX.setLineDash([5,4]);
+      EX.strokeRect(p.x-td,p.y-td,p.w+td*2,p.h+td*2);EX.setLineDash([]);
+    }
+    EX.fillStyle='#1a3060';EX.fillRect(p.x,p.y,p.w,p.h);
+    EX.fillStyle=trigger==='approach'?'#20c0f0':'#4090f0';EX.fillRect(p.x,p.y,p.w,4);
+    EX.fillStyle='#80c0ffcc';EX.font='14px sans-serif';EX.textAlign='center';EX.fillText(arrow,p.x+p.w/2,p.y+p.h/2+5);
+    EX.font='6px "Press Start 2P"';EX.fillStyle='#4090f0cc';
+    EX.fillText(trigger==='approach'?'TRIG':'AUTO',p.x+2,p.y+p.h-4);
+    EX.textAlign='left';eDrawSpikes(p);
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
 
