@@ -952,70 +952,6 @@ function showGblockPanel(){
 }
 
 // ── Spike universels sur blocs ──────────────────────────
-function toggleSpikeOpts(prefix){
-  const opts=document.getElementById(prefix+'-spike-opts');
-  const btn=document.getElementById(prefix+'-spike-toggle');
-  if(!opts)return;
-  opts.classList.toggle('show');
-  btn.classList.toggle('active');
-  btn.textContent=opts.classList.contains('show')?'🗡 PIQUES ▾':'🗡 PIQUES ▸';
-}
-
-function blockSpikeChanged(prefix){
-  const u=document.getElementById(prefix+'-sp-u')?.checked;
-  const d=document.getElementById(prefix+'-sp-d')?.checked;
-  const l=document.getElementById(prefix+'-sp-l')?.checked;
-  const r=document.getElementById(prefix+'-sp-r')?.checked;
-  const hidden=document.getElementById(prefix+'-sp-hidden')?.checked||false;
-  const delay=+(document.getElementById(prefix+'-sp-delay')?.value||0);
-  const delv=document.getElementById(prefix+'-sp-delay-v');if(delv)delv.textContent=delay;
-  if(selection.length===1&&selectedType===prefix){
-    const b=lv[prefix][selectedIdx];
-    if(b){
-      const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
-      if(dirs.length===0){delete b.spikes;}
-      else{b.spikes={dirs,hidden,delay};}
-    }
-  }
-  redraw();
-}
-
-function blockSpikePanelLoad(prefix,b){
-  const sp=b&&b.spikes;
-  const hasSp=sp&&sp.dirs&&sp.dirs.length>0;
-  const opts=document.getElementById(prefix+'-spike-opts');
-  const btn=document.getElementById(prefix+'-spike-toggle');
-  if(hasSp){
-    if(opts)opts.classList.add('show');
-    if(btn){btn.classList.add('active');btn.textContent='🗡 PIQUES ▾';}
-    const eu=document.getElementById(prefix+'-sp-u');if(eu)eu.checked=sp.dirs.includes('u');
-    const ed=document.getElementById(prefix+'-sp-d');if(ed)ed.checked=sp.dirs.includes('d');
-    const el=document.getElementById(prefix+'-sp-l');if(el)el.checked=sp.dirs.includes('l');
-    const er=document.getElementById(prefix+'-sp-r');if(er)er.checked=sp.dirs.includes('r');
-    const eh=document.getElementById(prefix+'-sp-hidden');if(eh)eh.checked=sp.hidden||false;
-    const edel=document.getElementById(prefix+'-sp-delay');if(edel)edel.value=sp.delay||0;
-    const edelv=document.getElementById(prefix+'-sp-delay-v');if(edelv)edelv.textContent=sp.delay||0;
-  }else{
-    if(opts)opts.classList.remove('show');
-    if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
-    ['sp-u','sp-d','sp-l','sp-r','sp-hidden'].forEach(id=>{const el=document.getElementById(prefix+'-'+id);if(el)el.checked=false;});
-    const edel=document.getElementById(prefix+'-sp-delay');if(edel)edel.value=0;
-    const edelv=document.getElementById(prefix+'-sp-delay-v');if(edelv)edelv.textContent=0;
-  }
-}
-
-function getSpikeFromPanel(prefix){
-  const u=document.getElementById(prefix+'-sp-u')?.checked;
-  const d=document.getElementById(prefix+'-sp-d')?.checked;
-  const l=document.getElementById(prefix+'-sp-l')?.checked;
-  const r=document.getElementById(prefix+'-sp-r')?.checked;
-  const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
-  if(dirs.length===0)return undefined;
-  return{dirs,hidden:document.getElementById(prefix+'-sp-hidden')?.checked||false,delay:+(document.getElementById(prefix+'-sp-delay')?.value||0)};
-}
-
-// ── Fermeture bloc spike functions ──
-
 // ── Spike universels sur blocs ──────────────────────────
 function toggleSpikeOpts(prefix){
   const opts=document.getElementById(prefix+'-spike-opts');
@@ -1582,5 +1518,209 @@ async function applyStudioLang(){
   s('statusbar',t.ready);
   STUDIO_T[l]=t;STUDIO_T._pub=data.publish||{};
 }
+const _PT={
+  fr:{title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',visLbl:'VISIBILITÉ',cancel:'ANNULER',ok:'💾 SAUVER →',saving:'SAUVEGARDE...',needLogin:'Tu dois être connecté !',needTitle:'Donne un nom à ton niveau !',needBlocks:'Ton niveau est vide !',successNew:'Niveau sauvegardé !',successUpdate:'Niveau mis à jour !',codeMsg:'Code de partage : ',codeCopied:'(copié !)',errorTxt:'Erreur : '},
+  en:{title:'💾 SAVE',nameLbl:'LEVEL NAME',ph:'My funky level...',visLbl:'VISIBILITY',cancel:'CANCEL',ok:'💾 SAVE →',saving:'SAVING...',needLogin:'You must be logged in!',needTitle:'Give your level a name!',needBlocks:'Your level is empty!',successNew:'Level saved!',successUpdate:'Level updated!',codeMsg:'Share code: ',codeCopied:'(copied!)',errorTxt:'Error: '}
+};
+const VIS_HINTS={
+  fr:{private:'🔒 Seul toi peux le voir',public:'🌍 Tout le monde peut jouer',code:'🔑 Accessible uniquement avec le code'},
+  en:{private:'🔒 Only you can see it',public:'🌍 Everyone can play',code:'🔑 Accessible with code only'}
+};
+function setVis(v){
+  _currentVisibility=v;
+  document.querySelectorAll('.pub-vis-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('vis-'+v);if(btn)btn.classList.add('active');
+  const hint=document.getElementById('pub-vis-hint');if(hint)hint.textContent=VIS_HINTS[_lang()][v]||'';
+}
+function _applyPubLang(){
+  const t=STUDIO_T._pub||_PT[_lang()];
+  const s=(id,val,prop='textContent')=>{const el=document.getElementById(id);if(el&&val)el[prop]=val;};
+  s('pub-title-lbl',t.title);s('pub-name-lbl',t.nameLbl);s('pub-name',t.ph,'placeholder');
+  s('pub-cancel-btn',t.cancel);s('pub-ok-btn',t.ok);setVis(_currentVisibility);
+}
+function openPublish(){
+  _applyPubLang();document.getElementById('pub-msg').className='pub-msg';
+  const ni=document.getElementById('level-name-input');const pubName=document.getElementById('pub-name');
+  if(ni&&pubName&&ni.value)pubName.value=ni.value;
+  document.getElementById('publish-modal').classList.add('show');if(pubName)pubName.focus();
+}
+function closePublish(){document.getElementById('publish-modal').classList.remove('show');}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(_isPublished&&_currentLevelId&&!window._dupConfirmed&&document.getElementById('load-modal').classList.contains('show'))return;}
+  if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();
+});
+async function doPublish(){
+  const t=STUDIO_T._pub||_PT[_lang()];
+  const title=document.getElementById('pub-name').value.trim();
+  const msgEl=document.getElementById('pub-msg');const okBtn=document.getElementById('pub-ok-btn');
+  const{data:sess}=await _sb.auth.getSession();
+  if(!sess.session){msgEl.className='pub-msg err';msgEl.textContent=t.needLogin;return;}
+  if(!title){msgEl.className='pub-msg err';msgEl.textContent=t.needTitle;return;}
+  const totalBlocks=(lv.fixed||[]).length+(lv.trap||[]).length+(lv.slider||[]).length+(lv.mobile||[]).length+(lv.bounce||[]).length+(lv.push||[]).length+(lv.invis||[]).length;
+  if(totalBlocks===0){msgEl.className='pub-msg err';msgEl.textContent=t.needBlocks;return;}
+  if(_currentLevelId&&!_authorCompleted){
+    const{data:lvlCheck}=await _sb.from('levels').select('author_completed,is_published').eq('id',_currentLevelId).single();
+    if(lvlCheck){_authorCompleted=lvlCheck.author_completed||false;_isPublished=lvlCheck.is_published||false;}
+    if(!_authorCompleted){msgEl.className='pub-msg err';msgEl.textContent=_lang()==='fr'?"🎮 Tu dois d'abord terminer le niveau toi-même !":'🎮 You must complete the level yourself first!';return;}
+  }
+  okBtn.disabled=true;okBtn.textContent=t.saving;msgEl.className='pub-msg';
+  const user=sess.session.user;let error,shareCode=null;
+  if(_currentLevelId){
+    const updates={title,data:lv,visibility:_currentVisibility};
+    if(_currentVisibility!=='private')updates.is_published=true;
+    const{error:e}=await _sb.from('levels').update(updates).eq('id',_currentLevelId).eq('user_id',user.id);
+    if(!e&&_currentVisibility!=='private')_isPublished=true;error=e;
+  }else{
+    function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
+    shareCode=genCode();
+    const{data:inserted,error:e}=await _sb.from('levels').insert({user_id:user.id,title,data:lv,plays:0,visibility:_currentVisibility,share_code:shareCode,author_completed:_authorCompleted,is_published:_currentVisibility!=='private'}).select().single();
+    error=e;if(!error&&inserted){_currentLevelId=inserted.id;history.replaceState(null,'','studio.html');}
+  }
+  _hasUnsavedChanges=false;autosaveClear();doAfterSaveNav&&doAfterSaveNav();
+  okBtn.disabled=false;okBtn.textContent=t.ok;
+  if(error){msgEl.className='pub-msg err';msgEl.textContent=t.errorTxt+error.message;}
+  else{
+    const ni=document.getElementById('level-name-input');if(ni)ni.value=title;
+    if(shareCode&&_currentVisibility==='code'){
+      navigator.clipboard?.writeText(shareCode).catch(()=>{});
+      msgEl.className='pub-msg ok';
+      msgEl.innerHTML=t.successNew+'<br>'+t.codeMsg+'<b>'+shareCode+'</b><br><span style="font-size:5px;color:#40f090aa;">'+t.codeCopied+'</span>';
+      setTimeout(()=>closePublish(),4000);
+    }else{msgEl.className='pub-msg ok';msgEl.textContent=shareCode?t.successNew:t.successUpdate;setTimeout(()=>closePublish(),1800);}
+  }
+}
+</script>
 
-const _PT={fr:{title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',cancel:'
+<!-- LOAD MODAL -->
+<div id="load-modal">
+  <div class="load-box">
+    <div class="load-header"><h3>📂 MES NIVEAUX</h3><button class="load-close" onclick="closeLoadModal()">✕</button></div>
+    <div class="load-search-wrap">
+      <input type="text" id="load-search" placeholder="🔍 Rechercher..." oninput="filterLoadList(this.value)"
+        style="width:100%;font-family:Rajdhani,sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:9px 14px;border-radius:5px;outline:none;"
+        onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--border2)'">
+    </div>
+    <div id="load-list"></div>
+  </div>
+</div>
+
+<!-- PUBLISH MODAL -->
+<div id="publish-modal">
+  <div class="pub-box">
+    <h3 id="pub-title-lbl">🚀 PUBLIER LE NIVEAU</h3>
+    <div><label id="pub-name-lbl">NOM DU NIVEAU</label><input type="text" id="pub-name" placeholder="Mon niveau funky..." maxlength="40" style="margin-top:8px;"></div>
+    <div id="pub-msg" class="pub-msg"></div>
+    <div class="pub-row">
+      <button class="pub-btn cancel" onclick="closePublish()" id="pub-cancel-btn">ANNULER</button>
+      <button class="pub-btn ok" onclick="doPublish()" id="pub-ok-btn">PUBLIER →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISHED LEVEL MODAL -->
+<div id="published-modal" style="display:none;position:fixed;inset:0;background:#000000dd;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:36px 32px;width:min(440px,90vw);display:flex;flex-direction:column;gap:20px;">
+    <div style="font-family:Orbitron,monospace;font-size:13px;color:#f0a040;text-align:center;letter-spacing:2px;">🔒 NIVEAU PUBLIÉ</div>
+    <p id="published-modal-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.8;text-align:center;"></p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onclick="confirmDuplicateFromModal()" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#2a1a00;border:2px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;">⧉ CRÉER UNE COPIE MODIFIABLE</button>
+      <button onclick="document.getElementById('published-modal').style.display='none';openLoadModal();" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">📂 CHARGER UN AUTRE NIVEAU</button>
+    </div>
+  </div>
+</div>
+
+<!-- UNSAVED CHANGES MODAL -->
+<div id="unsaved-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
+    <div id="unsaved-title" style="font-family:Orbitron,monospace;font-size:14px;color:#f0a040;text-align:center;letter-spacing:1px;">⚠️ MODIFICATIONS NON SAUVEGARDÉES</div>
+    <p id="unsaved-desc" style="font-family:Rajdhani,sans-serif;font-size:17px;color:#c0c0dd;text-align:center;line-height:1.7;margin:0;">Tu as des modifications non sauvegardées.<br>Que veux-tu faire ?</p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button id="unsaved-btn-save" onclick="unsavedSave()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#0d2a0d;border:1.5px solid #40f090;color:#40f090;border-radius:6px;cursor:pointer;">💾 ENREGISTRER ET QUITTER</button>
+      <button id="unsaved-btn-leave" onclick="unsavedLeave()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#2a0a0a;border:1.5px solid #f04060;color:#f04060;border-radius:6px;cursor:pointer;">🚪 QUITTER SANS ENREGISTRER</button>
+      <button id="unsaved-btn-stay" onclick="unsavedStay()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">← RESTER DANS LE STUDIO</button>
+    </div>
+  </div>
+</div>
+
+<!-- DUPLICATE MODAL -->
+<div id="dup-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
+    <div style="font-family:Orbitron,monospace;font-size:12px;color:#f0a040;text-align:center;letter-spacing:1px;">🔒 NIVEAU PUBLIÉ</div>
+    <p id="dup-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.7;text-align:center;"></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeDupModal()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;background:#12122a;border:1.5px solid #2a2a55;color:#6060aa;border-radius:6px;cursor:pointer;">ANNULER</button>
+      <button onclick="confirmDuplicate()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;background:#2a1a00;border:1.5px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;">⧉ CRÉER UNE COPIE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPublishedModal(title,lid){
+  document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>{if(b.id!=='btn-load')b.style.opacity='0.3';});
+  const lang=localStorage.getItem('fl_lang')||'fr';
+  const msg=lang==='fr'?'<strong style="color:#f0e040;">'+title+'</strong><br><br>Ce niveau est publié et ne peut pas être modifié directement.<br>Crée une copie privée pour y apporter des modifications.':'<strong style="color:#f0e040;">'+title+'</strong><br><br>This level is published and cannot be edited directly.<br>Create a private copy to make changes.';
+  document.getElementById('published-modal-msg').innerHTML=msg;
+  document.getElementById('published-modal').style.display='flex';
+}
+async function confirmDuplicateFromModal(){
+  document.getElementById('published-modal').style.display='none';window._dupConfirmed=true;
+  document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
+  await duplicateLevel();
+}
+function showDupModal(){
+  const lang=localStorage.getItem('fl_lang')||'fr';
+  document.getElementById('dup-msg').innerHTML=lang==='fr'?'Ce niveau est publié.<br>Tu ne peux pas le modifier directement.<br><br>Une copie privée sera créée.':'This level is published.<br>You cannot edit it directly.<br><br>A private copy will be created.';
+  document.getElementById('dup-modal').style.display='flex';
+}
+function closeDupModal(){document.getElementById('dup-modal').style.display='none';}
+function confirmDuplicate(){closeDupModal();window._dupConfirmed=true;document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');duplicateLevel();}
+
+(function(){_loadingLevel=false;_hasUnsavedChanges=false;checkAutosaveOnLoad();})();
+
+function autosaveSave(){
+  if(_loadingLevel)return;
+  try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');const ni=document.getElementById('level-name-input');sessionStorage.setItem('fl_autosave_name',ni?ni.value:'');}catch(ex){}
+}
+function autosaveClear(){sessionStorage.removeItem('fl_autosave_level');sessionStorage.removeItem('fl_autosave_id');sessionStorage.removeItem('fl_autosave_name');}
+function checkAutosaveOnLoad(){
+  const savedLv=sessionStorage.getItem('fl_autosave_level');if(!savedLv)return;
+  const savedName=sessionStorage.getItem('fl_autosave_name')||ts('untitled','Untitled');
+  try{
+    const restored=JSON.parse(savedLv);lv=restored;
+    if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
+    if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
+    if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
+    const ni=document.getElementById('level-name-input');if(ni&&savedName)ni.value=savedName;
+    const savedId=sessionStorage.getItem('fl_autosave_id');if(savedId)_currentLevelId=savedId;
+    _hasUnsavedChanges=true;redraw&&redraw();status&&status(ts('msgDraftRestored','⚡ Draft restored'));
+  }catch(ex){}
+}
+window.addEventListener('beforeunload',function(){
+  if(lv&&typeof lv==='object'){try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');sessionStorage.setItem('fl_autosave_name',document.getElementById('level-name-input')?.value||'');}catch(ex){}}
+});
+let _pendingNavUrl=null;
+history.pushState(null,'',location.href);
+window.addEventListener('popstate',function(){
+  if(_hasUnsavedChanges){history.pushState(null,'',location.href);_pendingNavUrl='__BACK__';showUnsavedModal();}else{autosaveClear();}
+});
+window.addEventListener('pagehide',function(){if(!_hasUnsavedChanges)autosaveClear();});
+function goToHome(){if(_hasUnsavedChanges){_pendingNavUrl='index.html';showUnsavedModal();}else{autosaveClear();window.location.href='index.html';}}
+function goToProfile(){if(_hasUnsavedChanges){_pendingNavUrl='settings.html';showUnsavedModal();}else{window.location.href='settings.html';}}
+function showUnsavedModal(){document.getElementById('unsaved-modal').style.display='flex';}
+function unsavedSave(){
+  document.getElementById('unsaved-modal').style.display='none';
+  const ni=document.getElementById('level-name-input');const hasName=ni&&ni.value.trim().length>0;
+  window._afterSaveNav=_pendingNavUrl;_pendingNavUrl=null;
+  if(!_currentLevelId&&!hasName)openPublish();else saveLevel();
+}
+function doAfterSaveNav(){if(window._afterSaveNav){const url=window._afterSaveNav;window._afterSaveNav=null;if(url==='__BACK__')history.go(-2);else window.location.href=url;}}
+function unsavedLeave(){
+  _hasUnsavedChanges=false;autosaveClear();_currentLevelId=null;lv=emptyLevel();
+  const ni=document.getElementById('level-name-input');if(ni)ni.value='';
+  document.getElementById('unsaved-modal').style.display='none';
+  if(_pendingNavUrl==='__BACK__'){_pendingNavUrl=null;history.go(-2);}else if(_pendingNavUrl){window.location.href=_pendingNavUrl;_pendingNavUrl=null;}
+}
+function unsavedStay(){document.getElementById('unsaved-modal').style.display='none';_pendingNavUrl=null;}
+</script>
+</body>
+</html>
