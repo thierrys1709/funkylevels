@@ -499,7 +499,7 @@ function startGameFrom(sx,sy){
   (gLv.spike||[]).forEach(s=>{s.state='idle';s.timer=0;});
   (gLv.gblock||[]).forEach(g=>{g._attached=false;g._justJumped=false;});
   (gLv.flash||[]).forEach(f=>{f._visible=true;f._timer=0;});
-  gParts=[];gBullets=[];gBounceEffects=[];gGravEffects=[];
+  gParts=[];gBullets=[];gBounceEffects=[];gGravEffects=[];gPushEffects=[];
   gLives=3;gElapsed=0;gWon=false;gRunning=false;gDeadPending=false;
   gStartTime=performance.now();
   gCamX=Math.max(0,sx-GW()*0.32);
@@ -543,6 +543,7 @@ let gLives=3,gElapsed=0,gWon=false,gRunning=false,gDeadPending=false,gStartTime=
 let gBullets=[];
 let gBounceEffects=[];
 let gGravEffects=[];
+let gPushEffects=[];
 
 function gLoopStart(){if(gRafId)cancelAnimationFrame(gRafId);gRafId=requestAnimationFrame(gLoop);}
 
@@ -762,8 +763,8 @@ function gUpdate(now){
       if(m===oB&&t.vy>2){killPlayer();}
       else if(m===oT&&gPlayer.vy>=0){gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}
       else if(m===oB&&gPlayer.vy<0){gPlayer.y=t.y+t.h;gPlayer.vy=0;}
-      else if(m===oL){t.vx=Math.max(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x-gPlayer.w;}
-      else if(m===oR){t.vx=Math.min(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x+t.w;}
+      else if(m===oL){t.vx=Math.max(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x-gPlayer.w;gPushEffects.push({x:t.x,y:t.y,w:t.w,h:t.h,life:1});}
+      else if(m===oR){t.vx=Math.min(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x+t.w;gPushEffects.push({x:t.x,y:t.y,w:t.w,h:t.h,life:1});}
     }
     if(t.y>EH+200){t.x=t.ox;t.y=t.oy;t.vx=0;t.vy=0;}
   });
@@ -888,7 +889,19 @@ function gDraw(){
 
   gLv.fixed.forEach(p=>gPlatform(p));
   (gLv.mobile||[]).forEach(t=>{const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);GX.fillStyle='#4090f0';GX.fillRect(x,y,w,4);});
-  (gLv.push||[]).forEach(t=>{const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);GX.fillStyle='#3d2b1a';GX.fillRect(x,y,w,h);GX.fillStyle='#8b6340';GX.fillRect(x,y,w,4);});
+  (gLv.push||[]).forEach(t=>gPlatform(t));
+  gPushEffects=gPushEffects.filter(e=>e.life>0);
+  gPushEffects.forEach(e=>{
+    e.life-=0.07;
+    const a=Math.max(0,e.life);
+    const expand=(1-e.life)*10;
+    GX.save();
+    GX.globalAlpha=a*0.6;GX.strokeStyle='#8b6340';GX.lineWidth=2;
+    GX.strokeRect(e.x-expand,e.y-expand,e.w+expand*2,e.h+expand*2);
+    GX.globalAlpha=a*0.15;GX.fillStyle='#8b6340';
+    GX.fillRect(e.x-expand,e.y-expand,e.w+expand*2,e.h+expand*2);
+    GX.restore();
+  });
 
   // ── Bounce : dessiné comme un bloc statique + effet au rebond ──
   (gLv.bounce||[]).forEach(p=>gPlatform(p));
