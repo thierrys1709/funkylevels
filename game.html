@@ -606,17 +606,10 @@ function checkBlockSpikes(b){
   const delay=(sp.delay||0)*60;
   // Timer tourne en permanence dès le premier contact
   if(hidden&&sp._touched&&sp._delayTimer<delay)sp._delayTimer++;
-  const oL=(gPlayer.x+gPlayer.w)-b.x,oR=(b.x+b.w)-gPlayer.x;
-  const oT=(gPlayer.y+gPlayer.h)-b.y,oB=(b.y+b.h)-gPlayer.y;
-  const m=Math.min(oL,oR,oT,oB);
-  const dirs=sp.dirs;
-  const faceHasSpike=
-    (m===oT&&dirs.includes('u'))||
-    (m===oB&&dirs.includes('d'))||
-    (m===oL&&dirs.includes('r'))||
-    (m===oR&&dirs.includes('l'));
-  if(!faceHasSpike)return false;
-  if(!hidden){killPlayer();return true;}
+  if(!hidden){
+    // Piques toujours actifs : tuer au moindre contact
+    killPlayer();return true;
+  }
   // hidden : déclencher délai au premier contact
   if(!sp._touched)sp._touched=true;
   const delayDone=delay===0||sp._delayTimer>=delay;
@@ -889,16 +882,12 @@ function gUpdate(now){
       (m===oR&&dirs.includes('l'));
 
     if(!hidden){
-      // Pas invisible : piques actifs dès le départ, tuent au contact
-      if(faceHasSpike){killPlayer();return;}
-      // Collision solide sur les autres faces
+      // Piques actifs dès le départ : tuer au contact
+      killPlayer();return;
     } else {
-      // Invisible au départ : délai déclenché au premier contact avec le bloc
       if(!sp._touched){sp._touched=true;}
       const delayDone=delay===0||sp._delayTimer>=delay;
-      // Une fois actif, tue sur les faces avec piques
-      if(delayDone&&faceHasSpike){killPlayer();return;}
-      // Sinon collision solide (bloc normal)
+      if(delayDone){killPlayer();return;}
     }
 
     // Collision solide sur toutes les faces sans pique actif
