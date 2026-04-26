@@ -1137,7 +1137,12 @@ document.addEventListener('keyup',e=>{
 });
 
 let _audioCtx=null;
-function getAudioCtx(){if(!_audioCtx)_audioCtx=new(window.AudioContext||window.webkitAudioContext)();return _audioCtx;}
+function getAudioCtx(){
+  if(!_audioCtx){
+    try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}
+  }
+  return _audioCtx;
+}
 function playSound(type){
   try{
     const ctx=getAudioCtx();const osc=ctx.createOscillator();const gain=ctx.createGain();
@@ -1180,7 +1185,7 @@ const _origShowWin=showWinScreen;
 showWinScreen=function(ms,prevBest,isNewRecord,l){_origShowWin(ms,prevBest,isNewRecord,l);playSound('win');};
 
 document.addEventListener('click',()=>{if(_audioCtx&&_audioCtx.state==='suspended')_audioCtx.resume();},{once:true});
-document.addEventListener('keydown',()=>{if(!_audioCtx)getAudioCtx();if(_audioCtx&&_audioCtx.state==='suspended')_audioCtx.resume();},{once:true});
+document.addEventListener('keydown',()=>{if(_audioCtx&&_audioCtx.state==='suspended')_audioCtx.resume();},{once:true});
 
 resizeGameCanvas();
 init();
