@@ -472,6 +472,11 @@ async function init(){
     lv.slider.forEach(s=>{lv.mobile.push({...s,trigger:'approach',dir:s.dir||'r',dist:s.maxDist||160,loop:s.returns!==false,waitDelay:s.retDelay||0,trigDist:s.trigDist||48,state:'idle',t:0,going:true,waitTimer:0,_triggered:false});});
     lv.slider=[];
   }
+  // Migrate old trap blocks into mobile (fall mode)
+  if(lv.trap&&lv.trap.length){
+    lv.trap.forEach(t=>{lv.mobile.push({...t,trigger:'approach',dir:'fall',dist:0,loop:t.returns!==false,waitDelay:t.riseDelay||0,trigDist:t.trigDist||48,speed:t.fallSpeed||3,state:'idle',t:0,going:true,waitTimer:0,_triggered:false});});
+    lv.trap=[];
+  }
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
   if(!lv.flash)lv.flash=[];if(!lv.spike)lv.spike=[];if(!lv.gblock)lv.gblock=[];
   if(_currentLevelId&&_levelData){
