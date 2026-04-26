@@ -853,6 +853,9 @@ function updatePanelState(){
     return;
   }
 
+  // Multi-sélection : cacher tous les panels de type individuels
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+
   // Multi-sélection
   if(multiPanel)multiPanel.classList.add('show');
   const count=document.getElementById('multi-sel-count');
