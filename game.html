@@ -804,19 +804,40 @@ function gUpdate(now){
   });
 
   (gLv.spike||[]).forEach(sp=>{
+    if(!ov(gPlayer,sp))return;
     const hidden=sp.hidden||false;
-    const delay=(sp.activationDelay||0)*60; // en frames
-    // Détecter le premier contact de proximité pour démarrer le délai
-    if(delay>0&&!sp._touched&&ov(gPlayer,{x:sp.x-2,y:sp.y-2,w:sp.w+4,h:sp.h+4})){
-      sp._touched=true;
-    }
-    if(sp._touched&&sp._delayTimer<delay){
-      sp._delayTimer++;
-    }
+    const delay=(sp.activationDelay||0)*60;
+    if(delay>0&&!sp._touched)sp._touched=true;
+    if(sp._touched&&sp._delayTimer<delay)sp._delayTimer++;
     const delayDone=delay===0||sp._delayTimer>=delay;
     const isActive=(sp.mode||'always')==='always'||sp.state==='active';
     const actuallyActive=isActive&&delayDone;
-    if(actuallyActive&&ov(gPlayer,sp))killPlayer();
+
+    // Collision solide de base (le bloc lui-même)
+    const oL=(gPlayer.x+gPlayer.w)-sp.x,oR=(sp.x+sp.w)-gPlayer.x;
+    const oT=(gPlayer.y+gPlayer.h)-sp.y,oB=(sp.y+sp.h)-gPlayer.y;
+    const m=Math.min(oL,oR,oT,oB);
+    const gd=gPlayer.gravDir;
+    const dirs=sp.dir==='all'?['u','d','l','r']:(sp.dir||'u').split(',');
+
+    // Sur chaque face : si pique actif → kill, sinon → collision solide
+    if(m===oT){
+      if(actuallyActive&&dirs.includes('u')){killPlayer();return;}
+      if(gd==='d'){gPlayer.y=sp.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;gPlayer.sq=1.15;}
+      else{gPlayer.y=sp.y-gPlayer.h;gPlayer.vy=Math.min(gPlayer.vy,0);}
+    } else if(m===oB){
+      if(actuallyActive&&dirs.includes('d')){killPlayer();return;}
+      if(gd==='u'){gPlayer.y=sp.y+sp.h;gPlayer.vy=0;gPlayer.onGround=true;gPlayer.sq=1.15;}
+      else{gPlayer.y=sp.y+sp.h;gPlayer.vy=Math.max(gPlayer.vy,0);}
+    } else if(m===oL){
+      if(actuallyActive&&dirs.includes('r')){killPlayer();return;}
+      if(gd==='r'){gPlayer.x=sp.x-gPlayer.w;gPlayer.vx=0;gPlayer.onGround=true;gPlayer.sq=1.15;}
+      else{gPlayer.x=sp.x-gPlayer.w;}
+    } else if(m===oR){
+      if(actuallyActive&&dirs.includes('l')){killPlayer();return;}
+      if(gd==='l'){gPlayer.x=sp.x+sp.w;gPlayer.vx=0;gPlayer.onGround=true;gPlayer.sq=1.15;}
+      else{gPlayer.x=sp.x+sp.w;}
+    }
   });
 
   if(gPlayer.y>EH+100)killPlayer();
