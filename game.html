@@ -1001,11 +1001,9 @@ function gDraw(){
     GX.fillStyle=PCOL.platT;GX.fillRect(x,y,w,4);
     GX.fillStyle=PCOL.platS;for(let i=x+7;i<x+w-4;i+=9)GX.fillRect(i,y+1,3,2);
     // Piques : toujours visibles si pas hidden, sinon apparaissent à l'activation
-    // Pendant le délai : clignotement
     let drawSpikes=false;
     if(!hidden){drawSpikes=true;}
     else if(activated){drawSpikes=true;}
-    else if(counting){drawSpikes=Math.floor(sp._delayTimer/6)%2===0;}
     if(drawSpikes){
       GX.fillStyle=activated?'#ff4060':'#884040';
       const sz=10;
