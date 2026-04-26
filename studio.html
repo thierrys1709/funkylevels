@@ -1006,17 +1006,18 @@ function showFlashPanel(){
 
 // ── Spike params ───────────────────────────────────────────
 function spikeParamChanged(){
-  const dir=document.getElementById('sp2-dir').value;
-  const mode=document.getElementById('sp2-mode').value;
-  const delay=+document.getElementById('sp2-delay').value;
+  const u=document.getElementById('sp2-dir-u').checked;
+  const d=document.getElementById('sp2-dir-d').checked;
+  const l=document.getElementById('sp2-dir-l').checked;
+  const r=document.getElementById('sp2-dir-r').checked;
+  const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
+  const dir=dirs.length===0?'u':dirs.length===4?'all':dirs.length===1?dirs[0]:dirs.join(',');
   const hidden=document.getElementById('sp2-hidden').checked;
   const activationDelay=+document.getElementById('sp2-act-delay').value;
-  document.getElementById('sp2-delay-v').textContent=delay;
   document.getElementById('sp2-act-delay-v').textContent=activationDelay;
-  document.getElementById('sp2-touch-opts').style.display=mode==='touch'?'':'none';
   if(selection.length===1&&selectedType==='spike'){
     const s=lv.spike[selectedIdx];
-    if(s){s.dir=dir;s.mode=mode;s.delay=delay;s.hidden=hidden;s.activationDelay=activationDelay;}
+    if(s){s.dir=dir;s.hidden=hidden;s.activationDelay=activationDelay;s.mode=activationDelay>0?'touch':'always';}
   }
   redraw();
 }
