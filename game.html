@@ -436,9 +436,7 @@ async function init(){
   s('btn-editor',t.gEditor);
   if(t.ovDieEdit){s('btn-quit',t.ovDieEdit);}
   if(t.ovWinBtn){s('btn-back',l==='fr'?'🏠 ACCUEIL':'🏠 HOME');}
-  const params=new URLSearchParams(window.location.search);
   const lid=params.get('level');
-  const preview=params.get('preview')==='1';
   const fromStudio=params.get('from')==='studio';
   const _edBtn=document.getElementById('btn-editor');
   if(fromStudio&&_edBtn){
