@@ -925,24 +925,28 @@ function multiSpikeChanged(){
   const delay=+(document.getElementById('multi-sp-delay')?.value||0);
   const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=delay;
   const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
-  // Appliquer à tous les blocs sélectionnés
+  snapshot();
   selection.forEach(s=>{
     const b=lv[s.type]?.[s.idx];
     if(!b)return;
     if(dirs.length===0){delete b.spikes;}
-    else{b.spikes={dirs,hidden,delay,_touched:false,_delayTimer:0};}
+    else{b.spikes={dirs,hidden,delay};}
   });
   redraw();
 }
 
 function multiSpikeClear(){
+  snapshot();
   selection.forEach(s=>{const b=lv[s.type]?.[s.idx];if(b)delete b.spikes;});
-  // Reset multi panel
   ['multi-sp-u','multi-sp-d','multi-sp-l','multi-sp-r','multi-sp-hidden'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.checked=false;
+    const el=document.getElementById(id);if(el){el.checked=false;el.indeterminate=false;}
   });
   const del=document.getElementById('multi-sp-delay');if(del)del.value=0;
   const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=0;
+  const opts=document.getElementById('multi-spike-opts');
+  const btn=document.getElementById('multi-spike-toggle');
+  if(opts)opts.classList.remove('show');
+  if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
   redraw();
 }
 function addToSel(type,idx){
@@ -1288,7 +1292,13 @@ window.addEventListener('mouseup',e=>{
   if(rubberBand){
     const rb=rubberBand;rubberBand=null;
     const rx=Math.min(rb.sx,rb.ex),ry=Math.min(rb.sy,rb.ey),rw=Math.abs(rb.ex-rb.sx),rh=Math.abs(rb.ey-rb.sy);
-    if(rw>4&&rh>4){if(!e.shiftKey)clearSel();['fixed','invis','bounce','mobile','push','gravflip','speed','flash','gblock'].forEach(k=>{(lv[k]||[]).forEach((p,i)=>{if(p.x<rx+rw&&p.x+p.w>rx&&p.y<ry+rh&&p.y+p.h>ry)addToSel(k,i);});});if(selection.length)status(`${selection.length} bloc${selection.length>1?'s':''} sélectionné${selection.length>1?'s':''}.`);}
+  if(rw>4&&rh>4){
+    if(!e.shiftKey)clearSel();
+    ['fixed','invis','bounce','mobile','push','gravflip','speed','flash','gblock'].forEach(k=>{(lv[k]||[]).forEach((p,i)=>{if(p.x<rx+rw&&p.x+p.w>rx&&p.y<ry+rh&&p.y+p.h>ry)selection.push({type:k,idx:i});});});
+    syncLegacy();
+    updatePanelState();
+    if(selection.length)status(`${selection.length} bloc${selection.length>1?'s':''} sélectionné${selection.length>1?'s':''}.`);
+  }
     redraw();return;
   }
   if(!drawing)return;drawing=false;
