@@ -337,7 +337,6 @@ body {
     <div class="tb-group">
       <button class="tool-btn" id="t-trap"   onclick="T('trap')"   data-tip="⚠ PIÈGE&#10;Tombe quand le joueur approche.">⚠ PIÈGE</button>
       <button class="tool-btn" id="t-slider" onclick="T('slider')" data-tip="➡ GLISSEUR&#10;Se déplace quand le joueur s'approche.">➡ GLISSEUR</button>
-      <button class="tool-btn" id="t-spike"  onclick="T('spike')"  data-tip="🗡 PIQUES&#10;Tue le joueur au contact.&#10;Peut être invisible + délai d'activation.">🗡 PIQUES</button>
       <button class="tool-btn" id="t-gblock" onclick="T('gblock')" data-tip="🌍 PLANÈTE&#10;Attire le joueur vers sa surface.">🌍 PLANÈTE</button>
     </div>
   </div>
@@ -624,44 +623,6 @@ body {
 </div>
     </div>
 
-    <!-- ═══ SPIKE PANEL ═══ -->
-    <div id="s-spike" class="psec">
-      <div class="pinfo" data-info="pInfoSpike"></div>
-      <div class="prow">
-        <label>DIRECTION DES PIQUES</label>
-        <select id="sp2-dir" onchange="spikeParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
-          <option value="u">↑ Vers le HAUT</option>
-          <option value="d">↓ Vers le BAS</option>
-          <option value="l">← Vers la GAUCHE</option>
-          <option value="r">→ Vers la DROITE</option>
-          <option value="all">✦ TOUS LES CÔTÉS</option>
-        </select>
-      </div>
-      <div class="prow">
-        <label>MODE</label>
-        <select id="sp2-mode" onchange="spikeParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
-          <option value="always">☠ TOUJOURS ACTIF</option>
-          <option value="touch">⚡ ACTIVÉ AU TOUCHER</option>
-        </select>
-      </div>
-      <div id="sp2-touch-opts" style="display:none;">
-        <div class="prow"><label>DÉLAI ACTIVATION (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sp2-delay" min="0" max="5" step="0.1" value="0" oninput="spikeParamChanged()"><span class="pval" id="sp2-delay-v">0</span></div></div>
-      </div>
-      <!-- ══ NOUVEAUX PARAMÈTRES ══ -->
-      <div class="prow" style="margin-top:6px;padding-top:8px;border-top:1px solid var(--border);">
-        <div class="crow"><input type="checkbox" id="sp2-hidden" onchange="spikeParamChanged()"><label for="sp2-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px;padding-left:20px;">Caché jusqu'à activation</div>
-      </div>
-      <div class="prow">
-        <label>DÉLAI AVANT ACTIVATION (s)</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="sp2-act-delay" min="0" max="10" step="0.5" value="0" oninput="spikeParamChanged()">
-          <span class="pval" id="sp2-act-delay-v">0</span>
-        </div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px;">Compte depuis le 1er contact</div>
-      </div>
-    </div>
-
     <!-- ═══ GBLOCK PANEL ═══ -->
     <div id="s-gblock" class="psec">
       <div class="pinfo" data-info="pInfoGblock"></div>
@@ -778,7 +739,6 @@ function addToSel(type,idx){
   if(selection.length===1&&type==='gravflip'){const z=lv.gravflip[idx];if(z){gfPanelLoad(z);showGfPanel();}}
   if(selection.length===1&&type==='speed'){const z=lv.speed[idx];if(z){spPanelLoad(z);showSpPanel();}}
   if(selection.length===1&&type==='flash'){const f=lv.flash[idx];if(f){flashPanelLoad(f);blockSpikePanelLoad('flash',f);showFlashPanel();}}
-  if(selection.length===1&&type==='spike'){const s=lv.spike[idx];if(s){spikePanelLoad(s);showSpikePanel();}}
   if(selection.length===1&&type==='gblock'){const g=lv.gblock[idx];if(g){gblockPanelLoad(g);blockSpikePanelLoad('gblock',g);showGblockPanel();}}
 }
 function toggleSel(type,idx){const i=selection.findIndex(s=>s.type===type&&s.idx===idx);if(i>=0)selection.splice(i,1);else selection.push({type,idx});syncLegacy();}
@@ -822,7 +782,7 @@ function pasteClip(){if(!clipboard||!clipboard.length)return;snapshot();clearSel
 let lv=emptyLevel();
 function emptyLevel(){return{fixed:[],trap:[],slider:[],invis:[],bounce:[],mobile:[],push:[],gravflip:[],speed:[],flash:[],spike:[],gblock:[],start:{x:80,y:480},end:null};}
 
-const TOOL_NAMES={fixed:'FIXE',trap:'PIÈGE',slider:'GLISSEUR',invis:'INVISIBLE',bounce:'REBOND',mobile:'MOBILE',push:'POUSSABLE',gravflip:'GRAVITÉ',speed:'VITESSE',flash:'FLASH',spike:'PIQUES',gblock:'PLANÈTE',start:'DÉPART',end:'ARRIVÉE',select:'SÉLECTION'};
+const TOOL_NAMES={fixed:'FIXE',trap:'PIÈGE',slider:'GLISSEUR',invis:'INVISIBLE',bounce:'REBOND',mobile:'MOBILE',push:'POUSSABLE',gravflip:'GRAVITÉ',speed:'VITESSE',flash:'FLASH',gblock:'PLANÈTE',start:'DÉPART',end:'ARRIVÉE',select:'SÉLECTION'};
 function T(t){
   currentTool=t;dragState=null;selectedIdx=-1;selectedType=null;
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
@@ -915,33 +875,6 @@ function flashPanelLoad(f){
 }
 function showFlashPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-flash').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : FLASH';}
 
-// ── Spike params — avec hidden + activationDelay ──────────
-function spikeParamChanged(){
-  const dir=document.getElementById('sp2-dir').value;
-  const mode=document.getElementById('sp2-mode').value;
-  const delay=+document.getElementById('sp2-delay').value;
-  const hidden=document.getElementById('sp2-hidden').checked;
-  const activationDelay=+document.getElementById('sp2-act-delay').value;
-  document.getElementById('sp2-delay-v').textContent=delay;
-  document.getElementById('sp2-act-delay-v').textContent=activationDelay;
-  document.getElementById('sp2-touch-opts').style.display=mode==='touch'?'':'none';
-  if(selection.length===1&&selectedType==='spike'){
-    const s=lv.spike[selectedIdx];
-    if(s){s.dir=dir;s.mode=mode;s.delay=delay;s.hidden=hidden;s.activationDelay=activationDelay;}
-  }
-  redraw();
-}
-function spikePanelLoad(s){
-  document.getElementById('sp2-dir').value=s.dir||'u';
-  document.getElementById('sp2-mode').value=s.mode||'always';
-  document.getElementById('sp2-delay').value=s.delay||0;
-  document.getElementById('sp2-delay-v').textContent=s.delay||0;
-  document.getElementById('sp2-hidden').checked=s.hidden||false;
-  document.getElementById('sp2-act-delay').value=s.activationDelay||0;
-  document.getElementById('sp2-act-delay-v').textContent=s.activationDelay||0;
-  document.getElementById('sp2-touch-opts').style.display=(s.mode==='touch')?'':'none';
-}
-function showSpikePanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-spike').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : PIQUES';}
 
 function gblockParamChanged(){redraw();}
 function gblockPanelLoad(g){blockSpikePanelLoad('gblock',g);}
@@ -1103,7 +1036,7 @@ window.addEventListener('mouseup',e=>{
   if(rubberBand){
     const rb=rubberBand;rubberBand=null;
     const rx=Math.min(rb.sx,rb.ex),ry=Math.min(rb.sy,rb.ey),rw=Math.abs(rb.ex-rb.sx),rh=Math.abs(rb.ey-rb.sy);
-    if(rw>4&&rh>4){if(!e.shiftKey)clearSel();['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock'].forEach(k=>{(lv[k]||[]).forEach((p,i)=>{if(p.x<rx+rw&&p.x+p.w>rx&&p.y<ry+rh&&p.y+p.h>ry)addToSel(k,i);});});if(selection.length)status(`${selection.length} bloc${selection.length>1?'s':''} sélectionné${selection.length>1?'s':''}.`);}
+    if(rw>4&&rh>4){if(!e.shiftKey)clearSel();['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','gblock'].forEach(k=>{(lv[k]||[]).forEach((p,i)=>{if(p.x<rx+rw&&p.x+p.w>rx&&p.y<ry+rh&&p.y+p.h>ry)addToSel(k,i);});});if(selection.length)status(`${selection.length} bloc${selection.length>1?'s':''} sélectionné${selection.length>1?'s':''}.`);}
     redraw();return;
   }
   if(!drawing)return;drawing=false;
@@ -1121,19 +1054,6 @@ window.addEventListener('mouseup',e=>{
   else if(currentTool==='gravflip'){lv.gravflip.push({x:rx,y:ry,w:W,h:H,dir:document.getElementById('gf-dir').value,strength:+document.getElementById('gf-str').value});newType='gravflip';}
   else if(currentTool==='speed'){lv.speed.push({x:rx,y:ry,w:W,h:H,spd:+document.getElementById('sp-val').value});newType='speed';}
   else if(currentTool==='flash'){const onCs=+document.getElementById('fl-on').value||50;const offCs=+document.getElementById('fl-off').value||50;const phase=+document.getElementById('fl-phase').value||0;lv.flash.push({x:rx,y:ry,w:W,h:H,onMs:onCs*10,offMs:offCs*10,phase:phase*10});newType='flash';}
-  else if(currentTool==='spike'){
-    // ── Spike avec hidden + activationDelay ──
-    lv.spike.push({
-      x:rx,y:ry,w:W,h:H,
-      dir:document.getElementById('sp2-dir').value,
-      mode:document.getElementById('sp2-mode').value,
-      delay:+document.getElementById('sp2-delay').value,
-      hidden:document.getElementById('sp2-hidden').checked,
-      activationDelay:+document.getElementById('sp2-act-delay').value,
-      state:'idle',timer:0
-    });
-    newType='spike';
-  }
   else if(currentTool==='gblock'){const _sp=getSpikeFromPanel('gblock');const _b={x:rx,y:ry,w:W,h:H};if(_sp)_b.spikes=_sp;lv.gblock.push(_b);newType='gblock';}
   else if(currentTool==='trap'){const v=trapPanelValues();const _sp=getSpikeFromPanel('trap');const _b={x:rx,y:ry,w:W,h:H,ox:rx,oy:ry,trigDist:v.trigDist,preDelay:v.preDelay,fallSpeed:v.fallSpeed,partial:v.partial,partDist:v.partDist,returns:v.returns,riseDelay:v.riseDelay,loop:v.loop,state:'idle',vy:0};if(_sp)_b.spikes=_sp;lv.trap.push(_b);newType='trap';}
   if(newType){clearSel();addToSel(newType,lv[newType].length-1);}
@@ -1142,7 +1062,7 @@ window.addEventListener('mouseup',e=>{
 
 EC.addEventListener('mouseleave',()=>{rubberBand=null;redraw();});
 
-function findBlockAt(x,y){const types=['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
+function findBlockAt(x,y){const types=['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','gblock'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
 function deleteSelected(){if(!selection.length)return;snapshotWithDupCheck();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
 function zoom(d,cx,cy){
   const prevZoom=ZOOM;ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));
@@ -1334,34 +1254,6 @@ function redraw(){
     EX.fillStyle='#40c0f0cc';EX.font='6px "Press Start 2P"';EX.fillText(`${f.onMs/10}/${f.offMs/10}cs`,f.x+2,f.y+f.h-4);eDrawSpikes(f);
   });
 
-  // ── Spike draw — affiche icônes hidden/delay si configurés ──
-  (lv.spike||[]).forEach((sp,i)=>{
-    const isSel=isSelected('spike',i);
-    EX.fillStyle='#2a1a1a';EX.fillRect(sp.x,sp.y,sp.w,sp.h);
-    EX.fillStyle='#cc3030';EX.fillRect(sp.x,sp.y,sp.w,4);
-    const dir=sp.dir||'u';const sz=10;
-    EX.fillStyle=isSel?'#ff4060':'#cc3030cc';
-    const drawSpikes=(ax,ay,horiz,d)=>{
-      const count=Math.max(1,Math.floor((horiz?sp.w:sp.h)/sz));const gap=(horiz?sp.w:sp.h)/count;
-      for(let k=0;k<count;k++){
-        const cx=horiz?sp.x+gap*(k+0.5):ax;const cy=horiz?ay:sp.y+gap*(k+0.5);
-        EX.beginPath();
-        if(d==='u'){EX.moveTo(cx-sz/2,sp.y);EX.lineTo(cx+sz/2,sp.y);EX.lineTo(cx,sp.y-sz);}
-        else if(d==='d'){EX.moveTo(cx-sz/2,sp.y+sp.h);EX.lineTo(cx+sz/2,sp.y+sp.h);EX.lineTo(cx,sp.y+sp.h+sz);}
-        else if(d==='l'){EX.moveTo(sp.x,cy-sz/2);EX.lineTo(sp.x,cy+sz/2);EX.lineTo(sp.x-sz,cy);}
-        else if(d==='r'){EX.moveTo(sp.x+sp.w,cy-sz/2);EX.lineTo(sp.x+sp.w,cy+sz/2);EX.lineTo(sp.x+sp.w+sz,cy);}
-        EX.closePath();EX.fill();
-      }
-    };
-    if(dir==='all'){['u','d','l','r'].forEach(d=>drawSpikes(sp.x,sp.y,d==='u'||d==='d',d));}
-    else drawSpikes(sp.x,sp.y,dir==='u'||dir==='d',dir);
-    // Badges : hidden + activationDelay
-    let badgeX=sp.x+2;const badgeY=sp.y+sp.h-4;
-    EX.font='6px "Press Start 2P"';EX.textAlign='left';
-    if(sp.hidden){EX.fillStyle='#8080ffcc';EX.fillText('👁',badgeX,badgeY);badgeX+=14;}
-    if(sp.activationDelay>0){EX.fillStyle='#f0c040cc';EX.fillText(`⏱${sp.activationDelay}s`,badgeX,badgeY);}
-    if(isSel){EX.strokeStyle='#f0e040cc';EX.lineWidth=1.5;EX.strokeRect(sp.x-2,sp.y-2,sp.w+4,sp.h+4);eSelection(sp);}
-  });
 
   (lv.gblock||[]).forEach((g,i)=>{
     const isSel=isSelected('gblock',i);const cx=g.x+g.w/2,cy=g.y+g.h/2,rad=g.radius||120;
