@@ -782,15 +782,15 @@ function gUpdate(now){
     checkBlockSpikes(t);
   });
 
-  gLv.fixed.forEach(p=>{res(p);checkBlockSpikes(p);});
-  (gLv.invis||[]).forEach(p=>{res(p);checkBlockSpikes(p);});
-  (gLv.gblock||[]).forEach(g=>{res(g);checkBlockSpikes(g);});
+  gLv.fixed.forEach(p=>{if(checkBlockSpikes(p))return;res(p);});
+  (gLv.invis||[]).forEach(p=>{if(checkBlockSpikes(p))return;res(p);});
+  (gLv.gblock||[]).forEach(g=>{if(checkBlockSpikes(g))return;res(g);});
 
   (gLv.flash||[]).forEach(f=>{
     f._timer=(f._timer||0)+1;
     const period=Math.round((f.freq||1)*60);
     if(f._timer>=period){f._timer=0;f._visible=!f._visible;}
-    if(f._visible){res(f);checkBlockSpikes(f);}
+    if(f._visible){if(checkBlockSpikes(f))return;res(f);}
     else checkBlockSpikes(f);
   });
 
@@ -799,7 +799,7 @@ function gUpdate(now){
     const[dx,dy]=MO_VEC[t.dir||'r'],spd=t.speed||2,prevX=t.x,prevY=t.y;
     if(t.going){t.x+=dx*spd;t.y+=dy*spd;t.t=(t.t||0)+spd;if(t.t>=(t.dist||160)){t.t=t.dist||160;t.going=false;}}
     else{t.x-=dx*spd;t.y-=dy*spd;t.t=(t.t||0)-spd;if(t.t<=0){t.t=0;t.x=t.ox;t.y=t.oy;t.going=true;}}
-    if(ov(gPlayer,t)){const oT=(gPlayer.y+gPlayer.h)-t.y;if(oT>0&&oT<20&&gPlayer.vy>=0){gPlayer.x+=t.x-prevX;gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}else res(t);checkBlockSpikes(t);}
+    if(ov(gPlayer,t)){if(checkBlockSpikes(t))return;const oT=(gPlayer.y+gPlayer.h)-t.y;if(oT>0&&oT<20&&gPlayer.vy>=0){gPlayer.x+=t.x-prevX;gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}else res(t);}
   });
 
   (gLv.push||[]).forEach(t=>{
@@ -826,6 +826,7 @@ function gUpdate(now){
   // ── Bounce ─────────────────────────────────────────────
   (gLv.bounce||[]).forEach(p=>{
     if(!ov(gPlayer,p))return;
+    if(checkBlockSpikes(p))return;
     const oL=(gPlayer.x+gPlayer.w)-p.x,oR=(p.x+p.w)-gPlayer.x,oT=(gPlayer.y+gPlayer.h)-p.y,oB=(p.y+p.h)-gPlayer.y,m=Math.min(oL,oR,oT,oB);
     const bf=JSPD*(1+(p.force-1)*0.15);
     const gd2=gPlayer.gravDir;
@@ -835,7 +836,6 @@ function gUpdate(now){
     else if(m===oR&&gd2==='l'){gPlayer.x=p.x+p.w;gPlayer.vx=bf;gPlayer.onGround=false;spawnP(gPlayer.x,gPlayer.y+11,'#f0c040',8);}
     else if(m===oL)gPlayer.x=p.x-gPlayer.w;else if(m===oR)gPlayer.x=p.x+p.w;
     else if(m===oT)gPlayer.y=p.y-gPlayer.h;else if(m===oB)gPlayer.y=p.y+p.h;
-    checkBlockSpikes(p);
   });
 
   const SDIRS={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1]};
@@ -855,7 +855,7 @@ function gUpdate(now){
       if(ov(gPlayer,t)){const oT=(gPlayer.y+gPlayer.h)-t.y;if(oT>0&&oT<22&&gPlayer.vy>=0){gPlayer.x+=t.x-prevX;gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}}
       if(len<=step){t.x=t.ox;t.y=t.oy;t.traveled=0;t.state=t.loop?'cooldown':'locked';}
     }else if(t.state==='cooldown'){if(!t.loop){t.state='locked';}else{const d2=Math.max(0,t.ox-(gPlayer.x+gPlayer.w),gPlayer.x-(t.ox+t.w),t.oy-(gPlayer.y+gPlayer.h),gPlayer.y-(t.oy+t.h));if(d2>(t.trigDist||48))t.state='idle';}}
-    if(t.state!=='done'){res(t);checkBlockSpikes(t);}
+    if(t.state!=='done'){if(checkBlockSpikes(t))return;res(t);}
   });
 
   (gLv.spike||[]).forEach(sp=>{
