@@ -208,6 +208,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
 }
 #panel::-webkit-scrollbar { width: 4px; }
 #panel::-webkit-scrollbar-track { background: var(--bg); }
@@ -305,6 +306,50 @@ body {
 .load-item-vis.code { background:#2a1a4a; color:#c090f0; border:1px solid #8040c0; }
 
 #s-flash .prow input[type=number]{width:70px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);font-family:Rajdhani,sans-serif;font-size:13px;padding:4px 6px;border-radius:4px;text-align:center;}
+/* Panel disabled state */
+#panel-overlay{
+  display:none;
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  z-index:10;
+  border-radius:0;
+  pointer-events:none;
+}
+#panel-overlay.show{display:block;}
+#panel-no-sel{
+  display:none;
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;
+  color:#4040aa;
+  text-align:center;
+  line-height:2.2;
+  pointer-events:none;
+  z-index:11;
+  white-space:nowrap;
+}
+#panel-no-sel.show{display:block;}
+/* Multi-select spike panel */
+#multi-sel-panel{
+  display:none;
+  flex-direction:column;
+  gap:10px;
+  padding:10px;
+  background:#0b0b20;
+  border:2px solid var(--border2);
+  border-radius:6px;
+  margin-top:4px;
+}
+#multi-sel-panel.show{display:flex;}
+#multi-sel-title{
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;
+  color:var(--accent);
+  letter-spacing:1px;
+}
 .spike-sub{border-top:1px solid var(--border);margin-top:6px;padding-top:8px;display:flex;flex-direction:column;gap:8px;}
 .spike-toggle{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--text2);cursor:pointer;padding:6px 8px;background:#0e0e28;border:2px solid var(--border2);border-radius:3px;text-align:left;width:100%;transition:all .1s;}
 .spike-toggle:hover{border-color:#f04060;color:#f04060;}
@@ -403,7 +448,38 @@ body {
 
 <div id="layout" style="visibility:hidden;">
   <div id="panel">
+    <div id="panel-overlay"></div>
+    <div id="panel-no-sel">AUCUN BLOC<br>SÉLECTIONNÉ</div>
     <h2 id="ptitle">OUTIL : FIXE</h2>
+    <div id="multi-sel-panel">
+      <div id="multi-sel-title">✦ MULTI-SÉLECTION</div>
+      <div id="multi-sel-count" style="font-family:Rajdhani,sans-serif;font-size:13px;color:var(--text2);"></div>
+      <div class="spike-sub" id="multi-spike-sub">
+        <button class="spike-toggle" id="multi-spike-toggle" onclick="toggleSpikeOpts('multi')">🗡 PIQUES ▸</button>
+        <div class="spike-opts" id="multi-spike-opts">
+          <div class="prow">
+            <label>DIRECTIONS</label>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+              <div class="crow"><input type="checkbox" id="multi-sp-u" onchange="multiSpikeChanged()"><label for="multi-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="multi-sp-d" onchange="multiSpikeChanged()"><label for="multi-sp-d" style="cursor:pointer;">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="multi-sp-l" onchange="multiSpikeChanged()"><label for="multi-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="multi-sp-r" onchange="multiSpikeChanged()"><label for="multi-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+            </div>
+          </div>
+          <div class="prow">
+            <div class="crow"><input type="checkbox" id="multi-sp-hidden" onchange="multiSpikeChanged()"><label for="multi-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
+          </div>
+          <div class="prow">
+            <label>DÉLAI (s)</label>
+            <div style="display:flex;gap:4px;align-items:center">
+              <input type="range" id="multi-sp-delay" min="0" max="10" step="0.5" value="0" oninput="multiSpikeChanged()">
+              <span class="pval" id="multi-sp-delay-v">0</span>
+            </div>
+          </div>
+          <button onclick="multiSpikeClear()" style="font-family:Rajdhani,sans-serif;font-size:13px;font-weight:700;padding:6px;background:#1a0808;border:1.5px solid #f04060;color:#f04060;border-radius:4px;cursor:pointer;margin-top:2px;">✕ ENLEVER PIQUES</button>
+        </div>
+      </div>
+    </div>
 
     <div id="s-fixed" class="psec show"><div class="pinfo" data-info="pInfoFixed"></div>
 <!-- ── SOUS-PANEL SPIKE (commun) ── -->
@@ -725,7 +801,64 @@ let selection=[],dragState=null,rubberBand=null;
 function getSelObj(){if(selection.length!==1)return null;const s=selection[0];return lv[s.type]?.[s.idx]??null;}
 let selectedIdx=-1,selectedType=null;
 function syncLegacy(){if(selection.length===1){selectedIdx=selection[0].idx;selectedType=selection[0].type;}else{selectedIdx=-1;selectedType=null;}}
-function clearSel(){selection=[];selectedIdx=-1;selectedType=null;}
+function clearSel(){selection=[];selectedIdx=-1;selectedType=null;updatePanelState();}
+
+function updatePanelState(){
+  const overlay=document.getElementById('panel-overlay');
+  const noSel=document.getElementById('panel-no-sel');
+  const multiPanel=document.getElementById('multi-sel-panel');
+  if(!overlay)return;
+  if(selection.length===0){
+    // Rien de sélectionné : griser le panel
+    overlay.classList.add('show');
+    noSel.classList.add('show');
+    if(multiPanel)multiPanel.classList.remove('show');
+  }else if(selection.length>1){
+    // Multi-sélection : cacher overlay, montrer panel multi
+    overlay.classList.remove('show');
+    noSel.classList.remove('show');
+    if(multiPanel){
+      multiPanel.classList.add('show');
+      const count=document.getElementById('multi-sel-count');
+      if(count)count.textContent=selection.length+' blocs sélectionnés';
+    }
+  }else{
+    // Sélection simple : panel normal
+    overlay.classList.remove('show');
+    noSel.classList.remove('show');
+    if(multiPanel)multiPanel.classList.remove('show');
+  }
+}
+
+function multiSpikeChanged(){
+  const u=document.getElementById('multi-sp-u')?.checked;
+  const d=document.getElementById('multi-sp-d')?.checked;
+  const l=document.getElementById('multi-sp-l')?.checked;
+  const r=document.getElementById('multi-sp-r')?.checked;
+  const hidden=document.getElementById('multi-sp-hidden')?.checked||false;
+  const delay=+(document.getElementById('multi-sp-delay')?.value||0);
+  const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=delay;
+  const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
+  // Appliquer à tous les blocs sélectionnés
+  selection.forEach(s=>{
+    const b=lv[s.type]?.[s.idx];
+    if(!b)return;
+    if(dirs.length===0){delete b.spikes;}
+    else{b.spikes={dirs,hidden,delay,_touched:false,_delayTimer:0};}
+  });
+  redraw();
+}
+
+function multiSpikeClear(){
+  selection.forEach(s=>{const b=lv[s.type]?.[s.idx];if(b)delete b.spikes;});
+  // Reset multi panel
+  ['multi-sp-u','multi-sp-d','multi-sp-l','multi-sp-r','multi-sp-hidden'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.checked=false;
+  });
+  const del=document.getElementById('multi-sp-delay');if(del)del.value=0;
+  const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=0;
+  redraw();
+}
 function addToSel(type,idx){
   if(!selection.find(s=>s.type===type&&s.idx===idx))selection.push({type,idx});
   syncLegacy();
@@ -740,8 +873,9 @@ function addToSel(type,idx){
   if(selection.length===1&&type==='speed'){const z=lv.speed[idx];if(z){spPanelLoad(z);showSpPanel();}}
   if(selection.length===1&&type==='flash'){const f=lv.flash[idx];if(f){flashPanelLoad(f);blockSpikePanelLoad('flash',f);showFlashPanel();}}
   if(selection.length===1&&type==='gblock'){const g=lv.gblock[idx];if(g){gblockPanelLoad(g);blockSpikePanelLoad('gblock',g);showGblockPanel();}}
+  updatePanelState();
 }
-function toggleSel(type,idx){const i=selection.findIndex(s=>s.type===type&&s.idx===idx);if(i>=0)selection.splice(i,1);else selection.push({type,idx});syncLegacy();}
+function toggleSel(type,idx){const i=selection.findIndex(s=>s.type===type&&s.idx===idx);if(i>=0)selection.splice(i,1);else selection.push({type,idx});syncLegacy();updatePanelState();}
 function isSelected(type,idx){return!!selection.find(s=>s.type===type&&s.idx===idx);}
 
 let undoStack=[],redoStack=[];
@@ -1283,6 +1417,7 @@ document.addEventListener('keydown',e=>{
 });
 
 redraw();
+updatePanelState();
 
 function playLevel(){
   sessionStorage.setItem('fl_preview_level',JSON.stringify(lv));
