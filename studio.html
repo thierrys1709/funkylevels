@@ -1022,14 +1022,15 @@ function spikeParamChanged(){
   redraw();
 }
 function spikePanelLoad(s){
-  document.getElementById('sp2-dir').value=s.dir||'u';
-  document.getElementById('sp2-mode').value=s.mode||'always';
-  document.getElementById('sp2-delay').value=s.delay||0;
-  document.getElementById('sp2-delay-v').textContent=s.delay||0;
+  const dir=s.dir||'u';
+  const dirs=dir==='all'?['u','d','l','r']:dir.split(',');
+  document.getElementById('sp2-dir-u').checked=dirs.includes('u');
+  document.getElementById('sp2-dir-d').checked=dirs.includes('d');
+  document.getElementById('sp2-dir-l').checked=dirs.includes('l');
+  document.getElementById('sp2-dir-r').checked=dirs.includes('r');
   document.getElementById('sp2-hidden').checked=s.hidden||false;
   document.getElementById('sp2-act-delay').value=s.activationDelay||0;
   document.getElementById('sp2-act-delay-v').textContent=s.activationDelay||0;
-  document.getElementById('sp2-touch-opts').style.display=(s.mode==='touch')?'':'none';
 }
 function showSpikePanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
