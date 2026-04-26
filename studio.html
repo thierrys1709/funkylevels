@@ -350,6 +350,8 @@ body {
   color:var(--accent);
   letter-spacing:1px;
 }
+.mixed-val{opacity:0.45;filter:grayscale(0.5);}
+.mixed-val input,.mixed-val select{color:var(--muted)!important;border-color:var(--border)!important;}
 .spike-sub{border-top:1px solid var(--border);margin-top:6px;padding-top:8px;display:flex;flex-direction:column;gap:8px;}
 .spike-toggle{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--text2);cursor:pointer;padding:6px 8px;background:#0e0e28;border:2px solid var(--border2);border-radius:3px;text-align:left;width:100%;transition:all .1s;}
 .spike-toggle:hover{border-color:#f04060;color:#f04060;}
@@ -445,6 +447,7 @@ body {
     <div id="multi-sel-panel">
       <div id="multi-sel-title">✦ MULTI-SÉLECTION</div>
       <div id="multi-sel-count" style="font-family:Rajdhani,sans-serif;font-size:13px;color:var(--text2);"></div>
+      <div id="multi-type-panel" style="display:flex;flex-direction:column;gap:10px;"></div>
       <div class="spike-sub" id="multi-spike-sub">
         <button class="spike-toggle" id="multi-spike-toggle" onclick="toggleSpikeOpts('multi')">🗡 PIQUES ▸</button>
         <div class="spike-opts" id="multi-spike-opts">
@@ -834,25 +837,205 @@ function updatePanelState(){
   const noSel=document.getElementById('panel-no-sel');
   const multiPanel=document.getElementById('multi-sel-panel');
   if(!overlay)return;
+
   if(selection.length===0){
     overlay.classList.add('show');
     noSel.classList.add('show');
     if(multiPanel)multiPanel.classList.remove('show');
-  }else if(selection.length>1){
-    overlay.classList.remove('show');
-    noSel.classList.remove('show');
-    if(multiPanel){
-      multiPanel.classList.add('show');
-      const count=document.getElementById('multi-sel-count');
-      if(count)count.textContent=selection.length+' blocs sélectionnés';
-      // Charger les valeurs communes dans le panel spike
-      loadMultiSpikePanel();
-    }
-  }else{
-    overlay.classList.remove('show');
-    noSel.classList.remove('show');
-    if(multiPanel)multiPanel.classList.remove('show');
+    return;
   }
+
+  overlay.classList.remove('show');
+  noSel.classList.remove('show');
+
+  if(selection.length===1){
+    if(multiPanel)multiPanel.classList.remove('show');
+    return;
+  }
+
+  // Multi-sélection
+  if(multiPanel)multiPanel.classList.add('show');
+  const count=document.getElementById('multi-sel-count');
+
+  // Vérifier si tous du même type
+  const types=[...new Set(selection.map(s=>s.type))];
+  const sameType=types.length===1;
+  const type=sameType?types[0]:null;
+
+  if(count){
+    const label=sameType?(TOOL_NAMES[type]||type.toUpperCase()):'types mixtes';
+    count.textContent=`${selection.length} blocs • ${label}`;
+  }
+
+  // Cacher/montrer panels de type dans la zone multi
+  const typePanel=document.getElementById('multi-type-panel');
+  if(typePanel)typePanel.innerHTML='';
+
+  if(sameType){
+    loadMultiTypePanel(type);
+  }
+
+  loadMultiSpikePanel();
+}
+
+function _getMultiBlocks(){return selection.map(s=>lv[s.type]?.[s.idx]).filter(Boolean);}
+
+// Valeur commune ou null si mixte
+function _commonVal(blocks, getter){
+  const vals=blocks.map(getter);
+  const first=vals[0];
+  return vals.every(v=>v===first)?first:null;
+}
+
+function _applyToAll(setter){
+  snapshot();
+  _getMultiBlocks().forEach(b=>setter(b));
+  redraw();
+}
+
+function loadMultiTypePanel(type){
+  const tp=document.getElementById('multi-type-panel');
+  if(!tp)return;
+  const blocks=_getMultiBlocks();
+
+  if(type==='mobile'){
+    tp.innerHTML=buildMultiMobileHTML();
+    loadMultiMobileValues(blocks);
+  } else if(type==='bounce'){
+    tp.innerHTML=buildMultiBounceHTML();
+    loadMultiBounceValues(blocks);
+  } else if(type==='fixed'||type==='invis'||type==='push'||type==='gblock'){
+    tp.innerHTML=''; // pas de paramètres spécifiques
+  }
+}
+
+// ── MOBILE multi-panel ──
+function buildMultiMobileHTML(){
+  return `<div class="prow"><label>DÉCLENCHEMENT</label>
+    <select id="mm-trigger" onchange="multiMobileChanged()" style="width:100%;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);font-family:Rajdhani,sans-serif;font-size:14px;padding:6px 8px;border-radius:4px;">
+      <option value="">—</option>
+      <option value="continuous">↺ EN CONTINU</option>
+      <option value="approach">👁 À L'APPROCHE</option>
+    </select></div>
+  <div class="prow" id="mm-trig-dist-row"><label>DISTANCE DÉCLENCHEMENT (px)</label>
+    <div style="display:flex;gap:4px;align-items:center">
+      <input type="range" id="mm-trig-dist" min="8" max="300" step="8" value="80" oninput="multiMobileChanged()">
+      <span class="pval" id="mm-trig-dist-v">80</span></div></div>
+  <div class="prow"><label>DIRECTION</label>
+    <select id="mm-dir" onchange="multiMobileChanged()" style="width:100%;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);font-family:Rajdhani,sans-serif;font-size:14px;padding:6px 8px;border-radius:4px;">
+      <option value="">—</option>
+      <option value="r">→ DROITE</option>
+      <option value="l">← GAUCHE</option>
+      <option value="u">↑ HAUT</option>
+      <option value="d">↓ BAS</option>
+      <option value="omni">⊕ OMNIDIRECTIONNEL</option>
+      <option value="fall">⬇ CHUTE</option>
+    </select></div>
+  <div class="prow"><label>VITESSE</label>
+    <div style="display:flex;gap:4px;align-items:center">
+      <input type="range" id="mm-spd" min="0.5" max="12" step="0.5" value="2" oninput="multiMobileChanged()">
+      <span class="pval" id="mm-spd-v">—</span></div></div>
+  <div class="prow" id="mm-dist-row"><label>DISTANCE (px)</label>
+    <div style="display:flex;gap:4px;align-items:center">
+      <input type="range" id="mm-dist" min="16" max="800" step="8" value="160" oninput="multiMobileChanged()">
+      <span class="pval" id="mm-dist-v">—</span></div></div>
+  <div class="prow"><div class="crow">
+    <input type="checkbox" id="mm-loop" onchange="multiMobileChanged()">
+    <label for="mm-loop" style="cursor:pointer;">ALLER-RETOUR EN BOUCLE</label></div></div>
+  <div class="prow"><label>ATTENTE AVANT RETOUR (s)</label>
+    <div style="display:flex;gap:4px;align-items:center">
+      <input type="range" id="mm-wait" min="0" max="10" step="0.5" value="0" oninput="multiMobileChanged()">
+      <span class="pval" id="mm-wait-v">—</span></div></div>`;
+}
+
+function _setMixed(elId, valId, mixed){
+  const el=document.getElementById(elId);
+  const vl=document.getElementById(valId);
+  if(!el)return;
+  if(mixed){el.parentElement?.classList.add('mixed-val');if(vl)vl.textContent='—';}
+  else{el.parentElement?.classList.remove('mixed-val');}
+}
+
+function loadMultiMobileValues(blocks){
+  const cTrigger=_commonVal(blocks,b=>b.trigger||'continuous');
+  const cDir=_commonVal(blocks,b=>b.dir||'r');
+  const cSpd=_commonVal(blocks,b=>b.speed??2);
+  const cDist=_commonVal(blocks,b=>b.dist??160);
+  const cLoop=_commonVal(blocks,b=>b.loop??true);
+  const cWait=_commonVal(blocks,b=>b.waitDelay??0);
+  const cTD=_commonVal(blocks,b=>b.trigDist??80);
+
+  const se=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val??'';};
+  const sv=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val!==null?val:'—';};
+  const sc=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=val===true;if(el&&val===null)el.indeterminate=true;};
+
+  se('mm-trigger',cTrigger);
+  se('mm-dir',cDir);
+  if(cSpd!==null){se('mm-spd',cSpd);sv('mm-spd-v',cSpd);}
+  if(cDist!==null){se('mm-dist',cDist);sv('mm-dist-v',cDist);}
+  if(cWait!==null){se('mm-wait',cWait);sv('mm-wait-v',cWait);}
+  if(cTD!==null){se('mm-trig-dist',cTD);sv('mm-trig-dist-v',cTD);}
+  sc('mm-loop',cLoop);
+
+  // Grise les valeurs mixtes
+  const isFall=cDir==='fall';
+  const isApproach=cTrigger==='approach';
+  const trigRow=document.getElementById('mm-trig-dist-row');
+  if(trigRow)trigRow.style.display=isApproach?'':'none';
+  const distRow=document.getElementById('mm-dist-row');
+  if(distRow)distRow.style.display=isFall?'none':'';
+}
+
+function multiMobileChanged(){
+  const trigger=document.getElementById('mm-trigger')?.value;
+  const dir=document.getElementById('mm-dir')?.value;
+  const spd=document.getElementById('mm-spd')?.value;
+  const dist=document.getElementById('mm-dist')?.value;
+  const loop=document.getElementById('mm-loop')?.checked;
+  const wait=document.getElementById('mm-wait')?.value;
+  const trigDist=document.getElementById('mm-trig-dist')?.value;
+
+  // Update pval displays
+  const sv=(id,val)=>{const el=document.getElementById(id);if(el&&val!==undefined)el.textContent=val;};
+  sv('mm-spd-v',spd);sv('mm-dist-v',dist);sv('mm-wait-v',wait);sv('mm-trig-dist-v',trigDist);
+
+  // Show/hide rows
+  const isFall=dir==='fall';
+  const isApproach=trigger==='approach';
+  const trigRow=document.getElementById('mm-trig-dist-row');
+  if(trigRow)trigRow.style.display=isApproach?'':'none';
+  const distRow=document.getElementById('mm-dist-row');
+  if(distRow)distRow.style.display=isFall?'none':'';
+
+  _applyToAll(b=>{
+    if(trigger)b.trigger=trigger;
+    if(dir)b.dir=dir;
+    if(spd)b.speed=+spd;
+    if(dist)b.dist=+dist;
+    if(loop!==undefined)b.loop=loop;
+    if(wait)b.waitDelay=+wait;
+    if(trigDist)b.trigDist=+trigDist;
+  });
+}
+
+// ── BOUNCE multi-panel ──
+function buildMultiBounceHTML(){
+  return `<div class="prow"><label>FORCE (1-10)</label>
+    <div style="display:flex;gap:4px;align-items:center">
+      <input type="range" id="mb-force" min="1" max="10" step="0.5" value="2" oninput="multiBounceChanged()">
+      <span class="pval" id="mb-force-v">—</span></div></div>`;
+}
+function loadMultiBounceValues(blocks){
+  const cForce=_commonVal(blocks,b=>b.force??2);
+  const el=document.getElementById('mb-force');
+  const vl=document.getElementById('mb-force-v');
+  if(el&&cForce!==null){el.value=cForce;if(vl)vl.textContent=cForce;}
+  else if(vl)vl.textContent='—';
+}
+function multiBounceChanged(){
+  const force=+document.getElementById('mb-force')?.value;
+  const vl=document.getElementById('mb-force-v');if(vl)vl.textContent=force;
+  _applyToAll(b=>{b.force=force;});
 }
 
 function loadMultiSpikePanel(){
