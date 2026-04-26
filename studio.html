@@ -699,21 +699,25 @@ body {
   <div class="pinfo" data-info="pInfoSpike"></div>
   <div class="prow">
     <label>DIRECTION DES PIQUES</label>
-    <select id="sp2-dir" onchange="spikeParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
-      <option value="u">↑ Vers le HAUT</option>
-      <option value="d">↓ Vers le BAS</option>
-      <option value="l">← Vers la GAUCHE</option>
-      <option value="r">→ Vers la DROITE</option>
-      <option value="all">✦ TOUS LES CÔTÉS</option>
-    </select>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+      <div class="crow"><input type="checkbox" id="sp2-dir-u" onchange="spikeParamChanged()"><label for="sp2-dir-u" style="cursor:pointer;">↑ HAUT</label></div>
+      <div class="crow"><input type="checkbox" id="sp2-dir-d" onchange="spikeParamChanged()"><label for="sp2-dir-d" style="cursor:pointer;">↓ BAS</label></div>
+      <div class="crow"><input type="checkbox" id="sp2-dir-l" onchange="spikeParamChanged()"><label for="sp2-dir-l" style="cursor:pointer;">← GAUCHE</label></div>
+      <div class="crow"><input type="checkbox" id="sp2-dir-r" onchange="spikeParamChanged()"><label for="sp2-dir-r" style="cursor:pointer;">→ DROITE</label></div>
+    </div>
+  </div>
+  <div class="prow" style="padding-top:8px;border-top:1px solid var(--border);">
+    <div class="crow"><input type="checkbox" id="sp2-hidden" onchange="spikeParamChanged()"><label for="sp2-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
   </div>
   <div class="prow">
-    <label>MODE</label>
-    <select id="sp2-mode" onchange="spikeParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
-      <option value="always">☠ TOUJOURS ACTIF</option>
-      <option value="touch">⚡ ACTIVÉ AU TOUCHER</option>
-    </select>
+    <label>DÉLAI ACTIVATION (s)</label>
+    <div style="display:flex;gap:4px;align-items:center">
+      <input type="range" id="sp2-act-delay" min="0" max="10" step="0.5" value="0" oninput="spikeParamChanged()">
+      <span class="pval" id="sp2-act-delay-v">0</span>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:2px;">Compte depuis le 1er contact</div>
   </div>
+</div>
   <div id="sp2-touch-opts" style="display:none;">
     <div class="prow"><label>DÉLAI ACTIVATION (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sp2-delay" min="0" max="5" step="0.1" value="0" oninput="spikeParamChanged()"><span class="pval" id="sp2-delay-v">0</span></div></div>
   </div>
