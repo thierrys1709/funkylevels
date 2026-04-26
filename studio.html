@@ -1621,36 +1621,39 @@ function redraw(){
   });
 
   // ── Spike blocks draw ──
-  (lv.spike||[]).forEach((sp,i)=>{
-    const isSel=isSelected('spike',i);
-    EX.fillStyle='#2a1a1a';EX.fillRect(sp.x,sp.y,sp.w,sp.h);
-    EX.fillStyle='#cc3030';EX.fillRect(sp.x,sp.y,sp.w,4);
-    // Draw spikes as triangles
-    const dir=sp.dir||'u';const sz=10;
-    EX.fillStyle=isSel?'#ff4060':'#cc3030cc';
-    const drawSpikes=(ax,ay,horiz)=>{
-      const count=Math.max(1,Math.floor((horiz?sp.w:sp.h)/sz));
-      const gap=(horiz?sp.w:sp.h)/count;
-      for(let k=0;k<count;k++){
-        const cx=horiz?sp.x+gap*(k+0.5):ax;
-        const cy=horiz?ay:sp.y+gap*(k+0.5);
-        EX.beginPath();
-        if(dir==='u'||(!horiz&&dir==='all')){EX.moveTo(cx-sz/2,sp.y);EX.lineTo(cx+sz/2,sp.y);EX.lineTo(cx,sp.y-sz);}
-        else if(dir==='d'||(!horiz&&dir==='all')){EX.moveTo(cx-sz/2,sp.y+sp.h);EX.lineTo(cx+sz/2,sp.y+sp.h);EX.lineTo(cx,sp.y+sp.h+sz);}
-        else if(dir==='l'||(!horiz&&dir==='all')){EX.moveTo(sp.x,cy-sz/2);EX.lineTo(sp.x,cy+sz/2);EX.lineTo(sp.x-sz,cy);}
-        else if(dir==='r'||(!horiz&&dir==='all')){EX.moveTo(sp.x+sp.w,cy-sz/2);EX.lineTo(sp.x+sp.w,cy+sz/2);EX.lineTo(sp.x+sp.w+sz,cy);}
-        EX.closePath();EX.fill();
-      }
-    };
-    if(dir==='u'||dir==='all')drawSpikes(sp.x,sp.y,true);
-    if(dir==='d'||dir==='all')drawSpikes(sp.x,sp.y+sp.h,true);
-    if(dir==='l'||dir==='all')drawSpikes(sp.x,sp.y,false);
-    if(dir==='r'||dir==='all')drawSpikes(sp.x+sp.w,sp.y,false);
-    EX.fillStyle='#ff4060cc';EX.font='7px sans-serif';EX.textAlign='center';
-    EX.fillText('🗡',sp.x+sp.w/2,sp.y+sp.h/2+3);EX.textAlign='left';
-    if(isSel){EX.strokeStyle='#f0e040cc';EX.lineWidth=1.5;EX.strokeRect(sp.x-2,sp.y-2,sp.w+4,sp.h+4);}
-    if(selection.length===1&&selectedType==='spike'&&selectedIdx===i)eSelection(sp);
-  });
+  // ── Spike blocks draw ──
+(lv.spike||[]).forEach((sp,i)=>{
+  const isSel=isSelected('spike',i);
+  EX.fillStyle='#2a1a1a';EX.fillRect(sp.x,sp.y,sp.w,sp.h);
+  EX.fillStyle='#cc3030';EX.fillRect(sp.x,sp.y,sp.w,4);
+  const dir=sp.dir||'u';const sz=10;
+  // Support multi-direction: 'u,r', 'all', 'u', etc.
+  const activeDirs=dir==='all'?['u','d','l','r']:dir.split(',');
+  EX.fillStyle=isSel?'#ff4060':'#cc3030cc';
+  const drawSpikeDir=(d)=>{
+    const horiz=(d==='u'||d==='d');
+    const count=Math.max(1,Math.floor((horiz?sp.w:sp.h)/sz));
+    const gap=(horiz?sp.w:sp.h)/count;
+    for(let k=0;k<count;k++){
+      const cx=horiz?sp.x+gap*(k+0.5):sp.x;
+      const cy=horiz?sp.y:sp.y+gap*(k+0.5);
+      EX.beginPath();
+      if(d==='u'){EX.moveTo(cx-sz/2,sp.y);EX.lineTo(cx+sz/2,sp.y);EX.lineTo(cx,sp.y-sz);}
+      else if(d==='d'){EX.moveTo(cx-sz/2,sp.y+sp.h);EX.lineTo(cx+sz/2,sp.y+sp.h);EX.lineTo(cx,sp.y+sp.h+sz);}
+      else if(d==='l'){EX.moveTo(sp.x,cy-sz/2);EX.lineTo(sp.x,cy+sz/2);EX.lineTo(sp.x-sz,cy);}
+      else if(d==='r'){EX.moveTo(sp.x+sp.w,cy-sz/2);EX.lineTo(sp.x+sp.w,cy+sz/2);EX.lineTo(sp.x+sp.w+sz,cy);}
+      EX.closePath();EX.fill();
+    }
+  };
+  activeDirs.forEach(d=>drawSpikeDir(d));
+  // Badges hidden/delay
+  EX.font='6px "Press Start 2P"';EX.textAlign='left';
+  let badgeX=sp.x+2;const badgeY=sp.y+sp.h-4;
+  if(sp.hidden){EX.fillStyle='#8080ffcc';EX.fillText('👁',badgeX,badgeY);badgeX+=14;}
+  if(sp.activationDelay>0){EX.fillStyle='#f0c040cc';EX.fillText(`⏱${sp.activationDelay}s`,badgeX,badgeY);}
+  if(isSel){EX.strokeStyle='#f0e040cc';EX.lineWidth=1.5;EX.strokeRect(sp.x-2,sp.y-2,sp.w+4,sp.h+4);}
+  if(selection.length===1&&selectedType==='spike'&&selectedIdx===i)eSelection(sp);
+});
 
   // ── Gravity blocks draw ──
   (lv.gblock||[]).forEach((g,i)=>{
