@@ -370,18 +370,10 @@ body {
       <button class="tool-btn active" id="t-fixed"  onclick="T('fixed')"  data-tip="🟫 FIXE&#10;Sol solide, ne bouge jamais.">🟫 FIXE</button>
       <button class="tool-btn"        id="t-invis"  onclick="T('invis')"  data-tip="👁 INVISIBLE&#10;Bloc solide invisible en jeu.">👁 INVIS</button>
       <button class="tool-btn"        id="t-bounce" onclick="T('bounce')" data-tip="🟡 REBOND&#10;Fait rebondir le joueur.">🟡 REBOND</button>
-      <button class="tool-btn"        id="t-mobile" onclick="T('mobile')" data-tip="🔵 MOBILE&#10;Bloc mobile configurable.&#10;Continu ou déclenché par le joueur.">🔵 MOBILE</button>
+      <button class="tool-btn"        id="t-mobile" onclick="T('mobile')" data-tip="🔵 MOBILE&#10;Continu, déclenché ou chute.">🔵 MOBILE</button>
       <button class="tool-btn"        id="t-push"   onclick="T('push')"   data-tip="🪨 POUSSABLE&#10;Le joueur peut pousser ce bloc.">🪨 PUSH</button>
       <button class="tool-btn"        id="t-flash"  onclick="T('flash')"  data-tip="⚡ FLASH&#10;Apparaît/disparaît en boucle.">⚡ FLASH</button>
-    </div>
-  </div>
-  <div class="sep"></div>
-
-  <div style="display:flex;flex-direction:column;gap:4px;">
-    <span class="tb-label" data-lbl="lblPieges">PIÈGES</span>
-    <div class="tb-group">
-      <button class="tool-btn" id="t-trap"   onclick="T('trap')"   data-tip="⚠ PIÈGE&#10;Tombe quand le joueur approche.">⚠ PIÈGE</button>
-      <button class="tool-btn" id="t-gblock" onclick="T('gblock')" data-tip="🌍 PLANÈTE&#10;Attire le joueur vers sa surface.">🌍 PLANÈTE</button>
+      <button class="tool-btn"        id="t-gblock" onclick="T('gblock')" data-tip="🌍 PLANÈTE&#10;Attire le joueur vers sa surface.">🌍 PLANÈTE</button>
     </div>
   </div>
   <div class="sep"></div>
@@ -506,17 +498,6 @@ body {
     </div>
   </div>
 </div></div>
-
-    <div id="s-trap" class="psec">
-      <div class="pinfo" data-info="pInfoTrap"></div>
-      <div class="prow"><label>ZONE DÉCLENCHEMENT (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="tr-dist" min="0" max="200" step="8" value="48" oninput="trapParamChanged()"><span class="pval" id="tr-dist-v">48</span></div></div>
-      <div class="prow"><label>DÉLAI AVANT CHUTE (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="tr-predelay" min="0" max="5" step="0.25" value="0" oninput="trapParamChanged()"><span class="pval" id="tr-predelay-v">0</span></div></div>
-      <div class="prow"><label>VITESSE DE CHUTE</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="tr-fall" min="0.2" max="4" step="0.1" value="1" oninput="trapParamChanged()"><span class="pval" id="tr-fall-v">1</span></div></div>
-      <div class="prow"><div class="crow"><input type="checkbox" id="tr-partial" onchange="trapParamChanged()"><label for="tr-partial">CHUTE PARTIELLE</label></div></div>
-      <div id="tr-partial-opts" style="display:none"><div class="prow"><label>DISTANCE (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="tr-partdist" min="16" max="400" step="8" value="80" oninput="trapParamChanged()"><span class="pval" id="tr-partdist-v">80</span></div></div></div>
-      <div class="prow"><div class="crow"><input type="checkbox" id="tr-returns" checked onchange="trapParamChanged()"><label for="tr-returns">REMONTE</label></div></div>
-      <div id="tr-returns-opts"><div class="prow"><label>DÉLAI REMONTÉE (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="tr-rise" min="0" max="10" step="0.5" value="2" oninput="trapParamChanged()"><span class="pval" id="tr-rise-v">2</span></div></div><div class="prow"><div class="crow"><input type="checkbox" id="tr-loop" onchange="trapParamChanged()"><label for="tr-loop">RETOMBE SI APPROCHE</label></div></div></div>
-    </div>
 
         <div id="s-bounce" class="psec">
       <div class="pinfo" data-info="pInfoBounce"></div>
@@ -968,7 +949,7 @@ function addToSel(type,idx){
   if(!selection.find(s=>s.type===type&&s.idx===idx))selection.push({type,idx});
   syncLegacy();
   if(selection.length===1&&type==='fixed'){const b=lv.fixed[idx];if(b)blockSpikePanelLoad('fixed',b);}
-  if(selection.length===1&&type==='trap'){const p=lv.trap[idx];if(p){trapPanelLoad(p);blockSpikePanelLoad('trap',p);showTrapPanel();}}
+
   if(selection.length===1&&type==='slider'){const m=lv.mobile[idx];if(m){moPanelLoad(m);blockSpikePanelLoad('mobile',m);showMoPanel();}}
   if(selection.length===1&&type==='invis'){const b=lv.invis[idx];if(b)blockSpikePanelLoad('invis',b);}
   if(selection.length===1&&type==='bounce'){const b=lv.bounce[idx];if(b){bouncePanelLoad(b);blockSpikePanelLoad('bounce',b);showBouncePanel();}}
@@ -1021,7 +1002,7 @@ function pasteClip(){if(!clipboard||!clipboard.length)return;snapshot();clearSel
 let lv=emptyLevel();
 function emptyLevel(){return{fixed:[],trap:[],slider:[],invis:[],bounce:[],mobile:[],push:[],gravflip:[],speed:[],flash:[],spike:[],gblock:[],start:{x:80,y:480},end:null};}
 
-const TOOL_NAMES={fixed:'FIXE',trap:'PIÈGE',slider:'GLISSEUR',invis:'INVISIBLE',bounce:'REBOND',mobile:'MOBILE',push:'POUSSABLE',gravflip:'GRAVITÉ',speed:'VITESSE',flash:'FLASH',gblock:'PLANÈTE',start:'DÉPART',end:'ARRIVÉE',select:'SÉLECTION'};
+const TOOL_NAMES={fixed:'FIXE',slider:'GLISSEUR',invis:'INVISIBLE',bounce:'REBOND',mobile:'MOBILE',push:'POUSSABLE',gravflip:'GRAVITÉ',speed:'VITESSE',flash:'FLASH',gblock:'PLANÈTE',start:'DÉPART',end:'ARRIVÉE',select:'SÉLECTION'};
 function T(t){
   currentTool=t;dragState=null;selectedIdx=-1;selectedType=null;
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
@@ -1126,10 +1107,6 @@ function slPanelValues(){return getMoValues();}
 function slParamChanged(){moParamChanged();}
 function slPanelLoad(s){moPanelLoad(s);}
 
-function trapPanelValues(){return{trigDist:+document.getElementById('tr-dist').value,preDelay:+document.getElementById('tr-predelay').value,fallSpeed:+document.getElementById('tr-fall').value,partial:document.getElementById('tr-partial').checked,partDist:+document.getElementById('tr-partdist').value,returns:document.getElementById('tr-returns').checked,riseDelay:+document.getElementById('tr-rise').value,loop:document.getElementById('tr-loop').checked};}
-function trapParamChanged(){document.getElementById('tr-dist-v').textContent=document.getElementById('tr-dist').value;document.getElementById('tr-predelay-v').textContent=document.getElementById('tr-predelay').value;document.getElementById('tr-fall-v').textContent=document.getElementById('tr-fall').value;document.getElementById('tr-partdist-v').textContent=document.getElementById('tr-partdist').value;document.getElementById('tr-rise-v').textContent=document.getElementById('tr-rise').value;trapReturnUI();if(selection.length===1&&selectedType==='trap'){const p=lv.trap[selectedIdx];if(p)Object.assign(p,trapPanelValues());}redraw();}
-function trapPanelLoad(p){document.getElementById('tr-dist').value=p.trigDist??48;document.getElementById('tr-predelay').value=p.preDelay??0;document.getElementById('tr-fall').value=p.fallSpeed??1;document.getElementById('tr-partial').checked=p.partial??false;document.getElementById('tr-partdist').value=p.partDist??80;document.getElementById('tr-returns').checked=p.returns??true;document.getElementById('tr-rise').value=p.riseDelay??2;document.getElementById('tr-loop').checked=p.loop??false;document.getElementById('tr-dist-v').textContent=p.trigDist??48;document.getElementById('tr-predelay-v').textContent=p.preDelay??0;document.getElementById('tr-fall-v').textContent=p.fallSpeed??1;document.getElementById('tr-partdist-v').textContent=p.partDist??80;document.getElementById('tr-rise-v').textContent=p.riseDelay??2;trapReturnUI();}
-function showTrapPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-trap').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : PIÈGE';}
 
 function status(s){document.getElementById('statusbar').textContent=s;}
 
@@ -1311,7 +1288,7 @@ window.addEventListener('mouseup',e=>{
   if(rubberBand){
     const rb=rubberBand;rubberBand=null;
     const rx=Math.min(rb.sx,rb.ex),ry=Math.min(rb.sy,rb.ey),rw=Math.abs(rb.ex-rb.sx),rh=Math.abs(rb.ey-rb.sy);
-    if(rw>4&&rh>4){if(!e.shiftKey)clearSel();['fixed','trap','invis','bounce','mobile','push','gravflip','speed','flash','gblock'].forEach(k=>{(lv[k]||[]).forEach((p,i)=>{if(p.x<rx+rw&&p.x+p.w>rx&&p.y<ry+rh&&p.y+p.h>ry)addToSel(k,i);});});if(selection.length)status(`${selection.length} bloc${selection.length>1?'s':''} sélectionné${selection.length>1?'s':''}.`);}
+    if(rw>4&&rh>4){if(!e.shiftKey)clearSel();['fixed','invis','bounce','mobile','push','gravflip','speed','flash','gblock'].forEach(k=>{(lv[k]||[]).forEach((p,i)=>{if(p.x<rx+rw&&p.x+p.w>rx&&p.y<ry+rh&&p.y+p.h>ry)addToSel(k,i);});});if(selection.length)status(`${selection.length} bloc${selection.length>1?'s':''} sélectionné${selection.length>1?'s':''}.`);}
     redraw();return;
   }
   if(!drawing)return;drawing=false;
@@ -1330,14 +1307,14 @@ window.addEventListener('mouseup',e=>{
   else if(currentTool==='speed'){lv.speed.push({x:rx,y:ry,w:W,h:H,spd:+document.getElementById('sp-val').value});newType='speed';}
   else if(currentTool==='flash'){const onCs=+document.getElementById('fl-on').value||50;const offCs=+document.getElementById('fl-off').value||50;const phase=+document.getElementById('fl-phase').value||0;lv.flash.push({x:rx,y:ry,w:W,h:H,onMs:onCs*10,offMs:offCs*10,phase:phase*10});newType='flash';}
   else if(currentTool==='gblock'){const _sp=getSpikeFromPanel('gblock');const _b={x:rx,y:ry,w:W,h:H};if(_sp)_b.spikes=_sp;lv.gblock.push(_b);newType='gblock';}
-  else if(currentTool==='trap'){const v=trapPanelValues();const _sp=getSpikeFromPanel('trap');const _b={x:rx,y:ry,w:W,h:H,ox:rx,oy:ry,trigDist:v.trigDist,preDelay:v.preDelay,fallSpeed:v.fallSpeed,partial:v.partial,partDist:v.partDist,returns:v.returns,riseDelay:v.riseDelay,loop:v.loop,state:'idle',vy:0};if(_sp)_b.spikes=_sp;lv.trap.push(_b);newType='trap';}
+  
   if(newType){clearSel();addToSel(newType,lv[newType].length-1);}
   startPt=null;redraw();
 });
 
 EC.addEventListener('mouseleave',()=>{rubberBand=null;redraw();});
 
-function findBlockAt(x,y){const types=['fixed','trap','invis','bounce','mobile','push','gravflip','speed','flash','gblock'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
+function findBlockAt(x,y){const types=['fixed','invis','bounce','mobile','push','gravflip','speed','flash','gblock'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
 function deleteSelected(){if(!selection.length)return;snapshotWithDupCheck();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
 function zoom(d,cx,cy){
   const prevZoom=ZOOM;ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));
@@ -1732,7 +1709,7 @@ async function doPublish(){
   const{data:sess}=await _sb.auth.getSession();
   if(!sess.session){msgEl.className='pub-msg err';msgEl.textContent=t.needLogin;return;}
   if(!title){msgEl.className='pub-msg err';msgEl.textContent=t.needTitle;return;}
-  const totalBlocks=(lv.fixed||[]).length+(lv.trap||[]).length+(lv.slider||[]).length+(lv.mobile||[]).length+(lv.bounce||[]).length+(lv.push||[]).length+(lv.invis||[]).length;
+  const totalBlocks=(lv.fixed||[]).length+(lv.slider||[]).length+(lv.mobile||[]).length+(lv.bounce||[]).length+(lv.push||[]).length+(lv.invis||[]).length;
   if(totalBlocks===0){msgEl.className='pub-msg err';msgEl.textContent=t.needBlocks;return;}
   if(_currentLevelId&&!_authorCompleted){
     const{data:lvlCheck}=await _sb.from('levels').select('author_completed,is_published').eq('id',_currentLevelId).single();
