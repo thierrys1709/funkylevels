@@ -1457,14 +1457,47 @@ function redraw(){
     const isSel=isSelected('mobile',i);
     const trigger=p.trigger||'continuous';
     const dir=p.dir||'r';
+    const dist=p.dist||160;
     const ARROWS={r:'→',l:'←',u:'↑',d:'↓',omni:'⊕',fall:'⬇'};
     const arrow=ARROWS[dir]||'→';
+
+    // ── Destination ghost + chemin ──
+    const VEC={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1]};
+    if(dir!=='omni'&&dir!=='fall'){
+      const[dx,dy]=VEC[dir]||[1,0];
+      const gx=p.x+dx*dist, gy=p.y+dy*dist;
+      // Ligne pointillée origin → destination
+      EX.save();
+      EX.strokeStyle=isSel?'#4090f0cc':'#4090f055';
+      EX.lineWidth=1.5;EX.setLineDash([6,4]);
+      EX.beginPath();EX.moveTo(p.x+p.w/2,p.y+p.h/2);EX.lineTo(gx+p.w/2,gy+p.h/2);EX.stroke();
+      EX.setLineDash([]);
+      // Flèche à l'arrivée
+      const ang=Math.atan2(gy-p.y,gx-p.x);
+      EX.fillStyle=isSel?'#4090f0cc':'#4090f066';
+      EX.beginPath();EX.moveTo(gx+p.w/2+Math.cos(ang)*10,gy+p.h/2+Math.sin(ang)*10);EX.lineTo(gx+p.w/2+Math.cos(ang+2.4)*6,gy+p.h/2+Math.sin(ang+2.4)*6);EX.lineTo(gx+p.w/2+Math.cos(ang-2.4)*6,gy+p.h/2+Math.sin(ang-2.4)*6);EX.closePath();EX.fill();
+      // Ghost bloc destination
+      EX.globalAlpha=isSel?0.35:0.18;
+      EX.fillStyle='#4090f0';EX.fillRect(gx,gy,p.w,p.h);
+      EX.fillStyle='#80c0ff';EX.fillRect(gx,gy,p.w,4);
+      EX.globalAlpha=1;
+      EX.restore();
+    } else if(dir==='fall'){
+      // Ligne vers le bas jusqu'à sortie écran
+      EX.save();
+      EX.strokeStyle=isSel?'#f04060cc':'#f0406044';
+      EX.lineWidth=1.5;EX.setLineDash([6,4]);
+      EX.beginPath();EX.moveTo(p.x+p.w/2,p.y+p.h);EX.lineTo(p.x+p.w/2,EH+40);EX.stroke();
+      EX.setLineDash([]);EX.restore();
+    }
+
     // Zone de déclenchement si approche
     if(trigger==='approach'){
       const td=p.trigDist||80;
       EX.strokeStyle=isSel?'#20c0f0cc':'#20c0f044';EX.lineWidth=1;EX.setLineDash([5,4]);
       EX.strokeRect(p.x-td,p.y-td,p.w+td*2,p.h+td*2);EX.setLineDash([]);
     }
+    // Bloc
     EX.fillStyle='#1a3060';EX.fillRect(p.x,p.y,p.w,p.h);
     EX.fillStyle=trigger==='approach'?'#20c0f0':'#4090f0';EX.fillRect(p.x,p.y,p.w,4);
     EX.fillStyle='#80c0ffcc';EX.font='14px sans-serif';EX.textAlign='center';EX.fillText(arrow,p.x+p.w/2,p.y+p.h/2+5);
