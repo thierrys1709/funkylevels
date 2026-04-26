@@ -1233,12 +1233,19 @@ window.addEventListener('mouseup',e=>{
     newType='flash';
   }
   else if(currentTool==='spike'){
+  const u=document.getElementById('sp2-dir-u').checked;
+  const d=document.getElementById('sp2-dir-d').checked;
+  const l=document.getElementById('sp2-dir-l').checked;
+  const r=document.getElementById('sp2-dir-r').checked;
+  const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
+  const dir=dirs.length===0?'u':dirs.length===4?'all':dirs.length===1?dirs[0]:dirs.join(',');
+  const activationDelay=+document.getElementById('sp2-act-delay').value;
   lv.spike.push({x:rx,y:ry,w:W,h:H,
-    dir:document.getElementById('sp2-dir').value,
-    mode:document.getElementById('sp2-mode').value,
-    delay:+document.getElementById('sp2-delay').value,
+    dir,
+    mode:activationDelay>0?'touch':'always',
+    delay:activationDelay,
     hidden:document.getElementById('sp2-hidden').checked,
-    activationDelay:+document.getElementById('sp2-act-delay').value,
+    activationDelay,
     state:'idle',timer:0
   });
   newType='spike';
