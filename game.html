@@ -911,10 +911,13 @@ function gDraw(){
     const a=Math.max(0,e.life);
     const expand=(1-e.life)*14;
     GX.save();
-    GX.globalAlpha=a*0.65;GX.strokeStyle='#f0c040';GX.lineWidth=2;
-    GX.strokeRect(e.x-expand,e.y-expand,e.w+expand*2,e.h+expand*2);
-    GX.globalAlpha=a*0.18;GX.fillStyle='#f0c040';
-    GX.fillRect(e.x-expand,e.y-expand,e.w+expand*2,e.h+expand*2);
+    GX.globalAlpha=a*0.9;GX.strokeStyle='#f0c040';GX.lineWidth=3;
+    GX.beginPath();
+    GX.moveTo(e.x-expand,e.y-expand);
+    GX.lineTo(e.x+e.w+expand,e.y-expand);
+    GX.stroke();
+    GX.globalAlpha=a*0.25;GX.fillStyle='#f0c040';
+    GX.fillRect(e.x,e.y,e.w,e.h);
     GX.restore();
   });
 
