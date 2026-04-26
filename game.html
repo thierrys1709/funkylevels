@@ -804,10 +804,14 @@ function gUpdate(now){
   });
 
   (gLv.spike||[]).forEach(sp=>{
-    if(!ov(gPlayer,sp))return;
     const hidden=sp.hidden||false;
     const delay=(sp.activationDelay||0)*60;
     const dirs=(sp.dir||'u')==='all'?['u','d','l','r']:(sp.dir||'u').split(',');
+
+    // Le timer continue même si le joueur quitte le bloc
+    if(hidden&&sp._touched&&sp._delayTimer<delay)sp._delayTimer++;
+
+    if(!ov(gPlayer,sp))return;
 
     // Calcul des overlaps
     const oL=(gPlayer.x+gPlayer.w)-sp.x,oR=(sp.x+sp.w)-gPlayer.x;
@@ -829,7 +833,6 @@ function gUpdate(now){
     } else {
       // Invisible au départ : délai déclenché au premier contact avec le bloc
       if(!sp._touched){sp._touched=true;}
-      if(sp._delayTimer<delay)sp._delayTimer++;
       const delayDone=delay===0||sp._delayTimer>=delay;
       // Une fois actif, tue sur les faces avec piques
       if(delayDone&&faceHasSpike){killPlayer();return;}
