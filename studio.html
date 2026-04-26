@@ -944,8 +944,77 @@ function spikePanelLoad(s){
 function showSpikePanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-spike').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : PIQUES';}
 
 function gblockParamChanged(){redraw();}
-function gblockPanelLoad(g){}
+function gblockPanelLoad(g){blockSpikePanelLoad('gblock',g);}
 function showGblockPanel(){
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  document.getElementById('s-gblock').classList.add('show');
+  document.getElementById('ptitle').textContent='PARAMÈTRES : PLANÈTE';
+}
+
+// ── Spike universels sur blocs ──────────────────────────
+function toggleSpikeOpts(prefix){
+  const opts=document.getElementById(prefix+'-spike-opts');
+  const btn=document.getElementById(prefix+'-spike-toggle');
+  if(!opts)return;
+  opts.classList.toggle('show');
+  btn.classList.toggle('active');
+  btn.textContent=opts.classList.contains('show')?'🗡 PIQUES ▾':'🗡 PIQUES ▸';
+}
+
+function blockSpikeChanged(prefix){
+  const u=document.getElementById(prefix+'-sp-u')?.checked;
+  const d=document.getElementById(prefix+'-sp-d')?.checked;
+  const l=document.getElementById(prefix+'-sp-l')?.checked;
+  const r=document.getElementById(prefix+'-sp-r')?.checked;
+  const hidden=document.getElementById(prefix+'-sp-hidden')?.checked||false;
+  const delay=+(document.getElementById(prefix+'-sp-delay')?.value||0);
+  const delv=document.getElementById(prefix+'-sp-delay-v');if(delv)delv.textContent=delay;
+  if(selection.length===1&&selectedType===prefix){
+    const b=lv[prefix][selectedIdx];
+    if(b){
+      const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
+      if(dirs.length===0){delete b.spikes;}
+      else{b.spikes={dirs,hidden,delay};}
+    }
+  }
+  redraw();
+}
+
+function blockSpikePanelLoad(prefix,b){
+  const sp=b&&b.spikes;
+  const hasSp=sp&&sp.dirs&&sp.dirs.length>0;
+  const opts=document.getElementById(prefix+'-spike-opts');
+  const btn=document.getElementById(prefix+'-spike-toggle');
+  if(hasSp){
+    if(opts)opts.classList.add('show');
+    if(btn){btn.classList.add('active');btn.textContent='🗡 PIQUES ▾';}
+    const eu=document.getElementById(prefix+'-sp-u');if(eu)eu.checked=sp.dirs.includes('u');
+    const ed=document.getElementById(prefix+'-sp-d');if(ed)ed.checked=sp.dirs.includes('d');
+    const el=document.getElementById(prefix+'-sp-l');if(el)el.checked=sp.dirs.includes('l');
+    const er=document.getElementById(prefix+'-sp-r');if(er)er.checked=sp.dirs.includes('r');
+    const eh=document.getElementById(prefix+'-sp-hidden');if(eh)eh.checked=sp.hidden||false;
+    const edel=document.getElementById(prefix+'-sp-delay');if(edel)edel.value=sp.delay||0;
+    const edelv=document.getElementById(prefix+'-sp-delay-v');if(edelv)edelv.textContent=sp.delay||0;
+  }else{
+    if(opts)opts.classList.remove('show');
+    if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
+    ['sp-u','sp-d','sp-l','sp-r','sp-hidden'].forEach(id=>{const el=document.getElementById(prefix+'-'+id);if(el)el.checked=false;});
+    const edel=document.getElementById(prefix+'-sp-delay');if(edel)edel.value=0;
+    const edelv=document.getElementById(prefix+'-sp-delay-v');if(edelv)edelv.textContent=0;
+  }
+}
+
+function getSpikeFromPanel(prefix){
+  const u=document.getElementById(prefix+'-sp-u')?.checked;
+  const d=document.getElementById(prefix+'-sp-d')?.checked;
+  const l=document.getElementById(prefix+'-sp-l')?.checked;
+  const r=document.getElementById(prefix+'-sp-r')?.checked;
+  const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
+  if(dirs.length===0)return undefined;
+  return{dirs,hidden:document.getElementById(prefix+'-sp-hidden')?.checked||false,delay:+(document.getElementById(prefix+'-sp-delay')?.value||0)};
+}
+
+// ── Fermeture bloc spike functions ──
 
 // ── Spike universels sur blocs ──────────────────────────
 function toggleSpikeOpts(prefix){
@@ -1009,7 +1078,7 @@ function getSpikeFromPanel(prefix){
   const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
   if(dirs.length===0)return undefined;
   return{dirs,hidden:document.getElementById(prefix+'-sp-hidden')?.checked||false,delay:+document.getElementById(prefix+'-sp-delay')?.value||0};
-}document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-gblock').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : PLANÈTE';}
+}
 
 function ts(frKey,enKey){const l=_lang();const t=STUDIO_T[l]||{};return t[frKey]||(l==='fr'?frKey:enKey);}
 
@@ -1498,8 +1567,6 @@ async function loadPlayerProfile(){
   redraw();status('Niveau "'+data.title+'" chargé.');
 })();
 
-var STUDIO_T={fr:{},en:{}};
-let _langCache={};
 async function loadLang(l){
   if(_langCache[l])return _langCache[l];
   try{const r=await fetch('lang/'+l+'.json');if(!r.ok){if(l!=='fr')return loadLang('fr');return null;}const data=await r.json();_langCache[l]=data;return data;}
