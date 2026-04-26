@@ -854,24 +854,84 @@ function updatePanelState(){
   const multiPanel=document.getElementById('multi-sel-panel');
   if(!overlay)return;
   if(selection.length===0){
-    // Rien de sélectionné : griser le panel
     overlay.classList.add('show');
     noSel.classList.add('show');
     if(multiPanel)multiPanel.classList.remove('show');
   }else if(selection.length>1){
-    // Multi-sélection : cacher overlay, montrer panel multi
     overlay.classList.remove('show');
     noSel.classList.remove('show');
     if(multiPanel){
       multiPanel.classList.add('show');
       const count=document.getElementById('multi-sel-count');
       if(count)count.textContent=selection.length+' blocs sélectionnés';
+      // Charger les valeurs communes dans le panel spike
+      loadMultiSpikePanel();
     }
   }else{
-    // Sélection simple : panel normal
     overlay.classList.remove('show');
     noSel.classList.remove('show');
     if(multiPanel)multiPanel.classList.remove('show');
+  }
+}
+
+function loadMultiSpikePanel(){
+  // Collecter les spikes de tous les blocs sélectionnés
+  const spikes=selection.map(s=>lv[s.type]?.[s.idx]?.spikes);
+  const hasSpikes=spikes.filter(sp=>sp&&sp.dirs&&sp.dirs.length>0);
+
+  const opts=document.getElementById('multi-spike-opts');
+  const btn=document.getElementById('multi-spike-toggle');
+
+  if(hasSpikes.length===0){
+    // Aucun bloc n'a de piques — panel fermé, tout décoché
+    if(opts)opts.classList.remove('show');
+    if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
+    ['multi-sp-u','multi-sp-d','multi-sp-l','multi-sp-r','multi-sp-hidden'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.checked=false;
+    });
+    const del=document.getElementById('multi-sp-delay');if(del)del.value=0;
+    const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=0;
+    return;
+  }
+
+  // Au moins un bloc a des piques — ouvrir le panel
+  if(opts)opts.classList.add('show');
+  if(btn){btn.classList.add('active');btn.textContent='🗡 PIQUES ▾';}
+
+  // Comparer les valeurs — si identiques on les affiche, sinon on laisse vide/indéterminé
+  const allDirs=hasSpikes.map(sp=>JSON.stringify([...sp.dirs].sort()));
+  const allHidden=hasSpikes.map(sp=>sp.hidden||false);
+  const allDelay=hasSpikes.map(sp=>sp.delay||0);
+
+  const sameDirs=allDirs.every(d=>d===allDirs[0]);
+  const sameHidden=allHidden.every(h=>h===allHidden[0]);
+  const sameDelay=allDelay.every(d=>d===allDelay[0]);
+
+  if(sameDirs){
+    const dirs=hasSpikes[0].dirs;
+    ['u','d','l','r'].forEach(d=>{
+      const el=document.getElementById('multi-sp-'+d);
+      if(el)el.checked=dirs.includes(d);
+    });
+  }else{
+    // Valeurs différentes : décocher tout (indéterminé)
+    ['u','d','l','r'].forEach(d=>{
+      const el=document.getElementById('multi-sp-'+d);
+      if(el){el.checked=false;el.indeterminate=true;}
+    });
+  }
+
+  const hid=document.getElementById('multi-sp-hidden');
+  if(hid){
+    if(sameHidden){hid.checked=allHidden[0];hid.indeterminate=false;}
+    else{hid.checked=false;hid.indeterminate=true;}
+  }
+
+  const del=document.getElementById('multi-sp-delay');
+  const delv=document.getElementById('multi-sp-delay-v');
+  if(del){
+    if(sameDelay){del.value=allDelay[0];if(delv)delv.textContent=allDelay[0];}
+    else{del.value=0;if(delv)delv.textContent='—';}
   }
 }
 
