@@ -807,7 +807,19 @@ function gUpdate(now){
     if(!ov(gPlayer,sp))return;
     const hidden=sp.hidden||false;
     const delay=(sp.activationDelay||0)*60;
-    if(delay>0&&!sp._touched)sp._touched=true;
+    if(delay>0&&!sp._touched){
+      // Détecter contact uniquement sur les faces avec piques
+      const dirs=(sp.dir||'u')==='all'?['u','d','l','r']:(sp.dir||'u').split(',');
+      const oL=(gPlayer.x+gPlayer.w)-sp.x,oR=(sp.x+sp.w)-gPlayer.x;
+      const oT=(gPlayer.y+gPlayer.h)-sp.y,oB=(sp.y+sp.h)-gPlayer.y;
+      const m=Math.min(oL,oR,oT,oB);
+      const touchedSide=
+        (m===oT&&dirs.includes('u'))||
+        (m===oB&&dirs.includes('d'))||
+        (m===oL&&dirs.includes('r'))||
+        (m===oR&&dirs.includes('l'));
+      if(touchedSide)sp._touched=true;
+    }
     if(sp._touched&&sp._delayTimer<delay)sp._delayTimer++;
     const delayDone=delay===0||sp._delayTimer>=delay;
     const isActive=(sp.mode||'always')==='always'||sp.state==='active';
@@ -984,9 +996,11 @@ function gDraw(){
     const delayDone=delay===0||sp._delayTimer>=delay;
     const isActive=(sp.mode||'always')==='always'||sp.state==='active';
     const actuallyActive=isActive&&delayDone;
-    // Le bloc est TOUJOURS visible — seuls les piques sont cachés
+    // Le bloc est TOUJOURS visible comme un bloc fixe
     const x=Math.round(sp.x),y=Math.round(sp.y),w=Math.round(sp.w),h=Math.round(sp.h);
-    GX.fillStyle='#2a1010';GX.fillRect(x,y,w,h);GX.fillStyle='#cc3030';GX.fillRect(x,y,w,4);
+    GX.fillStyle=PCOL.plat;GX.fillRect(x,y,w,h);
+    GX.fillStyle=PCOL.platT;GX.fillRect(x,y,w,4);
+    GX.fillStyle=PCOL.platS;for(let i=x+7;i<x+w-4;i+=9)GX.fillRect(i,y+1,3,2);
     // Piques visibles seulement si : pas hidden, OU déjà actif
     const spikesVisible=!hidden||actuallyActive;
     if(!spikesVisible)return;
