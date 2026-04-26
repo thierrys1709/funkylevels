@@ -496,7 +496,7 @@ function startGameFrom(sx,sy){
   (gLv.mobile||[]).forEach(m=>{m.x=m.ox;m.y=m.oy;m.t=0;m.going=true;});
   (gLv.push||[]).forEach(p=>{p.x=p.ox;p.y=p.oy;p.vx=0;p.vy=0;});
   (gLv.gravflip||[]).forEach(z=>{if(z.dir===undefined){z.dir=(z.grav??-10)<0?'u':'d';z.strength=Math.abs(z.grav??10);}});
-  (gLv.spike||[]).forEach(s=>{s.state='idle';s.timer=0;});
+  (gLv.spike||[]).forEach(s=>{s.state='idle';s.timer=0;s._touched=false;s._delayTimer=0;});
   (gLv.gblock||[]).forEach(g=>{g._attached=false;g._justJumped=false;});
   (gLv.flash||[]).forEach(f=>{f._visible=true;f._timer=0;});
   gParts=[];gBullets=[];gBounceEffects=[];gGravEffects=[];gPushEffects=[];
@@ -804,8 +804,19 @@ function gUpdate(now){
   });
 
   (gLv.spike||[]).forEach(sp=>{
+    const hidden=sp.hidden||false;
+    const delay=(sp.activationDelay||0)*60; // en frames
+    // Détecter le premier contact de proximité pour démarrer le délai
+    if(delay>0&&!sp._touched&&ov(gPlayer,{x:sp.x-2,y:sp.y-2,w:sp.w+4,h:sp.h+4})){
+      sp._touched=true;
+    }
+    if(sp._touched&&sp._delayTimer<delay){
+      sp._delayTimer++;
+    }
+    const delayDone=delay===0||sp._delayTimer>=delay;
     const isActive=(sp.mode||'always')==='always'||sp.state==='active';
-    if(isActive&&ov(gPlayer,sp))killPlayer();
+    const actuallyActive=isActive&&delayDone;
+    if(actuallyActive&&ov(gPlayer,sp))killPlayer();
   });
 
   if(gPlayer.y>EH+100)killPlayer();
@@ -947,10 +958,22 @@ function gDraw(){
 
   // ── Spike blocks draw ──
   (gLv.spike||[]).forEach(sp=>{
-    const x=Math.round(sp.x),y=Math.round(sp.y),w=Math.round(sp.w),h=Math.round(sp.h);
-    GX.fillStyle='#2a1010';GX.fillRect(x,y,w,h);GX.fillStyle='#cc3030';GX.fillRect(x,y,w,4);
+    const hidden=sp.hidden||false;
+    const delay=(sp.activationDelay||0)*60;
+    const delayDone=delay===0||sp._delayTimer>=delay;
     const isActive=(sp.mode||'always')==='always'||sp.state==='active';
-    const spikeCol=isActive?'#ff4060':'#884040';
+    const actuallyActive=isActive&&delayDone;
+    // Si caché et pas encore activé : invisible
+    if(hidden&&!actuallyActive)return;
+    const x=Math.round(sp.x),y=Math.round(sp.y),w=Math.round(sp.w),h=Math.round(sp.h);
+    // Clignotement pendant le délai de compte à rebours
+    const counting=sp._touched&&!delayDone;
+    if(counting){
+      const blink=Math.floor(sp._delayTimer/6)%2===0;
+      if(!blink)return;
+    }
+    GX.fillStyle='#2a1010';GX.fillRect(x,y,w,h);GX.fillStyle='#cc3030';GX.fillRect(x,y,w,4);
+    const spikeCol=actuallyActive?'#ff4060':'#884040';
     GX.fillStyle=spikeCol;
     const sz=10;
     const drawGameSpikes=(dir)=>{
