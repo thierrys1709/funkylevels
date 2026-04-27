@@ -162,7 +162,7 @@ async function loadCharacterSprite(id){
 }
 
 const EC={style:{pointerEvents:''}};
-const EH=640;
+const EH=750;
 const EW=3200;
 
 let _currentLevelId=null;
@@ -560,12 +560,12 @@ function gLoopStart(){if(gRafId)cancelAnimationFrame(gRafId);gRafId=requestAnima
 document.addEventListener('fullscreenchange',()=>{resizeGameCanvas();});
 
 function resizeGameCanvas(){
-  const wrap=document.getElementById('gwrap');
-  const vw=wrap.clientWidth;
-  const vh=wrap.clientHeight;
+  const topbarH=document.getElementById('gtopbar')?.offsetHeight||46;
+  const vw=window.innerWidth;
+  const vh=window.innerHeight-topbarH;
   let w,h;
-  if(vw/vh>16/9){h=vh;w=Math.round(h*(16/9));}else{w=vw;h=Math.round(w/(16/9));}
-  w=Math.max(320,w);h=Math.max(180,h);
+  const ratio=EW/EH;if(vw/vh>ratio){h=vh;w=Math.round(h*ratio);}else{w=vw;h=Math.round(w/ratio);}
+  w=Math.max(320,Math.min(vw,w));h=Math.max(180,Math.min(vh,h));
   if(GC.width===w&&GC.height===h)return;
   GC.width=w;GC.height=h;GC.style.width=w+'px';GC.style.height=h+'px';
 }
