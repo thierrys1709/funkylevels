@@ -1072,15 +1072,28 @@ function gDraw(){
   // ── Zone de mort (coordonnées écran) ──
   const deathScreenY = EH - gCamY;
   if(deathScreenY < GH()){
-    GX.fillStyle='rgba(80,0,0,0.35)';
+    // Zone jouable juste au-dessus : légère texture de danger (hachures diagonales)
+    const dangerH = Math.min(40, deathScreenY);
+    if(dangerH > 0){
+      GX.save();
+      GX.globalAlpha = 0.18;
+      GX.fillStyle = '#ff4060';
+      const stripW = 12;
+      for(let sx = -GH(); sx < GW()+GH(); sx += stripW*2){
+        GX.beginPath();
+        GX.moveTo(sx, deathScreenY - dangerH);
+        GX.lineTo(sx + dangerH, deathScreenY - dangerH);
+        GX.lineTo(sx + dangerH + dangerH, deathScreenY);
+        GX.lineTo(sx + dangerH, deathScreenY);
+        GX.closePath();
+        GX.fill();
+      }
+      GX.globalAlpha = 1;
+      GX.restore();
+    }
+    // Tout ce qui est sous la ligne de mort = noir total
+    GX.fillStyle='#000000';
     GX.fillRect(0, deathScreenY, GW(), GH()-deathScreenY);
-    GX.save();
-    GX.strokeStyle='#ff4060';
-    GX.lineWidth=2;
-    GX.setLineDash([16,8]);
-    GX.beginPath();GX.moveTo(0,deathScreenY);GX.lineTo(GW(),deathScreenY);GX.stroke();
-    GX.setLineDash([]);
-    GX.restore();
   }
 }
 
