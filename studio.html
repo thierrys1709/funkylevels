@@ -803,10 +803,10 @@ const EC=document.getElementById('ecanvas');
 const EX=EC.getContext('2d');
 let EW=EC.width,EH=EC.height;
 
-// ── MODIF 1 : hauteur canvas = GAME_HEIGHT fixe (640px), largeur dynamique ──
+// ── MODIF 1 : canvas remplit toute la hauteur du cwrap ──
 function resizeEditor(){
   const wrap=document.getElementById('cwrap');
-  const h=GAME_HEIGHT; // toujours 640, comme le jeu
+  const h=Math.max(GAME_HEIGHT, wrap.clientHeight);
   if(h>0&&h!==EC.height){EC.height=h;EH=h;redraw();}
 }
 window.addEventListener('resize',resizeEditor);
@@ -1436,9 +1436,9 @@ function redraw(){
 
   // ── MODIF 2 : Limite de mort du joueur (y = GAME_HEIGHT = 640) ──
   if(GAME_HEIGHT <= EH){
-    // Mince bande rouge sous la ligne (16px seulement)
-    EX.fillStyle='rgba(255,40,60,0.10)';
-    EX.fillRect(0,GAME_HEIGHT,EW,Math.min(16,EH-GAME_HEIGHT));
+    // Teinte rouge légère sous la ligne jusqu'en bas du canvas
+    EX.fillStyle='rgba(255,40,60,0.05)';
+    EX.fillRect(0,GAME_HEIGHT,EW,EH-GAME_HEIGHT);
     // Ligne rouge pointillée
     EX.save();
     EX.strokeStyle='#ff4060';
