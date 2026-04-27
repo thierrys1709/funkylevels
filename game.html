@@ -892,7 +892,7 @@ function gUpdate(now){
     else if(m===oR)gPlayer.x=sp.x+sp.w;
   });
 
-  if(gPlayer.y>EH+100)killPlayer();
+  if(gPlayer.y+gPlayer.h>EH)killPlayer();
   if(gPlayer.gravDir==='u'&&gPlayer.y<-200)killPlayer();
   if(gPlayer.gravDir==='l'&&gPlayer.x<-200)killPlayer();
   if(gPlayer.gravDir==='r'&&gPlayer.x>EW+200)killPlayer();
@@ -1072,7 +1072,7 @@ function gDraw(){
   // ── Zone de mort (coordonnées écran) ──
   const deathScreenY = EH - gCamY;
   if(deathScreenY < GH()){
-    GX.fillStyle='rgba(20,0,0,0.72)';
+    GX.fillStyle='rgba(80,0,0,0.35)';
     GX.fillRect(0, deathScreenY, GW(), GH()-deathScreenY);
     GX.save();
     GX.strokeStyle='#ff4060';
