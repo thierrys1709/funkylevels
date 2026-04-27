@@ -243,7 +243,9 @@ async function confirmPublish(){
   const confirmBtn=document.getElementById('pub-confirm-btn');
   if(confirmBtn){confirmBtn.disabled=true;confirmBtn.textContent='⏳...';}
   const token=_getToken();
-  const _ptc=_langCache[l]?.publish||{};if(!token){alert(_ptc.pubNeedLogin||(l==='fr'?'Non connecté':'Not logged in'));return;}
+  const l=_lang();
+  const _ptc=_langCache[l]?.publish||{};
+  if(!token){alert(_ptc.pubNeedLogin||(l==='fr'?'Non connecté':'Not logged in'));return;}
   let ok=false;
   if(_currentLevelId){
     const r=await fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{method:'PATCH',headers:{'apikey':_sbKey,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({title:newTitle,visibility:_pendingVisibility,is_published:true,author_completed:true})});
@@ -467,12 +469,10 @@ async function init(){
   }
   if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.mobile)lv.mobile=[];
   if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];
-  // Migrate old slider blocks into mobile
   if(lv.slider&&lv.slider.length){
     lv.slider.forEach(s=>{lv.mobile.push({...s,trigger:'approach',dir:s.dir||'r',dist:s.maxDist||160,loop:s.returns!==false,waitDelay:s.retDelay||0,trigDist:s.trigDist||48,state:'idle',t:0,going:true,waitTimer:0,_triggered:false});});
     lv.slider=[];
   }
-  // Migrate old trap blocks into mobile (fall mode)
   if(lv.trap&&lv.trap.length){
     lv.trap.forEach(t=>{lv.mobile.push({...t,trigger:'approach',dir:'fall',dist:0,loop:t.returns!==false,waitDelay:t.riseDelay||0,trigDist:t.trigDist||48,speed:t.fallSpeed||3,state:'idle',t:0,going:true,waitTimer:0,_triggered:false});});
     lv.trap=[];
@@ -505,7 +505,6 @@ function startGameFrom(sx,sy){
   (gLv.push||[]).forEach(p=>{p.x=p.ox;p.y=p.oy;p.vx=0;p.vy=0;});
   (gLv.gravflip||[]).forEach(z=>{if(z.dir===undefined){z.dir=(z.grav??-10)<0?'u':'d';z.strength=Math.abs(z.grav??10);}});
   (gLv.spike||[]).forEach(s=>{s.state='idle';s.timer=0;s._touched=false;s._delayTimer=0;});
-  // Reset spike state sur tous les autres types de blocs
   const _spikeTypes=['fixed','invis','bounce','mobile','push','flash','trap','slider','gblock'];
   _spikeTypes.forEach(k=>{(gLv[k]||[]).forEach(b=>{if(b.spikes){b.spikes._touched=false;b.spikes._delayTimer=0;}});});
   (gLv.gblock||[]).forEach(g=>{g._attached=false;g._justJumped=false;});
@@ -561,8 +560,9 @@ function gLoopStart(){if(gRafId)cancelAnimationFrame(gRafId);gRafId=requestAnima
 document.addEventListener('fullscreenchange',()=>{resizeGameCanvas();});
 
 function resizeGameCanvas(){
-  const HUD_H=90,BAR_H=48,RESERVED=HUD_H+BAR_H+4;
-  const vw=window.innerWidth,vh=window.innerHeight-RESERVED;
+  const wrap=document.getElementById('gwrap');
+  const vw=wrap.clientWidth;
+  const vh=wrap.clientHeight;
   let w,h;
   if(vw/vh>16/9){h=vh;w=Math.round(h*(16/9));}else{w=vw;h=Math.round(w/(16/9));}
   w=Math.max(320,w);h=Math.max(180,h);
@@ -597,27 +597,20 @@ function res(p){
 
 function killPlayer(){if(gPlayer.dead)return;gPlayer.dead=true;gPlayer.dT=0;spawnP(gPlayer.x+11,gPlayer.y+16,PCOL.player,20);}
 
-// ── Spike check universel pour tous les types de blocs ──
 function checkBlockSpikes(b){
   if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return false;
   if(!ov(gPlayer,b))return false;
   const sp=b.spikes;
   const hidden=sp.hidden||false;
   const delay=(sp.delay||0)*60;
-  // Timer tourne en permanence dès le premier contact
   if(hidden&&sp._touched&&sp._delayTimer<delay)sp._delayTimer++;
-  if(!hidden){
-    // Piques toujours actifs : tuer au moindre contact
-    killPlayer();return true;
-  }
-  // hidden : déclencher délai au premier contact
+  if(!hidden){killPlayer();return true;}
   if(!sp._touched)sp._touched=true;
   const delayDone=delay===0||sp._delayTimer>=delay;
   if(delayDone){killPlayer();return true;}
   return false;
 }
 
-// ── Rendu des piques sur un bloc quelconque ──
 function drawBlockSpikes(b){
   if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return;
   const sp=b.spikes;
@@ -678,7 +671,6 @@ function gUpdate(now){
   if(!jumpHeld)_jumpReady=true;
   const jump=jumpHeld&&_jumpReady;
 
-  // Sauvegarder la direction avant calcul pour détecter le changement
   const prevGravDir=gPlayer.gravDir;
 
   let activeDir='d',activeStr=GRAV,inGravZone=false;
@@ -712,15 +704,9 @@ function gUpdate(now){
   }
   gPlayer.gravDir=activeDir;
 
-  // ── Détecter changement de gravité → effet ripple sur le joueur ──
   if(gPlayer.gravDir!==prevGravDir){
     const GFC=GF_COLS[gPlayer.gravDir]||GF_COLS.u;
-    gGravEffects.push({
-      x:gPlayer.x+gPlayer.w/2,
-      y:gPlayer.y+gPlayer.h/2,
-      col:GFC.stroke,
-      life:1
-    });
+    gGravEffects.push({x:gPlayer.x+gPlayer.w/2,y:gPlayer.y+gPlayer.h/2,col:GFC.stroke,life:1});
   }
 
   let zoneSpd=SPD,zoneJspd=JSPD;
@@ -794,7 +780,6 @@ function gUpdate(now){
     else checkBlockSpikes(f);
   });
 
-  // ── Mobile unifié (continu + approche + omni + chute) ──
   (gLv.mobile||[]).forEach(t=>{
     const trigger=t.trigger||'continuous';
     const dir=t.dir||'r';
@@ -805,70 +790,42 @@ function gUpdate(now){
     const trigDist=t.trigDist||80;
     const prevX=t.x,prevY=t.y;
 
-    // Calcul direction vers joueur (omni)
     const toPlX=gPlayer.x+11-t.x-t.w/2;
     const toPlY=gPlayer.y+11-t.y-t.h/2;
     const toPlLen=Math.sqrt(toPlX*toPlX+toPlY*toPlY)||1;
 
-    // Direction vecteur
     const DIRS={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1],omni:[toPlX/toPlLen,toPlY/toPlLen],fall:[0,1]};
     const[dx,dy]=DIRS[dir]||[1,0];
 
-    // Distance joueur pour déclenchement
     const playerDist=Math.max(0,
-      t.ox-(gPlayer.x+gPlayer.w),
-      gPlayer.x-(t.ox+t.w),
-      t.oy-(gPlayer.y+gPlayer.h),
-      gPlayer.y-(t.oy+t.h)
+      t.ox-(gPlayer.x+gPlayer.w),gPlayer.x-(t.ox+t.w),
+      t.oy-(gPlayer.y+gPlayer.h),gPlayer.y-(t.oy+t.h)
     );
 
     if(trigger==='approach'){
-      // Déclenché à l'approche
       if(!t._triggered&&playerDist<=trigDist)t._triggered=true;
       if(!t._triggered){if(ov(gPlayer,t)){if(checkBlockSpikes(t))return;res(t);}return;}
-      // Chute : tombe jusqu'à hors écran
       if(dir==='fall'){
         t.y+=spd;
         if(t.y>EH+200){t.x=t.ox;t.y=t.oy;t._triggered=false;}
         if(ov(gPlayer,t)){if(checkBlockSpikes(t))return;res(t);}
         return;
       }
-      // Mouvement classique déclenché
       if(t.going){
-        if(dir==='omni'){
-          const nx=gPlayer.x+11-t.x-t.w/2,ny=gPlayer.y+11-t.y-t.h/2,l=Math.sqrt(nx*nx+ny*ny)||1;
-          t.x+=nx/l*spd;t.y+=ny/l*spd;t.t=(t.t||0)+spd;
-        }else{t.x+=dx*spd;t.y+=dy*spd;t.t=(t.t||0)+spd;}
-        if(t.t>=dist){
-          t.t=dist;
-          if(loop){t.going=false;t.waitTimer=0;}
-          else{t.going=false;}
-        }
+        if(dir==='omni'){const nx=gPlayer.x+11-t.x-t.w/2,ny=gPlayer.y+11-t.y-t.h/2,l=Math.sqrt(nx*nx+ny*ny)||1;t.x+=nx/l*spd;t.y+=ny/l*spd;t.t=(t.t||0)+spd;}
+        else{t.x+=dx*spd;t.y+=dy*spd;t.t=(t.t||0)+spd;}
+        if(t.t>=dist){t.t=dist;if(loop){t.going=false;t.waitTimer=0;}else{t.going=false;}}
       }else{
         if(waitDelay>0&&(t.waitTimer||0)<waitDelay){t.waitTimer++;}
-        else if(loop){
-          const rx=t.ox-t.x,ry=t.oy-t.y,rl=Math.sqrt(rx*rx+ry*ry)||1;
-          t.x+=rx/rl*spd;t.y+=ry/rl*spd;t.t=(t.t||0)-spd;
-          if(t.t<=0){t.x=t.ox;t.y=t.oy;t.t=0;t.going=true;t._triggered=false;}
-        }
+        else if(loop){const rx=t.ox-t.x,ry=t.oy-t.y,rl=Math.sqrt(rx*rx+ry*ry)||1;t.x+=rx/rl*spd;t.y+=ry/rl*spd;t.t=(t.t||0)-spd;if(t.t<=0){t.x=t.ox;t.y=t.oy;t.t=0;t.going=true;t._triggered=false;}}
       }
     }else{
-      // Continu : va-vient permanent
       if(dir==='omni'){
-        if(t.going){
-          const nx=gPlayer.x+11-t.x-t.w/2,ny=gPlayer.y+11-t.y-t.h/2,l=Math.sqrt(nx*nx+ny*ny)||1;
-          t.x+=nx/l*spd;t.y+=ny/l*spd;t.t=(t.t||0)+spd;
-          if(t.t>=dist){t.t=dist;t.going=false;t.waitTimer=0;}
-        }else{
-          if((t.waitTimer||0)<waitDelay){t.waitTimer++;}
-          else{const rx=t.ox-t.x,ry=t.oy-t.y,rl=Math.sqrt(rx*rx+ry*ry)||1;t.x+=rx/rl*spd;t.y+=ry/rl*spd;t.t-=spd;if(t.t<=0){t.x=t.ox;t.y=t.oy;t.t=0;t.going=true;}}
-        }
+        if(t.going){const nx=gPlayer.x+11-t.x-t.w/2,ny=gPlayer.y+11-t.y-t.h/2,l=Math.sqrt(nx*nx+ny*ny)||1;t.x+=nx/l*spd;t.y+=ny/l*spd;t.t=(t.t||0)+spd;if(t.t>=dist){t.t=dist;t.going=false;t.waitTimer=0;}}
+        else{if((t.waitTimer||0)<waitDelay){t.waitTimer++;}else{const rx=t.ox-t.x,ry=t.oy-t.y,rl=Math.sqrt(rx*rx+ry*ry)||1;t.x+=rx/rl*spd;t.y+=ry/rl*spd;t.t-=spd;if(t.t<=0){t.x=t.ox;t.y=t.oy;t.t=0;t.going=true;}}}
       }else{
         if(t.going){t.x+=dx*spd;t.y+=dy*spd;t.t=(t.t||0)+spd;if(t.t>=dist){t.t=dist;t.going=false;t.waitTimer=0;}}
-        else{
-          if((t.waitTimer||0)<waitDelay){t.waitTimer++;}
-          else{t.x-=dx*spd;t.y-=dy*spd;t.t=(t.t||0)-spd;if(t.t<=0){t.t=0;t.x=t.ox;t.y=t.oy;t.going=true;}}
-        }
+        else{if((t.waitTimer||0)<waitDelay){t.waitTimer++;}else{t.x-=dx*spd;t.y-=dy*spd;t.t=(t.t||0)-spd;if(t.t<=0){t.t=0;t.x=t.ox;t.y=t.oy;t.going=true;}}}
       }
     }
 
@@ -901,7 +858,6 @@ function gUpdate(now){
     if(t.y>EH+200){t.x=t.ox;t.y=t.oy;t.vx=0;t.vy=0;}
   });
 
-  // ── Bounce ─────────────────────────────────────────────
   (gLv.bounce||[]).forEach(p=>{
     if(!ov(gPlayer,p))return;
     if(checkBlockSpikes(p))return;
@@ -916,7 +872,6 @@ function gUpdate(now){
     else if(m===oT)gPlayer.y=p.y-gPlayer.h;else if(m===oB)gPlayer.y=p.y+p.h;
   });
 
-
   (gLv.spike||[]).forEach(sp=>{
     const hidden=sp.hidden||false;
     const delay=(sp.activationDelay||0)*60;
@@ -927,7 +882,6 @@ function gUpdate(now){
     if(!sp._touched)sp._touched=true;
     const delayDone=delay===0||sp._delayTimer>=delay;
     if(delayDone){killPlayer();return;}
-    // Collision solide si pas encore activé
     const oL=(gPlayer.x+gPlayer.w)-sp.x,oR=(sp.x+sp.w)-gPlayer.x;
     const oT=(gPlayer.y+gPlayer.h)-sp.y,oB=(sp.y+sp.h)-gPlayer.y;
     const m=Math.min(oL,oR,oT,oB);
@@ -1071,7 +1025,6 @@ function gDraw(){
     drawBlockSpikes(f);
   });
 
-  // ── Spike blocks draw ──
   (gLv.spike||[]).forEach(sp=>{
     const hidden=sp.hidden||false;
     const delay=(sp.activationDelay||0)*60;
@@ -1143,9 +1096,7 @@ document.addEventListener('keyup',e=>{
 
 let _audioCtx=null;
 function getAudioCtx(){
-  if(!_audioCtx){
-    try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}
-  }
+  if(!_audioCtx){try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}
   return _audioCtx;
 }
 function playSound(type){
@@ -1240,8 +1191,7 @@ if(isMobile){
 const mbMap={left:'ArrowLeft',right:'ArrowRight',jump:'Space'};
 const mbActive=new Set();
 function mbDown(dir){
-  if(mbActive.has(dir))return;
-  mbActive.add(dir);
+  if(mbActive.has(dir))return;mbActive.add(dir);
   const key=mbMap[dir];if(key)gKeys[key]=true;
   const btn=document.getElementById('mb-'+dir);if(btn)btn.classList.add('pressed');
 }
