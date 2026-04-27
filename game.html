@@ -570,24 +570,57 @@ let gPushEffects=[];
 let gConfetti=[];
 
 function spawnConfetti(x,y){
-  const COLORS=['#ff4060','#f0e040','#40f090','#40c0ff','#f070ff','#ff9020','#ffffff','#80ff40'];
-  for(let i=0;i<120;i++){
-    const angle=Math.random()*Math.PI*2;
-    const spd=Math.random()*18+4;
-    const col=COLORS[Math.floor(Math.random()*COLORS.length)];
-    const w=Math.random()*8+3;
-    const h=Math.random()*4+2;
-    const rot=Math.random()*Math.PI*2;
-    const rotSpd=(Math.random()-0.5)*0.4;
+  const COLORS=['#ff4060','#f0e040','#40f090','#40c0ff','#f070ff','#ff9020','#ffffff','#80ff40','#ff80c0','#c0ff40'];
+  // Vague 1 : explosion principale vers le haut
+  for(let i=0;i<80;i++){
+    const angle=(Math.random()*Math.PI)-Math.PI; // hémisphère haut
+    const spd=Math.random()*22+8;
     gConfetti.push({
       x,y,
       vx:Math.cos(angle)*spd,
-      vy:Math.sin(angle)*spd-8,
-      w,h,rot,rotSpd,
-      col,
-      life:1,
-      decay:0.012+Math.random()*0.008,
-      gravity:0.45+Math.random()*0.2
+      vy:Math.sin(angle)*spd-6,
+      w:Math.random()*9+3,h:Math.random()*5+2,
+      rot:Math.random()*Math.PI*2,
+      rotSpd:(Math.random()-0.5)*0.5,
+      col:COLORS[Math.floor(Math.random()*COLORS.length)],
+      life:1,decay:0.007+Math.random()*0.006,
+      gravity:0.38+Math.random()*0.18,
+      delay:0
+    });
+  }
+  // Vague 2 : retombées latérales avec délai
+  for(let i=0;i<60;i++){
+    const angle=Math.random()*Math.PI*2;
+    const spd=Math.random()*14+3;
+    gConfetti.push({
+      x:x+(Math.random()-0.5)*40,
+      y:y-(Math.random()*30),
+      vx:Math.cos(angle)*spd,
+      vy:Math.sin(angle)*spd-12,
+      w:Math.random()*7+2,h:Math.random()*4+2,
+      rot:Math.random()*Math.PI*2,
+      rotSpd:(Math.random()-0.5)*0.35,
+      col:COLORS[Math.floor(Math.random()*COLORS.length)],
+      life:1,decay:0.005+Math.random()*0.005,
+      gravity:0.32+Math.random()*0.15,
+      delay:Math.random()*30 // frames de délai
+    });
+  }
+  // Vague 3 : petits éclats rapides type étincelles
+  for(let i=0;i<40;i++){
+    const angle=Math.random()*Math.PI*2;
+    const spd=Math.random()*28+12;
+    gConfetti.push({
+      x,y,
+      vx:Math.cos(angle)*spd,
+      vy:Math.sin(angle)*spd-10,
+      w:Math.random()*4+1,h:Math.random()*4+1,
+      rot:Math.random()*Math.PI*2,
+      rotSpd:(Math.random()-0.5)*0.7,
+      col:'#ffffff',
+      life:1,decay:0.018+Math.random()*0.01,
+      gravity:0.5,
+      delay:0
     });
   }
 }
@@ -685,7 +718,13 @@ function gUpdate(now){
   gParts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.life-=p.decay;});
   // Confetti physics
   gConfetti=gConfetti.filter(c=>c.life>0);
-  gConfetti.forEach(c=>{c.x+=c.vx;c.y+=c.vy;c.vy+=c.gravity;c.vx*=0.97;c.rot+=c.rotSpd;c.life-=c.decay;});
+  gConfetti.forEach(c=>{
+    if(c.delay>0){c.delay--;return;}
+    c.x+=c.vx;c.y+=c.vy;
+    c.vy+=c.gravity;c.vx*=0.975;
+    c.rot+=c.rotSpd;
+    c.life-=c.decay;
+  });
 
   if(gPlayer.dead){
     gPlayer.dT++;
@@ -968,7 +1007,7 @@ function gUpdate(now){
     setTimeout(()=>{
       document.getElementById('ovWin').classList.add('show');
       if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')&&!_isOwner){setTimeout(()=>showRatingOverlay('rating-inline-win'),800);}
-    },600);
+    },2200);
   }
 
   const tx=gPlayer.x-GW()*0.32;gCamX+=(tx-gCamX)*0.1;gCamX=Math.max(0,gCamX);
