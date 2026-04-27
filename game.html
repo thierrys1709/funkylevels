@@ -1068,6 +1068,20 @@ function gDraw(){
   GX.globalAlpha=1;
   if(!gPlayer.dead)gDrawPlayer();
   GX.restore();
+
+  // ── Zone de mort (coordonnées écran) ──
+  const deathScreenY = EH - gCamY;
+  if(deathScreenY < GH()){
+    GX.fillStyle='rgba(20,0,0,0.72)';
+    GX.fillRect(0, deathScreenY, GW(), GH()-deathScreenY);
+    GX.save();
+    GX.strokeStyle='#ff4060';
+    GX.lineWidth=2;
+    GX.setLineDash([16,8]);
+    GX.beginPath();GX.moveTo(0,deathScreenY);GX.lineTo(GW(),deathScreenY);GX.stroke();
+    GX.setLineDash([]);
+    GX.restore();
+  }
 }
 
 let _lastFrameTime=0;
