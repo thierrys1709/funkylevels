@@ -540,6 +540,19 @@ function gameRespawn(){
 // ══════════════════════════════════════════════════════════
 const GC=document.getElementById('gcanvas');
 const GX=GC.getContext('2d');
+
+// ── Texture bruit statique ──
+const _noiseCanvas=document.createElement('canvas');
+_noiseCanvas.width=256;_noiseCanvas.height=256;
+const _noiseCtx=_noiseCanvas.getContext('2d');
+const _noiseData=_noiseCtx.createImageData(256,256);
+for(let i=0;i<_noiseData.data.length;i+=4){
+  const v=Math.random()*255|0;
+  _noiseData.data[i]=v;_noiseData.data[i+1]=v;_noiseData.data[i+2]=v;
+  _noiseData.data[i+3]=18; // très léger : opacité 7%
+}
+_noiseCtx.putImageData(_noiseData,0,0);
+let _noisePattern=null;
 function GW(){return GC.width;}
 function GH(){return GC.height;}
 
@@ -968,6 +981,9 @@ function gDrawPlayer(){
 
 function gDraw(){
   GX.fillStyle=PCOL.bg;GX.fillRect(0,0,GW(),GH());
+  // Bruit très léger sur le fond
+  if(!_noisePattern)_noisePattern=GX.createPattern(_noiseCanvas,'repeat');
+  if(_noisePattern){GX.save();GX.globalAlpha=1;GX.fillStyle=_noisePattern;GX.fillRect(0,0,GW(),GH());GX.restore();}
   GX.save();GX.translate(-Math.round(gCamX),-Math.round(gCamY));
 
   gLv.fixed.forEach(p=>{if(checkBlockSpikes(p))return;gPlatform(p);drawBlockSpikes(p);});
@@ -1072,26 +1088,6 @@ function gDraw(){
   // ── Zone de mort (coordonnées écran) ──
   const deathScreenY = EH - gCamY;
   if(deathScreenY < GH()){
-    // Zone jouable juste au-dessus : légère texture de danger (hachures diagonales)
-    const dangerH = Math.min(40, deathScreenY);
-    if(dangerH > 0){
-      GX.save();
-      GX.globalAlpha = 0.18;
-      GX.fillStyle = '#ff4060';
-      const stripW = 12;
-      for(let sx = -GH(); sx < GW()+GH(); sx += stripW*2){
-        GX.beginPath();
-        GX.moveTo(sx, deathScreenY - dangerH);
-        GX.lineTo(sx + dangerH, deathScreenY - dangerH);
-        GX.lineTo(sx + dangerH + dangerH, deathScreenY);
-        GX.lineTo(sx + dangerH, deathScreenY);
-        GX.closePath();
-        GX.fill();
-      }
-      GX.globalAlpha = 1;
-      GX.restore();
-    }
-    // Tout ce qui est sous la ligne de mort = noir total
     GX.fillStyle='#000000';
     GX.fillRect(0, deathScreenY, GW(), GH()-deathScreenY);
   }
