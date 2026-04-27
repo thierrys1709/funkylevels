@@ -509,7 +509,7 @@ function startGameFrom(sx,sy){
   _spikeTypes.forEach(k=>{(gLv[k]||[]).forEach(b=>{if(b.spikes){b.spikes._touched=false;b.spikes._delayTimer=0;}});});
   (gLv.gblock||[]).forEach(g=>{g._attached=false;g._justJumped=false;});
   (gLv.flash||[]).forEach(f=>{f._visible=true;f._timer=0;});
-  gParts=[];gBullets=[];gBounceEffects=[];gGravEffects=[];gPushEffects=[];gConfetti=[];
+  gParts=[];gBullets=[];gBounceEffects=[];gGravEffects=[];gPushEffects=[];gConfetti=[];gTrail=[];_currentSpeedMult=1;
   gLives=3;gElapsed=0;gWon=false;gRunning=false;gDeadPending=false;
   gStartTime=performance.now();
   gCamX=Math.max(0,sx-GW()*0.32);
@@ -568,6 +568,8 @@ let gBounceEffects=[];
 let gGravEffects=[];
 let gPushEffects=[];
 let gConfetti=[];
+let gTrail=[];
+let _currentSpeedMult=1;
 
 function spawnConfetti(x,y){
   const COLORS=['#ff4060','#f0e040','#40f090','#40c0ff','#f070ff','#ff9020','#ffffff','#80ff40','#ff80c0','#c0ff40'];
@@ -716,6 +718,10 @@ function gUpdate(now){
   gElapsed=(now-gStartTime)/1000;
   gParts=gParts.filter(p=>p.life>0);
   gParts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.life-=p.decay;});
+  // Traînée vitesse
+  gTrail=gTrail.filter(t=>t.life>0);
+  gTrail.forEach(t=>{t.x+=t.vx;t.y+=t.vy;t.vx*=0.9;t.vy*=0.9;t.life-=t.decay;});
+
   // Confetti physics
   gConfetti=gConfetti.filter(c=>c.life>0);
   gConfetti.forEach(c=>{
@@ -789,7 +795,8 @@ function gUpdate(now){
   }
 
   let zoneSpd=SPD,zoneJspd=JSPD;
-  (gLv.speed||[]).forEach(z=>{if(ov(gPlayer,z)){const mult=(z.spd??5)/5;zoneSpd=SPD*mult;zoneJspd=JSPD*mult;}});
+  _currentSpeedMult=1;
+  (gLv.speed||[]).forEach(z=>{if(ov(gPlayer,z)){const mult=(z.spd??5)/5;zoneSpd=SPD*mult;zoneJspd=JSPD*mult;_currentSpeedMult=mult;}});
 
   const gd=gPlayer.gravDir;
   const isHorizGrav=(gd==='l'||gd==='r');
@@ -806,6 +813,27 @@ function gUpdate(now){
   }
 
   const moveSpd=isHorizGrav?Math.abs(gPlayer.vy):Math.abs(gPlayer.vx);
+
+  // Traînée de vitesse
+  if(_currentSpeedMult>1&&moveSpd>1){
+    const excess=_currentSpeedMult-1; // 0 à ~3
+    const count=Math.ceil(excess*3);
+    for(let i=0;i<count;i++){
+      const alpha=0.12+excess*0.12;
+      const size=3+excess*3;
+      gTrail.push({
+        x:gPlayer.x+gPlayer.w/2+(Math.random()-0.5)*gPlayer.w*0.4,
+        y:gPlayer.y+gPlayer.h/2+(Math.random()-0.5)*gPlayer.h*0.4,
+        vx:(-gPlayer.vx*0.3)+(Math.random()-0.5)*1.5,
+        vy:(-gPlayer.vy*0.3)+(Math.random()-0.5)*1.5,
+        size,
+        alpha,
+        life:1,
+        decay:0.06+Math.random()*0.04,
+        mult:excess
+      });
+    }
+  }
   if(moveSpd>0.5&&gPlayer.onGround){gPlayer.wT++;if(gPlayer.wT>7){gPlayer.wF^=1;gPlayer.wT=0;}}
   else if(gPlayer.onGround)gPlayer.wF=0;
   gPlayer.sq+=(1-gPlayer.sq)*0.18;
@@ -1198,6 +1226,22 @@ function gDraw(){
   if(gLv.end)gFlag(gLv.end,PCOL.flagB,'B');
   gParts.forEach(p=>{GX.globalAlpha=Math.max(0,p.life);GX.fillStyle=p.col;GX.beginPath();GX.arc(p.x,p.y,Math.max(0,p.r*p.life),0,Math.PI*2);GX.fill();});
   GX.globalAlpha=1;
+  // Traînée de vitesse (dessinée avant le joueur)
+  gTrail.forEach(t=>{
+    const a=Math.max(0,t.life)*t.alpha;
+    GX.save();
+    GX.globalAlpha=a;
+    // Couleur selon intensité : bleu clair -> cyan -> blanc
+    const r=Math.round(80+t.mult*60);
+    const g=Math.round(160+t.mult*40);
+    const b=255;
+    GX.fillStyle=`rgb(${r},${g},${b})`;
+    const s=t.size*t.life;
+    GX.beginPath();
+    GX.arc(t.x, t.y, Math.max(0.5,s), 0, Math.PI*2);
+    GX.fill();
+    GX.restore();
+  });
   if(!gPlayer.dead)gDrawPlayer();
   // Confetti
   gConfetti.forEach(c=>{
