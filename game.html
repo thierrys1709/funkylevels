@@ -948,7 +948,61 @@ function gUpdate(now){
 }
 
 function gPlatform(p){const x=Math.round(p.x),y=Math.round(p.y),w=Math.round(p.w),h=Math.round(p.h);GX.fillStyle=PCOL.plat;GX.fillRect(x,y,w,h);GX.fillStyle=PCOL.platT;GX.fillRect(x,y,w,4);GX.fillStyle=PCOL.platS;for(let i=x+7;i<x+w-4;i+=9)GX.fillRect(i,y+1,3,2);}
-function gFlag(pos,col,lbl){GX.fillStyle='#888';GX.fillRect(pos.x+12,pos.y-50,3,50);GX.fillStyle=col;GX.beginPath();GX.moveTo(pos.x+15,pos.y-50);GX.lineTo(pos.x+36,pos.y-38);GX.lineTo(pos.x+15,pos.y-26);GX.closePath();GX.fill();}
+function gFlag(pos,col,lbl){
+  const t=performance.now()/1000;
+  const px=pos.x, py=pos.y;
+  // Mât
+  GX.save();
+  GX.strokeStyle='#aaaaaa';
+  GX.lineWidth=2.5;
+  GX.lineCap='round';
+  GX.beginPath();GX.moveTo(px+14,py);GX.lineTo(px+14,py-54);GX.stroke();
+  // Ombre mât
+  GX.strokeStyle='rgba(0,0,0,0.3)';
+  GX.lineWidth=1.5;
+  GX.beginPath();GX.moveTo(px+16,py);GX.lineTo(px+16,py-54);GX.stroke();
+  // Tissu ondulant — bezier courbe animée
+  const w1=Math.sin(t*3.2)*3;
+  const w2=Math.sin(t*3.2+1.2)*4;
+  const w3=Math.sin(t*3.2+2.1)*2;
+  const flagTop=py-54;
+  const flagMid=py-41;
+  const flagBot=py-28;
+  const flagLeft=px+14;
+  const flagRight=flagLeft+26;
+  // Ombre du drapeau
+  GX.globalAlpha=0.25;
+  GX.fillStyle='#000';
+  GX.beginPath();
+  GX.moveTo(flagLeft+2, flagTop+2);
+  GX.bezierCurveTo(flagLeft+12+w1+2, flagTop+2+w1, flagRight+w2+2, flagMid+w2+2, flagLeft+2, flagBot+2);
+  GX.closePath();
+  GX.fill();
+  GX.globalAlpha=1;
+  // Drapeau principal
+  GX.fillStyle=col;
+  GX.beginPath();
+  GX.moveTo(flagLeft, flagTop);
+  // bord supérieur ondulant
+  GX.bezierCurveTo(flagLeft+10+w1, flagTop+w1, flagRight+w2-4, flagTop+w2, flagRight+w2, flagMid+w3);
+  // pointe
+  GX.bezierCurveTo(flagRight+w2+1, flagMid+w3+2, flagRight+w2-2, flagMid+w3+4, flagRight+w2-4, flagMid+w3+6);
+  // bord inférieur ondulant
+  GX.bezierCurveTo(flagRight+w2-6, flagMid+w3+8, flagLeft+10+w3, flagBot+w3, flagLeft, flagBot);
+  GX.closePath();
+  GX.fill();
+  // Reflet sur le drapeau
+  GX.globalAlpha=0.18;
+  GX.fillStyle='#ffffff';
+  GX.beginPath();
+  GX.moveTo(flagLeft, flagTop);
+  GX.bezierCurveTo(flagLeft+8+w1, flagTop+w1, flagRight+w2-6, flagTop+w2, flagRight+w2-2, flagMid+w3);
+  GX.bezierCurveTo(flagLeft+14+w1, flagTop+4+w1, flagLeft+6, flagTop+8, flagLeft, flagTop);
+  GX.closePath();
+  GX.fill();
+  GX.globalAlpha=1;
+  GX.restore();
+}
 
 function gDrawPlayer(){
   const{x:px,y:py,w:pw,h:ph,facing:f,wF:wf,sq,onGround,angle,vy}=gPlayer;
@@ -1104,7 +1158,7 @@ function gLoop(now){
   const steps=Math.round(clampedDelta/FRAME_MS);
   for(let i=0;i<Math.max(1,steps);i++){gUpdate(now);}
   gDraw();
-  if(gRunning||gWon)gRafId=requestAnimationFrame(gLoop);
+  if(gRunning||gWon||gDeadPending)gRafId=requestAnimationFrame(gLoop);
 }
 
 document.addEventListener('keydown',e=>{
