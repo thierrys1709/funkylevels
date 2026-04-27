@@ -1095,12 +1095,7 @@ function gDraw(){
   });
   (gLv.push||[]).forEach(t=>{gPlatform(t);drawBlockSpikes(t);});
   (gLv.slider||[]).forEach(t=>{if(t.state!=='done'){gPlatform(t);drawBlockSpikes(t);}});
-  (gLv.speed||[]).forEach(z=>{
-    const spd=z.spd??5,fast=spd>5;
-    GX.fillStyle=spd===5?'#40c04018':fast?'#4040f018':'#f0404018';GX.fillRect(z.x,z.y,z.w,z.h);
-    GX.fillStyle=spd===5?'#40c04044':fast?'#4040f044':'#f0404044';
-    GX.fillRect(z.x,z.y,z.w,2);GX.fillRect(z.x,z.y+z.h-2,z.w,2);GX.fillRect(z.x,z.y,2,z.h);GX.fillRect(z.x+z.w-2,z.y,2,z.h);
-  });
+  // Speed zones invisibles en jeu
 
   gGravEffects=gGravEffects.filter(e=>e.life>0);
   gGravEffects.forEach(e=>{
