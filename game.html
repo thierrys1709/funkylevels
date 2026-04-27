@@ -22,7 +22,7 @@ body{background:#06060e;color:#e8e8ff;font-family:Rajdhani,sans-serif;overflow:h
 #hud-global-time{font-family:Orbitron,monospace;font-size:12px;font-weight:700;color:#f0e040;}
 #hud-global-user{font-family:Orbitron,monospace;font-size:14px;font-weight:700;color:#c0a0ff;letter-spacing:1px;}
 body.test-mode #hud-global-lbl,body.test-mode #hud-global-user,body.test-mode #hud-best{display:none!important;}
-#gwrap{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#0c0c1a;}
+#gwrap{flex:1;display:none;flex-direction:column;align-items:center;justify-content:flex-start;position:relative;overflow:hidden;background:#000000;}
 #gwrap.show{display:flex;}
 #gcanvas{display:block;image-rendering:pixelated;}
 .ov{display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#00000099;backdrop-filter:blur(2px);z-index:10;}
@@ -573,12 +573,12 @@ function gLoopStart(){if(gRafId)cancelAnimationFrame(gRafId);gRafId=requestAnima
 document.addEventListener('fullscreenchange',()=>{resizeGameCanvas();});
 
 function resizeGameCanvas(){
-  const topbarH=document.getElementById('gtopbar')?.offsetHeight||46;
-  const vw=window.innerWidth;
-  const vh=window.innerHeight-topbarH;
-  let w,h;
-  const ratio=EW/EH;if(vw/vh>ratio){h=vh;w=Math.round(h*ratio);}else{w=vw;h=Math.round(w/ratio);}
-  w=Math.max(320,Math.min(vw,w));h=Math.max(180,Math.min(vh,h));
+  const wrap=document.getElementById('gwrap');
+  const vw=wrap.clientWidth||window.innerWidth;
+  const vh=wrap.clientHeight||(window.innerHeight-(document.getElementById('gtopbar')?.offsetHeight||46));
+  // Le canvas occupe tout le gwrap — pas de letterbox, pas de bandes
+  const w=Math.max(320,vw);
+  const h=Math.max(180,vh);
   if(GC.width===w&&GC.height===h)return;
   GC.width=w;GC.height=h;GC.style.width=w+'px';GC.style.height=h+'px';
 }
