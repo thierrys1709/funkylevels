@@ -509,7 +509,7 @@ function startGameFrom(sx,sy){
   _spikeTypes.forEach(k=>{(gLv[k]||[]).forEach(b=>{if(b.spikes){b.spikes._touched=false;b.spikes._delayTimer=0;}});});
   (gLv.gblock||[]).forEach(g=>{g._attached=false;g._justJumped=false;});
   (gLv.flash||[]).forEach(f=>{f._visible=true;f._timer=0;});
-  gParts=[];gBullets=[];gBounceEffects=[];gGravEffects=[];gPushEffects=[];
+  gParts=[];gBullets=[];gBounceEffects=[];gGravEffects=[];gPushEffects=[];gConfetti=[];
   gLives=3;gElapsed=0;gWon=false;gRunning=false;gDeadPending=false;
   gStartTime=performance.now();
   gCamX=Math.max(0,sx-GW()*0.32);
@@ -567,6 +567,30 @@ let gBullets=[];
 let gBounceEffects=[];
 let gGravEffects=[];
 let gPushEffects=[];
+let gConfetti=[];
+
+function spawnConfetti(x,y){
+  const COLORS=['#ff4060','#f0e040','#40f090','#40c0ff','#f070ff','#ff9020','#ffffff','#80ff40'];
+  for(let i=0;i<120;i++){
+    const angle=Math.random()*Math.PI*2;
+    const spd=Math.random()*18+4;
+    const col=COLORS[Math.floor(Math.random()*COLORS.length)];
+    const w=Math.random()*8+3;
+    const h=Math.random()*4+2;
+    const rot=Math.random()*Math.PI*2;
+    const rotSpd=(Math.random()-0.5)*0.4;
+    gConfetti.push({
+      x,y,
+      vx:Math.cos(angle)*spd,
+      vy:Math.sin(angle)*spd-8,
+      w,h,rot,rotSpd,
+      col,
+      life:1,
+      decay:0.012+Math.random()*0.008,
+      gravity:0.45+Math.random()*0.2
+    });
+  }
+}
 
 function gLoopStart(){if(gRafId)cancelAnimationFrame(gRafId);gRafId=requestAnimationFrame(gLoop);}
 
@@ -659,6 +683,9 @@ function gUpdate(now){
   gElapsed=(now-gStartTime)/1000;
   gParts=gParts.filter(p=>p.life>0);
   gParts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.life-=p.decay;});
+  // Confetti physics
+  gConfetti=gConfetti.filter(c=>c.life>0);
+  gConfetti.forEach(c=>{c.x+=c.vx;c.y+=c.vy;c.vy+=c.gravity;c.vx*=0.97;c.rot+=c.rotSpd;c.life-=c.decay;});
 
   if(gPlayer.dead){
     gPlayer.dT++;
@@ -916,6 +943,7 @@ function gUpdate(now){
     gWon=true;gRunning=false;stopTimer();
     const winTime=_currentTimeMs;const l=_lang();
     spawnP(gLv.end.x,gLv.end.y-20,PCOL.flagB,30);
+    spawnConfetti(gLv.end.x+14,gLv.end.y-40);
     const prevBest=_bestTime;
     saveTime(winTime).then(isNewRecord=>{showWinScreen(winTime,prevBest,isNewRecord,l);});
     if(_currentLevelId){
@@ -1137,6 +1165,16 @@ function gDraw(){
   gParts.forEach(p=>{GX.globalAlpha=Math.max(0,p.life);GX.fillStyle=p.col;GX.beginPath();GX.arc(p.x,p.y,Math.max(0,p.r*p.life),0,Math.PI*2);GX.fill();});
   GX.globalAlpha=1;
   if(!gPlayer.dead)gDrawPlayer();
+  // Confetti
+  gConfetti.forEach(c=>{
+    GX.save();
+    GX.globalAlpha=Math.max(0,c.life);
+    GX.translate(Math.round(c.x),Math.round(c.y));
+    GX.rotate(c.rot);
+    GX.fillStyle=c.col;
+    GX.fillRect(-c.w/2,-c.h/2,c.w,c.h);
+    GX.restore();
+  });
   GX.restore();
 
   // ── Zone de mort (coordonnées écran) ──
