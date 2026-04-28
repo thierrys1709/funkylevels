@@ -1264,7 +1264,7 @@ function gDraw(){
       gPlayer.y+gPlayer.h>d.y&&gPlayer.y<d.y+d.h;
     if(!inZone)return;
     const radius=d.radius??120;
-    const soft=d.soft??60;
+    const soft=40;
     const px=gPlayer.x+gPlayer.w/2-gCamX;
     const py=gPlayer.y+gPlayer.h/2-gCamY;
     // Redimensionner le canvas masque si besoin
