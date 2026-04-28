@@ -632,10 +632,9 @@ function gLoopStart(){if(gRafId)cancelAnimationFrame(gRafId);gRafId=requestAnima
 document.addEventListener('fullscreenchange',()=>{resizeGameCanvas();});
 
 function resizeGameCanvas(){
-  const wrap=document.getElementById('gwrap');
-  const vw=wrap.clientWidth||window.innerWidth;
-  const vh=wrap.clientHeight||(window.innerHeight-(document.getElementById('gtopbar')?.offsetHeight||46));
-  // Le canvas occupe tout le gwrap — pas de letterbox, pas de bandes
+  const topbarH=document.getElementById('gtopbar')?.offsetHeight||46;
+  const vw=window.innerWidth;
+  const vh=window.innerHeight-topbarH;
   const w=Math.max(320,vw);
   const h=Math.max(180,vh);
   if(GC.width===w&&GC.height===h)return;
@@ -1273,6 +1272,19 @@ function gLoop(now){
   _lastFrameTime=now;
   const steps=Math.round(clampedDelta/FRAME_MS);
   for(let i=0;i<Math.max(1,steps);i++){gUpdate(now);}
+  // Mise à jour confetti/trail même après victoire
+  if(gWon||gDeadPending){
+    gConfetti=gConfetti.filter(c=>c.life>0);
+    gConfetti.forEach(c=>{
+      if(c.delay>0){c.delay--;return;}
+      c.x+=c.vx;c.y+=c.vy;
+      c.vy+=c.gravity;c.vx*=0.975;
+      c.rot+=c.rotSpd;
+      c.life-=c.decay;
+    });
+    gParts=gParts.filter(p=>p.life>0);
+    gParts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.life-=p.decay;});
+  }
   gDraw();
   if(gRunning||gWon||gDeadPending)gRafId=requestAnimationFrame(gLoop);
 }
