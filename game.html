@@ -478,7 +478,7 @@ async function init(){
     lv.trap=[];
   }
   if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-  if(!lv.flash)lv.flash=[];if(!lv.spike)lv.spike=[];if(!lv.gblock)lv.gblock=[];
+  if(!lv.flash)lv.flash=[];if(!lv.spike)lv.spike=[];if(!lv.gblock)lv.gblock=[];if(!lv.darkness)lv.darkness=[];
   if(_currentLevelId&&_levelData){
     fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{method:'PATCH',headers:{'apikey':_sbKey,'Authorization':'Bearer '+(_getToken()||_sbKey),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({plays:(_levelData.plays||0)+1})});
   }
@@ -1253,6 +1253,32 @@ function gDraw(){
     GX.restore();
   });
   GX.restore();
+
+  // ── Zones d'obscurité ──
+  (gLv.darkness||[]).forEach(d=>{
+    // Vérifier si le joueur est dans la zone
+    const inZone=gPlayer&&!gPlayer.dead&&
+      gPlayer.x+gPlayer.w>d.x&&gPlayer.x<d.x+d.w&&
+      gPlayer.y+gPlayer.h>d.y&&gPlayer.y<d.y+d.h;
+    if(!inZone)return;
+    const radius=d.radius??120;
+    const soft=d.soft??60;
+    // Position joueur en coords écran
+    const px=gPlayer.x+gPlayer.w/2-gCamX;
+    const py=gPlayer.y+gPlayer.h/2-gCamY;
+    // Masque noir total
+    GX.fillStyle='rgba(0,0,0,0.96)';
+    GX.fillRect(0,0,GW(),GH());
+    // Halo autour du joueur avec destination-out
+    GX.save();
+    GX.globalCompositeOperation='destination-out';
+    const grad=GX.createRadialGradient(px,py,Math.max(0,radius-soft),px,py,radius+soft);
+    grad.addColorStop(0,'rgba(0,0,0,1)');
+    grad.addColorStop(1,'rgba(0,0,0,0)');
+    GX.fillStyle=grad;
+    GX.beginPath();GX.arc(px,py,radius+soft,0,Math.PI*2);GX.fill();
+    GX.restore();
+  });
 
   // ── Zone de mort (coordonnées écran) ──
   const deathScreenY = EH - gCamY;
