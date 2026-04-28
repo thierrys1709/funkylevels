@@ -570,6 +570,9 @@ let gPushEffects=[];
 let gConfetti=[];
 let gTrail=[];
 let _currentSpeedMult=1;
+// Canvas masque pour l'obscurité
+let _darkCanvas=document.createElement('canvas');
+let _darkCtx=_darkCanvas.getContext('2d');
 
 function spawnConfetti(x,y){
   const COLORS=['#ff4060','#f0e040','#40f090','#40c0ff','#f070ff','#ff9020','#ffffff','#80ff40','#ff80c0','#c0ff40'];
@@ -1256,28 +1259,33 @@ function gDraw(){
 
   // ── Zones d'obscurité ──
   (gLv.darkness||[]).forEach(d=>{
-    // Vérifier si le joueur est dans la zone
     const inZone=gPlayer&&!gPlayer.dead&&
       gPlayer.x+gPlayer.w>d.x&&gPlayer.x<d.x+d.w&&
       gPlayer.y+gPlayer.h>d.y&&gPlayer.y<d.y+d.h;
     if(!inZone)return;
     const radius=d.radius??120;
     const soft=d.soft??60;
-    // Position joueur en coords écran
     const px=gPlayer.x+gPlayer.w/2-gCamX;
     const py=gPlayer.y+gPlayer.h/2-gCamY;
-    // Masque noir total
-    GX.fillStyle='rgba(0,0,0,0.96)';
-    GX.fillRect(0,0,GW(),GH());
-    // Halo autour du joueur avec destination-out
-    GX.save();
-    GX.globalCompositeOperation='destination-out';
-    const grad=GX.createRadialGradient(px,py,Math.max(0,radius-soft),px,py,radius+soft);
+    // Redimensionner le canvas masque si besoin
+    if(_darkCanvas.width!==GW()||_darkCanvas.height!==GH()){
+      _darkCanvas.width=GW();_darkCanvas.height=GH();
+    }
+    // Remplir de noir
+    _darkCtx.clearRect(0,0,GW(),GH());
+    _darkCtx.fillStyle='rgb(0,0,0)';
+    _darkCtx.fillRect(0,0,GW(),GH());
+    // Percer le halo lampe torche
+    _darkCtx.globalCompositeOperation='destination-out';
+    const grad=_darkCtx.createRadialGradient(px,py,0,px,py,radius+soft);
     grad.addColorStop(0,'rgba(0,0,0,1)');
+    grad.addColorStop(radius/(radius+soft),'rgba(0,0,0,0.88)');
     grad.addColorStop(1,'rgba(0,0,0,0)');
-    GX.fillStyle=grad;
-    GX.beginPath();GX.arc(px,py,radius+soft,0,Math.PI*2);GX.fill();
-    GX.restore();
+    _darkCtx.fillStyle=grad;
+    _darkCtx.beginPath();_darkCtx.arc(px,py,radius+soft,0,Math.PI*2);_darkCtx.fill();
+    _darkCtx.globalCompositeOperation='source-over';
+    // Appliquer le masque par-dessus le jeu
+    GX.drawImage(_darkCanvas,0,0);
   });
 
   // ── Zone de mort (coordonnées écran) ──
