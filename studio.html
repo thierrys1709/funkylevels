@@ -787,13 +787,7 @@ body {
           <span class="pval" id="dk-radius-v">120</span>
         </div>
       </div>
-      <div class="prow">
-        <label>DOUCEUR DU BORD</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="dk-soft" min="0" max="200" step="10" value="60" oninput="dkParamChanged()">
-          <span class="pval" id="dk-soft-v">60</span>
-        </div>
-      </div>
+
     </div>
 
     <div style="height:1px;background:#1a1a2a;margin:4px 0;"></div>
@@ -1223,20 +1217,16 @@ function getSpikeFromPanel(prefix){
 
 function dkParamChanged(){
   const radius=+document.getElementById('dk-radius').value;
-  const soft=+document.getElementById('dk-soft').value;
   document.getElementById('dk-radius-v').textContent=radius;
-  document.getElementById('dk-soft-v').textContent=soft;
   if(selection.length===1&&selectedType==='darkness'){
     const z=lv.darkness[selectedIdx];
-    if(z){z.radius=radius;z.soft=soft;}
+    if(z){z.radius=radius;}
   }
   redraw();
 }
 function dkPanelLoad(z){
   document.getElementById('dk-radius').value=z.radius??120;
   document.getElementById('dk-radius-v').textContent=z.radius??120;
-  document.getElementById('dk-soft').value=z.soft??60;
-  document.getElementById('dk-soft-v').textContent=z.soft??60;
 }
 function showDkPanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
@@ -1346,7 +1336,7 @@ window.addEventListener('mouseup',e=>{
   else if(currentTool==='speed'){lv.speed.push({x:rx,y:ry,w:W,h:H,spd:+document.getElementById('sp-val').value});newType='speed';}
   else if(currentTool==='flash'){const onCs=+document.getElementById('fl-on').value||50;const offCs=+document.getElementById('fl-off').value||50;const phase=+document.getElementById('fl-phase').value||0;lv.flash.push({x:rx,y:ry,w:W,h:H,onMs:onCs*10,offMs:offCs*10,phase:phase*10});newType='flash';}
   else if(currentTool==='gblock'){const _sp=getSpikeFromPanel('gblock');const _b={x:rx,y:ry,w:W,h:H};if(_sp)_b.spikes=_sp;lv.gblock.push(_b);newType='gblock';}
-  else if(currentTool==='darkness'){lv.darkness.push({x:rx,y:ry,w:W,h:H,radius:+document.getElementById('dk-radius').value,soft:+document.getElementById('dk-soft').value});newType='darkness';}
+  else if(currentTool==='darkness'){lv.darkness.push({x:rx,y:ry,w:W,h:H,radius:+document.getElementById('dk-radius').value});newType='darkness';}
   if(newType){clearSel();addToSel(newType,lv[newType].length-1);}
   startPt=null;redraw();
 });
