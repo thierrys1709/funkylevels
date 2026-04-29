@@ -302,52 +302,17 @@ body {
 .load-col-vis { padding:14px 22px; }
 .load-item-vis { font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; flex-shrink:0; letter-spacing:.5px; }
 .load-item-vis.private { background:#1a2a4a; color:#90c0f0; border:1px solid #4060c0; }
-.load-item-vis.public { background:#1a3a2a; color:#60e090; border:1px solid #40a060; }
-.load-item-vis.code { background:#2a1a4a; color:#c090f0; border:1px solid #8040c0; }
+.load-item-vis.public  { background:#1a3a2a; color:#60e090; border:1px solid #40a060; }
+.load-item-vis.code    { background:#2a1a4a; color:#c090f0; border:1px solid #8040c0; }
 
 #s-flash .prow input[type=number]{width:70px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);font-family:Rajdhani,sans-serif;font-size:13px;padding:4px 6px;border-radius:4px;text-align:center;}
-#panel-overlay{
-  display:none;
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.55);
-  z-index:10;
-  border-radius:0;
-  pointer-events:none;
-}
+#panel-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:10;border-radius:0;pointer-events:none;}
 #panel-overlay.show{display:block;}
-#panel-no-sel{
-  display:none;
-  position:absolute;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  font-family:'Press Start 2P',monospace;
-  font-size:7px;
-  color:#4040aa;
-  text-align:center;
-  line-height:2.2;
-  pointer-events:none;
-  z-index:11;
-  white-space:nowrap;
-}
+#panel-no-sel{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Press Start 2P',monospace;font-size:7px;color:#4040aa;text-align:center;line-height:2.2;pointer-events:none;z-index:11;white-space:nowrap;}
 #panel-no-sel.show{display:block;}
-#multi-sel-panel{
-  display:none;
-  flex-direction:column;
-  gap:10px;
-  padding:10px;
-  background:#0b0b20;
-  border:2px solid var(--border2);
-  border-radius:6px;
-  margin-top:4px;
-}
+#multi-sel-panel{display:none;flex-direction:column;gap:10px;padding:10px;background:#0b0b20;border:2px solid var(--border2);border-radius:6px;margin-top:4px;}
 #multi-sel-panel.show{display:flex;}
-#multi-sel-title{
-  font-family:'Press Start 2P',monospace;
-  font-size:7px;
-  color:var(--accent);
-  letter-spacing:1px;
-}
+#multi-sel-title{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--accent);letter-spacing:1px;}
 .mixed-val{opacity:0.45;filter:grayscale(0.5);}
 .mixed-val input,.mixed-val select{color:var(--muted)!important;border-color:var(--border)!important;}
 .spike-sub{border-top:1px solid var(--border);margin-top:6px;padding-top:8px;display:flex;flex-direction:column;gap:8px;}
@@ -367,13 +332,13 @@ body {
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblBlocs">BLOCS</span>
     <div class="tb-group">
-      <button class="tool-btn active" id="t-fixed"  onclick="T('fixed')"  data-tip="🟫 FIXE&#10;Sol solide, ne bouge jamais.">🟫 FIXE</button>
-      <button class="tool-btn"        id="t-invis"  onclick="T('invis')"  data-tip="👁 INVISIBLE&#10;Bloc solide invisible en jeu.">👁 INVIS</button>
-      <button class="tool-btn"        id="t-bounce" onclick="T('bounce')" data-tip="🟡 REBOND&#10;Fait rebondir le joueur.">🟡 REBOND</button>
-      <button class="tool-btn"        id="t-mobile" onclick="T('mobile')" data-tip="🔵 MOBILE&#10;Continu, déclenché ou chute.">🔵 MOBILE</button>
-      <button class="tool-btn"        id="t-push"   onclick="T('push')"   data-tip="🪨 POUSSABLE&#10;Le joueur peut pousser ce bloc.">🪨 PUSH</button>
-      <button class="tool-btn"        id="t-flash"  onclick="T('flash')"  data-tip="⚡ FLASH&#10;Apparaît/disparaît en boucle.">⚡ FLASH</button>
-      <button class="tool-btn"        id="t-gblock" onclick="T('gblock')" data-tip="🌍 PLANÈTE&#10;Attire le joueur vers sa surface.">🌍 PLANÈTE</button>
+      <button class="tool-btn active" id="t-fixed"   onclick="setTool('fixed')"   data-tip="">🟫 FIXE</button>
+      <button class="tool-btn"        id="t-invis"   onclick="setTool('invis')"   data-tip="">👁 INVIS</button>
+      <button class="tool-btn"        id="t-bounce"  onclick="setTool('bounce')"  data-tip="">🟡 REBOND</button>
+      <button class="tool-btn"        id="t-mobile"  onclick="setTool('mobile')"  data-tip="">🔵 MOBILE</button>
+      <button class="tool-btn"        id="t-push"    onclick="setTool('push')"    data-tip="">🪨 PUSH</button>
+      <button class="tool-btn"        id="t-flash"   onclick="setTool('flash')"   data-tip="">⚡ FLASH</button>
+      <button class="tool-btn"        id="t-gblock"  onclick="setTool('gblock')"  data-tip="">🌍 PLANÈTE</button>
     </div>
   </div>
   <div class="sep"></div>
@@ -381,9 +346,9 @@ body {
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblZones">ZONES</span>
     <div class="tb-group">
-      <button class="tool-btn" id="t-gravflip" onclick="T('gravflip')" data-tip="🔃 GRAVITÉ&#10;Attire le joueur vers un bord.">🔃 GRAVITÉ</button>
-      <button class="tool-btn" id="t-speed"    onclick="T('speed')"    data-tip="⚡ VITESSE&#10;Modifie la vitesse du joueur.">⚡ VITESSE</button>
-      <button class="tool-btn" id="t-darkness" onclick="T('darkness')" data-tip="🌑 OBSCURITÉ&#10;Zone sombre — seul un halo&#10;autour du joueur reste visible.">🌑 OBSCUR</button>
+      <button class="tool-btn" id="t-gravflip" onclick="setTool('gravflip')" data-tip="">🔃 GRAVITÉ</button>
+      <button class="tool-btn" id="t-speed"    onclick="setTool('speed')"    data-tip="">⚡ VITESSE</button>
+      <button class="tool-btn" id="t-darkness" onclick="setTool('darkness')" data-tip="">🌑 OBSCUR</button>
     </div>
   </div>
   <div class="sep"></div>
@@ -391,9 +356,9 @@ body {
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblNiveau">NIVEAU</span>
     <div class="tb-group">
-      <button class="tool-btn" id="t-start"  onclick="T('start')"  data-tip="🟢 DÉPART">🟢 DÉPART</button>
-      <button class="tool-btn" id="t-end"    onclick="T('end')"    data-tip="🔴 ARRIVÉE">🔴 ARRIVÉE</button>
-      <button class="tool-btn" id="t-select" onclick="T('select')" data-tip="✥ SÉLECTION&#10;Cliquer = sélectionner&#10;Glisser = déplacer&#10;Suppr = effacer&#10;Ctrl+C/V  Ctrl+Z/Y">✥ SEL</button>
+      <button class="tool-btn" id="t-start"  onclick="setTool('start')"  data-tip="">🟢 DÉPART</button>
+      <button class="tool-btn" id="t-end"    onclick="setTool('end')"    data-tip="">🔴 ARRIVÉE</button>
+      <button class="tool-btn" id="t-select" onclick="setTool('select')" data-tip="">✥ SEL</button>
     </div>
   </div>
   <div class="sep"></div>
@@ -431,7 +396,7 @@ body {
         <span id="studio-nav-lbl" style="font-family:'Press Start 2P',monospace;font-size:5px;color:#4040aa;letter-spacing:1px;">NAVIGATION</span>
         <div style="display:flex;gap:6px;">
           <button id="btn-nav-profile" onclick="goToProfile()" style="font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 10px;background:#1a0a2a;border:1.5px solid #a040f0;color:#c080ff;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background='#2a1040'" onmouseout="this.style.background='#1a0a2a'">👤 PROFIL</button>
-          <button id="btn-nav-home" onclick="goToHome()" style="font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 10px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background='#1a1a3a'" onmouseout="this.style.background='#0d0d28'">🏠 ACCUEIL</button>
+          <button id="btn-nav-home"    onclick="goToHome()"    style="font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 10px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background='#1a1a3a'" onmouseout="this.style.background='#0d0d28'">🏠 ACCUEIL</button>
         </div>
       </div>
     </div>
@@ -443,6 +408,8 @@ body {
     <div id="panel-overlay"></div>
     <div id="panel-no-sel">AUCUN BLOC<br>SÉLECTIONNÉ</div>
     <h2 id="ptitle">OUTIL : FIXE</h2>
+
+    <!-- Multi-sélection -->
     <div id="multi-sel-panel">
       <div id="multi-sel-title">✦ MULTI-SÉLECTION</div>
       <div id="multi-sel-count" style="font-family:Rajdhani,sans-serif;font-size:13px;color:var(--text2);"></div>
@@ -450,8 +417,7 @@ body {
       <div class="spike-sub" id="multi-spike-sub">
         <button class="spike-toggle" id="multi-spike-toggle" onclick="toggleSpikeOpts('multi')">🗡 PIQUES ▸</button>
         <div class="spike-opts" id="multi-spike-opts">
-          <div class="prow">
-            <label>DIRECTIONS</label>
+          <div class="prow"><label>DIRECTIONS</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
               <div class="crow"><input type="checkbox" id="multi-sp-u" onchange="multiSpikeChanged()"><label for="multi-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
               <div class="crow"><input type="checkbox" id="multi-sp-d" onchange="multiSpikeChanged()"><label for="multi-sp-d" style="cursor:pointer;">↓ BAS</label></div>
@@ -459,11 +425,8 @@ body {
               <div class="crow"><input type="checkbox" id="multi-sp-r" onchange="multiSpikeChanged()"><label for="multi-sp-r" style="cursor:pointer;">→ DROITE</label></div>
             </div>
           </div>
-          <div class="prow">
-            <div class="crow"><input type="checkbox" id="multi-sp-hidden" onchange="multiSpikeChanged()"><label for="multi-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
-          </div>
-          <div class="prow">
-            <label>DÉLAI (s)</label>
+          <div class="prow"><div class="crow"><input type="checkbox" id="multi-sp-hidden" onchange="multiSpikeChanged()"><label for="multi-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow"><label>DÉLAI (s)</label>
             <div style="display:flex;gap:4px;align-items:center">
               <input type="range" id="multi-sp-delay" min="0" max="10" step="0.5" value="0" oninput="multiSpikeChanged()">
               <span class="pval" id="multi-sp-delay-v">0</span>
@@ -474,87 +437,83 @@ body {
       </div>
     </div>
 
-    <div id="s-fixed" class="psec show"><div class="pinfo" data-info="pInfoFixed"></div>
-<div class="spike-sub" id="fixed-spike-sub">
-  <button class="spike-toggle" id="fixed-spike-toggle" onclick="toggleSpikeOpts('fixed')">🗡 PIQUES ▸</button>
-  <div class="spike-opts" id="fixed-spike-opts">
-    <div class="prow">
-      <label>DIRECTIONS</label>
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-        <div class="crow"><input type="checkbox" id="fixed-sp-u" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-        <div class="crow"><input type="checkbox" id="fixed-sp-d" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-        <div class="crow"><input type="checkbox" id="fixed-sp-l" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-        <div class="crow"><input type="checkbox" id="fixed-sp-r" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+    <!-- FIXED -->
+    <div id="s-fixed" class="psec show">
+      <div class="pinfo" data-info="pInfoFixed"></div>
+      <div class="spike-sub" id="fixed-spike-sub">
+        <button class="spike-toggle" id="fixed-spike-toggle" onclick="toggleSpikeOpts('fixed')">🗡 PIQUES ▸</button>
+        <div class="spike-opts" id="fixed-spike-opts">
+          <div class="prow"><label>DIRECTIONS</label>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+              <div class="crow"><input type="checkbox" id="fixed-sp-u" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="fixed-sp-d" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-d" style="cursor:pointer;">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="fixed-sp-l" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="fixed-sp-r" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+            </div>
+          </div>
+          <div class="prow"><div class="crow"><input type="checkbox" id="fixed-sp-hidden" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow" id="fixed-sp-delay-row"><label>DÉLAI (s)</label>
+            <div style="display:flex;gap:4px;align-items:center">
+              <input type="range" id="fixed-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('fixed')">
+              <span class="pval" id="fixed-sp-delay-v">0</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="prow">
-      <div class="crow"><input type="checkbox" id="fixed-sp-hidden" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
-    </div>
-    <div class="prow" id="fixed-sp-delay-row">
-      <label>DÉLAI (s)</label>
-      <div style="display:flex;gap:4px;align-items:center">
-        <input type="range" id="fixed-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('fixed')">
-        <span class="pval" id="fixed-sp-delay-v">0</span>
-      </div>
-    </div>
-  </div>
-</div></div>
 
+    <!-- BOUNCE -->
     <div id="s-bounce" class="psec">
       <div class="pinfo" data-info="pInfoBounce"></div>
       <div class="prow"><label>FORCE (1 - 10)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="bo-force" min="1" max="10" step="0.5" value="2" oninput="bounceParamChanged()"><span class="pval" id="bo-force-v">2</span></div></div>
-<div class="spike-sub" id="bounce-spike-sub">
-  <button class="spike-toggle" id="bounce-spike-toggle" onclick="toggleSpikeOpts('bounce')">🗡 PIQUES ▸</button>
-  <div class="spike-opts" id="bounce-spike-opts">
-    <div class="prow">
-      <label>DIRECTIONS</label>
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-        <div class="crow"><input type="checkbox" id="bounce-sp-u" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-        <div class="crow"><input type="checkbox" id="bounce-sp-d" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-        <div class="crow"><input type="checkbox" id="bounce-sp-l" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-        <div class="crow"><input type="checkbox" id="bounce-sp-r" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+      <div class="spike-sub" id="bounce-spike-sub">
+        <button class="spike-toggle" id="bounce-spike-toggle" onclick="toggleSpikeOpts('bounce')">🗡 PIQUES ▸</button>
+        <div class="spike-opts" id="bounce-spike-opts">
+          <div class="prow"><label>DIRECTIONS</label>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+              <div class="crow"><input type="checkbox" id="bounce-sp-u" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="bounce-sp-d" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-d" style="cursor:pointer;">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="bounce-sp-l" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="bounce-sp-r" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+            </div>
+          </div>
+          <div class="prow"><div class="crow"><input type="checkbox" id="bounce-sp-hidden" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow" id="bounce-sp-delay-row"><label>DÉLAI (s)</label>
+            <div style="display:flex;gap:4px;align-items:center">
+              <input type="range" id="bounce-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('bounce')">
+              <span class="pval" id="bounce-sp-delay-v">0</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="prow">
-      <div class="crow"><input type="checkbox" id="bounce-sp-hidden" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
-    </div>
-    <div class="prow" id="bounce-sp-delay-row">
-      <label>DÉLAI (s)</label>
-      <div style="display:flex;gap:4px;align-items:center">
-        <input type="range" id="bounce-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('bounce')">
-        <span class="pval" id="bounce-sp-delay-v">0</span>
-      </div>
-    </div>
-  </div>
-</div>
     </div>
 
-    <div id="s-invis" class="psec"><div class="pinfo" data-info="pInfoInvis"></div>
-<div class="spike-sub" id="invis-spike-sub">
-  <button class="spike-toggle" id="invis-spike-toggle" onclick="toggleSpikeOpts('invis')">🗡 PIQUES ▸</button>
-  <div class="spike-opts" id="invis-spike-opts">
-    <div class="prow">
-      <label>DIRECTIONS</label>
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-        <div class="crow"><input type="checkbox" id="invis-sp-u" onchange="blockSpikeChanged('invis')"><label for="invis-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-        <div class="crow"><input type="checkbox" id="invis-sp-d" onchange="blockSpikeChanged('invis')"><label for="invis-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-        <div class="crow"><input type="checkbox" id="invis-sp-l" onchange="blockSpikeChanged('invis')"><label for="invis-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-        <div class="crow"><input type="checkbox" id="invis-sp-r" onchange="blockSpikeChanged('invis')"><label for="invis-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+    <!-- INVIS -->
+    <div id="s-invis" class="psec">
+      <div class="pinfo" data-info="pInfoInvis"></div>
+      <div class="spike-sub" id="invis-spike-sub">
+        <button class="spike-toggle" id="invis-spike-toggle" onclick="toggleSpikeOpts('invis')">🗡 PIQUES ▸</button>
+        <div class="spike-opts" id="invis-spike-opts">
+          <div class="prow"><label>DIRECTIONS</label>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+              <div class="crow"><input type="checkbox" id="invis-sp-u" onchange="blockSpikeChanged('invis')"><label for="invis-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="invis-sp-d" onchange="blockSpikeChanged('invis')"><label for="invis-sp-d" style="cursor:pointer;">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="invis-sp-l" onchange="blockSpikeChanged('invis')"><label for="invis-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="invis-sp-r" onchange="blockSpikeChanged('invis')"><label for="invis-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+            </div>
+          </div>
+          <div class="prow"><div class="crow"><input type="checkbox" id="invis-sp-hidden" onchange="blockSpikeChanged('invis')"><label for="invis-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow" id="invis-sp-delay-row"><label>DÉLAI (s)</label>
+            <div style="display:flex;gap:4px;align-items:center">
+              <input type="range" id="invis-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('invis')">
+              <span class="pval" id="invis-sp-delay-v">0</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="prow">
-      <div class="crow"><input type="checkbox" id="invis-sp-hidden" onchange="blockSpikeChanged('invis')"><label for="invis-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
-    </div>
-    <div class="prow" id="invis-sp-delay-row">
-      <label>DÉLAI (s)</label>
-      <div style="display:flex;gap:4px;align-items:center">
-        <input type="range" id="invis-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('invis')">
-        <span class="pval" id="invis-sp-delay-v">0</span>
-      </div>
-    </div>
-  </div>
-</div></div>
 
+    <!-- MOBILE -->
     <div id="s-mobile" class="psec">
       <div class="pinfo" data-info="pInfoMobile"></div>
       <div class="prow">
@@ -582,88 +541,59 @@ body {
           <option value="fall">⬇ CHUTE</option>
         </select>
       </div>
-      <div class="prow">
-        <label>VITESSE</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="mo-spd" min="0.5" max="12" step="0.5" value="2" oninput="moParamChanged()">
-          <span class="pval" id="mo-spd-v">2</span>
+      <div class="prow"><label>VITESSE</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-spd" min="0.5" max="12" step="0.5" value="2" oninput="moParamChanged()"><span class="pval" id="mo-spd-v">2</span></div></div>
+      <div class="prow" id="mo-dist-row"><label>DISTANCE (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-dist" min="16" max="800" step="8" value="160" oninput="moParamChanged()"><span class="pval" id="mo-dist-v">160</span></div></div>
+      <div class="prow" id="mo-loop-row"><div class="crow"><input type="checkbox" id="mo-loop" checked onchange="moParamChanged()"><label for="mo-loop" style="cursor:pointer;">ALLER-RETOUR EN BOUCLE</label></div></div>
+      <div class="prow" id="mo-wait-row"><label>ATTENTE AVANT RETOUR (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-wait" min="0" max="10" step="0.5" value="0" oninput="moParamChanged()"><span class="pval" id="mo-wait-v">0</span></div></div>
+      <div class="spike-sub" id="mobile-spike-sub">
+        <button class="spike-toggle" id="mobile-spike-toggle" onclick="toggleSpikeOpts('mobile')">🗡 PIQUES ▸</button>
+        <div class="spike-opts" id="mobile-spike-opts">
+          <div class="prow"><label>DIRECTIONS</label>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+              <div class="crow"><input type="checkbox" id="mobile-sp-u" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="mobile-sp-d" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-d" style="cursor:pointer;">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="mobile-sp-l" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="mobile-sp-r" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+            </div>
+          </div>
+          <div class="prow"><div class="crow"><input type="checkbox" id="mobile-sp-hidden" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow" id="mobile-sp-delay-row"><label>DÉLAI (s)</label>
+            <div style="display:flex;gap:4px;align-items:center">
+              <input type="range" id="mobile-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('mobile')">
+              <span class="pval" id="mobile-sp-delay-v">0</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="prow" id="mo-dist-row">
-        <label>DISTANCE (px)</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="mo-dist" min="16" max="800" step="8" value="160" oninput="moParamChanged()">
-          <span class="pval" id="mo-dist-v">160</span>
-        </div>
-      </div>
-      <div class="prow" id="mo-loop-row">
-        <div class="crow">
-          <input type="checkbox" id="mo-loop" checked onchange="moParamChanged()">
-          <label for="mo-loop" style="cursor:pointer;">ALLER-RETOUR EN BOUCLE</label>
-        </div>
-      </div>
-      <div class="prow" id="mo-wait-row">
-        <label>ATTENTE AVANT RETOUR (s)</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="mo-wait" min="0" max="10" step="0.5" value="0" oninput="moParamChanged()">
-          <span class="pval" id="mo-wait-v">0</span>
-        </div>
-      </div>
-<div class="spike-sub" id="mobile-spike-sub">
-  <button class="spike-toggle" id="mobile-spike-toggle" onclick="toggleSpikeOpts('mobile')">🗡 PIQUES ▸</button>
-  <div class="spike-opts" id="mobile-spike-opts">
-    <div class="prow">
-      <label>DIRECTIONS</label>
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-        <div class="crow"><input type="checkbox" id="mobile-sp-u" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-        <div class="crow"><input type="checkbox" id="mobile-sp-d" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-        <div class="crow"><input type="checkbox" id="mobile-sp-l" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-        <div class="crow"><input type="checkbox" id="mobile-sp-r" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-r" style="cursor:pointer;">→ DROITE</label></div>
-      </div>
-    </div>
-    <div class="prow">
-      <div class="crow"><input type="checkbox" id="mobile-sp-hidden" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
-    </div>
-    <div class="prow" id="mobile-sp-delay-row">
-      <label>DÉLAI (s)</label>
-      <div style="display:flex;gap:4px;align-items:center">
-        <input type="range" id="mobile-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('mobile')">
-        <span class="pval" id="mobile-sp-delay-v">0</span>
-      </div>
-    </div>
-  </div>
-</div>
     </div>
 
+    <!-- PUSH -->
     <div id="s-push" class="psec">
       <div class="pinfo" data-info="pInfoPush"></div>
       <div class="prow"><label>FRICTION</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="pu-fric" min="0.5" max="0.99" step="0.01" value="0.8" oninput="document.getElementById('pu-fric-v').textContent=this.value"><span class="pval" id="pu-fric-v">0.8</span></div></div>
-<div class="spike-sub" id="push-spike-sub">
-  <button class="spike-toggle" id="push-spike-toggle" onclick="toggleSpikeOpts('push')">🗡 PIQUES ▸</button>
-  <div class="spike-opts" id="push-spike-opts">
-    <div class="prow">
-      <label>DIRECTIONS</label>
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-        <div class="crow"><input type="checkbox" id="push-sp-u" onchange="blockSpikeChanged('push')"><label for="push-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-        <div class="crow"><input type="checkbox" id="push-sp-d" onchange="blockSpikeChanged('push')"><label for="push-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-        <div class="crow"><input type="checkbox" id="push-sp-l" onchange="blockSpikeChanged('push')"><label for="push-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-        <div class="crow"><input type="checkbox" id="push-sp-r" onchange="blockSpikeChanged('push')"><label for="push-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+      <div class="spike-sub" id="push-spike-sub">
+        <button class="spike-toggle" id="push-spike-toggle" onclick="toggleSpikeOpts('push')">🗡 PIQUES ▸</button>
+        <div class="spike-opts" id="push-spike-opts">
+          <div class="prow"><label>DIRECTIONS</label>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+              <div class="crow"><input type="checkbox" id="push-sp-u" onchange="blockSpikeChanged('push')"><label for="push-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="push-sp-d" onchange="blockSpikeChanged('push')"><label for="push-sp-d" style="cursor:pointer;">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="push-sp-l" onchange="blockSpikeChanged('push')"><label for="push-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="push-sp-r" onchange="blockSpikeChanged('push')"><label for="push-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+            </div>
+          </div>
+          <div class="prow"><div class="crow"><input type="checkbox" id="push-sp-hidden" onchange="blockSpikeChanged('push')"><label for="push-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow" id="push-sp-delay-row"><label>DÉLAI (s)</label>
+            <div style="display:flex;gap:4px;align-items:center">
+              <input type="range" id="push-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('push')">
+              <span class="pval" id="push-sp-delay-v">0</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="prow">
-      <div class="crow"><input type="checkbox" id="push-sp-hidden" onchange="blockSpikeChanged('push')"><label for="push-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
-    </div>
-    <div class="prow" id="push-sp-delay-row">
-      <label>DÉLAI (s)</label>
-      <div style="display:flex;gap:4px;align-items:center">
-        <input type="range" id="push-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('push')">
-        <span class="pval" id="push-sp-delay-v">0</span>
-      </div>
-    </div>
-  </div>
-</div>
     </div>
 
+    <!-- FLASH -->
     <div id="s-flash" class="psec">
       <div class="pinfo" data-info="pInfoFlash"></div>
       <div class="prow">
@@ -680,71 +610,60 @@ body {
           <span style="font-size:11px;color:var(--muted);">× 10ms</span>
         </div>
       </div>
-      <div class="prow">
-        <label>DÉCALAGE DE PHASE (cs)</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="fl-phase" min="0" max="200" step="1" value="0" oninput="flashParamChanged()">
-          <span class="pval" id="fl-phase-v">0</span>
+      <div class="prow"><label>DÉCALAGE DE PHASE (cs)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="fl-phase" min="0" max="200" step="1" value="0" oninput="flashParamChanged()"><span class="pval" id="fl-phase-v">0</span></div></div>
+      <div class="spike-sub" id="flash-spike-sub">
+        <button class="spike-toggle" id="flash-spike-toggle" onclick="toggleSpikeOpts('flash')">🗡 PIQUES ▸</button>
+        <div class="spike-opts" id="flash-spike-opts">
+          <div class="prow"><label>DIRECTIONS</label>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+              <div class="crow"><input type="checkbox" id="flash-sp-u" onchange="blockSpikeChanged('flash')"><label for="flash-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="flash-sp-d" onchange="blockSpikeChanged('flash')"><label for="flash-sp-d" style="cursor:pointer;">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="flash-sp-l" onchange="blockSpikeChanged('flash')"><label for="flash-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="flash-sp-r" onchange="blockSpikeChanged('flash')"><label for="flash-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+            </div>
+          </div>
+          <div class="prow"><div class="crow"><input type="checkbox" id="flash-sp-hidden" onchange="blockSpikeChanged('flash')"><label for="flash-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow" id="flash-sp-delay-row"><label>DÉLAI (s)</label>
+            <div style="display:flex;gap:4px;align-items:center">
+              <input type="range" id="flash-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('flash')">
+              <span class="pval" id="flash-sp-delay-v">0</span>
+            </div>
+          </div>
         </div>
       </div>
-<div class="spike-sub" id="flash-spike-sub">
-  <button class="spike-toggle" id="flash-spike-toggle" onclick="toggleSpikeOpts('flash')">🗡 PIQUES ▸</button>
-  <div class="spike-opts" id="flash-spike-opts">
-    <div class="prow">
-      <label>DIRECTIONS</label>
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-        <div class="crow"><input type="checkbox" id="flash-sp-u" onchange="blockSpikeChanged('flash')"><label for="flash-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-        <div class="crow"><input type="checkbox" id="flash-sp-d" onchange="blockSpikeChanged('flash')"><label for="flash-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-        <div class="crow"><input type="checkbox" id="flash-sp-l" onchange="blockSpikeChanged('flash')"><label for="flash-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-        <div class="crow"><input type="checkbox" id="flash-sp-r" onchange="blockSpikeChanged('flash')"><label for="flash-sp-r" style="cursor:pointer;">→ DROITE</label></div>
-      </div>
-    </div>
-    <div class="prow">
-      <div class="crow"><input type="checkbox" id="flash-sp-hidden" onchange="blockSpikeChanged('flash')"><label for="flash-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
-    </div>
-    <div class="prow" id="flash-sp-delay-row">
-      <label>DÉLAI (s)</label>
-      <div style="display:flex;gap:4px;align-items:center">
-        <input type="range" id="flash-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('flash')">
-        <span class="pval" id="flash-sp-delay-v">0</span>
-      </div>
-    </div>
-  </div>
-</div>
     </div>
 
+    <!-- GBLOCK -->
     <div id="s-gblock" class="psec">
       <div class="pinfo" data-info="pInfoGblock"></div>
-<div class="spike-sub" id="gblock-spike-sub">
-  <button class="spike-toggle" id="gblock-spike-toggle" onclick="toggleSpikeOpts('gblock')">🗡 PIQUES ▸</button>
-  <div class="spike-opts" id="gblock-spike-opts">
-    <div class="prow">
-      <label>DIRECTIONS</label>
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-        <div class="crow"><input type="checkbox" id="gblock-sp-u" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-        <div class="crow"><input type="checkbox" id="gblock-sp-d" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-        <div class="crow"><input type="checkbox" id="gblock-sp-l" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-        <div class="crow"><input type="checkbox" id="gblock-sp-r" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+      <div class="spike-sub" id="gblock-spike-sub">
+        <button class="spike-toggle" id="gblock-spike-toggle" onclick="toggleSpikeOpts('gblock')">🗡 PIQUES ▸</button>
+        <div class="spike-opts" id="gblock-spike-opts">
+          <div class="prow"><label>DIRECTIONS</label>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+              <div class="crow"><input type="checkbox" id="gblock-sp-u" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="gblock-sp-d" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-d" style="cursor:pointer;">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="gblock-sp-l" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="gblock-sp-r" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+            </div>
+          </div>
+          <div class="prow"><div class="crow"><input type="checkbox" id="gblock-sp-hidden" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow" id="gblock-sp-delay-row"><label>DÉLAI (s)</label>
+            <div style="display:flex;gap:4px;align-items:center">
+              <input type="range" id="gblock-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('gblock')">
+              <span class="pval" id="gblock-sp-delay-v">0</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="prow">
-      <div class="crow"><input type="checkbox" id="gblock-sp-hidden" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div>
-    </div>
-    <div class="prow" id="gblock-sp-delay-row">
-      <label>DÉLAI (s)</label>
-      <div style="display:flex;gap:4px;align-items:center">
-        <input type="range" id="gblock-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('gblock')">
-        <span class="pval" id="gblock-sp-delay-v">0</span>
-      </div>
-    </div>
-  </div>
-</div>
     </div>
 
-    <div id="s-start" class="psec"><div class="pinfo" data-info="pInfoStart"></div></div>
-    <div id="s-end" class="psec"><div class="pinfo" data-info="pInfoEnd">Cliquer pour placer<br>l'arrivée.</div></div>
+    <!-- START / END / SELECT -->
+    <div id="s-start"  class="psec"><div class="pinfo" data-info="pInfoStart"></div></div>
+    <div id="s-end"    class="psec"><div class="pinfo" data-info="pInfoEnd"></div></div>
     <div id="s-select" class="psec"><div class="pinfo" data-info="pInfoSelect"></div></div>
 
+    <!-- GRAVFLIP -->
     <div id="s-gravflip" class="psec">
       <div class="pinfo" data-info="pInfoGravflip"></div>
       <div class="prow">
@@ -756,38 +675,21 @@ body {
           <option value="r">→ Vers la DROITE</option>
         </select>
       </div>
-      <div class="prow">
-        <label>FORCE (0 = apesanteur)</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="gf-str" min="0" max="50" step="1" value="10" oninput="gfParamChanged()">
-          <span class="pval" id="gf-str-v">10</span>
-        </div>
-      </div>
+      <div class="prow"><label>FORCE (0 = apesanteur)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="gf-str" min="0" max="50" step="1" value="10" oninput="gfParamChanged()"><span class="pval" id="gf-str-v">10</span></div></div>
       <div style="font-size:6px;color:#a040f0;margin-top:2px;padding:4px;background:#0a0a16;border-radius:2px;" id="gf-hint"></div>
     </div>
 
+    <!-- SPEED -->
     <div id="s-speed" class="psec">
       <div class="pinfo" data-info="pInfoSpeed"></div>
-      <div class="prow">
-        <label>VITESSE (1 – 20)</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="sp-val" min="1" max="20" step="0.5" value="5" oninput="spParamChanged()">
-          <span class="pval" id="sp-val-v">5</span>
-        </div>
-      </div>
+      <div class="prow"><label>VITESSE (1 – 20)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sp-val" min="1" max="20" step="0.5" value="5" oninput="spParamChanged()"><span class="pval" id="sp-val-v">5</span></div></div>
       <div style="font-size:6px;color:#00e5ff;margin-top:2px;padding:4px;background:#0a0a16;border-radius:2px;" id="sp-hint">= normal</div>
     </div>
 
+    <!-- DARKNESS -->
     <div id="s-darkness" class="psec">
       <div class="pinfo" style="font-size:13px;line-height:1.8;background:#0b0b20;padding:10px;border-radius:4px;border:1px solid var(--border2);color:var(--text);">Zone sombre : seul un halo autour du joueur reste visible.</div>
-      <div class="prow">
-        <label>RAYON DU HALO (px)</label>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input type="range" id="dk-radius" min="40" max="400" step="10" value="120" oninput="dkParamChanged()">
-          <span class="pval" id="dk-radius-v">120</span>
-        </div>
-      </div>
-
+      <div class="prow"><label>RAYON DU HALO (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="dk-radius" min="40" max="400" step="10" value="120" oninput="dkParamChanged()"><span class="pval" id="dk-radius-v">120</span></div></div>
     </div>
 
     <div style="height:1px;background:#1a1a2a;margin:4px 0;"></div>
@@ -800,136 +702,304 @@ body {
 
 <input type="file" id="fileInput" accept=".json" style="display:none" onchange="loadFile(event)">
 
+<!-- LOAD MODAL -->
+<div id="load-modal">
+  <div class="load-box">
+    <div class="load-header">
+      <h3 id="load-modal-title">📂 MES NIVEAUX</h3>
+      <button class="load-close" onclick="closeLoadModal()">✕</button>
+    </div>
+    <div class="load-search-wrap">
+      <input type="text" id="load-search" placeholder="🔍 Rechercher..."
+        oninput="filterLoadList(this.value)"
+        style="width:100%;font-family:Rajdhani,sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:9px 14px;border-radius:5px;outline:none;"
+        onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--border2)'">
+    </div>
+    <div id="load-list"></div>
+  </div>
+</div>
+
+<!-- PUBLISH MODAL -->
+<div id="publish-modal">
+  <div class="pub-box">
+    <h3 id="pub-title-lbl">💾 SAUVEGARDER</h3>
+    <div>
+      <label id="pub-name-lbl">NOM DU NIVEAU</label>
+      <input type="text" id="pub-name" placeholder="Mon niveau funky..." maxlength="40" style="margin-top:8px;">
+    </div>
+    <div>
+      <label id="pub-vis-lbl" style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--label);letter-spacing:1px;text-transform:uppercase;">VISIBILITÉ</label>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="pub-vis-btn active" id="vis-private" onclick="setVis('private')">🔒 PRIVÉ</button>
+        <button class="pub-vis-btn"        id="vis-public"  onclick="setVis('public')">🌍 PUBLIC</button>
+        <button class="pub-vis-btn"        id="vis-code"    onclick="setVis('code')">🔑 CODE</button>
+      </div>
+      <div id="pub-vis-hint" style="font-family:Rajdhani,sans-serif;font-size:12px;color:var(--muted);margin-top:6px;min-height:16px;"></div>
+    </div>
+    <div id="pub-msg" class="pub-msg"></div>
+    <div class="pub-row">
+      <button class="pub-btn cancel" onclick="closePublish()" id="pub-cancel-btn">ANNULER</button>
+      <button class="pub-btn ok"     onclick="doPublish()"    id="pub-ok-btn">💾 SAUVER →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISHED LEVEL MODAL -->
+<div id="published-modal" style="display:none;position:fixed;inset:0;background:#000000dd;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:36px 32px;width:min(440px,90vw);display:flex;flex-direction:column;gap:20px;">
+    <div style="font-family:Orbitron,monospace;font-size:13px;color:#f0a040;text-align:center;letter-spacing:2px;">🔒 NIVEAU PUBLIÉ</div>
+    <p id="published-modal-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.8;text-align:center;"></p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onclick="confirmDuplicateFromModal()" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#2a1a00;border:2px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;">⧉ CRÉER UNE COPIE MODIFIABLE</button>
+      <button onclick="document.getElementById('published-modal').style.display='none';openLoadModal();" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">📂 CHARGER UN AUTRE NIVEAU</button>
+    </div>
+  </div>
+</div>
+
+<!-- UNSAVED CHANGES MODAL -->
+<div id="unsaved-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
+    <div id="unsaved-title" style="font-family:Orbitron,monospace;font-size:14px;color:#f0a040;text-align:center;letter-spacing:1px;">⚠️ MODIFICATIONS NON SAUVEGARDÉES</div>
+    <p id="unsaved-desc" style="font-family:Rajdhani,sans-serif;font-size:17px;color:#c0c0dd;text-align:center;line-height:1.7;margin:0;"></p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button id="unsaved-btn-save"  onclick="unsavedSave()"  style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#0d2a0d;border:1.5px solid #40f090;color:#40f090;border-radius:6px;cursor:pointer;"></button>
+      <button id="unsaved-btn-leave" onclick="unsavedLeave()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#2a0a0a;border:1.5px solid #f04060;color:#f04060;border-radius:6px;cursor:pointer;"></button>
+      <button id="unsaved-btn-stay"  onclick="unsavedStay()"  style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;"></button>
+    </div>
+  </div>
+</div>
+
+<!-- DUPLICATE MODAL -->
+<div id="dup-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
+    <div style="font-family:Orbitron,monospace;font-size:12px;color:#f0a040;text-align:center;letter-spacing:1px;">🔒 NIVEAU PUBLIÉ</div>
+    <p id="dup-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.7;text-align:center;"></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeDupModal()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;background:#12122a;border:1.5px solid #2a2a55;color:#6060aa;border-radius:6px;cursor:pointer;" id="dup-cancel-btn">ANNULER</button>
+      <button onclick="confirmDuplicate()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;background:#2a1a00;border:1.5px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;" id="dup-ok-btn">⧉ CRÉER UNE COPIE</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ── CONSTANTE : hauteur de jeu (limite de mort) ──
+// ─────────────────────────────────────────────
+//  CONSTANTES
+// ─────────────────────────────────────────────
 const GAME_HEIGHT = 640;
+const SUPABASE_URL = 'https://ydpkyktfvpdnjjiewctf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let _currentLevelId=null;
-let _currentVisibility='private';
-let _authorCompleted=false;
-let _isPublished=false;
-const _lang=()=>localStorage.getItem('fl_lang')||'fr';
-var STUDIO_T={fr:{},en:{}};
+// ─────────────────────────────────────────────
+//  I18N — chargement des fichiers JSON
+// ─────────────────────────────────────────────
+const _lang = () => localStorage.getItem('fl_lang') || 'fr';
+let STUDIO_T = { fr:{}, en:{} };   // studio section
+let _langCache = {};
 
-const EC=document.getElementById('ecanvas');
-const EX=EC.getContext('2d');
-let EW=EC.width,EH=EC.height;
-
-// ── MODIF 1 : canvas remplit toute la hauteur du cwrap ──
-function resizeEditor(){
-  const wrap=document.getElementById('cwrap');
-  const h=Math.max(GAME_HEIGHT, wrap.clientHeight);
-  if(h>0&&h!==EC.height){EC.height=h;EH=h;redraw();}
+async function loadLang(l) {
+  if (_langCache[l]) return _langCache[l];
+  try {
+    const r = await fetch('lang/' + l + '.json');
+    if (!r.ok) { if (l !== 'fr') return loadLang('fr'); return null; }
+    const data = await r.json();
+    _langCache[l] = data;
+    return data;
+  } catch(e) { if (l !== 'fr') return loadLang('fr'); return null; }
 }
-window.addEventListener('resize',resizeEditor);
-setTimeout(resizeEditor,50);
-document.addEventListener('DOMContentLoaded',()=>setTimeout(resizeEditor,100));
 
-let GRID=16,ZOOM=1,currentTool='fixed';
-let drawing=false,startPt=null,mousePos={x:0,y:0};
-let selection=[],dragState=null,rubberBand=null;
+async function applyStudioLang() {
+  const l    = _lang();
+  const data = await loadLang(l);
+  if (!data) return;
 
-function getSelObj(){if(selection.length!==1)return null;const s=selection[0];return lv[s.type]?.[s.idx]??null;}
-let selectedIdx=-1,selectedType=null;
-function syncLegacy(){if(selection.length===1){selectedIdx=selection[0].idx;selectedType=selection[0].type;}else{selectedIdx=-1;selectedType=null;}}
-function clearSel(){selection=[];selectedIdx=-1;selectedType=null;updatePanelState();}
+  const t  = data.studio  || {};
+  const tp = data.publish || {};
 
-function updatePanelState(){
-  const overlay=document.getElementById('panel-overlay');
-  const noSel=document.getElementById('panel-no-sel');
-  const multiPanel=document.getElementById('multi-sel-panel');
-  if(!overlay)return;
-  if(selection.length===0){overlay.classList.add('show');noSel.classList.add('show');if(multiPanel)multiPanel.classList.remove('show');return;}
-  overlay.classList.remove('show');noSel.classList.remove('show');
-  if(selection.length===1){if(multiPanel)multiPanel.classList.remove('show');return;}
-  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
-  if(multiPanel)multiPanel.classList.add('show');
-  const count=document.getElementById('multi-sel-count');
-  const types=[...new Set(selection.map(s=>s.type))];
-  const sameType=types.length===1;
-  const type=sameType?types[0]:null;
-  if(count){const label=sameType?(TOOL_NAMES[type]||type.toUpperCase()):'types mixtes';count.textContent=`${selection.length} blocs • ${label}`;}
-  const typePanel=document.getElementById('multi-type-panel');
-  if(typePanel)typePanel.innerHTML='';
-  if(sameType){loadMultiTypePanel(type);}
+  STUDIO_T[l]   = t;
+  STUDIO_T._pub = tp;
+
+  // ── data-lbl (labels topbar) ──────────────
+  document.querySelectorAll('[data-lbl]').forEach(el => {
+    const key = el.getAttribute('data-lbl');
+    if (t[key]) el.textContent = t[key];
+  });
+
+  // ── data-info (textes panel) ──────────────
+  document.querySelectorAll('[data-info]').forEach(el => {
+    const key = el.getAttribute('data-info');
+    if (t[key]) el.innerHTML = t[key].replace(/\n/g, '<br>');
+  });
+
+  // ── Boutons outil (texte + tooltip) ───────
+  const TOOL_MAP = {
+    fixed:'tFixed', invis:'tInvis', bounce:'tBounce', mobile:'tMobile',
+    push:'tPush', flash:'tFlash', gblock:'tGblock',
+    gravflip:'tGravflip', speed:'tSpeed',
+    start:'tStart', end:'tEnd', select:'tSelect'
+  };
+  const TIP_MAP = {
+    fixed:'tipFixed', invis:'tipInvis', bounce:'tipBounce', mobile:'tipMobile',
+    push:'tipPush', flash:'tipFlash', gblock:'tipGblock',
+    gravflip:'tipGravflip', speed:'tipSpeed',
+    start:'tipStart', end:'tipEnd', select:'tipSelect'
+  };
+  Object.entries(TOOL_MAP).forEach(([id, key]) => {
+    const el = document.getElementById('t-' + id);
+    if (el && t[key]) el.textContent = t[key];
+  });
+  Object.entries(TIP_MAP).forEach(([id, key]) => {
+    const el = document.getElementById('t-' + id);
+    if (el && t[key]) el.setAttribute('data-tip', t[key]);
+  });
+
+  // ── Boutons action topbar ─────────────────
+  const sa = (id, key) => { const el = document.getElementById(id); if (el && t[key]) el.textContent = t[key]; };
+  sa('btn-play',        'btnPlay');
+  sa('btn-save',        'btnSave');
+  sa('btn-load',        'btnLoad');
+  sa('btn-clear',       'btnClear');
+  sa('btn-nav-profile', 'btnProfil');
+  sa('btn-nav-home',    'btnAccueil');
+
+  // ── Panel titre ───────────────────────────
+  const prefix = t.toolPrefix || 'TOOL: ';
+  const names  = t.toolNames  || {};
+  const ptitle = document.getElementById('ptitle');
+  if (ptitle) ptitle.textContent = prefix + (names[currentTool] || currentTool.toUpperCase());
+
+  // ── Statusbar ─────────────────────────────
+  const sb = document.getElementById('statusbar');
+  if (sb && t.ready) sb.textContent = t.ready;
+
+  // ── Load modal header ─────────────────────
+  const lh = document.getElementById('load-modal-title');
+  if (lh && t.tipLoad) lh.textContent = '📂 ' + (t.toolNames?.select ? '' : '') + (data.home?.stabMine || (l === 'fr' ? 'MES NIVEAUX' : 'MY LEVELS'));
+
+  // ── Unsaved modal ─────────────────────────
+  const su = (id, key) => { const el = document.getElementById(id); if (el && t[key]) el.innerHTML = t[key]; };
+  su('unsaved-title',    'unsavedTitle');
+  su('unsaved-desc',     'unsavedDesc');
+  su('unsaved-btn-save', 'unsavedSave');
+  su('unsaved-btn-leave','unsavedLeave');
+  su('unsaved-btn-stay', 'unsavedStay');
+
+  // ── Placeholder level-name ────────────────
+  const ni = document.getElementById('level-name-input');
+  if (ni && t.untitled) ni.placeholder = t.untitled + '...';
+}
+
+// ─────────────────────────────────────────────
+//  CANVAS & ÉTAT ÉDITEUR
+// ─────────────────────────────────────────────
+const EC = document.getElementById('ecanvas');
+const EX = EC.getContext('2d');
+let EW = EC.width, EH = EC.height;
+
+function resizeEditor() {
+  const wrap = document.getElementById('cwrap');
+  const h = Math.max(GAME_HEIGHT, wrap.clientHeight);
+  if (h > 0 && h !== EC.height) { EC.height = h; EH = h; redraw(); }
+}
+window.addEventListener('resize', resizeEditor);
+setTimeout(resizeEditor, 50);
+document.addEventListener('DOMContentLoaded', () => setTimeout(resizeEditor, 100));
+
+let GRID = 16, ZOOM = 1, currentTool = 'fixed';
+let drawing = false, startPt = null, mousePos = {x:0, y:0};
+let selection = [], dragState = null, rubberBand = null;
+
+function getSelObj() { if (selection.length !== 1) return null; const s = selection[0]; return lv[s.type]?.[s.idx] ?? null; }
+let selectedIdx = -1, selectedType = null;
+function syncLegacy() { if (selection.length === 1) { selectedIdx = selection[0].idx; selectedType = selection[0].type; } else { selectedIdx = -1; selectedType = null; } }
+function clearSel() { selection = []; selectedIdx = -1; selectedType = null; updatePanelState(); }
+
+// ─────────────────────────────────────────────
+//  PANEL STATE
+// ─────────────────────────────────────────────
+function updatePanelState() {
+  const overlay    = document.getElementById('panel-overlay');
+  const noSel      = document.getElementById('panel-no-sel');
+  const multiPanel = document.getElementById('multi-sel-panel');
+  if (!overlay) return;
+  if (selection.length === 0) { overlay.classList.add('show'); noSel.classList.add('show'); if (multiPanel) multiPanel.classList.remove('show'); return; }
+  overlay.classList.remove('show'); noSel.classList.remove('show');
+  if (selection.length === 1) { if (multiPanel) multiPanel.classList.remove('show'); return; }
+  document.querySelectorAll('.psec').forEach(s => s.classList.remove('show'));
+  if (multiPanel) multiPanel.classList.add('show');
+  const count = document.getElementById('multi-sel-count');
+  const types = [...new Set(selection.map(s => s.type))];
+  const sameType = types.length === 1;
+  const type = sameType ? types[0] : null;
+  const l = _lang(); const tn = STUDIO_T[l]?.toolNames || {};
+  if (count) { const label = sameType ? (tn[type] || type.toUpperCase()) : (l === 'fr' ? 'types mixtes' : 'mixed types'); count.textContent = `${selection.length} blocs • ${label}`; }
+  const typePanel = document.getElementById('multi-type-panel');
+  if (typePanel) typePanel.innerHTML = '';
+  if (sameType) loadMultiTypePanel(type);
   loadMultiSpikePanel();
 }
 
-function _getMultiBlocks(){return selection.map(s=>lv[s.type]?.[s.idx]).filter(Boolean);}
-function _commonVal(blocks,getter){const vals=blocks.map(getter);const first=vals[0];return vals.every(v=>v===first)?first:null;}
-function _applyToAll(setter){snapshot();_getMultiBlocks().forEach(b=>setter(b));redraw();}
+function _getMultiBlocks() { return selection.map(s => lv[s.type]?.[s.idx]).filter(Boolean); }
+function _commonVal(blocks, getter) { const vals = blocks.map(getter); const first = vals[0]; return vals.every(v => v === first) ? first : null; }
+function _applyToAll(setter) { snapshot(); _getMultiBlocks().forEach(b => setter(b)); redraw(); }
 
-function loadMultiTypePanel(type){
-  const tp=document.getElementById('multi-type-panel');
-  if(!tp)return;
-  const blocks=_getMultiBlocks();
-  if(type==='mobile'){tp.innerHTML=buildMultiMobileHTML();loadMultiMobileValues(blocks);}
-  else if(type==='bounce'){tp.innerHTML=buildMultiBounceHTML();loadMultiBounceValues(blocks);}
-  else if(type==='fixed'||type==='invis'||type==='push'||type==='gblock'){tp.innerHTML='';}
+function loadMultiTypePanel(type) {
+  const tp = document.getElementById('multi-type-panel');
+  if (!tp) return;
+  const blocks = _getMultiBlocks();
+  if (type === 'mobile') { tp.innerHTML = buildMultiMobileHTML(); loadMultiMobileValues(blocks); }
+  else if (type === 'bounce') { tp.innerHTML = buildMultiBounceHTML(); loadMultiBounceValues(blocks); }
 }
 
-function buildMultiMobileHTML(){
+function buildMultiMobileHTML() {
   return `<div class="prow"><label>DÉCLENCHEMENT</label>
     <select id="mm-trigger" onchange="multiMobileChanged()" style="width:100%;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);font-family:Rajdhani,sans-serif;font-size:14px;padding:6px 8px;border-radius:4px;">
-      <option value="">—</option>
-      <option value="continuous">↺ EN CONTINU</option>
-      <option value="approach">👁 À L'APPROCHE</option>
-    </select></div>
+      <option value="">—</option><option value="continuous">↺ EN CONTINU</option><option value="approach">👁 À L'APPROCHE</option></select></div>
   <div class="prow" id="mm-trig-dist-row"><label>DISTANCE DÉCLENCHEMENT (px)</label>
-    <div style="display:flex;gap:4px;align-items:center">
-      <input type="range" id="mm-trig-dist" min="8" max="300" step="8" value="80" oninput="multiMobileChanged()">
-      <span class="pval" id="mm-trig-dist-v">80</span></div></div>
+    <div style="display:flex;gap:4px;align-items:center"><input type="range" id="mm-trig-dist" min="8" max="300" step="8" value="80" oninput="multiMobileChanged()">
+    <span class="pval" id="mm-trig-dist-v">80</span></div></div>
   <div class="prow"><label>DIRECTION</label>
     <select id="mm-dir" onchange="multiMobileChanged()" style="width:100%;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);font-family:Rajdhani,sans-serif;font-size:14px;padding:6px 8px;border-radius:4px;">
-      <option value="">—</option>
-      <option value="r">→ DROITE</option>
-      <option value="l">← GAUCHE</option>
-      <option value="u">↑ HAUT</option>
-      <option value="d">↓ BAS</option>
-      <option value="omni">⊕ OMNIDIRECTIONNEL</option>
-      <option value="fall">⬇ CHUTE</option>
-    </select></div>
-  <div class="prow"><label>VITESSE</label>
-    <div style="display:flex;gap:4px;align-items:center">
-      <input type="range" id="mm-spd" min="0.5" max="12" step="0.5" value="2" oninput="multiMobileChanged()">
-      <span class="pval" id="mm-spd-v">—</span></div></div>
-  <div class="prow" id="mm-dist-row"><label>DISTANCE (px)</label>
-    <div style="display:flex;gap:4px;align-items:center">
-      <input type="range" id="mm-dist" min="16" max="800" step="8" value="160" oninput="multiMobileChanged()">
-      <span class="pval" id="mm-dist-v">—</span></div></div>
-  <div class="prow"><div class="crow">
-    <input type="checkbox" id="mm-loop" onchange="multiMobileChanged()">
+      <option value="">—</option><option value="r">→ DROITE</option><option value="l">← GAUCHE</option>
+      <option value="u">↑ HAUT</option><option value="d">↓ BAS</option>
+      <option value="omni">⊕ OMNIDIRECTIONNEL</option><option value="fall">⬇ CHUTE</option></select></div>
+  <div class="prow"><label>VITESSE</label><div style="display:flex;gap:4px;align-items:center">
+    <input type="range" id="mm-spd" min="0.5" max="12" step="0.5" value="2" oninput="multiMobileChanged()">
+    <span class="pval" id="mm-spd-v">—</span></div></div>
+  <div class="prow" id="mm-dist-row"><label>DISTANCE (px)</label><div style="display:flex;gap:4px;align-items:center">
+    <input type="range" id="mm-dist" min="16" max="800" step="8" value="160" oninput="multiMobileChanged()">
+    <span class="pval" id="mm-dist-v">—</span></div></div>
+  <div class="prow"><div class="crow"><input type="checkbox" id="mm-loop" onchange="multiMobileChanged()">
     <label for="mm-loop" style="cursor:pointer;">ALLER-RETOUR EN BOUCLE</label></div></div>
-  <div class="prow"><label>ATTENTE AVANT RETOUR (s)</label>
-    <div style="display:flex;gap:4px;align-items:center">
-      <input type="range" id="mm-wait" min="0" max="10" step="0.5" value="0" oninput="multiMobileChanged()">
-      <span class="pval" id="mm-wait-v">—</span></div></div>`;
+  <div class="prow"><label>ATTENTE AVANT RETOUR (s)</label><div style="display:flex;gap:4px;align-items:center">
+    <input type="range" id="mm-wait" min="0" max="10" step="0.5" value="0" oninput="multiMobileChanged()">
+    <span class="pval" id="mm-wait-v">—</span></div></div>`;
 }
 
-function loadMultiMobileValues(blocks){
-  const cTrigger=_commonVal(blocks,b=>b.trigger||'continuous');
-  const cDir=_commonVal(blocks,b=>b.dir||'r');
-  const cSpd=_commonVal(blocks,b=>b.speed??2);
-  const cDist=_commonVal(blocks,b=>b.dist??160);
-  const cLoop=_commonVal(blocks,b=>b.loop??true);
-  const cWait=_commonVal(blocks,b=>b.waitDelay??0);
-  const cTD=_commonVal(blocks,b=>b.trigDist??80);
-  const se=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val??'';};
-  const sv=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val!==null?val:'—';};
-  const sc=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=val===true;if(el&&val===null)el.indeterminate=true;};
-  se('mm-trigger',cTrigger);se('mm-dir',cDir);
+function loadMultiMobileValues(blocks) {
+  const cTrigger = _commonVal(blocks, b => b.trigger||'continuous');
+  const cDir     = _commonVal(blocks, b => b.dir||'r');
+  const cSpd     = _commonVal(blocks, b => b.speed??2);
+  const cDist    = _commonVal(blocks, b => b.dist??160);
+  const cLoop    = _commonVal(blocks, b => b.loop??true);
+  const cWait    = _commonVal(blocks, b => b.waitDelay??0);
+  const cTD      = _commonVal(blocks, b => b.trigDist??80);
+  const se = (id,val) => { const el=document.getElementById(id); if(el) el.value=val??''; };
+  const sv = (id,val) => { const el=document.getElementById(id); if(el) el.textContent=val!==null?val:'—'; };
+  const sc = (id,val) => { const el=document.getElementById(id); if(el) el.checked=val===true; if(el&&val===null) el.indeterminate=true; };
+  se('mm-trigger',cTrigger); se('mm-dir',cDir);
   if(cSpd!==null){se('mm-spd',cSpd);sv('mm-spd-v',cSpd);}
   if(cDist!==null){se('mm-dist',cDist);sv('mm-dist-v',cDist);}
   if(cWait!==null){se('mm-wait',cWait);sv('mm-wait-v',cWait);}
   if(cTD!==null){se('mm-trig-dist',cTD);sv('mm-trig-dist-v',cTD);}
   sc('mm-loop',cLoop);
-  const isFall=cDir==='fall';const isApproach=cTrigger==='approach';
-  const trigRow=document.getElementById('mm-trig-dist-row');if(trigRow)trigRow.style.display=isApproach?'':'none';
-  const distRow=document.getElementById('mm-dist-row');if(distRow)distRow.style.display=isFall?'none':'';
+  const isFall=cDir==='fall'; const isApproach=cTrigger==='approach';
+  const trigRow=document.getElementById('mm-trig-dist-row'); if(trigRow) trigRow.style.display=isApproach?'':'none';
+  const distRow=document.getElementById('mm-dist-row'); if(distRow) distRow.style.display=isFall?'none':'';
 }
 
-function multiMobileChanged(){
+function multiMobileChanged() {
   const trigger=document.getElementById('mm-trigger')?.value;
   const dir=document.getElementById('mm-dir')?.value;
   const spd=document.getElementById('mm-spd')?.value;
@@ -939,42 +1009,45 @@ function multiMobileChanged(){
   const trigDist=document.getElementById('mm-trig-dist')?.value;
   const sv=(id,val)=>{const el=document.getElementById(id);if(el&&val!==undefined)el.textContent=val;};
   sv('mm-spd-v',spd);sv('mm-dist-v',dist);sv('mm-wait-v',wait);sv('mm-trig-dist-v',trigDist);
-  const isFall=dir==='fall';const isApproach=trigger==='approach';
-  const trigRow=document.getElementById('mm-trig-dist-row');if(trigRow)trigRow.style.display=isApproach?'':'none';
-  const distRow=document.getElementById('mm-dist-row');if(distRow)distRow.style.display=isFall?'none':'';
+  const isFall=dir==='fall'; const isApproach=trigger==='approach';
+  const trigRow=document.getElementById('mm-trig-dist-row'); if(trigRow) trigRow.style.display=isApproach?'':'none';
+  const distRow=document.getElementById('mm-dist-row'); if(distRow) distRow.style.display=isFall?'none':'';
   _applyToAll(b=>{
-    if(trigger)b.trigger=trigger;if(dir)b.dir=dir;if(spd)b.speed=+spd;
-    if(dist)b.dist=+dist;if(loop!==undefined)b.loop=loop;if(wait)b.waitDelay=+wait;if(trigDist)b.trigDist=+trigDist;
+    if(trigger) b.trigger=trigger; if(dir) b.dir=dir; if(spd) b.speed=+spd;
+    if(dist) b.dist=+dist; if(loop!==undefined) b.loop=loop; if(wait) b.waitDelay=+wait; if(trigDist) b.trigDist=+trigDist;
   });
 }
 
-function buildMultiBounceHTML(){
+function buildMultiBounceHTML() {
   return `<div class="prow"><label>FORCE (1-10)</label>
     <div style="display:flex;gap:4px;align-items:center">
       <input type="range" id="mb-force" min="1" max="10" step="0.5" value="2" oninput="multiBounceChanged()">
       <span class="pval" id="mb-force-v">—</span></div></div>`;
 }
-function loadMultiBounceValues(blocks){
-  const cForce=_commonVal(blocks,b=>b.force??2);
-  const el=document.getElementById('mb-force');const vl=document.getElementById('mb-force-v');
-  if(el&&cForce!==null){el.value=cForce;if(vl)vl.textContent=cForce;}else if(vl)vl.textContent='—';
+function loadMultiBounceValues(blocks) {
+  const cForce = _commonVal(blocks, b => b.force??2);
+  const el = document.getElementById('mb-force'); const vl = document.getElementById('mb-force-v');
+  if (el && cForce !== null) { el.value = cForce; if (vl) vl.textContent = cForce; } else if (vl) vl.textContent = '—';
 }
-function multiBounceChanged(){
-  const force=+document.getElementById('mb-force')?.value;
-  const vl=document.getElementById('mb-force-v');if(vl)vl.textContent=force;
-  _applyToAll(b=>{b.force=force;});
+function multiBounceChanged() {
+  const force = +document.getElementById('mb-force')?.value;
+  const vl = document.getElementById('mb-force-v'); if (vl) vl.textContent = force;
+  _applyToAll(b => { b.force = force; });
 }
 
-function loadMultiSpikePanel(){
-  const spikes=selection.map(s=>lv[s.type]?.[s.idx]?.spikes);
-  const hasSpikes=spikes.filter(sp=>sp&&sp.dirs&&sp.dirs.length>0);
-  const opts=document.getElementById('multi-spike-opts');const btn=document.getElementById('multi-spike-toggle');
-  if(hasSpikes.length===0){
-    if(opts)opts.classList.remove('show');if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
+// ─────────────────────────────────────────────
+//  MULTI-SPIKE
+// ─────────────────────────────────────────────
+function loadMultiSpikePanel() {
+  const spikes = selection.map(s => lv[s.type]?.[s.idx]?.spikes);
+  const hasSpikes = spikes.filter(sp => sp && sp.dirs && sp.dirs.length > 0);
+  const opts = document.getElementById('multi-spike-opts'); const btn = document.getElementById('multi-spike-toggle');
+  if (hasSpikes.length === 0) {
+    if(opts) opts.classList.remove('show'); if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
     ['multi-sp-u','multi-sp-d','multi-sp-l','multi-sp-r','multi-sp-hidden'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=false;});
     const del=document.getElementById('multi-sp-delay');if(del)del.value=0;const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=0;return;
   }
-  if(opts)opts.classList.add('show');if(btn){btn.classList.add('active');btn.textContent='🗡 PIQUES ▾';}
+  if(opts) opts.classList.add('show'); if(btn){btn.classList.add('active');btn.textContent='🗡 PIQUES ▾';}
   const allDirs=hasSpikes.map(sp=>JSON.stringify([...sp.dirs].sort()));
   const allHidden=hasSpikes.map(sp=>sp.hidden||false);
   const allDelay=hasSpikes.map(sp=>sp.delay||0);
@@ -989,121 +1062,150 @@ function loadMultiSpikePanel(){
   if(del){if(sameDelay){del.value=allDelay[0];if(delv)delv.textContent=allDelay[0];}else{del.value=0;if(delv)delv.textContent='—';}}
 }
 
-function multiSpikeChanged(){
-  const u=document.getElementById('multi-sp-u')?.checked;const d=document.getElementById('multi-sp-d')?.checked;
-  const l=document.getElementById('multi-sp-l')?.checked;const r=document.getElementById('multi-sp-r')?.checked;
+function multiSpikeChanged() {
+  const u=document.getElementById('multi-sp-u')?.checked; const d=document.getElementById('multi-sp-d')?.checked;
+  const l=document.getElementById('multi-sp-l')?.checked; const r=document.getElementById('multi-sp-r')?.checked;
   const hidden=document.getElementById('multi-sp-hidden')?.checked||false;
   const delay=+(document.getElementById('multi-sp-delay')?.value||0);
-  const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=delay;
+  const delv=document.getElementById('multi-sp-delay-v'); if(delv) delv.textContent=delay;
   const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
   snapshot();
   selection.forEach(s=>{const b=lv[s.type]?.[s.idx];if(!b)return;if(dirs.length===0){delete b.spikes;}else{b.spikes={dirs,hidden,delay};}});
   redraw();
 }
 
-function multiSpikeClear(){
+function multiSpikeClear() {
   snapshot();
   selection.forEach(s=>{const b=lv[s.type]?.[s.idx];if(b)delete b.spikes;});
   ['multi-sp-u','multi-sp-d','multi-sp-l','multi-sp-r','multi-sp-hidden'].forEach(id=>{const el=document.getElementById(id);if(el){el.checked=false;el.indeterminate=false;}});
-  const del=document.getElementById('multi-sp-delay');if(del)del.value=0;const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=0;
-  const opts=document.getElementById('multi-spike-opts');const btn=document.getElementById('multi-spike-toggle');
-  if(opts)opts.classList.remove('show');if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
+  const del=document.getElementById('multi-sp-delay'); if(del) del.value=0;
+  const delv=document.getElementById('multi-sp-delay-v'); if(delv) delv.textContent=0;
+  const opts=document.getElementById('multi-spike-opts'); const btn=document.getElementById('multi-spike-toggle');
+  if(opts) opts.classList.remove('show'); if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
   redraw();
 }
 
-function addToSel(type,idx){
-  if(!selection.find(s=>s.type===type&&s.idx===idx))selection.push({type,idx});
+// ─────────────────────────────────────────────
+//  SÉLECTION
+// ─────────────────────────────────────────────
+function addToSel(type, idx) {
+  if (!selection.find(s => s.type===type && s.idx===idx)) selection.push({type,idx});
   syncLegacy();
   if(selection.length===1&&type==='fixed'){const b=lv.fixed[idx];if(b)blockSpikePanelLoad('fixed',b);}
-  if(selection.length===1&&type==='slider'){const m=lv.mobile[idx];if(m){moPanelLoad(m);blockSpikePanelLoad('mobile',m);showMoPanel();}}
   if(selection.length===1&&type==='invis'){const b=lv.invis[idx];if(b)blockSpikePanelLoad('invis',b);}
   if(selection.length===1&&type==='bounce'){const b=lv.bounce[idx];if(b){bouncePanelLoad(b);blockSpikePanelLoad('bounce',b);showBouncePanel();}}
-  if(selection.length===1&&type==='mobile'){const m=lv.mobile[idx];if(m){moPanelLoad(m);blockSpikePanelLoad('mobile',m);showMoPanel();}}
+  if(selection.length===1&&(type==='mobile'||type==='slider')){const m=lv.mobile[idx];if(m){moPanelLoad(m);blockSpikePanelLoad('mobile',m);showMoPanel();}}
   if(selection.length===1&&type==='push'){const b=lv.push[idx];if(b)blockSpikePanelLoad('push',b);}
   if(selection.length===1&&type==='gravflip'){const z=lv.gravflip[idx];if(z){gfPanelLoad(z);showGfPanel();}}
   if(selection.length===1&&type==='speed'){const z=lv.speed[idx];if(z){spPanelLoad(z);showSpPanel();}}
   if(selection.length===1&&type==='flash'){const f=lv.flash[idx];if(f){flashPanelLoad(f);blockSpikePanelLoad('flash',f);showFlashPanel();}}
   if(selection.length===1&&type==='gblock'){const g=lv.gblock[idx];if(g){gblockPanelLoad(g);blockSpikePanelLoad('gblock',g);showGblockPanel();}}
-  if(selection.length===1&&type==='darkness'){const d=lv.darkness[idx];if(d){dkPanelLoad(d);showDkPanel();}}
+  if(selection.length===1&&type==='darkness'){const dk=lv.darkness[idx];if(dk){dkPanelLoad(dk);showDkPanel();}}
   updatePanelState();
 }
 function toggleSel(type,idx){const i=selection.findIndex(s=>s.type===type&&s.idx===idx);if(i>=0)selection.splice(i,1);else selection.push({type,idx});syncLegacy();updatePanelState();}
 function isSelected(type,idx){return!!selection.find(s=>s.type===type&&s.idx===idx);}
 
-let undoStack=[],redoStack=[];
-function snapshot(){
-  if(_isPublished&&_currentLevelId)return;
-  _hasUnsavedChanges=true;
-  undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
+// ─────────────────────────────────────────────
+//  UNDO / REDO
+// ─────────────────────────────────────────────
+let undoStack=[], redoStack=[];
+let _currentLevelId=null, _currentVisibility='private', _authorCompleted=false, _isPublished=false;
+let _hasUnsavedChanges=false, _loadingLevel=false;
+
+function snapshot() {
+  if (_isPublished && _currentLevelId) return;
+  _hasUnsavedChanges = true;
+  undoStack.push(JSON.stringify(lv));
+  if (undoStack.length > 60) undoStack.shift();
+  redoStack = [];
 }
-function snapshotWithDupCheck(){
-  if(_currentLevelId&&!window._authorCompletedReset){window._authorCompletedReset=true;_sb.from('levels').update({author_completed:false}).eq('id',_currentLevelId).then(()=>{_authorCompleted=false;});}
-  if(_isPublished&&_currentLevelId&&!window._dupConfirmed){showDupModal();return;}
+function snapshotWithDupCheck() {
+  if (_currentLevelId && !window._authorCompletedReset) { window._authorCompletedReset=true; _sb.from('levels').update({author_completed:false}).eq('id',_currentLevelId).then(()=>{_authorCompleted=false;}); }
+  if (_isPublished && _currentLevelId && !window._dupConfirmed) { showDupModal(); return; }
   snapshot();
 }
-async function duplicateLevel(){
-  const{data:sess}=await _sb.auth.getSession();if(!sess.session)return;
-  const user=sess.session.user;
+async function duplicateLevel() {
+  const {data:sess} = await _sb.auth.getSession(); if (!sess.session) return;
+  const user = sess.session.user;
   function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
-  const{data:inserted,error}=await _sb.from('levels').insert({user_id:user.id,title:(document.getElementById('level-name-input')?.value||'Untitled')+' (copie)',data:lv,plays:0,visibility:'private',share_code:genCode(),author_completed:false,is_published:false}).select().single();
-  if(error){showSaveToast('⚠️ '+error.message);window._dupWarningShown=false;return;}
-  _currentLevelId=inserted.id;_currentVisibility='private';_authorCompleted=false;_isPublished=false;
-  window._dupConfirmed=true;window._dupWarningShown=false;
-  const ni=document.getElementById('level-name-input');if(ni)ni.value=inserted.title;
+  const {data:inserted,error} = await _sb.from('levels').insert({user_id:user.id,title:(document.getElementById('level-name-input')?.value||'Untitled')+' (copie)',data:lv,plays:0,visibility:'private',share_code:genCode(),author_completed:false,is_published:false}).select().single();
+  if (error) { showSaveToast('⚠️ '+error.message); window._dupWarningShown=false; return; }
+  _currentLevelId=inserted.id; _currentVisibility='private'; _authorCompleted=false; _isPublished=false;
+  window._dupConfirmed=true; window._dupWarningShown=false;
+  const ni=document.getElementById('level-name-input'); if(ni) ni.value=inserted.title;
   history.replaceState(null,'','studio.html');
-  undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
-  status('Niveau dupliqué ! Tu peux maintenant éditer.');
+  undoStack.push(JSON.stringify(lv)); if(undoStack.length>60) undoStack.shift(); redoStack=[];
+  const l=_lang(); status(STUDIO_T[l]?.msgLoaded || 'Dupliqué !');
 }
 function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(lv));lv=JSON.parse(undoStack.pop());clearSel();redraw();}
 function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(lv));lv=JSON.parse(redoStack.pop());clearSel();redraw();}
 
-let clipboard=null;
-function copySelected(){if(!selection.length)return;clipboard=selection.map(s=>({type:s.type,data:JSON.parse(JSON.stringify(lv[s.type][s.idx]))}));status(`Copié (${clipboard.length} bloc${clipboard.length>1?'s':''}).`);}
-function pasteClip(){if(!clipboard||!clipboard.length)return;snapshot();clearSel();clipboard.forEach(c=>{const d=JSON.parse(JSON.stringify(c.data));d.x+=GRID*2;d.y+=GRID*2;lv[c.type].push(d);addToSel(c.type,lv[c.type].length-1);});redraw();status('Collé.');}
+// ─────────────────────────────────────────────
+//  CLIPBOARD
+// ─────────────────────────────────────────────
+let clipboard = null;
+function copySelected(){if(!selection.length)return;clipboard=selection.map(s=>({type:s.type,data:JSON.parse(JSON.stringify(lv[s.type][s.idx]))}));}
+function pasteClip(){
+  if(!clipboard||!clipboard.length)return;snapshot();clearSel();
+  clipboard.forEach(c=>{const d=JSON.parse(JSON.stringify(c.data));d.x+=GRID*2;d.y+=GRID*2;lv[c.type].push(d);addToSel(c.type,lv[c.type].length-1);});
+  redraw();
+  const l=_lang(); status(STUDIO_T[l]?.msgPaste || 'Collé.');
+}
 
-let lv=emptyLevel();
+// ─────────────────────────────────────────────
+//  NIVEAU
+// ─────────────────────────────────────────────
+let lv = emptyLevel();
 function emptyLevel(){return{fixed:[],trap:[],slider:[],invis:[],bounce:[],mobile:[],push:[],gravflip:[],speed:[],flash:[],spike:[],gblock:[],darkness:[],start:{x:80,y:480},end:null};}
 
-const TOOL_NAMES={fixed:'FIXE',slider:'GLISSEUR',invis:'INVISIBLE',bounce:'REBOND',mobile:'MOBILE',push:'POUSSABLE',gravflip:'GRAVITÉ',speed:'VITESSE',flash:'FLASH',gblock:'PLANÈTE',darkness:'OBSCURITÉ',start:'DÉPART',end:'ARRIVÉE',select:'SÉLECTION'};
-function T(t){
-  currentTool=t;dragState=null;selectedIdx=-1;selectedType=null;
-  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
+// ─────────────────────────────────────────────
+//  OUTIL ACTIF
+// ─────────────────────────────────────────────
+function setTool(t) {
+  currentTool = t; dragState = null; selectedIdx = -1; selectedType = null;
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('t-'+t)?.classList.add('active');
-  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  document.querySelectorAll('.psec').forEach(s => s.classList.remove('show'));
   document.getElementById('s-'+t)?.classList.add('show');
-  const l=_lang();const names=STUDIO_T[l]?.toolNames||null;
-  const name=names?names[t]:(TOOL_NAMES[t]||t.toUpperCase());
-  const prefix=STUDIO_T[l]?.toolPrefix||'OUTIL : ';
-  document.getElementById('ptitle').textContent=prefix+name;
-  trapReturnUI();redraw();
+  const l = _lang(); const st = STUDIO_T[l] || {};
+  const prefix = st.toolPrefix || 'TOOL: ';
+  const names  = st.toolNames  || {};
+  document.getElementById('ptitle').textContent = prefix + (names[t] || t.toUpperCase());
+  redraw();
 }
 
-function trapReturnUI(){
-  const ret=document.getElementById('tr-returns')?.checked;const part=document.getElementById('tr-partial')?.checked;
-  const d=document.getElementById('tr-returns-opts');if(d)d.style.display=ret?'':'none';
-  const dp=document.getElementById('tr-partial-opts');if(dp)dp.style.display=part?'':'none';
-}
+// ─────────────────────────────────────────────
+//  PANELS PARAMÈTRES
+// ─────────────────────────────────────────────
+const GF_HINTS_FR = {u:'↑ Attire vers le haut (plafond)',d:'↓ Attire vers le bas (sol)',l:'← Attire vers la gauche (mur gauche)',r:'→ Attire vers la droite (mur droit)'};
+const GF_HINTS_EN = {u:'↑ Pulls to ceiling',d:'↓ Pulls to floor',l:'← Pulls to left wall',r:'→ Pulls to right wall'};
+const GF_HINTS = () => _lang()==='fr' ? GF_HINTS_FR : GF_HINTS_EN;
 
-const GF_ARROWS={u:'↑',d:'↓',l:'←',r:'→'};
-const GF_HINTS_FR={u:'↑ Attire vers le haut (plafond)',d:'↓ Attire vers le bas (sol)',l:'← Attire vers la gauche (mur gauche)',r:'→ Attire vers la droite (mur droit)'};
-const GF_HINTS_EN={u:'↑ Pulls to ceiling',d:'↓ Pulls to floor',l:'← Pulls to left wall',r:'→ Pulls to right wall'};
-const GF_HINTS=()=>_lang()==='fr'?GF_HINTS_FR:GF_HINTS_EN;
 function gfParamChanged(){
-  const dir=document.getElementById('gf-dir').value;const str=+document.getElementById('gf-str').value;
+  const dir=document.getElementById('gf-dir').value; const str=+document.getElementById('gf-str').value;
   document.getElementById('gf-str-v').textContent=str;
-  document.getElementById('gf-hint').textContent=str===0?'○ Apesanteur':GF_HINTS()[dir];
+  const isFr=_lang()==='fr';
+  document.getElementById('gf-hint').textContent=str===0?(isFr?'○ Apesanteur':'○ Weightless'):GF_HINTS()[dir];
   if(selection.length===1&&selectedType==='gravflip'){const z=lv.gravflip[selectedIdx];if(z){z.dir=dir;z.strength=str;}}
   redraw();
 }
 function gfPanelLoad(z){
-  const dir=z.dir??(((z.grav??-10)<0)?'u':'d');const str=z.strength??Math.abs(z.grav??10);
-  document.getElementById('gf-dir').value=dir;document.getElementById('gf-str').value=str;
-  document.getElementById('gf-str-v').textContent=str;document.getElementById('gf-hint').textContent=str===0?'○ Apesanteur':GF_HINTS()[dir];
+  const dir=z.dir??(((z.grav??-10)<0)?'u':'d'); const str=z.strength??Math.abs(z.grav??10);
+  document.getElementById('gf-dir').value=dir; document.getElementById('gf-str').value=str;
+  document.getElementById('gf-str-v').textContent=str;
+  const isFr=_lang()==='fr';
+  document.getElementById('gf-hint').textContent=str===0?(isFr?'○ Apesanteur':'○ Weightless'):GF_HINTS()[dir];
 }
-function showGfPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-gravflip').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : GRAVITÉ';}
+function showGfPanel(){
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  document.getElementById('s-gravflip').classList.add('show');
+  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  document.getElementById('ptitle').textContent=p+(n.gravflip||'GRAVITY');
+}
 
 function spParamChanged(){
-  const val=+document.getElementById('sp-val').value;document.getElementById('sp-val-v').textContent=val;
+  const val=+document.getElementById('sp-val').value; document.getElementById('sp-val-v').textContent=val;
   const isFr=_lang()==='fr';
   const hint=val<3?(isFr?'⬇ très lent':'⬇ very slow'):val<5?(isFr?'⬇ lent':'⬇ slow'):val===5?'= normal':val<10?(isFr?'⬆ rapide':'⬆ fast'):val<15?(isFr?'⬆⬆ très rapide':'⬆⬆ very fast'):'⚡ turbo';
   document.getElementById('sp-hint').textContent=hint;
@@ -1111,20 +1213,34 @@ function spParamChanged(){
   redraw();
 }
 function spPanelLoad(z){document.getElementById('sp-val').value=z.spd??5;document.getElementById('sp-val-v').textContent=z.spd??5;spParamChanged();}
-function showSpPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-speed').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : VITESSE';}
+function showSpPanel(){
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  document.getElementById('s-speed').classList.add('show');
+  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  document.getElementById('ptitle').textContent=p+(n.speed||'SPEED');
+}
 
-function bounceParamChanged(){document.getElementById('bo-force-v').textContent=document.getElementById('bo-force').value;if(selection.length===1&&selectedType==='bounce'){const b=lv.bounce[selectedIdx];if(b)b.force=+document.getElementById('bo-force').value;}redraw();}
+function bounceParamChanged(){
+  document.getElementById('bo-force-v').textContent=document.getElementById('bo-force').value;
+  if(selection.length===1&&selectedType==='bounce'){const b=lv.bounce[selectedIdx];if(b)b.force=+document.getElementById('bo-force').value;}
+  redraw();
+}
 function bouncePanelLoad(b){document.getElementById('bo-force').value=b.force??2;document.getElementById('bo-force-v').textContent=b.force??2;}
-function showBouncePanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-bounce').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : REBOND';}
+function showBouncePanel(){
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  document.getElementById('s-bounce').classList.add('show');
+  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  document.getElementById('ptitle').textContent=p+(n.bounce||'BOUNCE');
+}
 
 function moParamChanged(){
-  const trigger=document.getElementById('mo-trigger').value;const dir=document.getElementById('mo-dir').value;
-  const spd=+document.getElementById('mo-spd').value;const dist=+document.getElementById('mo-dist').value;
-  const loop=document.getElementById('mo-loop').checked;const wait=+document.getElementById('mo-wait').value;
+  const trigger=document.getElementById('mo-trigger').value; const dir=document.getElementById('mo-dir').value;
+  const spd=+document.getElementById('mo-spd').value; const dist=+document.getElementById('mo-dist').value;
+  const loop=document.getElementById('mo-loop').checked; const wait=+document.getElementById('mo-wait').value;
   const trigDist=+document.getElementById('mo-trig-dist').value;
-  document.getElementById('mo-spd-v').textContent=spd;document.getElementById('mo-dist-v').textContent=dist;
-  document.getElementById('mo-wait-v').textContent=wait;document.getElementById('mo-trig-dist-v').textContent=trigDist;
-  const isFall=dir==='fall';const isApproach=trigger==='approach';
+  document.getElementById('mo-spd-v').textContent=spd; document.getElementById('mo-dist-v').textContent=dist;
+  document.getElementById('mo-wait-v').textContent=wait; document.getElementById('mo-trig-dist-v').textContent=trigDist;
+  const isFall=dir==='fall'; const isApproach=trigger==='approach';
   document.getElementById('mo-trig-dist-row').style.display=isApproach?'':'none';
   document.getElementById('mo-dist-row').style.display=isFall?'none':'';
   document.getElementById('mo-loop-row').style.display=isFall?'none':'';
@@ -1133,25 +1249,29 @@ function moParamChanged(){
   redraw();
 }
 function moPanelLoad(m){
-  document.getElementById('mo-trigger').value=m.trigger||'continuous';document.getElementById('mo-dir').value=m.dir||'r';
-  document.getElementById('mo-spd').value=m.speed??2;document.getElementById('mo-dist').value=m.dist??160;
-  document.getElementById('mo-loop').checked=m.loop??true;document.getElementById('mo-wait').value=m.waitDelay??0;
+  document.getElementById('mo-trigger').value=m.trigger||'continuous';
+  document.getElementById('mo-dir').value=m.dir||'r';
+  document.getElementById('mo-spd').value=m.speed??2;
+  document.getElementById('mo-dist').value=m.dist??160;
+  document.getElementById('mo-loop').checked=m.loop??true;
+  document.getElementById('mo-wait').value=m.waitDelay??0;
   document.getElementById('mo-trig-dist').value=m.trigDist??80;
-  document.getElementById('mo-spd-v').textContent=m.speed??2;document.getElementById('mo-dist-v').textContent=m.dist??160;
-  document.getElementById('mo-wait-v').textContent=m.waitDelay??0;document.getElementById('mo-trig-dist-v').textContent=m.trigDist??80;
+  document.getElementById('mo-spd-v').textContent=m.speed??2;
+  document.getElementById('mo-dist-v').textContent=m.dist??160;
+  document.getElementById('mo-wait-v').textContent=m.waitDelay??0;
+  document.getElementById('mo-trig-dist-v').textContent=m.trigDist??80;
   moParamChanged();
 }
-function showMoPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-mobile').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : MOBILE';}
+function showMoPanel(){
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  document.getElementById('s-mobile').classList.add('show');
+  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  document.getElementById('ptitle').textContent=p+(n.mobile||'MOBILE');
+}
 function getMoValues(){return{trigger:document.getElementById('mo-trigger').value,dir:document.getElementById('mo-dir').value,speed:+document.getElementById('mo-spd').value,dist:+document.getElementById('mo-dist').value,loop:document.getElementById('mo-loop').checked,waitDelay:+document.getElementById('mo-wait').value,trigDist:+document.getElementById('mo-trig-dist').value};}
-function showSlPanel(){showMoPanel();}
-function slPanelValues(){return getMoValues();}
-function slParamChanged(){moParamChanged();}
-function slPanelLoad(s){moPanelLoad(s);}
-
-function status(s){document.getElementById('statusbar').textContent=s;}
 
 function flashParamChanged(){
-  const onCs=+document.getElementById('fl-on').value||50;const offCs=+document.getElementById('fl-off').value||50;
+  const onCs=+document.getElementById('fl-on').value||50; const offCs=+document.getElementById('fl-off').value||50;
   const phase=+document.getElementById('fl-phase').value||0;
   document.getElementById('fl-phase-v').textContent=phase;
   if(selection.length===1&&selectedType==='flash'){const f=lv.flash[selectedIdx];if(f){f.onMs=onCs*10;f.offMs=offCs*10;f.phase=phase*10;}}
@@ -1163,21 +1283,45 @@ function flashPanelLoad(f){
   document.getElementById('fl-phase').value=Math.round((f.phase||0)/10);
   document.getElementById('fl-phase-v').textContent=Math.round((f.phase||0)/10);
 }
-function showFlashPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-flash').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : FLASH';}
-
-function gblockParamChanged(){redraw();}
-function gblockPanelLoad(g){blockSpikePanelLoad('gblock',g);}
-function showGblockPanel(){document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));document.getElementById('s-gblock').classList.add('show');document.getElementById('ptitle').textContent='PARAMÈTRES : PLANÈTE';}
-
-function toggleSpikeOpts(prefix){
-  const opts=document.getElementById(prefix+'-spike-opts');const btn=document.getElementById(prefix+'-spike-toggle');
-  if(!opts)return;opts.classList.toggle('show');btn.classList.toggle('active');
-  btn.textContent=opts.classList.contains('show')?'🗡 PIQUES ▾':'🗡 PIQUES ▸';
+function showFlashPanel(){
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  document.getElementById('s-flash').classList.add('show');
+  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  document.getElementById('ptitle').textContent=p+(n.flash||'FLASH');
 }
 
+function gblockPanelLoad(g){blockSpikePanelLoad('gblock',g);}
+function showGblockPanel(){
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  document.getElementById('s-gblock').classList.add('show');
+  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  document.getElementById('ptitle').textContent=p+(n.gblock||'PLANET');
+}
+
+function dkParamChanged(){
+  const radius=+document.getElementById('dk-radius').value;
+  document.getElementById('dk-radius-v').textContent=radius;
+  if(selection.length===1&&selectedType==='darkness'){const z=lv.darkness[selectedIdx];if(z)z.radius=radius;}
+  redraw();
+}
+function dkPanelLoad(z){document.getElementById('dk-radius').value=z.radius??120;document.getElementById('dk-radius-v').textContent=z.radius??120;}
+function showDkPanel(){
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  document.getElementById('s-darkness').classList.add('show');
+  document.getElementById('ptitle').textContent='DARKNESS';
+}
+
+// ─────────────────────────────────────────────
+//  SPIKES PANEL
+// ─────────────────────────────────────────────
+function toggleSpikeOpts(prefix){
+  const opts=document.getElementById(prefix+'-spike-opts'); const btn=document.getElementById(prefix+'-spike-toggle');
+  if(!opts)return; opts.classList.toggle('show'); btn.classList.toggle('active');
+  btn.textContent=opts.classList.contains('show')?'🗡 PIQUES ▾':'🗡 PIQUES ▸';
+}
 function blockSpikeChanged(prefix){
-  const u=document.getElementById(prefix+'-sp-u')?.checked;const d=document.getElementById(prefix+'-sp-d')?.checked;
-  const l=document.getElementById(prefix+'-sp-l')?.checked;const r=document.getElementById(prefix+'-sp-r')?.checked;
+  const u=document.getElementById(prefix+'-sp-u')?.checked; const d=document.getElementById(prefix+'-sp-d')?.checked;
+  const l=document.getElementById(prefix+'-sp-l')?.checked; const r=document.getElementById(prefix+'-sp-r')?.checked;
   const hidden=document.getElementById(prefix+'-sp-hidden')?.checked;
   const delay=+document.getElementById(prefix+'-sp-delay')?.value||0;
   document.getElementById(prefix+'-sp-delay-v').textContent=delay;
@@ -1187,16 +1331,12 @@ function blockSpikeChanged(prefix){
   }
   redraw();
 }
-
 function blockSpikePanelLoad(prefix,b){
-  const sp=b.spikes;const hasSp=sp&&sp.dirs&&sp.dirs.length>0;
-  const opts=document.getElementById(prefix+'-spike-opts');const btn=document.getElementById(prefix+'-spike-toggle');
+  const sp=b.spikes; const hasSp=sp&&sp.dirs&&sp.dirs.length>0;
+  const opts=document.getElementById(prefix+'-spike-opts'); const btn=document.getElementById(prefix+'-spike-toggle');
   if(hasSp){
     if(opts)opts.classList.add('show');if(btn){btn.classList.add('active');btn.textContent='🗡 PIQUES ▾';}
-    const u=document.getElementById(prefix+'-sp-u');if(u)u.checked=sp.dirs.includes('u');
-    const d=document.getElementById(prefix+'-sp-d');if(d)d.checked=sp.dirs.includes('d');
-    const l=document.getElementById(prefix+'-sp-l');if(l)l.checked=sp.dirs.includes('l');
-    const r=document.getElementById(prefix+'-sp-r');if(r)r.checked=sp.dirs.includes('r');
+    ['u','d','l','r'].forEach(dir=>{const el=document.getElementById(prefix+'-sp-'+dir);if(el)el.checked=sp.dirs.includes(dir);});
     const h=document.getElementById(prefix+'-sp-hidden');if(h)h.checked=sp.hidden||false;
     const del=document.getElementById(prefix+'-sp-delay');if(del)del.value=sp.delay||0;
     const delv=document.getElementById(prefix+'-sp-delay-v');if(delv)delv.textContent=sp.delay||0;
@@ -1207,34 +1347,21 @@ function blockSpikePanelLoad(prefix,b){
     const delv=document.getElementById(prefix+'-sp-delay-v');if(delv)delv.textContent=0;
   }
 }
-
 function getSpikeFromPanel(prefix){
-  const u=document.getElementById(prefix+'-sp-u')?.checked;const d=document.getElementById(prefix+'-sp-d')?.checked;
-  const l=document.getElementById(prefix+'-sp-l')?.checked;const r=document.getElementById(prefix+'-sp-r')?.checked;
-  const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);if(dirs.length===0)return undefined;
+  const u=document.getElementById(prefix+'-sp-u')?.checked; const d=document.getElementById(prefix+'-sp-d')?.checked;
+  const l=document.getElementById(prefix+'-sp-l')?.checked; const r=document.getElementById(prefix+'-sp-r')?.checked;
+  const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean); if(dirs.length===0)return undefined;
   return{dirs,hidden:document.getElementById(prefix+'-sp-hidden')?.checked||false,delay:+document.getElementById(prefix+'-sp-delay')?.value||0};
 }
 
-function dkParamChanged(){
-  const radius=+document.getElementById('dk-radius').value;
-  document.getElementById('dk-radius-v').textContent=radius;
-  if(selection.length===1&&selectedType==='darkness'){
-    const z=lv.darkness[selectedIdx];
-    if(z){z.radius=radius;}
-  }
-  redraw();
-}
-function dkPanelLoad(z){
-  document.getElementById('dk-radius').value=z.radius??120;
-  document.getElementById('dk-radius-v').textContent=z.radius??120;
-}
-function showDkPanel(){
-  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
-  document.getElementById('s-darkness').classList.add('show');
-  document.getElementById('ptitle').textContent='PARAMÈTRES : OBSCURITÉ';
-}
-function ts(frKey,enKey){const l=_lang();const t=STUDIO_T[l]||{};return t[frKey]||(l==='fr'?frKey:enKey);}
+// ─────────────────────────────────────────────
+//  STATUSBAR
+// ─────────────────────────────────────────────
+function status(s){document.getElementById('statusbar').textContent=s;}
 
+// ─────────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────────
 function showSaveToast(msg){
   let toast=document.getElementById('save-toast');
   if(!toast){toast=document.createElement('div');toast.id='save-toast';toast.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:#0d0d1e;border:2px solid #40f090;color:#40f090;font-family:Orbitron,monospace;font-size:14px;font-weight:700;padding:18px 32px;border-radius:8px;z-index:9999;box-shadow:0 0 40px #40f09044;pointer-events:none;transition:transform .2s,opacity .3s;opacity:0;letter-spacing:1px;';document.body.appendChild(toast);}
@@ -1242,13 +1369,10 @@ function showSaveToast(msg){
   clearTimeout(toast._timer);toast._timer=setTimeout(()=>{toast.style.transform='translate(-50%,-50%) scale(0.8)';toast.style.opacity='0';},1800);
 }
 
-function onLevelNameChange(){
-  clearTimeout(window._nameSaveTimer);
-  if(_currentLevelId){window._nameSaveTimer=setTimeout(async()=>{const title=document.getElementById('level-name-input').value.trim();if(title){await _sb.from('levels').update({title}).eq('id',_currentLevelId);status('Titre mis à jour.');}},1000);}
-}
-
+// ─────────────────────────────────────────────
+//  CANVAS EVENTS
+// ─────────────────────────────────────────────
 function snap(v){return Math.round(v/GRID)*GRID;}
-
 const HS=7;
 function getHandles(p){return{nw:{x:p.x,y:p.y},n:{x:p.x+p.w/2,y:p.y},ne:{x:p.x+p.w,y:p.y},e:{x:p.x+p.w,y:p.y+p.h/2},se:{x:p.x+p.w,y:p.y+p.h},s:{x:p.x+p.w/2,y:p.y+p.h},sw:{x:p.x,y:p.y+p.h},w:{x:p.x,y:p.y+p.h/2}};}
 function hitHandle(p,x,y){for(const[k,v]of Object.entries(getHandles(p)))if(Math.abs(x-v.x)<=HS&&Math.abs(y-v.y)<=HS)return k;return null;}
@@ -1270,7 +1394,6 @@ EC.addEventListener('mousedown',e=>{
   if(lv.end){const ex=lv.end.x,ey=lv.end.y;if(x>=ex&&x<=ex+40&&y>=ey-52&&y<=ey+8){dragState={mode:'flag',flag:'end',sm:{x,y},orig:{x:ex,y:ey}};redraw();return;}}
   if(selection.length===1){
     const obj=getSelObj();
-    if(obj&&selectedType==='trap'&&obj.partial&&obj.partDist>0){const ghostY=obj.y+obj.partDist+obj.h;if(Math.abs(y-ghostY)<=8&&x>=obj.x&&x<=obj.x+obj.w){dragState={mode:'partdist',sm:{x,y},orig:obj.partDist,trap:obj};return;}}
     const h=obj?hitHandle(obj,x,y):null;
     if(h){dragState={mode:'resize',handle:h,sm:{x,y},sr:{x:obj.x,y:obj.y,w:obj.w,h:obj.h}};return;}
   }
@@ -1291,13 +1414,12 @@ window.addEventListener('mousemove',e=>{
   if(dragState){
     const dx=x-dragState.sm.x,dy=y-dragState.sm.y;
     if(dragState.mode==='flag'){EC.style.cursor='grabbing';const nx=snap(dragState.orig.x+dx),ny=snap(dragState.orig.y+dy);if(dragState.flag==='start')lv.start={x:Math.max(0,Math.min(EW,nx)),y:Math.max(0,Math.min(EH,ny))};else lv.end={x:Math.max(0,Math.min(EW,nx)),y:Math.max(0,Math.min(EH,ny))};redraw();return;}
-    if(dragState.mode==='partdist'){dragState.trap.partDist=Math.max(GRID,snap(dragState.orig+(y-dragState.sm.y)));const sl=document.getElementById('tr-partdist'),lbl=document.getElementById('tr-partdist-v');if(sl){sl.value=dragState.trap.partDist;lbl.textContent=dragState.trap.partDist;}redraw();return;}
     if(dragState.mode==='move')dragState.origins.forEach(o=>{const b=lv[o.type][o.idx];b.x=Math.max(0,Math.min(EW-b.w,snap(o.ox+dx)));b.y=Math.max(0,Math.min(EH-b.h,snap(o.oy+dy)));if(b.ox!==undefined)b.ox=b.x;if(b.oy!==undefined)b.oy=b.y;});
     else if(dragState.mode==='resize'){const obj=getSelObj();if(obj){const h=dragState.handle,r=dragState.sr;let nx=r.x,ny=r.y,nw=r.w,nh=r.h;if(h.includes('e'))nw=Math.max(GRID,snap(r.w+dx));if(h.includes('s'))nh=Math.max(GRID,snap(r.h+dy));if(h.includes('w')){nx=snap(r.x+dx);nw=Math.max(GRID,r.w-snap(dx));}if(h.includes('n')){ny=snap(r.y+dy);nh=Math.max(GRID,r.h-snap(dy));}obj.x=nx;obj.y=ny;obj.w=nw;obj.h=nh;}}
     redraw();return;
   }
   if(rubberBand){rubberBand.ex=x;rubberBand.ey=y;redraw();return;}
-  if(selection.length===1){const obj=getSelObj();if(obj){if(selectedType==='trap'&&obj.partial&&obj.partDist>0){const ghostY=obj.y+obj.partDist+obj.h;if(Math.abs(y-ghostY)<=8&&x>=obj.x&&x<=obj.x+obj.w){EC.style.cursor='s-resize';redraw();return;}}const h=hitHandle(obj,x,y);if(h){EC.style.cursor=CURSOR_MAP[h];redraw();return;}}}
+  if(selection.length===1){const obj=getSelObj();if(obj){const h=hitHandle(obj,x,y);if(h){EC.style.cursor=CURSOR_MAP[h];redraw();return;}}}
   if(selection.length>0){const hit=findBlockAt(x,y);if(hit&&isSelected(hit.type,hit.idx)){EC.style.cursor='move';redraw();return;}}
   let hovFlag=null;
   if(lv.start&&x>=lv.start.x&&x<=lv.start.x+40&&y>=lv.start.y-52&&y<=lv.start.y+8)hovFlag='start';
@@ -1317,7 +1439,6 @@ window.addEventListener('mouseup',e=>{
       if(!e.shiftKey)clearSel();
       ['fixed','invis','bounce','mobile','push','gravflip','speed','flash','gblock','darkness'].forEach(k=>{(lv[k]||[]).forEach((p,i)=>{if(p.x<rx+rw&&p.x+p.w>rx&&p.y<ry+rh&&p.y+p.h>ry)selection.push({type:k,idx:i});});});
       syncLegacy();updatePanelState();
-      if(selection.length)status(`${selection.length} bloc${selection.length>1?'s':''} sélectionné${selection.length>1?'s':''}.`);
     }
     redraw();return;
   }
@@ -1343,28 +1464,59 @@ window.addEventListener('mouseup',e=>{
 
 EC.addEventListener('mouseleave',()=>{rubberBand=null;redraw();});
 
-function findBlockAt(x,y){const types=['fixed','invis','bounce','mobile','push','gravflip','speed','flash','gblock','darkness'];for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}return null;}
-function deleteSelected(){if(!selection.length)return;snapshotWithDupCheck();[...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();status('Supprimé.');}
+function findBlockAt(x,y){
+  const types=['fixed','invis','bounce','mobile','push','gravflip','speed','flash','gblock','darkness'];
+  for(const k of types)for(let i=(lv[k]||[]).length-1;i>=0;i--){const p=lv[k][i];if(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)return{type:k,idx:i};}
+  return null;
+}
+function deleteSelected(){
+  if(!selection.length)return;snapshotWithDupCheck();
+  [...selection].sort((a,b)=>b.idx-a.idx).forEach(s=>lv[s.type].splice(s.idx,1));clearSel();redraw();
+  const l=_lang();status(STUDIO_T[l]?.msgDeleted||'Deleted.');
+}
 function zoom(d,cx,cy){
   const prevZoom=ZOOM;ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));
   if(cx!==undefined&&cy!==undefined){const wrap=document.getElementById('cwrap');const scrollX=wrap.scrollLeft,scrollY=wrap.scrollTop;const ratio=ZOOM/prevZoom;wrap.scrollLeft=cx*ratio-(cx-scrollX);wrap.scrollTop=cy*ratio-(cy-scrollY);}
   EC.style.transform='scale('+ZOOM+')';EC.style.transformOrigin='top left';
-  document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%';
+  document.getElementById('zoomLbl') && (document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%');
 }
-document.getElementById('cwrap').addEventListener('wheel',e=>{e.preventDefault();const wrap=document.getElementById('cwrap');const rect=wrap.getBoundingClientRect();const mx=(e.clientX-rect.left+wrap.scrollLeft);const my=(e.clientY-rect.top+wrap.scrollTop);zoom(e.deltaY<0?0.15:-0.15,mx,my);},{passive:false});
+document.getElementById('cwrap').addEventListener('wheel',e=>{
+  e.preventDefault();
+  const wrap=document.getElementById('cwrap');const rect=wrap.getBoundingClientRect();
+  zoom(e.deltaY<0?0.15:-0.15,(e.clientX-rect.left+wrap.scrollLeft),(e.clientY-rect.top+wrap.scrollTop));
+},{passive:false});
+
+// ─────────────────────────────────────────────
+//  SAUVEGARDE / CHARGEMENT
+// ─────────────────────────────────────────────
+function onLevelNameChange(){
+  clearTimeout(window._nameSaveTimer);
+  if(_currentLevelId){window._nameSaveTimer=setTimeout(async()=>{
+    const title=document.getElementById('level-name-input').value.trim();
+    if(title){await _sb.from('levels').update({title}).eq('id',_currentLevelId);
+      const l=_lang();status(STUDIO_T[l]?.msgTitleUpdated||'Title updated.');}
+  },1000);}
+}
 
 function saveLevel(){
   _sb.auth.getSession().then(async({data})=>{
-    if(!data.session){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));a.download='level.json';a.click();status('Sauvegardé.');return;}
+    if(!data.session){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));a.download='level.json';a.click();
+      const l=_lang();status(STUDIO_T[l]?.msgSavedShort||'Saved.');return;}
     if(_currentLevelId)await doQuickSave();else openPublish();
   });
 }
 async function doQuickSave(){
-  const title=document.getElementById('level-name-input').value.trim()||'Sans titre';
+  const l=_lang();
+  const title=document.getElementById('level-name-input').value.trim()||(STUDIO_T[l]?.untitled||'Untitled');
   const{data,error}=await _sb.from('levels').update({title,data:lv,visibility:_currentVisibility}).eq('id',_currentLevelId).select();
-  if(error){status('Erreur : '+error.message);}
-  else{status('✅ Sauvegardé !');showSaveToast('✅ SAUVEGARDÉ !');_hasUnsavedChanges=false;autosaveClear();doAfterSaveNav();
-    sessionStorage.setItem('fl_preview_level',JSON.stringify(lv));if(_currentLevelId)sessionStorage.setItem('fl_preview_id',_currentLevelId);const _t=document.getElementById('level-name-input');if(_t)sessionStorage.setItem('fl_preview_title',_t.value);
+  if(error){status((STUDIO_T[l]?.toastLoadError||'Error')+': '+error.message);}
+  else{
+    status(STUDIO_T[l]?.msgSaved||'✅ Saved!');
+    showSaveToast(STUDIO_T[l]?.toastSaved||'✅ SAVED!');
+    _hasUnsavedChanges=false;autosaveClear();doAfterSaveNav();
+    sessionStorage.setItem('fl_preview_level',JSON.stringify(lv));
+    if(_currentLevelId)sessionStorage.setItem('fl_preview_id',_currentLevelId);
+    const _t=document.getElementById('level-name-input');if(_t)sessionStorage.setItem('fl_preview_title',_t.value);
     const btn=document.getElementById('btn-save');if(btn){btn.style.background='#0d280d';btn.style.borderColor='#3a7a3a';btn.style.color='#68d391';setTimeout(()=>{btn.style.background='';btn.style.borderColor='';btn.style.color='';},1500);}
   }
 }
@@ -1372,26 +1524,34 @@ function loadLevel(){openLoadModal();}
 
 async function openLoadModal(){
   const modal=document.getElementById('load-modal');const list=document.getElementById('load-list');
-  modal.classList.add('show');list.innerHTML='<div class="load-empty">Chargement...</div>';
+  modal.classList.add('show');
+  const l=_lang();
+  list.innerHTML='<div class="load-empty">'+(STUDIO_T[l]?.loading||'Loading...')+'</div>';
   const{data:sess}=await _sb.auth.getSession();
-  if(!sess.session){list.innerHTML='<div class="load-empty">Connecte-toi pour voir tes niveaux.</div>';return;}
-  const{data,error}=await _sb.from('levels').select('id,title,visibility,created_at,updated_at,plays,completions').eq('user_id',sess.session.user.id).order('updated_at',{ascending:false});
-  if(error){list.innerHTML='<div class="load-empty">Erreur: '+error.message+'</div>';return;}
-  if(!data||!data.length){list.innerHTML='<div class="load-empty">Aucun niveau sauvegardé.</div>';return;}
+  if(!sess.session){list.innerHTML='<div class="load-empty">'+(STUDIO_T[l]?.notLogged||'Log in to see your levels.')+'</div>';return;}
+  const{data,error}=await _sb.from('levels').select('id,title,visibility,created_at,updated_at').eq('user_id',sess.session.user.id).order('updated_at',{ascending:false});
+  if(error){list.innerHTML='<div class="load-empty">'+error.message+'</div>';return;}
+  if(!data||!data.length){list.innerHTML='<div class="load-empty">'+(STUDIO_T[l]?.emptyMine||'No levels yet.')+'</div>';return;}
   window._loadData=data;renderLoadItems(data);
   setTimeout(()=>{const s=document.getElementById('load-search');if(s){s.value='';s.focus();}},50);
 }
 function closeLoadModal(){document.getElementById('load-modal').classList.remove('show');const s=document.getElementById('load-search');if(s)s.value='';}
 function renderLoadItems(data){
   const list=document.getElementById('load-list');const l=_lang();
-  if(!data||!data.length){list.innerHTML='<div class="load-empty">Aucun niveau trouvé.</div>';return;}
-  const VIS={private:{label:l==='fr'?'Privé':'Private',cls:'private'},public:{label:'Public',cls:'public'},code:{label:'Code',cls:'code'}};
+  if(!data||!data.length){list.innerHTML='<div class="load-empty">'+(STUDIO_T[l]?.emptySearch||'No results.')+'</div>';return;}
+  const VIS={
+    private:{label:l==='fr'?'Privé':'Private',cls:'private'},
+    public: {label:'Public',cls:'public'},
+    code:   {label:l==='fr'?'Invitation':'Invite',cls:'code'}
+  };
   let html='<table class="load-table"><thead><tr><th>NOM</th><th>DERNIÈRE MODIF.</th><th>ÉTAT</th></tr></thead><tbody>';
   data.forEach(lvl=>{
     const ts=lvl.updated_at||lvl.created_at;const d=new Date(ts);
-    const dateStr=d.toLocaleDateString('fr-FR');const timeStr=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const dateStr=d.toLocaleDateString(l==='fr'?'fr-FR':'en-GB');
+    const timeStr=d.toLocaleTimeString(l==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'});
     const vis=VIS[lvl.visibility||'private'];
-    html+=`<tr class="load-row" onclick="doLoadLevel('${lvl.id}','${(lvl.title||'Sans titre').replace(/'/g,"\\'")}')"><td class="load-col-name">${lvl.title||'Sans titre'}</td><td class="load-col-date"><span class="load-date">${dateStr}</span><span class="load-time">${timeStr}</span></td><td class="load-col-vis"><span class="load-item-vis ${vis.cls}">${vis.label}</span></td></tr>`;
+    const title=(lvl.title||'').replace(/'/g,"\\'");
+    html+=`<tr class="load-row" onclick="doLoadLevel('${lvl.id}','${title}')"><td class="load-col-name">${lvl.title||'—'}</td><td class="load-col-date"><span class="load-date">${dateStr}</span><span class="load-time">${timeStr}</span></td><td class="load-col-vis"><span class="load-item-vis ${vis.cls}">${vis.label}</span></td></tr>`;
   });
   html+='</tbody></table>';list.innerHTML=html;
 }
@@ -1399,42 +1559,134 @@ function filterLoadList(q){if(!window._loadData)return;const filtered=q.trim()?w
 
 async function doLoadLevel(id,title){
   const{data,error}=await _sb.from('levels').select('*').eq('id',id).single();
-  if(error||!data){showSaveToast('⚠️ Erreur de chargement');return;}
+  const l=_lang();
+  if(error||!data){showSaveToast(STUDIO_T[l]?.toastLoadError||'⚠️ Load error');return;}
   _isPublished=false;window._dupConfirmed=false;
   document.querySelectorAll('.act-btn,#btn-save,#btn-clear,#btn-load').forEach(b=>b.style.opacity='');
   lv=data.data;
-  if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
-  if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
-  if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-  if(!lv.flash)lv.flash=[];if(!lv.spike)lv.spike=[];if(!lv.gblock)lv.gblock=[];if(!lv.darkness)lv.darkness=[];
+  ['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock','darkness'].forEach(k=>{if(!lv[k])lv[k]=[];});
   _currentLevelId=id;_currentVisibility=data.visibility||'private';_authorCompleted=data.author_completed||false;_isPublished=data.is_published||false;
   const nameInput=document.getElementById('level-name-input');if(nameInput)nameInput.value=data.title||'';
   history.replaceState(null,'','studio.html');
   sessionStorage.setItem('fl_preview_level',JSON.stringify(lv));sessionStorage.setItem('fl_preview_id',id);sessionStorage.setItem('fl_preview_title',data.title||'');
-  redraw();closeLoadModal();_hasUnsavedChanges=false;autosaveClear();status('Niveau "'+title+'" chargé.');
+  redraw();closeLoadModal();_hasUnsavedChanges=false;autosaveClear();
+  status((STUDIO_T[l]?.msgLoaded||'Loaded.')+' "'+title+'"');
 }
 
 function loadFile(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=ev=>{try{lv=JSON.parse(ev.target.result);if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];if(!lv.flash)lv.flash=[];if(!lv.spike)lv.spike=[];if(!lv.gblock)lv.gblock=[];if(!lv.darkness)lv.darkness=[];if(!lv.start)lv.start={x:80,y:480};selectedIdx=-1;selectedType=null;redraw();status('Chargé.');}catch(err){showSaveToast('⚠️ Fichier invalide');}};
+  r.onload=ev=>{try{
+    lv=JSON.parse(ev.target.result);
+    ['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock','darkness'].forEach(k=>{if(!lv[k])lv[k]=[];});
+    if(!lv.start)lv.start={x:80,y:480};
+    selectedIdx=-1;selectedType=null;redraw();
+    const l=_lang();status(STUDIO_T[l]?.msgLoaded||'Loaded.');
+  }catch(err){showSaveToast('⚠️ Invalid file');}};
   r.readAsText(f);e.target.value='';
 }
 
 function clearLevel(){
-  const msg='Vider le niveau ?';if(!confirm(msg))return;
+  const l=_lang();
+  if(!confirm(l==='fr'?'Vider le niveau ?':'Clear the level?'))return;
   sessionStorage.removeItem('fl_autosave_level');sessionStorage.removeItem('fl_autosave_id');sessionStorage.removeItem('fl_autosave_name');
   _hasUnsavedChanges=false;_currentLevelId=null;
   undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
-  lv=emptyLevel();selectedIdx=-1;selectedType=null;_currentLevelId=null;_currentVisibility='private';_authorCompleted=false;_isPublished=false;window._dupWarningShown=false;
+  lv=emptyLevel();selectedIdx=-1;selectedType=null;_currentVisibility='private';_authorCompleted=false;_isPublished=false;window._dupWarningShown=false;
   const ni=document.getElementById('level-name-input');if(ni)ni.value='';
-  history.replaceState(null,'','studio.html');redraw();status('Vidé.');
+  history.replaceState(null,'','studio.html');redraw();
+  status(STUDIO_T[l]?.msgCleared||'Cleared.');
 }
 
-// ══════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────
+//  PUBLISH MODAL
+// ─────────────────────────────────────────────
+function setVis(v){
+  _currentVisibility=v;
+  document.querySelectorAll('.pub-vis-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('vis-'+v);if(btn)btn.classList.add('active');
+  const hint=document.getElementById('pub-vis-hint');
+  if(hint){
+    const tp=STUDIO_T._pub||{};
+    const map={private:tp.hintPrivate,public:tp.hintPublic,code:tp.hintCode};
+    hint.textContent=map[v]||'';
+  }
+}
+function _applyPubLang(){
+  const tp=STUDIO_T._pub||{};
+  const s=(id,val,prop='textContent')=>{const el=document.getElementById(id);if(el&&val)el[prop]=val;};
+  s('pub-title-lbl', tp.title);
+  s('pub-name-lbl',  tp.nameLbl);
+  s('pub-name',      tp.ph,'placeholder');
+  s('pub-vis-lbl',   tp.visLbl);
+  s('pub-cancel-btn',tp.cancel);
+  s('pub-ok-btn',    tp.ok);
+  // vis button labels
+  const vmap={private:'🔒 '+(tp.hintPrivate?.split(' ').slice(1,3).join(' ')||'PRIVÉ'),public:'🌍 '+(tp.hintPublic?.split(' ').slice(1,3).join(' ')||'PUBLIC'),code:'🔑 CODE'};
+  ['private','public','code'].forEach(v=>{const el=document.getElementById('vis-'+v);if(el)el.textContent=v==='private'?(tp.hintPrivate?'🔒 PRIVÉ':'🔒 PRIVÉ'):v==='public'?(tp.hintPublic?'🌍 PUBLIC':'🌍 PUBLIC'):'🔑 CODE';});
+  setVis(_currentVisibility);
+}
+function openPublish(){
+  _applyPubLang();
+  document.getElementById('pub-msg').className='pub-msg';
+  const ni=document.getElementById('level-name-input');const pubName=document.getElementById('pub-name');
+  if(ni&&pubName&&ni.value)pubName.value=ni.value;
+  document.getElementById('publish-modal').classList.add('show');if(pubName)pubName.focus();
+}
+function closePublish(){document.getElementById('publish-modal').classList.remove('show');}
+
+async function doPublish(){
+  const tp=STUDIO_T._pub||{};
+  const l=_lang();
+  const title=document.getElementById('pub-name').value.trim();
+  const msgEl=document.getElementById('pub-msg');const okBtn=document.getElementById('pub-ok-btn');
+  const{data:sess}=await _sb.auth.getSession();
+  if(!sess.session){msgEl.className='pub-msg err';msgEl.textContent=tp.needLogin||(l==='fr'?'Tu dois être connecté !':'You must be logged in!');return;}
+  if(!title){msgEl.className='pub-msg err';msgEl.textContent=tp.needTitle||(l==='fr'?'Donne un nom à ton niveau !':'Give your level a name!');return;}
+  const totalBlocks=(lv.fixed||[]).length+(lv.mobile||[]).length+(lv.bounce||[]).length+(lv.push||[]).length+(lv.invis||[]).length;
+  if(totalBlocks===0){msgEl.className='pub-msg err';msgEl.textContent=tp.needBlocks||(l==='fr'?'Ton niveau est vide !':'Your level is empty!');return;}
+  if(_currentLevelId&&!_authorCompleted){
+    const{data:lvlCheck}=await _sb.from('levels').select('author_completed,is_published').eq('id',_currentLevelId).single();
+    if(lvlCheck){_authorCompleted=lvlCheck.author_completed||false;_isPublished=lvlCheck.is_published||false;}
+    if(!_authorCompleted){msgEl.className='pub-msg err';msgEl.textContent=tp.needComplete||(l==='fr'?"🎮 Tu dois d'abord terminer le niveau toi-même !":'🎮 You must complete the level yourself first!');return;}
+  }
+  okBtn.disabled=true;okBtn.textContent=tp.saving||(l==='fr'?'SAUVEGARDE...':'SAVING...');
+  msgEl.className='pub-msg';
+  const user=sess.session.user;let error,shareCode=null;
+  if(_currentLevelId){
+    const updates={title,data:lv,visibility:_currentVisibility};if(_currentVisibility!=='private')updates.is_published=true;
+    const{error:e}=await _sb.from('levels').update(updates).eq('id',_currentLevelId).eq('user_id',user.id);
+    if(!e&&_currentVisibility!=='private')_isPublished=true;error=e;
+  }else{
+    function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
+    shareCode=genCode();
+    const{data:inserted,error:e}=await _sb.from('levels').insert({user_id:user.id,title,data:lv,plays:0,visibility:_currentVisibility,share_code:shareCode,author_completed:_authorCompleted,is_published:_currentVisibility!=='private'}).select().single();
+    error=e;if(!error&&inserted){_currentLevelId=inserted.id;history.replaceState(null,'','studio.html');}
+  }
+  _hasUnsavedChanges=false;autosaveClear();doAfterSaveNav&&doAfterSaveNav();
+  okBtn.disabled=false;okBtn.textContent=tp.ok||'💾 SAVE →';
+  if(error){msgEl.className='pub-msg err';msgEl.textContent=(tp.errorTxt||'Error: ')+error.message;}
+  else{
+    const ni=document.getElementById('level-name-input');if(ni)ni.value=title;
+    if(shareCode&&_currentVisibility==='code'){
+      navigator.clipboard?.writeText(shareCode).catch(()=>{});
+      msgEl.className='pub-msg ok';
+      msgEl.innerHTML=(tp.successNew||'Saved!')+'<br>'+(tp.codeMsg||'Code: ')+'<b>'+shareCode+'</b><br><span style="font-size:10px;color:#40f090aa;">'+(tp.codeCopied||'(copied!)')+'</span>';
+      setTimeout(()=>closePublish(),4000);
+    }else{
+      msgEl.className='pub-msg ok';
+      msgEl.textContent=shareCode?(tp.successNew||'Saved!'):(tp.successUpdate||'Updated!');
+      setTimeout(()=>closePublish(),1800);
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
 //  RENDU ÉDITEUR
-// ══════════════════════════════════════════════════════════
-const EC_COL={bg:'#0c0c1a',grid:'#12122a',fixed:{b:'#4a5568',t:'#718096',s:'#a0aec0'},trap:{b:'#4a5568',t:'#718096',s:'#a0aec0'},flagA:'#68d391',flagB:'#fc8181',sel:'#f0e040',ghost:'#ffffff18'};
+// ─────────────────────────────────────────────
+const EC_COL={bg:'#0c0c1a',grid:'#12122a',fixed:{b:'#4a5568',t:'#718096',s:'#a0aec0'},flagA:'#68d391',flagB:'#fc8181',sel:'#f0e040',ghost:'#ffffff18'};
+const GF_COLS={u:{bg:'#6020c0',stroke:'#a040f0',light:'#c060ff',arrow:'↑'},d:{bg:'#206040',stroke:'#40f090',light:'#60ffa0',arrow:'↓'},l:{bg:'#204060',stroke:'#4090f0',light:'#60c0ff',arrow:'←'},r:{bg:'#602020',stroke:'#f04040',light:'#ff8060',arrow:'→'}};
+
 function ePlatform(p,c){EX.fillStyle=c.b;EX.fillRect(p.x,p.y,p.w,p.h);EX.fillStyle=c.t;EX.fillRect(p.x,p.y,p.w,4);EX.fillStyle=c.s;for(let i=p.x+7;i<p.x+p.w-4;i+=9)EX.fillRect(i,p.y+1,3,2);}
 function eDrawSpikes(b){
   if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return;
@@ -1457,47 +1709,29 @@ function eDrawSpikes(b){
 function eFlag(x,y,col,lbl){EX.fillStyle='#888';EX.fillRect(x+12,y-48,3,48);EX.fillStyle=col;EX.beginPath();EX.moveTo(x+15,y-48);EX.lineTo(x+36,y-36);EX.lineTo(x+15,y-24);EX.closePath();EX.fill();EX.fillStyle=col;EX.font='bold 7px "Press Start 2P"';EX.textAlign='center';EX.fillText(lbl,x+13,y+5);EX.textAlign='left';}
 function eSelection(p){EX.strokeStyle=EC_COL.sel+'cc';EX.lineWidth=1.5;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);for(const[,v]of Object.entries(getHandles(p))){EX.fillStyle=EC_COL.bg;EX.fillRect(v.x-HS,v.y-HS,HS*2,HS*2);EX.strokeStyle=EC_COL.sel;EX.lineWidth=1.5;EX.strokeRect(v.x-HS,v.y-HS,HS*2,HS*2);}}
 
-const GF_COLS={u:{bg:'#6020c0',stroke:'#a040f0',light:'#c060ff',arrow:'↑'},d:{bg:'#206040',stroke:'#40f090',light:'#60ffa0',arrow:'↓'},l:{bg:'#204060',stroke:'#4090f0',light:'#60c0ff',arrow:'←'},r:{bg:'#602020',stroke:'#f04040',light:'#ff8060',arrow:'→'}};
-
 function redraw(){
   EX.clearRect(0,0,EW,EH);EX.fillStyle=EC_COL.bg;EX.fillRect(0,0,EW,EH);
-
-  // Grille
   EX.strokeStyle=EC_COL.grid;EX.lineWidth=1;
   for(let x=0;x<EW;x+=GRID){EX.beginPath();EX.moveTo(x,0);EX.lineTo(x,EH);EX.stroke();}
   for(let y=0;y<EH;y+=GRID){EX.beginPath();EX.moveTo(0,y);EX.lineTo(EW,y);EX.stroke();}
-
-  // ── MODIF 2 : Limite de mort du joueur (y = GAME_HEIGHT = 640) ──
-  if(GAME_HEIGHT <= EH){
-    // Teinte rouge légère sous la ligne jusqu'en bas du canvas
-    EX.fillStyle='rgba(255,40,60,0.05)';
-    EX.fillRect(0,GAME_HEIGHT,EW,EH-GAME_HEIGHT);
-    // Ligne rouge pointillée
-    EX.save();
-    EX.strokeStyle='#ff4060';
-    EX.lineWidth=2;
-    EX.setLineDash([14,8]);
-    EX.beginPath();EX.moveTo(0,GAME_HEIGHT);EX.lineTo(EW,GAME_HEIGHT);EX.stroke();
-    EX.setLineDash([]);
-    // Label répété tous les 400px
-    EX.font='7px "Press Start 2P"';
-    EX.fillStyle='#ff406099';
-    for(let lx=8;lx<EW;lx+=400){EX.fillText('⬇ MORT',lx,GAME_HEIGHT-6);}
+  if(GAME_HEIGHT<=EH){
+    EX.fillStyle='rgba(255,40,60,0.05)';EX.fillRect(0,GAME_HEIGHT,EW,EH-GAME_HEIGHT);
+    EX.save();EX.strokeStyle='#ff4060';EX.lineWidth=2;EX.setLineDash([14,8]);EX.beginPath();EX.moveTo(0,GAME_HEIGHT);EX.lineTo(EW,GAME_HEIGHT);EX.stroke();EX.setLineDash([]);
+    EX.font='7px "Press Start 2P"';EX.fillStyle='#ff406099';
+    for(let lx=8;lx<EW;lx+=400)EX.fillText('⬇ MORT',lx,GAME_HEIGHT-6);
     EX.restore();
   }
 
   lv.fixed.forEach((p,i)=>{ePlatform(p,EC_COL.fixed);eDrawSpikes(p);if(isSelected('fixed',i)){if(selection.length===1&&selectedType==='fixed'&&selectedIdx===i)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}});
 
   (lv.trap||[]).forEach((p,i)=>{
-    const isSel=isSelected('trap',i),d=p.trigDist||0;
-    if(d>0){EX.save();EX.strokeStyle=isSel?'#ff9020ff':'#ff902055';EX.lineWidth=isSel?1.5:1;EX.setLineDash([6,4]);EX.strokeRect(p.x-d,p.y-d,p.w+d*2,p.h+d*2);EX.setLineDash([]);EX.fillStyle=isSel?'#ff9020cc':'#ff902077';EX.font='6px "Press Start 2P"';EX.fillText(`${d}px`,p.x-d+2,p.y-d-3);EX.restore();}
-    ePlatform(p,EC_COL.trap);EX.fillStyle='#ff9020cc';EX.font='8px sans-serif';EX.textAlign='center';EX.fillText('⚠',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';eDrawSpikes(p);
-    if(isSel){if(selection.length===1&&selectedType==='trap'&&selectedIdx===i)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
+    ePlatform(p,EC_COL.fixed);EX.fillStyle='#ff9020cc';EX.font='8px sans-serif';EX.textAlign='center';EX.fillText('⚠',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';eDrawSpikes(p);
+    if(isSelected('trap',i)){if(selection.length===1&&selectedType==='trap'&&selectedIdx===i)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
 
   (lv.mobile||[]).forEach((p,i)=>{
     const isSel=isSelected('mobile',i);const trigger=p.trigger||'continuous';const dir=p.dir||'r';const dist=p.dist||160;
-    const ARROWS={r:'→',l:'←',u:'↑',d:'↓',omni:'⊕',fall:'⬇'};const arrow=ARROWS[dir]||'→';
+    const ARROWS={r:'→',l:'←',u:'↑',d:'↓',omni:'⊕',fall:'⬇'};
     const VEC={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1]};
     if(dir!=='omni'&&dir!=='fall'){
       const[dx,dy]=VEC[dir]||[1,0];const gx=p.x+dx*dist,gy=p.y+dy*dist;
@@ -1507,7 +1741,7 @@ function redraw(){
     }else if(dir==='fall'){EX.save();EX.strokeStyle=isSel?'#f04060cc':'#f0406044';EX.lineWidth=1.5;EX.setLineDash([6,4]);EX.beginPath();EX.moveTo(p.x+p.w/2,p.y+p.h);EX.lineTo(p.x+p.w/2,EH+40);EX.stroke();EX.setLineDash([]);EX.restore();}
     if(trigger==='approach'){const td=p.trigDist||80;EX.strokeStyle=isSel?'#20c0f0cc':'#20c0f044';EX.lineWidth=1;EX.setLineDash([5,4]);EX.strokeRect(p.x-td,p.y-td,p.w+td*2,p.h+td*2);EX.setLineDash([]);}
     EX.fillStyle='#1a3060';EX.fillRect(p.x,p.y,p.w,p.h);EX.fillStyle=trigger==='approach'?'#20c0f0':'#4090f0';EX.fillRect(p.x,p.y,p.w,4);
-    EX.fillStyle='#80c0ffcc';EX.font='14px sans-serif';EX.textAlign='center';EX.fillText(arrow,p.x+p.w/2,p.y+p.h/2+5);
+    EX.fillStyle='#80c0ffcc';EX.font='14px sans-serif';EX.textAlign='center';EX.fillText(ARROWS[dir]||'→',p.x+p.w/2,p.y+p.h/2+5);
     EX.font='6px "Press Start 2P"';EX.fillStyle='#4090f0cc';EX.fillText(trigger==='approach'?'TRIG':'AUTO',p.x+2,p.y+p.h-4);EX.textAlign='left';eDrawSpikes(p);
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
@@ -1515,7 +1749,7 @@ function redraw(){
   (lv.push||[]).forEach((p,i)=>{const isSel=isSelected('push',i);EX.fillStyle='#3d2b1a';EX.fillRect(p.x,p.y,p.w,p.h);EX.fillStyle='#8b6340';EX.fillRect(p.x,p.y,p.w,4);EX.fillStyle='#c49a6ccc';EX.font='7px sans-serif';EX.textAlign='center';EX.fillText('PUSH',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';eDrawSpikes(p);if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}});
 
   (lv.bounce||[]).forEach((p,i)=>{
-    const isSel=isSelected('bounce',i),col={b:'#8b6914',t:'#f0c040',s:'#fde68a'};ePlatform(p,col);
+    const isSel=isSelected('bounce',i);ePlatform(p,{b:'#8b6914',t:'#f0c040',s:'#fde68a'});
     EX.fillStyle='#f0c040cc';EX.font='6px "Press Start 2P"';EX.textAlign='center';EX.fillText(`x${p.force}`,p.x+p.w/2,p.y+p.h-4);EX.textAlign='left';eDrawSpikes(p);
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
@@ -1561,24 +1795,14 @@ function redraw(){
     if(selection.length===1&&selectedType==='gblock'&&selectedIdx===i)eSelection(g);
   });
 
-  // Zones obscurité
   (lv.darkness||[]).forEach((d,i)=>{
     const isSel=isSelected('darkness',i);
-    EX.fillStyle='rgba(0,0,0,0.55)';
-    EX.fillRect(d.x,d.y,d.w,d.h);
-    // Halo au centre
+    EX.fillStyle='rgba(0,0,0,0.55)';EX.fillRect(d.x,d.y,d.w,d.h);
     const cx=d.x+d.w/2,cy=d.y+d.h/2,r=d.radius??120;
-    const grad=EX.createRadialGradient(cx,cy,0,cx,cy,r);
-    grad.addColorStop(0,'rgba(80,80,160,0.5)');
-    grad.addColorStop(1,'rgba(0,0,0,0)');
+    const grad=EX.createRadialGradient(cx,cy,0,cx,cy,r);grad.addColorStop(0,'rgba(80,80,160,0.5)');grad.addColorStop(1,'rgba(0,0,0,0)');
     EX.fillStyle=grad;EX.fillRect(d.x,d.y,d.w,d.h);
-    // Bordure
-    EX.strokeStyle=isSel?'#c080ff99':'#6030aa55';
-    EX.lineWidth=isSel?2:1;
-    EX.setLineDash([8,4]);EX.strokeRect(d.x,d.y,d.w,d.h);EX.setLineDash([]);
-    EX.fillStyle='#9060cccc';EX.font='7px "Press Start 2P"';
-    EX.textAlign='center';EX.fillText('🌑',d.x+d.w/2,d.y+d.h/2+3);EX.textAlign='left';
-    EX.fillText(`r=${d.radius??120}`,d.x+4,d.y+d.h-4);
+    EX.strokeStyle=isSel?'#c080ff99':'#6030aa55';EX.lineWidth=isSel?2:1;EX.setLineDash([8,4]);EX.strokeRect(d.x,d.y,d.w,d.h);EX.setLineDash([]);
+    EX.fillStyle='#9060cccc';EX.font='7px "Press Start 2P"';EX.textAlign='center';EX.fillText('🌑',d.x+d.w/2,d.y+d.h/2+3);EX.textAlign='left';EX.fillText(`r=${d.radius??120}`,d.x+4,d.y+d.h-4);
     if(isSel){if(selection.length===1)eSelection(d);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(d.x-2,d.y-2,d.w+4,d.h+4);}}
   });
 
@@ -1591,6 +1815,9 @@ function redraw(){
   EX.fillStyle='#ffffff20';EX.font='6px "Press Start 2P"';EX.fillText(`${snap(mousePos.x)}, ${snap(mousePos.y)}`,mousePos.x+6,mousePos.y-4);
 }
 
+// ─────────────────────────────────────────────
+//  CLAVIER
+// ─────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
   if(e.ctrlKey&&e.code==='KeyZ'){e.preventDefault();undo();}
@@ -1599,10 +1826,17 @@ document.addEventListener('keydown',e=>{
   else if(e.ctrlKey&&e.code==='KeyV')pasteClip();
   else if(e.code==='Delete'&&selection.length)deleteSelected();
 });
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();
+  if(e.key==='Escape')closePublish();
+});
 
 redraw();
 updatePanelState();
 
+// ─────────────────────────────────────────────
+//  PLAY
+// ─────────────────────────────────────────────
 function playLevel(){
   sessionStorage.setItem('fl_preview_level',JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id',_currentLevelId||'');
@@ -1613,53 +1847,97 @@ function playLevel(){
   else window.location.href='game.html?preview=1&from=studio';
 }
 
-let _hasUnsavedChanges=false;
-let _loadingLevel=false;
-</script>
+// ─────────────────────────────────────────────
+//  AUTOSAVE
+// ─────────────────────────────────────────────
+function autosaveSave(){
+  if(_loadingLevel)return;
+  try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');const ni=document.getElementById('level-name-input');sessionStorage.setItem('fl_autosave_name',ni?ni.value:'');}catch(ex){}
+}
+function autosaveClear(){sessionStorage.removeItem('fl_autosave_level');sessionStorage.removeItem('fl_autosave_id');sessionStorage.removeItem('fl_autosave_name');}
+function checkAutosaveOnLoad(){
+  const savedLv=sessionStorage.getItem('fl_autosave_level');if(!savedLv)return;
+  const l=_lang();
+  const savedName=sessionStorage.getItem('fl_autosave_name')||(STUDIO_T[l]?.untitled||'Untitled');
+  try{
+    const restored=JSON.parse(savedLv);lv=restored;
+    ['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock','darkness'].forEach(k=>{if(!lv[k])lv[k]=[];});
+    const ni=document.getElementById('level-name-input');if(ni&&savedName)ni.value=savedName;
+    const savedId=sessionStorage.getItem('fl_autosave_id');if(savedId)_currentLevelId=savedId;
+    _hasUnsavedChanges=true;redraw&&redraw();
+    status(STUDIO_T[l]?.msgDraftRestored||'⚡ Draft restored');
+  }catch(ex){}
+}
+window.addEventListener('beforeunload',function(){
+  if(lv&&typeof lv==='object'){try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');sessionStorage.setItem('fl_autosave_name',document.getElementById('level-name-input')?.value||'');}catch(ex){}}
+});
 
-<!-- LOAD MODAL -->
-<div id="load-modal">
-  <div class="load-box">
-    <div class="load-header">
-      <h3>📂 MES NIVEAUX</h3>
-      <button class="load-close" onclick="closeLoadModal()">✕</button>
-    </div>
-    <div class="load-search-wrap">
-      <input type="text" id="load-search" placeholder="🔍 Rechercher..."
-        oninput="filterLoadList(this.value)"
-        style="width:100%;font-family:Rajdhani,sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:9px 14px;border-radius:5px;outline:none;"
-        onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--border2)'">
-    </div>
-    <div id="load-list"></div>
-  </div>
-</div>
+// ─────────────────────────────────────────────
+//  NAVIGATION (unsaved changes)
+// ─────────────────────────────────────────────
+let _pendingNavUrl=null;
+history.pushState(null,'',location.href);
+window.addEventListener('popstate',function(){
+  if(_hasUnsavedChanges){history.pushState(null,'',location.href);_pendingNavUrl='__BACK__';showUnsavedModal();}else{autosaveClear();}
+});
+window.addEventListener('pagehide',function(){if(!_hasUnsavedChanges)autosaveClear();});
 
-<!-- PUBLISH MODAL -->
-<div id="publish-modal">
-  <div class="pub-box">
-    <h3 id="pub-title-lbl">🚀 SAUVEGARDER LE NIVEAU</h3>
-    <div>
-      <label id="pub-name-lbl">NOM DU NIVEAU</label>
-      <input type="text" id="pub-name" placeholder="Mon niveau funky..." maxlength="40" style="margin-top:8px;">
-    </div>
-    <div id="pub-msg" class="pub-msg"></div>
-    <div class="pub-row">
-      <button class="pub-btn cancel" onclick="closePublish()" id="pub-cancel-btn">ANNULER</button>
-      <button class="pub-btn ok" onclick="doPublish()" id="pub-ok-btn">SAUVER →</button>
-    </div>
-  </div>
-</div>
+function goToHome(){if(_hasUnsavedChanges){_pendingNavUrl='index.html';showUnsavedModal();}else{autosaveClear();window.location.href='index.html';}}
+function goToProfile(){if(_hasUnsavedChanges){_pendingNavUrl='settings.html';showUnsavedModal();}else{window.location.href='settings.html';}}
+function showUnsavedModal(){document.getElementById('unsaved-modal').style.display='flex';}
+function unsavedSave(){
+  document.getElementById('unsaved-modal').style.display='none';
+  const ni=document.getElementById('level-name-input');const hasName=ni&&ni.value.trim().length>0;
+  window._afterSaveNav=_pendingNavUrl;_pendingNavUrl=null;
+  if(!_currentLevelId&&!hasName)openPublish();else saveLevel();
+}
+function doAfterSaveNav(){if(window._afterSaveNav){const url=window._afterSaveNav;window._afterSaveNav=null;if(url==='__BACK__')history.go(-2);else window.location.href=url;}}
+function unsavedLeave(){
+  _hasUnsavedChanges=false;autosaveClear();_currentLevelId=null;lv=emptyLevel();
+  const ni=document.getElementById('level-name-input');if(ni)ni.value='';
+  document.getElementById('unsaved-modal').style.display='none';
+  if(_pendingNavUrl==='__BACK__'){_pendingNavUrl=null;history.go(-2);}else if(_pendingNavUrl){window.location.href=_pendingNavUrl;_pendingNavUrl=null;}
+}
+function unsavedStay(){document.getElementById('unsaved-modal').style.display='none';_pendingNavUrl=null;}
 
-<script>
-const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
-const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
-const _sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+// ─────────────────────────────────────────────
+//  DUPLICATE MODAL
+// ─────────────────────────────────────────────
+function showPublishedModal(title){
+  document.querySelectorAll('.act-btn,#btn-save,#btn-clear,#btn-load').forEach(b=>{if(b.id!=='btn-load')b.style.opacity='0.3';});
+  const l=_lang();
+  const msg=l==='fr'?'<strong style="color:#f0e040;">'+title+'</strong><br><br>Ce niveau est publié et ne peut pas être modifié directement.<br>Crée une copie privée pour y apporter des modifications.':'<strong style="color:#f0e040;">'+title+'</strong><br><br>This level is published and cannot be edited directly.<br>Create a private copy to make changes.';
+  document.getElementById('published-modal-msg').innerHTML=msg;
+  document.getElementById('published-modal').style.display='flex';
+}
+async function confirmDuplicateFromModal(){
+  document.getElementById('published-modal').style.display='none';window._dupConfirmed=true;
+  document.querySelectorAll('.act-btn,#btn-save,#btn-clear,#btn-load').forEach(b=>b.style.opacity='');
+  await duplicateLevel();
+}
+function showDupModal(){
+  const l=_lang();
+  document.getElementById('dup-msg').innerHTML=l==='fr'?'Ce niveau est publié.<br>Tu ne peux pas le modifier directement.<br><br>Une copie privée sera créée.':'This level is published.<br>You cannot edit it directly.<br><br>A private copy will be created.';
+  const dc=document.getElementById('dup-cancel-btn');const dok=document.getElementById('dup-ok-btn');
+  if(dc)dc.textContent=l==='fr'?'ANNULER':'CANCEL';
+  if(dok)dok.textContent=l==='fr'?'⧉ CRÉER UNE COPIE':'⧉ CREATE A COPY';
+  document.getElementById('dup-modal').style.display='flex';
+}
+function closeDupModal(){document.getElementById('dup-modal').style.display='none';}
+function confirmDuplicate(){closeDupModal();window._dupConfirmed=true;document.querySelectorAll('.act-btn,#btn-save,#btn-clear,#btn-load').forEach(b=>b.style.opacity='');duplicateLevel();}
 
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
 let _charSprite=null,_charId='default';
 async function loadCharacterSprite(charId){return new Promise(resolve=>{const img=new Image();img.onload=()=>{_charSprite=img;resolve(img);};img.onerror=()=>{_charSprite=null;resolve(null);};img.src=`characters/${charId}.svg`;});}
 async function loadPlayerProfile(){
   let charId='default';
-  try{const{data:sess}=await _sb.auth.getSession();if(sess.session){const{data:profile}=await _sb.from('profiles').select('character,lang').eq('id',sess.session.user.id).single();if(profile){if(profile.character)charId=profile.character;if(profile.lang)localStorage.setItem('fl_lang',profile.lang);}}else{charId=localStorage.getItem('fl_char')||'default';}}catch(e){charId=localStorage.getItem('fl_char')||'default';}
+  try{
+    const{data:sess}=await _sb.auth.getSession();
+    if(sess.session){const{data:profile}=await _sb.from('profiles').select('character,lang').eq('id',sess.session.user.id).single();if(profile){if(profile.character)charId=profile.character;if(profile.lang)localStorage.setItem('fl_lang',profile.lang);}}
+    else{charId=localStorage.getItem('fl_char')||'default';}
+  }catch(e){charId=localStorage.getItem('fl_char')||'default';}
   _charId=charId;await loadCharacterSprite(charId);
 }
 
@@ -1684,207 +1962,34 @@ async function loadPlayerProfile(){
   if(fromGame){
     sessionStorage.removeItem('fl_from_game');
     const raw=sessionStorage.getItem('fl_preview_level');
-    if(raw){try{const saved=JSON.parse(raw);lv=saved;if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];if(!lv.flash)lv.flash=[];if(!lv.spike)lv.spike=[];if(!lv.gblock)lv.gblock=[];if(!lv.darkness)lv.darkness=[];const savedId=sessionStorage.getItem('fl_preview_id');const savedTitle=sessionStorage.getItem('fl_preview_title');if(savedId){_currentLevelId=savedId;history.replaceState(null,'','studio.html');}const ni=document.getElementById('level-name-input');if(ni&&savedTitle)ni.value=savedTitle;redraw();status('✅ Niveau restauré.');return;}catch(e){}}
+    if(raw){try{
+      const saved=JSON.parse(raw);lv=saved;
+      ['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock','darkness'].forEach(k=>{if(!lv[k])lv[k]=[];});
+      const savedId=sessionStorage.getItem('fl_preview_id');const savedTitle=sessionStorage.getItem('fl_preview_title');
+      if(savedId){_currentLevelId=savedId;history.replaceState(null,'','studio.html');}
+      const ni=document.getElementById('level-name-input');if(ni&&savedTitle)ni.value=savedTitle;
+      redraw();
+      const l=_lang();status(STUDIO_T[l]?.msgRestored||'✅ Level restored.');
+      return;
+    }catch(e){}}
   }
-  if(!lid)return;
+  if(!lid){checkAutosaveOnLoad();return;}
   const{data:sess}=await _sb.auth.getSession();
   if(!sess.session){document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 CONNEXION REQUISE</div><a href="login.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">SE CONNECTER</a></div>`;return;}
   const{data,error}=await _sb.from('levels').select('*').eq('id',lid).single();
-  if(error||!data){showSaveToast('⚠️ Niveau introuvable');return;}
+  const l2=_lang();
+  if(error||!data){showSaveToast(STUDIO_T[l2]?.toastNotFound||'⚠️ Level not found');return;}
   if(data.user_id!==sess.session.user.id){document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 ACCÈS REFUSÉ</div><a href="index.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">🏠 ACCUEIL</a></div>`;return;}
   lv=data.data;
-  if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];if(!lv.flash)lv.flash=[];if(!lv.spike)lv.spike=[];if(!lv.gblock)lv.gblock=[];if(!lv.darkness)lv.darkness=[];
+  ['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock','darkness'].forEach(k=>{if(!lv[k])lv[k]=[];});
   _currentLevelId=lid;_currentVisibility=data.visibility||'private';_authorCompleted=data.author_completed||false;_isPublished=data.is_published||false;
   const _ni=document.getElementById('level-name-input');if(_ni)_ni.value=data.title||'';
-  redraw();status('Niveau "'+data.title+'" chargé.');
+  redraw();
+  status((STUDIO_T[l2]?.msgLoaded||'Loaded.')+' "'+data.title+'"');
+  if(_isPublished)showPublishedModal(data.title||'');
 })();
 
-let _langCache={};
-async function loadLang(l){
-  if(_langCache[l])return _langCache[l];
-  try{const r=await fetch('lang/'+l+'.json');if(!r.ok){if(l!=='fr')return loadLang('fr');return null;}const data=await r.json();_langCache[l]=data;return data;}
-  catch(e){if(l!=='fr')return loadLang('fr');return null;}
-}
-async function applyStudioLang(){
-  const l=_lang();const data=await loadLang(l);if(!data||!data.studio)return;
-  const t=data.studio||{};
-  document.querySelectorAll('[data-lbl]').forEach(el=>{const key=el.getAttribute('data-lbl');if(t[key])el.textContent=t[key];});
-  document.querySelectorAll('[data-info]').forEach(el=>{const key=el.getAttribute('data-info');if(t[key])el.innerHTML=t[key].replace(/\n/g,'<br>');});
-  const s=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.textContent=val;};
-  s('statusbar',t.ready);
-  STUDIO_T[l]=t;STUDIO_T._pub=data.publish||{};
-}
-const _PT={
-  fr:{title:'💾 SAUVEGARDER',nameLbl:'NOM DU NIVEAU',ph:'Mon niveau funky...',visLbl:'VISIBILITÉ',cancel:'ANNULER',ok:'💾 SAUVER →',saving:'SAUVEGARDE...',needLogin:'Tu dois être connecté !',needTitle:'Donne un nom à ton niveau !',needBlocks:'Ton niveau est vide !',successNew:'Niveau sauvegardé !',successUpdate:'Niveau mis à jour !',codeMsg:'Code de partage : ',codeCopied:'(copié !)',errorTxt:'Erreur : '},
-  en:{title:'💾 SAVE',nameLbl:'LEVEL NAME',ph:'My funky level...',visLbl:'VISIBILITY',cancel:'CANCEL',ok:'💾 SAVE →',saving:'SAVING...',needLogin:'You must be logged in!',needTitle:'Give your level a name!',needBlocks:'Your level is empty!',successNew:'Level saved!',successUpdate:'Level updated!',codeMsg:'Share code: ',codeCopied:'(copied!)',errorTxt:'Error: '}
-};
-const VIS_HINTS={
-  fr:{private:'🔒 Seul toi peux le voir',public:'🌍 Tout le monde peut jouer',code:'🔑 Accessible uniquement avec le code'},
-  en:{private:'🔒 Only you can see it',public:'🌍 Everyone can play',code:'🔑 Accessible with code only'}
-};
-function setVis(v){
-  _currentVisibility=v;document.querySelectorAll('.pub-vis-btn').forEach(b=>b.classList.remove('active'));
-  const btn=document.getElementById('vis-'+v);if(btn)btn.classList.add('active');
-  const hint=document.getElementById('pub-vis-hint');if(hint)hint.textContent=VIS_HINTS[_lang()][v]||'';
-}
-function _applyPubLang(){
-  const t=STUDIO_T._pub||_PT[_lang()];
-  const s=(id,val,prop='textContent')=>{const el=document.getElementById(id);if(el&&val)el[prop]=val;};
-  s('pub-title-lbl',t.title);s('pub-name-lbl',t.nameLbl);s('pub-name',t.ph,'placeholder');
-  s('pub-cancel-btn',t.cancel);s('pub-ok-btn',t.ok);setVis(_currentVisibility);
-}
-function openPublish(){
-  _applyPubLang();document.getElementById('pub-msg').className='pub-msg';
-  const ni=document.getElementById('level-name-input');const pubName=document.getElementById('pub-name');
-  if(ni&&pubName&&ni.value)pubName.value=ni.value;
-  document.getElementById('publish-modal').classList.add('show');if(pubName)pubName.focus();
-}
-function closePublish(){document.getElementById('publish-modal').classList.remove('show');}
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(_isPublished&&_currentLevelId&&!window._dupConfirmed&&document.getElementById('load-modal').classList.contains('show'))return;}
-  if(e.key==='Enter'&&document.getElementById('publish-modal').classList.contains('show'))doPublish();
-});
-async function doPublish(){
-  const t=STUDIO_T._pub||_PT[_lang()];
-  const title=document.getElementById('pub-name').value.trim();
-  const msgEl=document.getElementById('pub-msg');const okBtn=document.getElementById('pub-ok-btn');
-  const{data:sess}=await _sb.auth.getSession();
-  if(!sess.session){msgEl.className='pub-msg err';msgEl.textContent=t.needLogin;return;}
-  if(!title){msgEl.className='pub-msg err';msgEl.textContent=t.needTitle;return;}
-  const totalBlocks=(lv.fixed||[]).length+(lv.slider||[]).length+(lv.mobile||[]).length+(lv.bounce||[]).length+(lv.push||[]).length+(lv.invis||[]).length;
-  if(totalBlocks===0){msgEl.className='pub-msg err';msgEl.textContent=t.needBlocks;return;}
-  if(_currentLevelId&&!_authorCompleted){
-    const{data:lvlCheck}=await _sb.from('levels').select('author_completed,is_published').eq('id',_currentLevelId).single();
-    if(lvlCheck){_authorCompleted=lvlCheck.author_completed||false;_isPublished=lvlCheck.is_published||false;}
-    if(!_authorCompleted){msgEl.className='pub-msg err';msgEl.textContent=_lang()==='fr'?"🎮 Tu dois d'abord terminer le niveau toi-même !":'🎮 You must complete the level yourself first!';return;}
-  }
-  okBtn.disabled=true;okBtn.textContent=t.saving;msgEl.className='pub-msg';
-  const user=sess.session.user;let error,shareCode=null;
-  if(_currentLevelId){
-    const updates={title,data:lv,visibility:_currentVisibility};if(_currentVisibility!=='private')updates.is_published=true;
-    const{error:e}=await _sb.from('levels').update(updates).eq('id',_currentLevelId).eq('user_id',user.id);
-    if(!e&&_currentVisibility!=='private')_isPublished=true;error=e;
-  }else{
-    function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
-    shareCode=genCode();
-    const{data:inserted,error:e}=await _sb.from('levels').insert({user_id:user.id,title,data:lv,plays:0,visibility:_currentVisibility,share_code:shareCode,author_completed:_authorCompleted,is_published:_currentVisibility!=='private'}).select().single();
-    error=e;if(!error&&inserted){_currentLevelId=inserted.id;history.replaceState(null,'','studio.html');}
-  }
-  _hasUnsavedChanges=false;autosaveClear();doAfterSaveNav&&doAfterSaveNav();
-  okBtn.disabled=false;okBtn.textContent=t.ok;
-  if(error){msgEl.className='pub-msg err';msgEl.textContent=t.errorTxt+error.message;}
-  else{
-    const ni=document.getElementById('level-name-input');if(ni)ni.value=title;
-    if(shareCode&&_currentVisibility==='code'){navigator.clipboard?.writeText(shareCode).catch(()=>{});msgEl.className='pub-msg ok';msgEl.innerHTML=t.successNew+'<br>'+t.codeMsg+'<b>'+shareCode+'</b><br><span style="font-size:5px;color:#40f090aa;">'+t.codeCopied+'</span>';setTimeout(()=>closePublish(),4000);}
-    else{msgEl.className='pub-msg ok';msgEl.textContent=shareCode?t.successNew:t.successUpdate;setTimeout(()=>closePublish(),1800);}
-  }
-}
-</script>
-
-<!-- PUBLISHED LEVEL MODAL -->
-<div id="published-modal" style="display:none;position:fixed;inset:0;background:#000000dd;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
-  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:36px 32px;width:min(440px,90vw);display:flex;flex-direction:column;gap:20px;">
-    <div style="font-family:Orbitron,monospace;font-size:13px;color:#f0a040;text-align:center;letter-spacing:2px;">🔒 NIVEAU PUBLIÉ</div>
-    <p id="published-modal-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.8;text-align:center;"></p>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <button onclick="confirmDuplicateFromModal()" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#2a1a00;border:2px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;">⧉ CRÉER UNE COPIE MODIFIABLE</button>
-      <button onclick="document.getElementById('published-modal').style.display='none';openLoadModal();" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">📂 CHARGER UN AUTRE NIVEAU</button>
-    </div>
-  </div>
-</div>
-
-<!-- UNSAVED CHANGES MODAL -->
-<div id="unsaved-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
-    <div id="unsaved-title" style="font-family:Orbitron,monospace;font-size:14px;color:#f0a040;text-align:center;letter-spacing:1px;">⚠️ MODIFICATIONS NON SAUVEGARDÉES</div>
-    <p id="unsaved-desc" style="font-family:Rajdhani,sans-serif;font-size:17px;color:#c0c0dd;text-align:center;line-height:1.7;margin:0;">Tu as des modifications non sauvegardées.<br>Que veux-tu faire ?</p>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <button id="unsaved-btn-save" onclick="unsavedSave()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#0d2a0d;border:1.5px solid #40f090;color:#40f090;border-radius:6px;cursor:pointer;">💾 ENREGISTRER ET QUITTER</button>
-      <button id="unsaved-btn-leave" onclick="unsavedLeave()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#2a0a0a;border:1.5px solid #f04060;color:#f04060;border-radius:6px;cursor:pointer;">🚪 QUITTER SANS ENREGISTRER</button>
-      <button id="unsaved-btn-stay" onclick="unsavedStay()" style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">← RESTER DANS LE STUDIO</button>
-    </div>
-  </div>
-</div>
-
-<!-- DUPLICATE MODAL -->
-<div id="dup-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-  <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
-    <div style="font-family:Orbitron,monospace;font-size:12px;color:#f0a040;text-align:center;letter-spacing:1px;">🔒 NIVEAU PUBLIÉ</div>
-    <p id="dup-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.7;text-align:center;"></p>
-    <div style="display:flex;gap:10px;">
-      <button onclick="closeDupModal()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;background:#12122a;border:1.5px solid #2a2a55;color:#6060aa;border-radius:6px;cursor:pointer;">ANNULER</button>
-      <button onclick="confirmDuplicate()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;background:#2a1a00;border:1.5px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;">⧉ CRÉER UNE COPIE</button>
-    </div>
-  </div>
-</div>
-
-<script>
-function showPublishedModal(title,lid){
-  document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>{if(b.id!=='btn-load')b.style.opacity='0.3';});
-  const lang=localStorage.getItem('fl_lang')||'fr';
-  const msg=lang==='fr'?'<strong style="color:#f0e040;">'+title+'</strong><br><br>Ce niveau est publié et ne peut pas être modifié directement.<br>Crée une copie privée pour y apporter des modifications.':'<strong style="color:#f0e040;">'+title+'</strong><br><br>This level is published and cannot be edited directly.<br>Create a private copy to make changes.';
-  document.getElementById('published-modal-msg').innerHTML=msg;
-  document.getElementById('published-modal').style.display='flex';
-}
-async function confirmDuplicateFromModal(){
-  document.getElementById('published-modal').style.display='none';window._dupConfirmed=true;
-  document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');
-  await duplicateLevel();
-}
-function showDupModal(){
-  const lang=localStorage.getItem('fl_lang')||'fr';
-  document.getElementById('dup-msg').innerHTML=lang==='fr'?'Ce niveau est publié.<br>Tu ne peux pas le modifier directement.<br><br>Une copie privée sera créée.':'This level is published.<br>You cannot edit it directly.<br><br>A private copy will be created.';
-  document.getElementById('dup-modal').style.display='flex';
-}
-function closeDupModal(){document.getElementById('dup-modal').style.display='none';}
-function confirmDuplicate(){closeDupModal();window._dupConfirmed=true;document.querySelectorAll('.act-btn, #btn-save, #btn-clear, #btn-load').forEach(b=>b.style.opacity='');duplicateLevel();}
-
-(function(){_loadingLevel=false;_hasUnsavedChanges=false;checkAutosaveOnLoad();})();
-
-function autosaveSave(){
-  if(_loadingLevel)return;
-  try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');const ni=document.getElementById('level-name-input');sessionStorage.setItem('fl_autosave_name',ni?ni.value:'');}catch(ex){}
-}
-function autosaveClear(){sessionStorage.removeItem('fl_autosave_level');sessionStorage.removeItem('fl_autosave_id');sessionStorage.removeItem('fl_autosave_name');}
-function checkAutosaveOnLoad(){
-  const savedLv=sessionStorage.getItem('fl_autosave_level');if(!savedLv)return;
-  const savedName=sessionStorage.getItem('fl_autosave_name')||ts('untitled','Untitled');
-  try{
-    const restored=JSON.parse(savedLv);lv=restored;
-    if(!lv.fixed)lv.fixed=[];if(!lv.trap)lv.trap=[];if(!lv.slider)lv.slider=[];
-    if(!lv.invis)lv.invis=[];if(!lv.bounce)lv.bounce=[];if(!lv.mobile)lv.mobile=[];
-    if(!lv.push)lv.push=[];if(!lv.gravflip)lv.gravflip=[];if(!lv.speed)lv.speed=[];
-    const ni=document.getElementById('level-name-input');if(ni&&savedName)ni.value=savedName;
-    const savedId=sessionStorage.getItem('fl_autosave_id');if(savedId)_currentLevelId=savedId;
-    _hasUnsavedChanges=true;redraw&&redraw();status&&status(ts('msgDraftRestored','⚡ Draft restored'));
-  }catch(ex){}
-}
-window.addEventListener('beforeunload',function(){
-  if(lv&&typeof lv==='object'){try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');sessionStorage.setItem('fl_autosave_name',document.getElementById('level-name-input')?.value||'');}catch(ex){}}
-});
-let _pendingNavUrl=null;
-history.pushState(null,'',location.href);
-window.addEventListener('popstate',function(){
-  if(_hasUnsavedChanges){history.pushState(null,'',location.href);_pendingNavUrl='__BACK__';showUnsavedModal();}else{autosaveClear();}
-});
-window.addEventListener('pagehide',function(){if(!_hasUnsavedChanges)autosaveClear();});
-function goToHome(){if(_hasUnsavedChanges){_pendingNavUrl='index.html';showUnsavedModal();}else{autosaveClear();window.location.href='index.html';}}
-function goToProfile(){if(_hasUnsavedChanges){_pendingNavUrl='settings.html';showUnsavedModal();}else{window.location.href='settings.html';}}
-function showUnsavedModal(){document.getElementById('unsaved-modal').style.display='flex';}
-function unsavedSave(){
-  document.getElementById('unsaved-modal').style.display='none';
-  const ni=document.getElementById('level-name-input');const hasName=ni&&ni.value.trim().length>0;
-  window._afterSaveNav=_pendingNavUrl;_pendingNavUrl=null;
-  if(!_currentLevelId&&!hasName)openPublish();else saveLevel();
-}
-function doAfterSaveNav(){if(window._afterSaveNav){const url=window._afterSaveNav;window._afterSaveNav=null;if(url==='__BACK__')history.go(-2);else window.location.href=url;}}
-function unsavedLeave(){
-  _hasUnsavedChanges=false;autosaveClear();_currentLevelId=null;lv=emptyLevel();
-  const ni=document.getElementById('level-name-input');if(ni)ni.value='';
-  document.getElementById('unsaved-modal').style.display='none';
-  if(_pendingNavUrl==='__BACK__'){_pendingNavUrl=null;history.go(-2);}else if(_pendingNavUrl){window.location.href=_pendingNavUrl;_pendingNavUrl=null;}
-}
-function unsavedStay(){document.getElementById('unsaved-modal').style.display='none';_pendingNavUrl=null;}
+(function(){_loadingLevel=false;_hasUnsavedChanges=false;})();
 </script>
 </body>
 </html>
