@@ -112,7 +112,6 @@ for(let i=0;i<20;i++){const p=document.createElement('div');p.className='pixel';
     <!-- SIGNUP -->
     <div class="form" id="form-signup">
       <div id="msg-signup" class="msg"></div>
-      <div class="field"><label id="lbl-signup-pseudo">Pseudo</label><input type="text" id="signup-pseudo" placeholder="MonPseudo" maxlength="20" autocomplete="username"></div>
       <div class="field"><label id="lbl-signup-email">Email</label><input type="email" id="signup-email" placeholder="ton@email.com" autocomplete="email"></div>
       <div class="field"><label id="lbl-signup-pass">Mot de passe</label><input type="password" id="signup-pass" placeholder="8 caractères minimum" autocomplete="new-password"></div>
       <div class="field"><label id="lbl-signup-pass2">Confirmer le mot de passe</label><input type="password" id="signup-pass2" placeholder="Répète ton mot de passe" autocomplete="new-password"></div>
@@ -178,10 +177,10 @@ const T={
     logoSub:'CRÉE · PARTAGE · JOUE',
     tabLogin:'CONNEXION',tabSignup:'INSCRIPTION',
     lblLoginEmail:'Email',lblLoginPass:'Mot de passe',
-    lblPseudo:'Pseudo',lblSignupEmail:'Email',lblSignupPass:'Mot de passe',
+    lblSignupEmail:'Email',lblSignupPass:'Mot de passe',
     btnLogin:'JOUER →',btnSignup:'CRÉER MON COMPTE →',
     google:'CONTINUER AVEC GOOGLE',or:'OU',back:'← RETOUR AU JEU',
-    phEmail:'ton@email.com',phPass:'••••••••',phPseudo:'MonPseudo',phPassNew:'8 caractères minimum',
+    phEmail:'ton@email.com',phPass:'••••••••',phPassNew:'8 caractères minimum',
     errFields:'Remplis tous les champs !',errLen:'Mot de passe trop court (8 min).',
     errCreds:'Email ou mot de passe incorrect.',
     okLogin:'Connexion réussie ! Redirection...',okSignup:'Compte créé ! Vérifie ta boîte mail.',
@@ -196,10 +195,10 @@ const T={
     logoSub:'CREATE · SHARE · PLAY',
     tabLogin:'LOGIN',tabSignup:'SIGN UP',
     lblLoginEmail:'Email',lblLoginPass:'Password',
-    lblPseudo:'Username',lblSignupEmail:'Email',lblSignupPass:'Password',
+    lblSignupEmail:'Email',lblSignupPass:'Password',
     btnLogin:'PLAY →',btnSignup:'CREATE ACCOUNT →',
     google:'CONTINUE WITH GOOGLE',or:'OR',back:'← BACK TO GAME',
-    phEmail:'your@email.com',phPass:'••••••••',phPseudo:'MyUsername',phPassNew:'8 characters minimum',
+    phEmail:'your@email.com',phPass:'••••••••',phPassNew:'8 characters minimum',
     errFields:'Please fill in all fields!',errLen:'Password too short (8 min).',
     errCreds:'Invalid email or password.',
     okLogin:'Logged in! Redirecting...',okSignup:'Account created! Check your email.',
@@ -224,7 +223,6 @@ function setLang(l){
   document.getElementById('tab-signup').textContent=t.tabSignup;
   document.getElementById('lbl-login-email').textContent=t.lblLoginEmail;
   document.getElementById('lbl-login-pass').textContent=t.lblLoginPass;
-  document.getElementById('lbl-signup-pseudo').textContent=t.lblPseudo;
   document.getElementById('lbl-signup-email').textContent=t.lblSignupEmail;
   document.getElementById('lbl-signup-pass').textContent=t.lblSignupPass;
   document.getElementById('btn-login').textContent=t.btnLogin;
@@ -236,7 +234,6 @@ function setLang(l){
   document.getElementById('back-link-txt').textContent=t.back;
   document.getElementById('login-email').placeholder=t.phEmail;
   document.getElementById('login-pass').placeholder=t.phPass;
-  document.getElementById('signup-pseudo').placeholder=t.phPseudo;
   document.getElementById('signup-email').placeholder=t.phEmail;
   document.getElementById('signup-pass').placeholder=t.phPassNew;
   document.getElementById('forgot-btn').textContent=t.forgot;
@@ -248,10 +245,7 @@ function setLang(l){
 }
 setLang(lang);
 
-
-
 let _captchaRendered=false;
-
 let _loginToken='';
 let _signupToken='';
 function onLoginCaptcha(t){_loginToken=t;}
@@ -317,60 +311,42 @@ async function doLogin(){
   if(error){showMsg('msg-login','error',error.message.includes('Invalid')?t.errCreds:error.message);_loginToken='';_signupToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();}
   else{
     showMsg('msg-login','success',t.okLogin);
-    // Simple: just redirect immediately, session is set by Supabase client
     window.location.href='index.html';
   }
 }
 
-async function checkUsernameAvailable(pseudo){
-  if(!pseudo||pseudo.length<3)return false;
-  const{data}=await sb.from('profiles').select('id').eq('username',pseudo).maybeSingle();
-  return !data; // true = available
-}
-
 async function doSignup(){
   clearMsg('msg-signup');const l=lang;const t=T[l]||T['fr'];
-  const pseudo=document.getElementById('signup-pseudo').value.trim();
   const email=document.getElementById('signup-email').value.trim();
   const pass=document.getElementById('signup-pass').value;
   const pass2=document.getElementById('signup-pass2').value;
-  if(!pseudo||!email||!pass){showMsg('msg-signup','error',t.errFields);return;}
-  if(pseudo.length<3){showMsg('msg-signup','error',l==='fr'?'Le pseudo doit avoir au moins 3 caractères.':'Username must be at least 3 characters.');return;}
+  if(!email||!pass){showMsg('msg-signup','error',t.errFields);return;}
   if(pass.length<8){showMsg('msg-signup','error',t.errLen);return;}
   if(pass!==pass2){showMsg('msg-signup','error',l==='fr'?'Les mots de passe ne correspondent pas !':'Passwords do not match!');return;}
   if(!/[a-zA-Z]/.test(pass)||!/[0-9]/.test(pass)){showMsg('msg-signup','error',l==='fr'?'Le mot de passe doit contenir des lettres et des chiffres.':'Password must contain letters and digits.');return;}
-  // Terms check
   const terms=document.getElementById('terms-check');
   if(!terms||!terms.checked){showMsg('msg-signup','error',l==='fr'?"Tu dois accepter les conditions d'utilisation.":'You must accept the terms of service.');return;}
-  // hCaptcha check
   const hcaptchaToken=_signupToken||'';
   if(!hcaptchaToken){showMsg('msg-signup','error',l==='fr'?'Merci de compléter le captcha !':'Please complete the captcha!');return;}
-  // Check username availability
-  const available=await checkUsernameAvailable(pseudo);
-  if(!available){showMsg('msg-signup','error',l==='fr'?'Ce pseudo est déjà pris !':'Username already taken!');return;}
   setLoading('btn-signup',true);
-  const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{username:pseudo},captchaToken:hcaptchaToken}});
+  const{data,error}=await sb.auth.signUp({email,password:pass,options:{captchaToken:hcaptchaToken}});
   if(error){
     setLoading('btn-signup',false);
     showMsg('msg-signup','error',error.message);
     _loginToken='';_signupToken='';if(typeof hcaptcha!=='undefined')hcaptcha.reset();
     return;
   }
-  localStorage.setItem('fl_pending_username',pseudo);
   setLoading('btn-signup',false);
   showMsg('msg-signup','success',t.okSignup);
-  // Switch to login tab after 2 seconds
   setTimeout(()=>switchTab('login'),2000);
 }
 
 async function doGoogleLogin(){
-  // Direct Google login - no terms check needed (existing users)
   const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://funkylevels.com/index.html'}});
   if(error)alert(error.message);
 }
 
 function doGoogle(){
-  // Show terms modal before Google OAuth (signup)
   document.getElementById('terms-google-check').checked=false;
   document.getElementById('terms-google-msg').textContent='';
   document.getElementById('terms-modal').style.display='flex';
@@ -402,7 +378,6 @@ function openReset(){
   document.getElementById('reset-email').value='';
   document.getElementById('reset-modal').classList.add('show');
   document.getElementById('reset-email').focus();
-  // Render captcha if not yet done
   if(!_resetCaptchaRendered&&typeof hcaptcha!=='undefined'){
     try{
       hcaptcha.render('hcaptcha-reset-widget',{
@@ -451,16 +426,13 @@ document.addEventListener('keydown',e=>{
 
 sb.auth.getSession().then(({data})=>{if(data.session)window.location.href='index.html';});
 
-// hCaptcha callbacks
 let _captchaToken='';
 function onCaptchaSuccess(token){_captchaToken=token;}
 function onCaptchaExpired(){_captchaToken='';}
 
-// Auto-switch to signup if #signup in URL
 if(window.location.hash==='#signup'){
   switchTab('signup');
 }
-
 </script>
 </body>
 </html>
