@@ -1837,12 +1837,19 @@ updatePanelState();
 // ─────────────────────────────────────────────
 //  PLAY
 // ─────────────────────────────────────────────
-function playLevel(){
+async function playLevel(){
   sessionStorage.setItem('fl_preview_level',JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id',_currentLevelId||'');
   const titleEl=document.getElementById('level-name-input');
   sessionStorage.setItem('fl_preview_title',titleEl?titleEl.value:'');
   autosaveSave();
+
+  // Sauvegarde automatique avant de jouer
+  if(_currentLevelId){
+    const title=titleEl?.value.trim()||STUDIO_T[_lang()]?.untitled||'Untitled';
+    await _sb.from('levels').update({title,data:lv,visibility:_currentVisibility}).eq('id',_currentLevelId);
+  }
+
   if(_currentLevelId)window.location.href='game.html?preview=1&level='+_currentLevelId+'&from=studio';
   else window.location.href='game.html?preview=1&from=studio';
 }
