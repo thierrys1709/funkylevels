@@ -385,7 +385,16 @@ async function loadBestTime(){
     const el_time=document.getElementById('hud-global-time');
     const el_user=document.getElementById('hud-global-user');
     if(el_time)el_time.textContent=fmtTimeFull(global.time_ms);
-    if(el_user)el_user.textContent='@'+username;
+    if(el_user){
+      el_user.innerHTML='';
+      const a=document.createElement('a');
+      a.textContent='@'+username;
+      a.href='profil.html?id='+global.user_id;
+      a.style.cssText='color:#c0a0ff;text-decoration:none;font-family:Orbitron,monospace;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;';
+      a.onmouseover=()=>a.style.color='#f0e040';
+      a.onmouseout=()=>a.style.color='#c0a0ff';
+      el_user.appendChild(a);
+    }
   }
   updateBestDisplay();
 }
