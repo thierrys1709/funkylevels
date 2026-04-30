@@ -55,6 +55,7 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 /* GRID */
 .levels-wrap{max-width:900px;margin:0 auto;padding:0 24px 60px;}
 .levels-grid{width:100%;}
+
 /* Level table */
 .lvl-table{width:100%;border-collapse:collapse;}
 .lvl-table thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
@@ -71,6 +72,8 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 .lvl-td-vis{width:90px;}
 .lvl-td-actions{width:80px;text-align:right;}
 .star-count{font-family:Orbitron,monospace;font-size:10px;color:#f0c040;}
+.author-link{color:#a0a0cc;text-decoration:none;transition:color .15s;}
+.author-link:hover{color:#f0e040;}
 .edit-btn{font-family:'Press Start 2P',monospace;font-size:8px;padding:6px 12px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .edit-btn:hover{background:#1a1a3a;border-color:#7060f0;}
 .empty{text-align:center;padding:60px 24px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;}
@@ -147,7 +150,7 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 </footer>
 
 <!-- COOKIE BANNER -->
-<div id="cookie-banner" style="display:none;position:fixed;z-index:99999;bottom:0;left:0;right:0;background:#0d0d1e;border-top:2px solid #2a2a55;padding:16px 24px;z-index:9999;align-items:center;gap:16px;flex-wrap:wrap;">
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#0d0d1e;border-top:2px solid #2a2a55;padding:16px 24px;z-index:9999;align-items:center;gap:16px;flex-wrap:wrap;">
   <p id="cookie-text" style="font-family:Rajdhani,sans-serif;font-size:13px;color:#a0a0cc;flex:1;margin:0;line-height:1.6;">
     🍪 Ce site utilise des cookies strictement nécessaires à l'authentification. Aucun cookie publicitaire.
     <a href="legal.html#privacy" style="color:#a040f0;margin-left:4px;" id="cookie-link">En savoir plus</a>
@@ -173,7 +176,8 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{realtime:{enabled:fals
 
 const T={
   fr:{
-    heroTitle:'⚡ FUNKYLEVELS',heroSub:'Crée des niveaux de platformer fous,\npartage-les et joue à ceux des autres !',
+    heroTitle:'⚡ FUNKYLEVELS',
+    heroSub:'Crée des niveaux de platformer fous,\npartage-les et joue à ceux des autres !',
     btnCreate:'✏️ CRÉER UN NIVEAU',btnBrowse:'🎮 PARCOURIR',
     statLevels:'NIVEAUX',statPlays:'PARTIES',
     searchPh:'🔍 Rechercher un niveau...',searchBtn:'CHERCHER',
@@ -189,7 +193,8 @@ const T={
     edit:'ÉDITER',play:'JOUER',logoutOk:'Déconnecté !'
   },
   en:{
-    heroTitle:'⚡ FUNKYLEVELS',heroSub:'Create crazy platformer levels,\nshare them and play others\'!',
+    heroTitle:'⚡ FUNKYLEVELS',
+    heroSub:'Create crazy platformer levels,\nshare them and play others\'!',
     btnCreate:'✏️ CREATE A LEVEL',btnBrowse:'🎮 BROWSE',
     statLevels:'LEVELS',statPlays:'GAMES',
     searchPh:'🔍 Search a level...',searchBtn:'SEARCH',
@@ -251,7 +256,6 @@ function setLang(l,save=true){
   if(ft)ft.textContent=l==='fr'?'Conditions d\'utilisation':'Terms of Use';
   if(fc)fc.textContent=l==='fr'?'Contact':'Contact';
   const cb=document.getElementById('cookie-text');
-  const cbl=document.getElementById('cookie-link');
   const cbb=document.getElementById('cookie-btn');
   if(cb)cb.innerHTML=(l==='fr'?'🍪 Ce site utilise des cookies strictement nécessaires à l\'authentification. Aucun cookie publicitaire.':'🍪 This site uses cookies strictly necessary for authentication. No advertising cookies.')+' <a href="legal.html#privacy" style="color:#a040f0;margin-left:4px;">'+(l==='fr'?'En savoir plus':'Learn more')+'</a>';
   if(cbb)cbb.textContent=l==='fr'?'✓ COMPRIS':'✓ GOT IT';
@@ -339,8 +343,8 @@ function applySession(user){
   if(signupBtn)signupBtn.style.display='none';
   checkNeedsPseudo(user);
   detectAndSaveCountry(user.id);
-  fetch('https://ydpkyktfvpdnjjiewctf.supabase.co/rest/v1/profiles?select=username&id=eq.'+user.id,{
-    headers:{'apikey':'sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD','Authorization':'Bearer sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD'}
+  fetch(SUPABASE_URL+'/rest/v1/profiles?select=username&id=eq.'+user.id,{
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
   }).then(r=>r.json()).then(data=>{
     const username=(data&&data[0]&&data[0].username)||user.email.split('@')[0];
     document.getElementById('nav-user').textContent='👤 '+username;
@@ -351,7 +355,6 @@ function applySession(user){
   document.getElementById('nav-create').style.display='';
   const hbc=document.getElementById('hero-btn-create');
   if(hbc)hbc.style.display='';
-  // Hide language switcher — language is managed via profile settings
   const lb=document.querySelector('.lang-bar');
   if(lb)lb.style.display='none';
 }
@@ -368,8 +371,7 @@ async function checkAuth(){
     }
   }else{
     const _storedLang=localStorage.getItem('fl_lang');
-    if(!_storedLang){
-    }else{
+    if(_storedLang){
       document.getElementById('lang-modal').style.display='none';
       setLang(_storedLang);
     }
@@ -437,27 +439,33 @@ async function loadSection(s){
   }else if(s==='top'){
     const allRatings=await sbFetch('ratings?select=level_id,score&limit=2000');
     if(!Array.isArray(allRatings)||!allRatings.length){levels=[];}
-    const rmap={};
-    allRatings.forEach(r=>{
-      if(!rmap[r.level_id])rmap[r.level_id]={sum:0,count:0};
-      rmap[r.level_id].sum+=r.score;
-      rmap[r.level_id].count++;
-    });
-    const ratedIds=Object.keys(rmap);
-    if(!ratedIds.length){levels=[];}
-    let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=eq.public&id=in.('+ratedIds.join(',')+')';
-    if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
-    levels=await sbFetch(url);
-    levels.forEach(l=>{
-      const r=rmap[l.id];
-      l.avgRating=r?(Math.round((r.sum/r.count)*100)/100):null;
-      l.ratingCount=r?r.count:0;
-    });
-    levels=levels.filter(l=>l.avgRating!=null);
-    levels.sort((a,b)=>b.avgRating-a.avgRating);
-    levels=levels.slice(0,24);
+    else{
+      const rmap={};
+      allRatings.forEach(r=>{
+        if(!rmap[r.level_id])rmap[r.level_id]={sum:0,count:0};
+        rmap[r.level_id].sum+=r.score;
+        rmap[r.level_id].count++;
+      });
+      const ratedIds=Object.keys(rmap);
+      if(ratedIds.length){
+        let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=eq.public&id=in.('+ratedIds.join(',')+')';
+        if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
+        levels=await sbFetch(url);
+        levels.forEach(l=>{
+          const r=rmap[l.id];
+          l.avgRating=r?(Math.round((r.sum/r.count)*100)/100):null;
+          l.ratingCount=r?r.count:0;
+        });
+        levels=levels.filter(l=>l.avgRating!=null);
+        levels.sort((a,b)=>b.avgRating-a.avgRating);
+        levels=levels.slice(0,24);
+      }
+    }
   }else if(s==='mine'){
-    if(!currentUser){grid.innerHTML=`<div class="empty"><div class="icon">🔒</div><p>${t.notLogged}</p></div>`;return;}
+    if(!currentUser){
+      grid.innerHTML=`<div class="empty"><div class="icon">🔒</div><p>${t.notLogged}</p></div>`;
+      return;
+    }
     const token=getToken();
     let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&user_id=eq.'+currentUser.id+'&order=created_at.desc';
     if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
@@ -470,6 +478,15 @@ async function loadSection(s){
     return;
   }
 
+  // Fetch usernames
+  const uids=[...new Set(levels.map(l=>l.user_id).filter(Boolean))];
+  if(uids.length){
+    const profiles=await sbFetch('profiles?select=id,username&id=in.('+uids.join(',')+')')
+    if(Array.isArray(profiles))profiles.forEach(p=>{
+      levels.forEach(l=>{if(l.user_id===p.id)l.username=p.username;});
+    });
+  }
+
   const thead=`<thead><tr>
     <th>${lang==='fr'?'NOM':'NAME'}</th>
     <th>${lang==='fr'?'DATE':'DATE'}</th>
@@ -478,15 +495,10 @@ async function loadSection(s){
     ${s==='mine'?`<th>${lang==='fr'?'ÉTAT':'STATUS'}</th>`:''}
     <th></th>
   </tr></thead>`;
-  const uids=[...new Set(levels.map(l=>l.user_id).filter(Boolean))];
-  if(uids.length){
-    const profiles=await sbFetch('profiles?select=id,username&id=in.('+uids.join(',')+')')
-    if(Array.isArray(profiles))profiles.forEach(p=>{
-      levels.forEach(l=>{if(l.user_id===p.id)l.username=p.username;});
-    });
-  }
+
   grid.innerHTML=`<table class="lvl-table">${thead}<tbody>${levels.map(l=>levelRow(l)).join('')}</tbody></table>`;
 
+  // Leaderboard
   const ids=levels.map(l=>l.id);
   const records=await sbFetch('leaderboard?select=level_id,time_ms&level_id=in.('+ids.join(',')+')'+'&order=time_ms.asc');
   const worldBests={};
@@ -516,14 +528,16 @@ function levelRow(l){
   const d=new Date(l.created_at);
   const dateStr=d.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
   const visLabel=l.visibility==='public'?(lang==='fr'?'Public':'Public'):l.visibility==='code'?(lang==='fr'?'Invitation':'Invite'):(lang==='fr'?'Privé':'Private');
+  const authorLink=l.user_id
+    ?`<a href="profile.html?id=${l.user_id}" class="author-link" onclick="event.stopPropagation()">@${esc(l.username||'anonyme')}</a>`
+    :`<span style="color:#a0a0cc;">@${esc(l.username||'anonyme')}</span>`;
   return`<tr class="lvl-tr" data-id="${l.id}" onclick="window.location.href='game.html?level=${l.id}'">
     <td class="lvl-td lvl-td-name">${esc(l.title||'Sans titre')}${isNew?`<span class="new-badge">${t.new}</span>`:''}</td>
     <td class="lvl-td lvl-td-date">${dateStr}</td>
-    <td class="lvl-td lvl-td-author">@${esc(l.username||'anonyme')}</td>
-    <td class="lvl-td lvl-td-stars">${l.avgRating?`<span style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#f0e040;">★ ${l.avgRating.toFixed(2)}</span><span style="font-family:Rajdhani,sans-serif;font-size:11px;color:#6060aa;margin-left:4px;">(${l.ratingCount})</span>`:'<span style="color:#3a3a55;">—</span>'}</td>
+    <td class="lvl-td lvl-td-author">${authorLink}</td>
+    <td class="lvl-td lvl-td-stars"><span class="star-count" data-id="${l.id}">${l.avgRating?`<span style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#f0e040;">★ ${l.avgRating.toFixed(2)}</span><span style="font-family:Rajdhani,sans-serif;font-size:11px;color:#6060aa;margin-left:4px;">(${l.ratingCount})</span>`:'<span style="color:#3a3a55;">—</span>'}</span></td>
     ${currentSection==='mine'?`<td class="lvl-td lvl-td-vis"><span class="vis-badge vis-${l.visibility||'private'}">${visLabel}</span></td>`:''}
-    <td class="lvl-td lvl-td-actions">${isOwner?`<button class="edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'">✏️ ${lang==='fr'?'ÉDITER':'EDIT'}</button>`:''}
-    </td>
+    <td class="lvl-td lvl-td-actions">${isOwner?`<button class="edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'">✏️ ${lang==='fr'?'ÉDITER':'EDIT'}</button>`:''}</td>
   </tr>`;
 }
 
@@ -532,7 +546,6 @@ function doLogout(){
     if(k.startsWith('sb-')||k.includes('supabase'))localStorage.removeItem(k);
   });
   currentUser=null;
-  // Restore language switcher
   const lb=document.querySelector('.lang-bar');
   if(lb)lb.style.display='';
   showToast((T[lang]||T['fr']).logoutOk);
@@ -542,7 +555,7 @@ function doLogout(){
 if(localStorage.getItem('fl_lang')){
   setLang(lang);
 }else{
-  setLang('en', false);
+  setLang('en',false);
 }
 loadStats();
 
@@ -583,32 +596,13 @@ function selectLang(l){
   signupBtn.style.background='#0d2a0d';
 }
 
-function confirmLang(){
-  if(_selectedLang)selectLang(_selectedLang);
-}
-
-function chooseLang(lang){
-  localStorage.setItem('fl_lang', lang);
-  document.getElementById('lang-modal').style.display='none';
-  setLang(lang);
-}
-
-function checkLangModal(){
-  const hasLang=localStorage.getItem('fl_lang');
-  if(!hasLang){
-    document.getElementById('lang-modal').style.display='flex';
-  }
-}
-
 function acceptCookies(){
   localStorage.setItem('fl_cookies','1');
   document.getElementById('cookie-banner').style.display='none';
 }
 
 const cb=document.getElementById('cookie-banner');
-if(!localStorage.getItem('fl_cookies')){
-  cb.style.display='flex';
-}
+if(!localStorage.getItem('fl_cookies')){cb.style.display='flex';}
 </script>
 
 <!-- LANGUAGE SELECTION MODAL -->
