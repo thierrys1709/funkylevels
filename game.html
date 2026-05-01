@@ -557,12 +557,39 @@ function killPlayer(){if(gPlayer.dead)return;gPlayer.dead=true;gPlayer.dT=0;spaw
 
 function checkBlockSpikes(b){
   if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return false;
-  if(!ov(gPlayer,b))return false;
   const sp=b.spikes;const hidden=sp.hidden||false;const delay=(sp.delay||0)*60;
-  if(!hidden){killPlayer();return true;}
-  if(!sp._touched)sp._touched=true;
+  const activated=!hidden||(sp._touched&&sp._delayTimer>=delay);
+  if(!activated)return false;
+  if(!hidden){
+    // hitbox précise par direction
+    const sz=10;
+    let hit=false;
+    sp.dirs.forEach(dir=>{
+      let hb;
+      if(dir==='u')hb={x:b.x,y:b.y-sz,w:b.w,h:sz};
+      else if(dir==='d')hb={x:b.x,y:b.y+b.h,w:b.w,h:sz};
+      else if(dir==='l')hb={x:b.x-sz,y:b.y,w:sz,h:b.h};
+      else if(dir==='r')hb={x:b.x+b.w,y:b.y,w:sz,h:b.h};
+      if(hb&&ov(gPlayer,hb))hit=true;
+    });
+    if(hit){killPlayer();return true;}
+    return false;
+  }
+  // hidden : même logique avec hitbox précise
+  if(!sp._touched&&ov(gPlayer,b))sp._touched=true;
   const delayDone=delay===0||sp._delayTimer>=delay;
-  if(delayDone){killPlayer();return true;}
+  if(delayDone){
+    const sz=10;let hit=false;
+    sp.dirs.forEach(dir=>{
+      let hb;
+      if(dir==='u')hb={x:b.x,y:b.y-sz,w:b.w,h:sz};
+      else if(dir==='d')hb={x:b.x,y:b.y+b.h,w:b.w,h:sz};
+      else if(dir==='l')hb={x:b.x-sz,y:b.y,w:sz,h:b.h};
+      else if(dir==='r')hb={x:b.x+b.w,y:b.y,w:sz,h:b.h};
+      if(hb&&ov(gPlayer,hb))hit=true;
+    });
+    if(hit){killPlayer();return true;}
+  }
   return false;
 }
 
