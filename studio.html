@@ -1863,15 +1863,22 @@ function autosaveSave(){
 }
 function autosaveClear(){sessionStorage.removeItem('fl_autosave_level');sessionStorage.removeItem('fl_autosave_id');sessionStorage.removeItem('fl_autosave_name');}
 function checkAutosaveOnLoad(){
-  const savedLv=sessionStorage.getItem('fl_autosave_level');if(!savedLv)return;
+  const savedLv=sessionStorage.getItem('fl_autosave_level');
+  if(!savedLv)return;
   const l=_lang();
   const savedName=sessionStorage.getItem('fl_autosave_name')||(STUDIO_T[l]?.untitled||'Untitled');
   try{
-    const restored=JSON.parse(savedLv);lv=restored;
+    const restored=JSON.parse(savedLv);
+    lv=restored;
     ['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock','darkness'].forEach(k=>{if(!lv[k])lv[k]=[];});
-    const ni=document.getElementById('level-name-input');if(ni&&savedName)ni.value=savedName;
-    const savedId=sessionStorage.getItem('fl_autosave_id');if(savedId)_currentLevelId=savedId;
-    _hasUnsavedChanges=true;redraw&&redraw();
+    const ni=document.getElementById('level-name-input');
+    if(ni&&savedName)ni.value=savedName;
+    const savedId=sessionStorage.getItem('fl_autosave_id');
+    if(savedId)_currentLevelId=savedId;
+    _hasUnsavedChanges=true;
+    // ← Réécrire immédiatement pour survivre au pagehide
+    autosaveSave();
+    redraw&&redraw();
     status(STUDIO_T[l]?.msgDraftRestored||'⚡ Draft restored');
   }catch(ex){}
 }
@@ -1996,7 +2003,8 @@ async function loadPlayerProfile(){
   if(_isPublished)showPublishedModal(data.title||'');
 })();
 
-(function(){_loadingLevel=false;_hasUnsavedChanges=false;})();
+_loadingLevel=false;
+// ⚠️ Ne pas reset _hasUnsavedChanges ici — checkAutosaveOnLoad l'a peut-être mis à true
 </script>
 </body>
 </html>
