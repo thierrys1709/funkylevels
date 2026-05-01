@@ -8,6 +8,21 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:#08080f;color:#e8e8ff;font-family:Rajdhani,sans-serif;min-height:100vh;}
+
+/* LOADING SCREEN */
+#loading-screen{
+  position:fixed;inset:0;z-index:9999;
+  background:#08080f;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+  transition:opacity .3s;
+}
+#loading-screen.hidden{opacity:0;pointer-events:none;}
+.loading-logo{font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:#f0e040;letter-spacing:3px;text-shadow:0 0 20px #f0e04066;}
+.loading-bar-wrap{width:200px;height:4px;background:#1e1e40;border-radius:2px;overflow:hidden;}
+.loading-bar{height:100%;width:0%;background:#f0e040;border-radius:2px;animation:loadbar 1.2s ease-in-out infinite;}
+@keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+.loading-txt{font-family:Orbitron,monospace;font-size:9px;color:#4040aa;letter-spacing:2px;}
+
 nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(12px);border-bottom:1px solid #1e1e40;padding:0 24px;height:56px;display:flex;align-items:center;gap:12px;}
 .nav-logo{font-family:Orbitron,monospace;font-size:14px;font-weight:900;color:#f0e040;letter-spacing:2px;text-decoration:none;margin-right:auto;}
 .nav-back{font-family:'Press Start 2P',monospace;font-size:9px;color:#6060aa;text-decoration:none;padding:8px 14px;border:1.5px solid #2a2a55;border-radius:4px;}
@@ -16,14 +31,12 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 .container{max-width:1200px;margin:0 auto;padding:32px 24px 80px;}
 h1{font-family:Orbitron,monospace;font-size:16px;color:#f0e040;letter-spacing:2px;margin-bottom:24px;}
 
-/* SEARCH BAR */
 .search-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
 .search-input{flex:1;min-width:200px;background:#12122a;border:1.5px solid #2a2a55;border-radius:4px;color:#e8e8ff;font-family:Rajdhani,sans-serif;font-size:15px;padding:11px 16px;outline:none;transition:border-color .2s;}
 .search-input:focus{border-color:#a040f0;}
 .search-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:12px 18px;background:#a040f0;color:#fff;border:none;border-radius:4px;cursor:pointer;}
 .count-info{font-family:Rajdhani,sans-serif;font-size:13px;color:#4040aa;margin-left:auto;}
 
-/* TABLE */
 .table-wrap{overflow-x:auto;border:1.5px solid #1e1e40;border-radius:8px;}
 table{width:100%;border-collapse:collapse;min-width:700px;}
 thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
@@ -45,18 +58,12 @@ td{padding:14px 16px;vertical-align:middle;}
 .td-author{font-family:Rajdhani,sans-serif;font-size:13px;color:#a0a0cc;width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .td-plays{font-family:Orbitron,monospace;font-size:11px;color:#8080cc;width:80px;text-align:right;}
 .td-record{font-family:Orbitron,monospace;font-size:10px;width:100px;}
-.td-vis{width:90px;}
 .td-edit{width:70px;text-align:right;}
-.vis-badge{font-family:'Press Start 2P',monospace;font-size:6px;padding:3px 7px;border-radius:3px;}
-.vis-badge.public{background:#0d2a1a;color:#40f090;border:1px solid #40f090;}
-.vis-badge.code{background:#1a0d2a;color:#c090f0;border:1px solid #c090f0;}
-.vis-badge.private{background:#2a0d14;color:#f04060;border:1px solid #f04060;}
 .edit-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:5px 10px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;}
 .edit-btn:hover{background:#1a1a3a;border-color:#7060f0;}
 .wr{color:#c0a0ff;}
 .my{color:#f0e040;font-size:9px;}
 
-/* LOADER */
 .loader-row td{text-align:center;padding:24px;font-family:'Press Start 2P',monospace;font-size:8px;color:#4040aa;}
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid #2a2a55;border-top-color:#a040f0;border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -66,9 +73,16 @@ td{padding:14px 16px;vertical-align:middle;}
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <div class="loading-logo">⚡ FUNKYLEVELS</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-txt" id="loading-txt">LOADING...</div>
+</div>
+
 <nav>
   <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
-  <a href="index.html" class="nav-back">← ACCUEIL</a>
+  <a href="index.html" class="nav-back" id="nav-back">← ACCUEIL</a>
 </nav>
 
 <div class="container">
@@ -76,14 +90,13 @@ td{padding:14px 16px;vertical-align:middle;}
 
   <div class="search-bar">
     <input type="text" class="search-input" id="search-input" placeholder="🔍 Rechercher un niveau ou un créateur..." onkeydown="if(event.key==='Enter')doSearch()">
-    <button class="search-btn" onclick="doSearch()">CHERCHER</button>
-    <span class="count-info" id="count-info loaded-count"></span>
+    <button class="search-btn" id="search-btn" onclick="doSearch()">CHERCHER</button>
+    <span class="count-info" id="count-info"></span>
   </div>
 
-  <!-- Star filter -->
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0;">
-    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#6060aa;">NOTE :</span>
-    <button class="star-filter-btn active" data-val="0" onclick="toggleStarFilter(0)">TOUS</button>
+    <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#6060aa;" id="filter-label">NOTE :</span>
+    <button class="star-filter-btn active" data-val="0" onclick="toggleStarFilter(0)" id="filter-all">TOUS</button>
     <button class="star-filter-btn" data-val="1" onclick="toggleStarFilter(1)">★</button>
     <button class="star-filter-btn" data-val="2" onclick="toggleStarFilter(2)">★★</button>
     <button class="star-filter-btn" data-val="3" onclick="toggleStarFilter(3)">★★★</button>
@@ -95,18 +108,16 @@ td{padding:14px 16px;vertical-align:middle;}
     <table id="lvl-table">
       <thead>
         <tr>
-          <th class="sortable" data-col="title" onclick="sortBy('title')">NOM</th>
-          <th class="sortable" data-col="created_at" onclick="sortBy('created_at')">DATE</th>
-          <th>CRÉATEUR</th>
-          <th class="sortable" data-col="plays" onclick="sortBy('plays')">PARTIES</th>
-          <th>RECORD</th>
-          <th class="sortable" data-col="avg_rating" onclick="sortBy('avg_rating')">NOTE</th>
+          <th class="sortable" data-col="title" onclick="sortBy('title')" id="th-name">NOM</th>
+          <th class="sortable" data-col="created_at" onclick="sortBy('created_at')" id="th-date">DATE</th>
+          <th id="th-creator">CRÉATEUR</th>
+          <th class="sortable" data-col="plays" onclick="sortBy('plays')" id="th-plays">PARTIES</th>
+          <th id="th-record">RECORD</th>
+          <th class="sortable" data-col="avg_rating" onclick="sortBy('avg_rating')" id="th-rating">NOTE</th>
           <th></th>
         </tr>
       </thead>
-      <tbody id="lvl-tbody">
-        
-      </tbody>
+      <tbody id="lvl-tbody"></tbody>
     </table>
   </div>
   <div id="end-msg"></div>
@@ -115,33 +126,64 @@ td{padding:14px 16px;vertical-align:middle;}
 <script>
 const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
 const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
-const LANG_BASE='/lang/';
 
 const PAGE_SIZE=100;
-let offset=0;
-let loading=false;
-let allLoaded=false;
-let sortCol='created_at';
-let sortDir='desc';
+let offset=0,loading=false,allLoaded=false;
+let sortCol='created_at',sortDir='desc';
 let searchQ='';
 let currentUser=null;
-let worldBests={};
-let myBests={};
+let worldBests={},myBests={};
 
-const lang=(()=>{const l=localStorage.getItem('fl_lang')||'fr';return(l==='fr'||l==='en')?l:'fr';})();
+// Langue sans flash
+const lang=localStorage.getItem('fl_lang')||(navigator.language?.startsWith('fr')?'fr':'en');
+let T={};
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtMs(ms){if(!ms)return'—';return(ms/1000).toFixed(2)+'s';}
 function fmtDate(d){return new Date(d).toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');}
-function getToken(){
-  try{const k=Object.keys(localStorage).find(k=>k.includes('auth-token'));if(!k)return null;const o=JSON.parse(localStorage.getItem(k));return o?.access_token||o?.currentSession?.access_token||null;}catch(e){return null;}
+function getToken(){try{const k=Object.keys(localStorage).find(k=>k.includes('auth-token'));if(!k)return null;const o=JSON.parse(localStorage.getItem(k));return o?.access_token||o?.currentSession?.access_token||null;}catch(e){return null;}}
+
+function hideLoading(){
+  const el=document.getElementById('loading-screen');
+  if(el){el.classList.add('hidden');setTimeout(()=>el.remove(),350);}
+}
+function setLoadingText(txt){
+  const el=document.getElementById('loading-txt');
+  if(el)el.textContent=txt;
 }
 
 async function sbFetch(path,token){
-  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
-    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(token||SUPABASE_KEY)}
-  });
+  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(token||SUPABASE_KEY)}});
   return r.ok?r.json():[];
+}
+
+async function loadLangFile(){
+  try{
+    const r=await fetch('/lang/'+lang+'.json');
+    const data=await r.json();
+    T=data.browse||{};
+  }catch(e){T={};}
+}
+
+function applyLang(){
+  const s=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.textContent=val;};
+  s('page-title',T.title);
+  s('nav-back',T.back);
+  s('search-btn',T.searchBtn);
+  s('filter-label',T.filterLabel||'NOTE :');
+  s('filter-all',T.filterAll||'TOUS');
+  s('th-name',T.thName);
+  s('th-date',T.thDate);
+  s('th-creator',T.thCreator);
+  s('th-plays',T.thPlays);
+  s('th-record',T.thRecord);
+  s('th-rating',T.thRating||'NOTE');
+  const si=document.getElementById('search-input');
+  if(si&&T.search)si.placeholder=T.search;
+  // Restore sort indicator on active th
+  document.querySelectorAll('th.sortable').forEach(th=>{
+    if(th.dataset.col===sortCol)th.classList.add('sorted-'+sortDir);
+  });
 }
 
 async function loadPage(){
@@ -151,31 +193,24 @@ async function loadPage(){
 
   let url='levels?select=id,title,plays,completions,created_at,visibility,user_id';
   url+='&visibility=in.(public,code)';
-  if(searchQ){
-    // Search by title only in DB, then client-filter by username after fetching
-    url+='&title=ilike.*'+encodeURIComponent(searchQ)+'*';
-  }
-  url+='&order='+sortCol+'.'+(sortDir)+',id.asc';
+  if(searchQ)url+='&title=ilike.*'+encodeURIComponent(searchQ)+'*';
+  url+='&order='+sortCol+'.'+sortDir+',id.asc';
   url+='&limit='+PAGE_SIZE+'&offset='+offset;
 
   const data=await sbFetch(url);
-
   hideLoader();
+
   if(!Array.isArray(data)||data.length===0){
-    // No title match - but still try creator search before giving up
     if(searchQ&&offset===0){
       const profRes=await sbFetch('profiles?select=id&username=ilike.*'+encodeURIComponent(searchQ)+'*&limit=50');
       const cIds=Array.isArray(profRes)?profRes.map(p=>p.id):[];
       if(cIds.length){
-        const creatorUrl='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=in.(public,code)&user_id=in.('+cIds.join(',')+')'
-          +'&order='+sortCol+'.'+sortDir+'&limit='+PAGE_SIZE;
+        const creatorUrl='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=in.(public,code)&user_id=in.('+cIds.join(',')+')'+'&order='+sortCol+'.'+sortDir+'&limit='+PAGE_SIZE;
         const cData=await sbFetch(creatorUrl);
         if(Array.isArray(cData)&&cData.length){
-          // Fetch ratings
           const cRatings=await sbFetch('ratings?select=level_id,score&level_id=in.('+cData.map(l=>l.id).join(',')+')&limit=500');
           const crmap={};
           if(Array.isArray(cRatings))cRatings.forEach(r=>{if(!crmap[r.level_id])crmap[r.level_id]={sum:0,count:0};crmap[r.level_id].sum+=r.score;crmap[r.level_id].count++;});
-          // Fetch usernames
           const cuids=[...new Set(cData.map(l=>l.user_id))];
           const cProfiles=await sbFetch('profiles?select=id,username&id=in.('+cuids.join(',')+')')
           const cumap={};if(Array.isArray(cProfiles))cProfiles.forEach(p=>{cumap[p.id]=p.username;});
@@ -187,8 +222,7 @@ async function loadPage(){
             tbody.appendChild(createRow(l));
           });
           fetchRecords(cData.map(l=>l.id));
-          loading=false;
-          return;
+          loading=false;return;
         }
       }
       document.getElementById('lvl-tbody').innerHTML=`<tr><td colspan="7" class="empty-msg">${T.empty||'AUCUN NIVEAU TROUVÉ'}</td></tr>`;
@@ -198,27 +232,17 @@ async function loadPage(){
       document.getElementById('end-msg').innerHTML=`<p class="end-msg">— ${T.endList||'FIN DE LA LISTE'} —</p>`;
       allLoaded=true;
     }
-    loading=false;
-    return;
+    loading=false;return;
   }
 
-  // Fetch ratings for this batch
   const levelIds=data.map(l=>l.id);
   if(levelIds.length){
     const ratingsData=await sbFetch('ratings?select=level_id,score&level_id=in.('+levelIds.join(',')+')&limit=1000');
     const rmap={};
-    if(Array.isArray(ratingsData))ratingsData.forEach(r=>{
-      if(!rmap[r.level_id])rmap[r.level_id]={sum:0,count:0};
-      rmap[r.level_id].sum+=r.score;rmap[r.level_id].count++;
-    });
-    data.forEach(l=>{
-      const r=rmap[l.id];
-      l.avg_rating=r?Math.round((r.sum/r.count)*100)/100:null;
-      l.rating_count=r?r.count:0;
-    });
+    if(Array.isArray(ratingsData))ratingsData.forEach(r=>{if(!rmap[r.level_id])rmap[r.level_id]={sum:0,count:0};rmap[r.level_id].sum+=r.score;rmap[r.level_id].count++;});
+    data.forEach(l=>{const r=rmap[l.id];l.avg_rating=r?Math.round((r.sum/r.count)*100)/100:null;l.rating_count=r?r.count:0;});
   }
 
-  // Fetch usernames for this batch
   const uids=[...new Set(data.map(l=>l.user_id).filter(Boolean))];
   let usernameMap={};
   if(uids.length){
@@ -227,7 +251,6 @@ async function loadPage(){
   }
 
   const tbody=document.getElementById('lvl-tbody');
-  // Also fetch levels by creator username match
   let extraIds=[];
   if(searchQ){
     const profRes=await sbFetch('profiles?select=id&username=ilike.*'+encodeURIComponent(searchQ)+'*&limit=50');
@@ -235,41 +258,28 @@ async function loadPage(){
   }
   data.forEach(l=>{
     l.username=usernameMap[l.user_id]||'anonyme';
-    // Apply star filter
     if(!matchesStarFilter(l.avg_rating))return;
-    const tr=createRow(l);
-    tbody.appendChild(tr);
+    tbody.appendChild(createRow(l));
   });
-  // Fetch levels by creator username that weren't in title search
   if(extraIds.length&&searchQ){
     const creatorIds=extraIds.filter(id=>!data.find(l=>l.user_id===id));
     if(creatorIds.length){
-      const creatorUrl='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=in.(public,code)&user_id=in.('+creatorIds.join(',')+')'
-        +'&order='+sortCol+'.'+sortDir+'&limit='+PAGE_SIZE;
+      const creatorUrl='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=in.(public,code)&user_id=in.('+creatorIds.join(',')+')'+'&order='+sortCol+'.'+sortDir+'&limit='+PAGE_SIZE;
       const creatorData=await sbFetch(creatorUrl);
       if(Array.isArray(creatorData)&&creatorData.length){
-        // Fetch ratings for creator levels
         const cIds=creatorData.map(l=>l.id);
         const cRatings=await sbFetch('ratings?select=level_id,score&level_id=in.('+cIds.join(',')+')&limit=500');
         const crmap={};
-        if(Array.isArray(cRatings))cRatings.forEach(r=>{
-          if(!crmap[r.level_id])crmap[r.level_id]={sum:0,count:0};
-          crmap[r.level_id].sum+=r.score;crmap[r.level_id].count++;
-        });
-        // Get usernames
+        if(Array.isArray(cRatings))cRatings.forEach(r=>{if(!crmap[r.level_id])crmap[r.level_id]={sum:0,count:0};crmap[r.level_id].sum+=r.score;crmap[r.level_id].count++;});
         const cuids=[...new Set(creatorData.map(l=>l.user_id))];
         const cProfiles=await sbFetch('profiles?select=id,username&id=in.('+cuids.join(',')+')')
-        const cumap={};
-        if(Array.isArray(cProfiles))cProfiles.forEach(p=>{cumap[p.id]=p.username;});
+        const cumap={};if(Array.isArray(cProfiles))cProfiles.forEach(p=>{cumap[p.id]=p.username;});
         creatorData.forEach(l=>{
-          if(data.find(d=>d.id===l.id))return; // skip duplicates
+          if(data.find(d=>d.id===l.id))return;
           l.username=cumap[l.user_id]||'anonyme';
-          const r=crmap[l.id];
-          l.avg_rating=r?Math.round((r.sum/r.count)*100)/100:null;
-          l.rating_count=r?r.count:0;
+          const r=crmap[l.id];l.avg_rating=r?Math.round((r.sum/r.count)*100)/100:null;l.rating_count=r?r.count:0;
           if(!matchesStarFilter(l.avg_rating))return;
-          const tr=createRow(l);
-          tbody.appendChild(tr);
+          tbody.appendChild(createRow(l));
         });
       }
     }
@@ -280,8 +290,6 @@ async function loadPage(){
     document.getElementById('end-msg').innerHTML=`<p class="end-msg">— ${T.endList||'FIN DE LA LISTE'} —</p>`;
     allLoaded=true;
   }
-
-  // Fetch records for this batch
   fetchRecords(data.map(l=>l.id));
   const lc=document.getElementById('count-info');if(lc)lc.textContent=offset+' '+(T.loaded||'niveau(x) chargé(s)');
   loading=false;
@@ -292,14 +300,11 @@ async function fetchRecords(ids){
   const idsStr=ids.join(',');
   const records=await sbFetch('leaderboard?select=level_id,time_ms&level_id=in.('+idsStr+')&order=time_ms.asc');
   if(Array.isArray(records))records.forEach(r=>{if(!worldBests[r.level_id])worldBests[r.level_id]=r.time_ms;});
-
   if(currentUser){
     const token=getToken();
     const mine=await sbFetch('leaderboard?select=level_id,time_ms&level_id=in.('+idsStr+')&user_id=eq.'+currentUser.id+'&order=time_ms.asc',token);
     if(Array.isArray(mine))mine.forEach(r=>{if(!myBests[r.level_id])myBests[r.level_id]=r.time_ms;});
   }
-
-  // Update record cells
   ids.forEach(id=>{
     const el=document.querySelector(`.rec-cell[data-id="${id}"]`);
     if(!el)return;
@@ -315,7 +320,6 @@ function createRow(l){
   const isNew=age<48;
   const isOwner=currentUser&&currentUser.id===l.user_id;
   const ratingStars=l.avg_rating?('★ '+Number(l.avg_rating).toFixed(1)+(l.rating_count?' ('+l.rating_count+')':'')):'—';
-
   const tr=document.createElement('tr');
   tr.className='lvl-tr';
   tr.dataset.rating=l.avg_rating||0;
@@ -325,7 +329,7 @@ function createRow(l){
     <td class="td-author"><a href="profile.html?id=${l.user_id}" onclick="event.stopPropagation();" style="color:#a0a0cc;text-decoration:none;">@${esc(l.username)}</a></td>
     <td class="td-plays">${l.plays||0}</td>
     <td class="td-record"><span class="rec-cell" data-id="${l.id}">—</span></td>
-    <td class="td-rating" style="font-family:Orbitron,monospace;font-size:11px;color:#f0e040;">${ratingStars}</td>
+    <td style="font-family:Orbitron,monospace;font-size:11px;color:#f0e040;">${ratingStars}</td>
     <td class="td-edit">${isOwner?`<button class="edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'">✏️</button>`:''}</td>
   `;
   tr.onclick=()=>window.location.href='game.html?level='+l.id;
@@ -336,61 +340,34 @@ function showLoader(){
   const tbody=document.getElementById('lvl-tbody');
   let row=document.getElementById('loader-row');
   if(!row){
-    row=document.createElement('tr');
-    row.id='loader-row';
-    row.className='loader-row';
+    row=document.createElement('tr');row.id='loader-row';row.className='loader-row';
     row.innerHTML=`<td colspan="7"><span class="spinner"></span>${T.loading||'Chargement...'}</td>`;
     tbody.appendChild(row);
   }
 }
-function hideLoader(){
-  const row=document.getElementById('loader-row');
-  if(row)row.remove();
-}
+function hideLoader(){const row=document.getElementById('loader-row');if(row)row.remove();}
 
-let starSelected=new Set(); // empty = all
-
+let starSelected=new Set();
 function toggleStarFilter(val){
-  if(val===0){
-    // TOUS button - clear selection
-    starSelected.clear();
-  } else {
-    if(starSelected.has(val)){
-      starSelected.delete(val);
-    } else {
-      starSelected.add(val);
-    }
-  }
-  // Update button states
+  if(val===0){starSelected.clear();}
+  else{if(starSelected.has(val)){starSelected.delete(val);}else{starSelected.add(val);}}
   document.querySelectorAll('.star-filter-btn').forEach(b=>{
     const v=parseInt(b.dataset.val);
-    if(v===0){
-      b.classList.toggle('active', starSelected.size===0);
-    } else {
-      b.classList.toggle('active', starSelected.has(v));
-    }
+    b.classList.toggle('active',v===0?starSelected.size===0:starSelected.has(v));
   });
-  // Reload
   offset=0;allLoaded=false;loading=false;worldBests={};myBests={};
   document.getElementById('lvl-tbody').innerHTML='';
   loadPage();
 }
-
 function matchesStarFilter(avgRating){
-  if(starSelected.size===0)return true; // TOUS
+  if(starSelected.size===0)return true;
   if(!avgRating)return false;
-  const floor=Math.floor(avgRating); // 3.2 → floor=3
-  return starSelected.has(floor);
+  return starSelected.has(Math.floor(avgRating));
 }
 
 function sortBy(col){
-  if(sortCol===col){
-    sortDir=sortDir==='asc'?'desc':'asc';
-  }else{
-    sortCol=col;
-    sortDir=col==='title'?'asc':'desc';
-  }
-  // Update header classes
+  if(sortCol===col){sortDir=sortDir==='asc'?'desc':'asc';}
+  else{sortCol=col;sortDir=col==='title'?'asc':'desc';}
   document.querySelectorAll('th.sortable').forEach(th=>{
     th.classList.remove('sorted-asc','sorted-desc');
     if(th.dataset.col===col)th.classList.add('sorted-'+sortDir);
@@ -398,70 +375,39 @@ function sortBy(col){
   reset();
 }
 
-function doSearch(){
-  searchQ=document.getElementById('search-input').value.trim();
-  reset();
-}
+function doSearch(){searchQ=document.getElementById('search-input').value.trim();reset();}
 
 function reset(){
-  offset=0;
-  allLoaded=false;
-  loading=false;
-  worldBests={};
-  myBests={};
+  offset=0;allLoaded=false;loading=false;worldBests={};myBests={};
   document.getElementById('lvl-tbody').innerHTML='';
   document.getElementById('end-msg').innerHTML='';
-  const lc2=document.getElementById('loaded-count')||document.getElementById('count-info');if(lc2)lc2.textContent='';
+  const lc=document.getElementById('count-info');if(lc)lc.textContent='';
   loadPage();
 }
 
-// Infinite scroll
 window.addEventListener('scroll',()=>{
-  if((window.innerHeight+window.scrollY)>=document.body.offsetHeight-300){
-    loadPage();
-  }
+  if((window.innerHeight+window.scrollY)>=document.body.offsetHeight-300)loadPage();
 });
 
 // Init sort header
 document.querySelector('th[data-col="created_at"]').classList.add('sorted-desc');
 
-// Load lang file and apply
-let T={};
-async function loadLangFile(){
-  try{
-    const r=await fetch(LANG_BASE+lang+'.json');
-    const data=await r.json();
-    T=data.browse||{};
-    applyLang();
-  }catch(e){console.warn('Lang load failed',e);}
-}
-
-function applyLang(){
-  const t=T;
-  if(!t.title)return;
-  document.getElementById('page-title').textContent=t.title||'🎮 TOUS LES NIVEAUX';
-  document.querySelector('.nav-back').textContent=t.back||'← ACCUEIL';
-  document.getElementById('search-input').placeholder=t.search||'🔍 Rechercher...';
-  document.querySelector('.search-btn').textContent=t.searchBtn||'CHERCHER';
-  // Update table headers
-  const ths=document.querySelectorAll('th.sortable, th');
-  const labels=[t.thName,t.thDate,t.thCreator,t.thPlays,t.thRecord,t.thStatus,''];
-  ths.forEach((th,i)=>{if(labels[i]!==undefined){
-    // Preserve sort indicator
-    const cls=th.className;
-    const indicator=th.classList.contains('sorted-asc')?' ▲':th.classList.contains('sorted-desc')?' ▼':'';
-    th.textContent=(labels[i]||'')+indicator;
-    th.className=cls;
-  }});
-}
-
-// Auth + start
+// ── INIT ──
 (async()=>{
+  // 1. Charge la langue EN PREMIER avant tout affichage
+  setLoadingText('LOADING LANGUAGE...');
   await loadLangFile();
+  applyLang();
+
+  // 2. Auth
+  setLoadingText('LOADING...');
   try{
     const{data}=await supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{realtime:{enabled:false}}).auth.getSession();
     if(data.session)currentUser=data.session.user;
   }catch(e){}
+
+  // 3. Cache le loading → page prête, on charge les niveaux
+  hideLoading();
   loadPage();
 })();
 </script>
