@@ -724,11 +724,21 @@ function gUpdate(now){
   const gd=gPlayer.gravDir;const isHorizGrav=(gd==='l'||gd==='r');
   if(isHorizGrav){
     if(left){gPlayer.vy=(gd==='r')?-zoneSpd:zoneSpd;gPlayer.facing=1;}else if(right){gPlayer.vy=(gd==='r')?zoneSpd:-zoneSpd;gPlayer.facing=-1;}else gPlayer.vy*=0.75;
-    if(jump&&gPlayer.onGround){gPlayer.vx=(gd==='r')?-zoneJspd:zoneJspd;gPlayer.onGround=false;gPlayer.sq=0.6;spawnP(gPlayer.x+(gd==='r'?gPlayer.w:0),gPlayer.y+gPlayer.h/2,'#ffffff20',5);_jumpReady=false;}
+    if(jump&&gPlayer.onGround){gPlayer.vx=(gd==='r')?-zoneJspd:zoneJspd;gPlayer.onGround=false;gPlayer.sq=0.6;gPlayer._jumpHeld=true;spawnP(gPlayer.x+(gd==='r'?gPlayer.w:0),gPlayer.y+gPlayer.h/2,'#ffffff20',5);_jumpReady=false;}
   }else{
     if(left){gPlayer.vx=-zoneSpd;gPlayer.facing=-1;}else if(right){gPlayer.vx=zoneSpd;gPlayer.facing=1;}else gPlayer.vx*=0.75;
-    if(jump&&gPlayer.onGround){gPlayer.vy=(gd==='d')?-zoneJspd:zoneJspd;gPlayer.onGround=false;gPlayer.sq=0.6;spawnP(gPlayer.x+11,gPlayer.y+(gd==='d'?32:0),'#ffffff20',5);_jumpReady=false;}
+    if(jump&&gPlayer.onGround){gPlayer.vy=(gd==='d')?-zoneJspd:zoneJspd;gPlayer.onGround=false;gPlayer.sq=0.6;gPlayer._jumpHeld=true;spawnP(gPlayer.x+11,gPlayer.y+(gd==='d'?32:0),'#ffffff20',5);_jumpReady=false;}
   }
+
+  // Saut variable : relâcher tôt = saut plus court
+  if(gPlayer._jumpHeld&&!jumpHeld){
+    gPlayer._jumpHeld=false;
+    if(gd==='d'&&gPlayer.vy<0)gPlayer.vy*=0.45;
+    else if(gd==='u'&&gPlayer.vy>0)gPlayer.vy*=0.45;
+    else if(gd==='r'&&gPlayer.vx<0)gPlayer.vx*=0.45;
+    else if(gd==='l'&&gPlayer.vx>0)gPlayer.vx*=0.45;
+  }
+  if(gPlayer.onGround)gPlayer._jumpHeld=false;
 
   const moveSpd=isHorizGrav?Math.abs(gPlayer.vy):Math.abs(gPlayer.vx);
   if(_currentSpeedMult>1&&moveSpd>1){const excess=_currentSpeedMult-1;const count=Math.ceil(excess*3);for(let i=0;i<count;i++){const alpha=0.12+excess*0.12;const size=3+excess*3;gTrail.push({x:gPlayer.x+gPlayer.w/2+(Math.random()-0.5)*gPlayer.w*0.4,y:gPlayer.y+gPlayer.h/2+(Math.random()-0.5)*gPlayer.h*0.4,vx:(-gPlayer.vx*0.3)+(Math.random()-0.5)*1.5,vy:(-gPlayer.vy*0.3)+(Math.random()-0.5)*1.5,size,alpha,life:1,decay:0.06+Math.random()*0.04,mult:excess});}}
