@@ -12,6 +12,20 @@ body.light{--bg:#f0f0fa;--bg2:#e4e4f4;--bg3:#d8d8ee;--border:#c0c0dc;--border2:#
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);font-family:Rajdhani,sans-serif;min-height:100vh;color:var(--text);transition:background .3s,color .3s;}
 
+/* ── LOADING SCREEN ── */
+#loading-screen{
+  position:fixed;inset:0;z-index:9999;
+  background:#070710;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+  transition:opacity .3s;
+}
+#loading-screen.hidden{opacity:0;pointer-events:none;}
+.loading-logo{font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:#f0e040;letter-spacing:3px;text-shadow:0 0 20px #f0e04066;}
+.loading-bar-wrap{width:200px;height:4px;background:#1e1e40;border-radius:2px;overflow:hidden;}
+.loading-bar{height:100%;width:0%;background:#f0e040;border-radius:2px;animation:loadbar 1.2s ease-in-out infinite;}
+@keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+.loading-txt{font-family:Orbitron,monospace;font-size:9px;color:#4040aa;letter-spacing:2px;}
+
 /* NAV */
 nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur(10px);border-bottom:2px solid var(--border2);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 2px 20px #00000044;}
 .nav-logo{font-family:Orbitron,monospace;font-size:14px;font-weight:900;color:var(--accent);text-shadow:0 0 12px var(--accent)44;text-decoration:none;}
@@ -42,7 +56,6 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .char-item:hover{border-color:var(--accent2);}
 .char-item.selected{border-color:var(--accent);background:#f0e04012;}
 .char-icon{width:36px;height:47px;image-rendering:pixelated;}
-.char-icon-fallback{font-size:28px;display:none;}
 .char-name{font-family:Rajdhani,sans-serif;font-weight:700;font-size:9px;color:var(--muted);text-align:center;letter-spacing:1px;}
 .char-item.selected .char-name{color:var(--accent);}
 
@@ -72,7 +85,6 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .lvl-row{cursor:pointer;border-bottom:1px solid #1a1a35;transition:background .1s;}
 .lvl-row:last-child{border-bottom:none;}
 .lvl-row:hover{background:#16163a;}
-/* Real table cells */
 .lvl-row td{padding:12px 16px;vertical-align:middle;}
 .lvl-td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:130px;min-width:130px;max-width:130px;position:relative;}
 .lvl-td-date{font-family:Rajdhani,sans-serif;font-size:11px;color:#a0a0cc;white-space:nowrap;width:70px;}
@@ -83,16 +95,12 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .lvl-vis-badge.private{background:#1a2a4a;color:#90c0f0;border:1px solid #4060c0;}
 .lvl-vis-badge.public{background:#1a3a2a;color:#60e090;border:1px solid #40a060;}
 .lvl-vis-badge.code{background:#2a1a4a;color:#c090f0;border:1px solid #8040c0;}
-
-/* Visibility 3-button group */
 .vis-btn-group{display:flex;gap:4px;}
 .vis-btn{font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;border:1.5px solid #2a2a55;border-radius:5px;background:#12122a;color:#4040aa;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
 .vis-btn:hover{border-color:#6060aa;color:#a0a0cc;background:#1a1a3a;}
 .vis-btn.active-private{background:#1a2a4a;color:#90c0f0;border-color:#4060c0;}
 .vis-btn.active-public{background:#1a3a2a;color:#60e090;border-color:#40a060;}
 .vis-btn.active-code{background:#2a1a4a;color:#c090f0;border-color:#8040c0;}
-.vis-btn:not([class*="active"]):hover{opacity:0.8;}
-/* Actions: always in DOM, invisible by default */
 .lvl-actions{display:flex;gap:6px;opacity:0;pointer-events:none;transition:opacity .15s;}
 .lvl-row:hover .lvl-actions{opacity:1;pointer-events:auto;}
 .lvl-act-btn{font-family:sans-serif;font-size:14px;padding:5px 10px;border-radius:4px;cursor:pointer;border:1.5px solid;transition:filter .1s;line-height:1;}
@@ -135,6 +143,14 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 </style>
 </head>
 <body>
+
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <div class="loading-logo">⚡ FUNKYLEVELS</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-txt" id="loading-txt">LOADING...</div>
+</div>
+
 <div class="bg-grid" style="position:fixed;inset:0;background-image:linear-gradient(#1e1e4022 1px,transparent 1px),linear-gradient(90deg,#1e1e4022 1px,transparent 1px);background-size:32px 32px;pointer-events:none;"></div>
 
 <nav>
@@ -145,24 +161,19 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 <div class="page">
   <div class="page-title" id="page-title">⚙️ PARAMÈTRES</div>
 
-  <!-- TABS -->
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('general')" id="tab-general">⚙️ GÉNÉRAL</button>
     <button class="tab-btn" onclick="switchTab('levels')" id="tab-levels">🎮 NIVEAUX</button>
     <button class="tab-btn" onclick="switchTab('account')" id="tab-account">👤 COMPTE</button>
   </div>
 
-  <!-- ══ TAB: GÉNÉRAL ══ -->
+  <!-- TAB: GÉNÉRAL -->
   <div class="tab-pane active" id="pane-general">
-
-    <!-- Personnage -->
     <div class="card">
       <div class="card-title" id="char-title">🎮 MON PERSONNAGE</div>
       <div class="char-grid" id="char-grid"></div>
       <div id="char-msg" class="msg" style="margin-top:12px;"></div>
     </div>
-
-    <!-- Langue -->
     <div class="card">
       <div class="card-title" id="lang-title">🌍 LANGUE PAR DÉFAUT</div>
       <div class="lang-options" id="lang-options"></div>
@@ -171,10 +182,9 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
         <div id="lang-msg" class="msg"></div>
       </div>
     </div>
-
   </div>
 
-  <!-- ══ TAB: NIVEAUX ══ -->
+  <!-- TAB: NIVEAUX -->
   <div class="tab-pane" id="pane-levels">
     <div class="card">
       <div class="card-title" id="stats-title">🎮 MES NIVEAUX</div>
@@ -182,10 +192,8 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
     </div>
   </div>
 
-  <!-- ══ TAB: COMPTE ══ -->
+  <!-- TAB: COMPTE -->
   <div class="tab-pane" id="pane-account">
-
-    <!-- Infos compte -->
     <div class="card">
       <div class="card-title" id="account-info-title">👤 MON COMPTE</div>
       <div class="account-info">
@@ -194,8 +202,6 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
         <span id="account-since"></span>
       </div>
     </div>
-
-    <!-- Changer pseudo -->
     <div class="card">
       <div class="card-title" id="pseudo-title">✏️ CHANGER MON PSEUDO</div>
       <div class="field">
@@ -211,31 +217,26 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
       </div>
       <div id="pseudo-msg" class="msg" style="margin-top:10px;"></div>
     </div>
-
-    <!-- Changer mot de passe -->
     <div class="card">
       <div class="card-title" id="pwd-title">🔑 CHANGER MON MOT DE PASSE</div>
       <div class="field">
-        <label style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;" id="pwd-new-lbl">NOUVEAU MOT DE PASSE</label>
-        <input type="password" id="new-pass-input" placeholder="8 caractères minimum" maxlength="60" style="width:100%;background:#0a0a18;border:1.5px solid #2a2a55;border-radius:3px;color:#e8e8ff;font-family:Rajdhani,sans-serif;font-size:14px;padding:10px 12px;outline:none;box-sizing:border-box;">
+        <label style="font-family:Rajdhani,sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;" id="pwd-new-lbl">NOUVEAU MOT DE PASSE</label>
+        <input type="password" id="new-pass-input" placeholder="8 caractères minimum" maxlength="60" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:Rajdhani,sans-serif;font-size:14px;padding:10px 14px;outline:none;box-sizing:border-box;">
       </div>
-      <div class="field">
-        <label style="font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;" id="pwd-confirm-lbl">CONFIRMER LE MOT DE PASSE</label>
-        <input type="password" id="confirm-pass-input" placeholder="Répète ton mot de passe" maxlength="60" style="width:100%;background:#0a0a18;border:1.5px solid #2a2a55;border-radius:3px;color:#e8e8ff;font-family:Rajdhani,sans-serif;font-size:14px;padding:10px 12px;outline:none;box-sizing:border-box;">
+      <div class="field" style="margin-top:12px;">
+        <label style="font-family:Rajdhani,sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;" id="pwd-confirm-lbl">CONFIRMER LE MOT DE PASSE</label>
+        <input type="password" id="confirm-pass-input" placeholder="Répète ton mot de passe" maxlength="60" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:Rajdhani,sans-serif;font-size:14px;padding:10px 14px;outline:none;box-sizing:border-box;">
       </div>
       <div id="pass-msg" class="msg" style="margin-top:8px;"></div>
       <div style="margin-top:12px;">
         <button class="btn-primary" onclick="changePassword()" id="btn-change-pwd">🔑 CHANGER LE MOT DE PASSE</button>
       </div>
     </div>
-
-    <!-- Danger zone -->
     <div class="card danger-zone">
       <div class="card-title" id="danger-title">⚠️ ZONE DANGEREUSE</div>
       <p class="danger-desc" id="danger-desc">Supprimer ton compte effacera définitivement ton profil et tous tes niveaux. Cette action est irréversible.</p>
       <button class="btn-danger" onclick="showAccountDeleteConfirm()" id="btn-delete">🗑 SUPPRIMER MON COMPTE</button>
     </div>
-
   </div>
 </div>
 
@@ -243,7 +244,7 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 <div id="confirm-modal">
   <div class="confirm-box">
     <h3 id="confirm-title">⚠️ CONFIRMATION</h3>
-    <p id="confirm-desc">Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ?</p>
+    <p id="confirm-desc"></p>
     <div class="confirm-row">
       <button class="confirm-btn no" onclick="confirmCancel()" id="confirm-no">ANNULER</button>
       <button class="confirm-btn yes" onclick="confirmOk()" id="confirm-yes">SUPPRIMER</button>
@@ -254,19 +255,33 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 <div id="settings-toast"></div>
 
 <script>
-
 const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
 const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let CHARACTERS=[];
+let _langData={};
+// Détermine la langue sans flash : localStorage d'abord, sinon navigateur
+let lang=localStorage.getItem('fl_lang')||(navigator.language?.startsWith('fr')?'fr':'en');
+let currentUser=null;
+let selectedChar=localStorage.getItem('fl_char')||'default';
+let selectedLang=lang;
+
+// ── LOADING SCREEN ──
+function hideLoading(){
+  const el=document.getElementById('loading-screen');
+  if(el){el.classList.add('hidden');setTimeout(()=>el.remove(),350);}
+}
+function setLoadingText(txt){
+  const el=document.getElementById('loading-txt');
+  if(el)el.textContent=txt;
+}
 
 async function loadManifest(){
   try{
     const r=await fetch('characters/manifest.json');
     CHARACTERS=await r.json();
   }catch(e){
-    // Fallback si manifest non trouvé
     CHARACTERS=[
       {id:'default',icon:'🧑',name:'DEFAULT',file:'characters/default.svg'},
       {id:'ninja',icon:'🥷',name:'NINJA',file:'characters/ninja.svg'},
@@ -274,9 +289,6 @@ async function loadManifest(){
     ];
   }
 }
-
-let _langData={};
-let lang=localStorage.getItem('fl_lang')||'fr';
 
 async function loadLangData(l){
   if(_langData[l])return _langData[l];
@@ -294,7 +306,6 @@ function T(section){
   return (_langData[lang]||{})[section]||{};
 }
 
-// Load available languages for the selector
 async function loadLangOptions(){
   try{
     const manifest=await fetch('lang/manifest.json').then(r=>r.json());
@@ -309,22 +320,15 @@ async function loadLangOptions(){
   }catch(e){}
 }
 
-localStorage.getItem('fl_lang')||'fr';
-let currentUser=null;
-let selectedChar=localStorage.getItem('fl_char')||'default';
-let selectedLang=lang;
-
 async function applyLang(l){
   await loadLangData(l);
   const t=T('settings');
   if(!t||!t.pageTitle)return;
   const s=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.textContent=val;};
   s('page-title',t.pageTitle);
-  // Tabs
   s('tab-general',t.tabGeneral||'⚙️ GÉNÉRAL');
   s('tab-levels',t.tabLevels||'🎮 NIVEAUX');
   s('tab-account',t.tabAccount||'👤 COMPTE');
-  // Account tab
   s('pseudo-title',t.pseudoTitle);
   s('pseudo-lbl',t.pseudoLbl);
   s('btn-save-pseudo',t.pseudoSave);
@@ -341,21 +345,12 @@ async function applyLang(l){
   s('lang-title',t.langTitle);
   s('btn-save-lang',t.saveLang);
   s('stats-title',t.statsTitle);
-  s('danger-title',t.dangerTitle);
-  s('danger-desc',t.dangerDesc);
-  s('btn-delete',t.btnDelete);
-  s('confirm-title',t.confirmTitle);
-  s('confirm-desc',t.confirmDesc);
-  s('confirm-no',t.confirmNo);
-  s('confirm-yes',t.confirmYes);
   s('stats-loading',t.statsLoading);
-  // Password section
   s('pwd-title',t.pwdTitle);
   s('pwd-new-lbl',t.pwdNewLbl);
   s('pwd-confirm-lbl',t.pwdConfirmLbl);
   const bcp=document.getElementById('btn-change-pwd');
   if(bcp&&t.pwdBtn)bcp.textContent=t.pwdBtn;
-  // Placeholder translations
   const np=document.getElementById('new-pass-input');
   if(np&&t.phPassNew)np.placeholder=t.phPassNew;
   const cp=document.getElementById('confirm-pass-input');
@@ -377,27 +372,17 @@ function buildCharGrid(){
   `).join('');
 }
 
-function selectChar(id){
-  selectedChar=id;
-  document.querySelectorAll('.char-item').forEach(el=>el.classList.remove('selected'));
-  document.getElementById('char-'+id).classList.add('selected');
-  localStorage.setItem('fl_char',id);
-  const t=T('settings');
-  const msg=document.getElementById('char-msg');
-  msg.className='msg ok';msg.textContent=t.charSaved;
-  setTimeout(()=>msg.className='msg',2000);
-}
-
 function selectLang(l){
   selectedLang=l;
-  document.getElementById('lang-fr').classList.toggle('selected',l==='fr');
-  document.getElementById('lang-en').classList.toggle('selected',l==='en');
+  document.querySelectorAll('.lang-option').forEach(el=>el.classList.remove('selected'));
+  const el=document.getElementById('lang-'+l);
+  if(el)el.classList.add('selected');
 }
 
 async function saveLang(){
   lang=selectedLang;
   localStorage.setItem('fl_lang',lang);
-  await saveProfile({lang:lang});
+  await saveProfile({lang});
   await loadLangData(lang);
   await applyLang(lang);
   const msg=document.getElementById('lang-msg');
@@ -415,16 +400,11 @@ function copyCode(code){
 }
 
 function showToast(msg){
-  let t=document.getElementById('settings-toast');
-  if(!t){
-    t=document.createElement('div');
-    t.id='settings-toast';
-    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--panel);border:1.5px solid var(--green);color:var(--green);font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:12px 20px;border-radius:4px;z-index:999;transition:transform .3s;';
-    document.body.appendChild(t);
-  }
+  const t=document.getElementById('settings-toast');
+  if(!t)return;
   t.textContent=msg;
-  t.style.transform='translateX(-50%) translateY(0)';
-  setTimeout(()=>t.style.transform='translateX(-50%) translateY(80px)',2500);
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
 async function loadStats(){
@@ -435,26 +415,16 @@ async function loadStats(){
     el.innerHTML='<div class="no-levels">'+(t.notLogged||'...')+'</div>';
     return;
   }
-
-  // Fetch levels
-  const{data:levels,error}=await sb
-    .from('levels')
-    .select('*')
-    .eq('user_id',currentUser.id)
-    .order('created_at',{ascending:false});
-
+  const{data:levels,error}=await sb.from('levels').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   if(error||!levels||!levels.length){
     el.innerHTML='<div class="no-levels">'+(t.statsEmpty||'Aucun niveau.')+'</div>';
     return;
   }
-
-  // Fetch ratings for all levels
   const ids=levels.map(l=>l.id);
   const{data:ratings}=await sb.from('ratings').select('*').in('level_id',ids);
   const ratingMap={};
   if(ratings){ratings.forEach(r=>{if(!ratingMap[r.level_id])ratingMap[r.level_id]=[];ratingMap[r.level_id].push(r.score);});}
 
-  // Build table
   const table=document.createElement('table');
   table.className='levels-table';
   const thead=document.createElement('thead');
@@ -472,19 +442,13 @@ async function loadStats(){
 
   levels.forEach(l=>{
     const vis=l.visibility||'private';
-    const visLabels={
-      fr:{private:'🔒 Privé',public:'🌍 Public',code:'🔑 Code'},
-      en:{private:'🔒 Private',public:'🌍 Public',code:'🔑 Code'}
-    };
-    const visLabel=(visLabels[lang]||visLabels.fr)[vis];
     const ts=l.updated_at||l.created_at;
     const d=new Date(ts);
     const dateStr=d.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
-    const timeStr=d.toLocaleTimeString(lang==='fr'?'fr-FR':'en-GB',{hour:'2-digit',minute:'2-digit'});
 
     const tr=document.createElement('tr');
     tr.className='lvl-row';
-    tr.setAttribute('data-level-id', l.id);
+    tr.setAttribute('data-level-id',l.id);
     tr.innerHTML=
       '<td class="lvl-td-name" title="'+(lang==='fr'?'Double-clic pour renommer':'Double-click to rename')+'">'+
         '<span class="lvl-name-text">'+esc(l.title||'Sans titre')+'</span>'+
@@ -496,61 +460,44 @@ async function loadStats(){
       '<td class="lvl-td-myrecord" style="font-family:Orbitron,monospace;font-size:9px;color:#f0e040;padding:14px 6px;white-space:nowrap;width:70px;">—</td>'+
       '<td class="lvl-td-vis" data-level-id-vis="'+l.id+'">'+
         '<div class="vis-btn-group" data-level-id="'+l.id+'">'+
-          '<button class="vis-btn '+(vis==='private'?'active-private':'')+'" data-vis="private" onclick="event.stopPropagation();" title="Privé">🔒 '+(lang==='fr'?'Privé':'Private')+'</button>'+
-          '<button class="vis-btn '+(vis==='public'?'active-public':'')+'" data-vis="public" onclick="event.stopPropagation();" title="Public">🌍 Public</button>'+
-          '<button class="vis-btn '+(vis==='code'?'active-code':'')+'" data-vis="code" onclick="event.stopPropagation();" title="Par code">'+(lang==='fr'?'🔑 Code':'🔑 Code')+'</button>'+
+          '<button class="vis-btn '+(vis==='private'?'active-private':'')+'" data-vis="private" title="'+(lang==='fr'?'Privé':'Private')+'">🔒 '+(lang==='fr'?'Privé':'Private')+'</button>'+
+          '<button class="vis-btn '+(vis==='public'?'active-public':'')+'" data-vis="public" title="Public">🌍 Public</button>'+
+          '<button class="vis-btn '+(vis==='code'?'active-code':'')+'" data-vis="code" title="'+(lang==='fr'?'Par code':'By code')+'">🔑 Code</button>'+
         '</div>'+
       '</td>'+
       '<td class="lvl-td-actions"><div class="lvl-actions">'+
-        '<button class="lvl-act-btn lvl-act-play" title="'+(l.is_published?(lang==='fr'?'Jouer':'Play'):(lang==='fr'?'Tester le niveau':'Test level'))+'">'+(l.is_published?'▶':'🧪')+'</button>'+
-        '<button class="lvl-act-btn lvl-act-edit" title="'+(lang==='fr'?'Éditer dans le studio':'Edit in studio')+'">✏️</button>'+
+        '<button class="lvl-act-btn lvl-act-play'+(l.is_published?'':' test-mode')+'" title="'+(l.is_published?(lang==='fr'?'Jouer':'Play'):(lang==='fr'?'Tester':'Test'))+'">'+(l.is_published?'▶':'🧪')+'</button>'+
+        '<button class="lvl-act-btn lvl-act-edit" title="'+(lang==='fr'?'Éditer':'Edit')+'">✏️</button>'+
         '<button class="lvl-act-btn lvl-act-dup" title="'+(lang==='fr'?'Dupliquer':'Duplicate')+'">⧉</button>'+
         '<button class="lvl-act-btn lvl-act-del" title="'+(lang==='fr'?'Supprimer':'Delete')+'">🗑</button>'+
       '</div></td>';
 
     // Visibility buttons
-    const visBtns=tr.querySelectorAll('.vis-btn');
-    visBtns.forEach(btn=>{
-      btn.onclick=(e)=>{
-        e.stopPropagation();
-        setVisibility(l.id,btn.dataset.vis,btn,l);
-      };
+    tr.querySelectorAll('.vis-btn').forEach(btn=>{
+      btn.onclick=(e)=>{e.stopPropagation();setVisibility(l.id,btn.dataset.vis,btn,l);};
     });
-    const playBtn=tr.querySelector('.lvl-act-play');
-    if(playBtn){
-      if(!l.is_published)playBtn.classList.add('test-mode');
-      playBtn.onclick=(e)=>{e.stopPropagation();window.location.href='game.html?level='+l.id+(l.is_published?'':'&from=studio');};
-    }
 
-    // Inline rename on double-click
-    const nameCell=tr.querySelector('.lvl-td-name');
+    const playBtn=tr.querySelector('.lvl-act-play');
+    if(playBtn)playBtn.onclick=(e)=>{e.stopPropagation();window.location.href='game.html?level='+l.id+(l.is_published?'':'&from=studio');};
+
+    // Inline rename
     const nameText=tr.querySelector('.lvl-name-text');
     const nameInput=tr.querySelector('.lvl-name-input');
-    if(nameCell&&nameText&&nameInput){
-      nameCell.ondblclick=(e)=>{
-        e.stopPropagation();
-        nameText.style.display='none';
-        nameInput.style.display='inline-block';
-        nameInput.focus();
-        nameInput.select();
-      };
+    const nameCell=tr.querySelector('.lvl-td-name');
+    if(nameCell){
+      nameCell.ondblclick=(e)=>{e.stopPropagation();nameText.style.display='none';nameInput.style.display='inline-block';nameInput.focus();nameInput.select();};
       const saveRename=async()=>{
         const newTitle=nameInput.value.trim()||'Sans titre';
-        nameInput.style.display='none';
-        nameText.style.display='';
+        nameInput.style.display='none';nameText.style.display='';
         if(newTitle===l.title)return;
         const{error}=await sb.from('levels').update({title:newTitle}).eq('id',l.id).eq('user_id',currentUser.id);
         if(error){alert('Erreur: '+error.message);nameInput.value=l.title;return;}
-        l.title=newTitle;
-        nameText.textContent=newTitle;
+        l.title=newTitle;nameText.textContent=newTitle;
       };
       nameInput.onblur=saveRename;
-      nameInput.onkeydown=(e)=>{
-        if(e.key==='Enter'){e.preventDefault();nameInput.blur();}
-        if(e.key==='Escape'){nameInput.value=l.title;nameInput.blur();}
-        e.stopPropagation();
-      };
+      nameInput.onkeydown=(e)=>{if(e.key==='Enter'){e.preventDefault();nameInput.blur();}if(e.key==='Escape'){nameInput.value=l.title;nameInput.blur();}e.stopPropagation();};
     }
+
     tr.querySelector('.lvl-act-edit').onclick=(e)=>{e.stopPropagation();window.location.href='studio.html?level='+l.id+'&mode=edit';};
     tr.querySelector('.lvl-act-dup').onclick=(e)=>{e.stopPropagation();duplicateLevelSettings(l);};
     tr.querySelector('.lvl-act-del').onclick=(e)=>{e.stopPropagation();deleteLevelSettings(l.id,l.title,tr);};
@@ -565,142 +512,48 @@ async function loadStats(){
   el.innerHTML='';
   el.appendChild(wrap);
 
-  // Fetch leaderboard for all levels
-  if(levels.length){
-    const ids=levels.map(l=>l.id);
-    // World records
-    const{data:records}=await sb.from('leaderboard')
-      .select('level_id,time_ms')
-      .in('level_id',ids)
-      .order('time_ms',{ascending:true});
-    const worldBests={};
-    if(records)records.forEach(r=>{if(!worldBests[r.level_id])worldBests[r.level_id]=r.time_ms;});
-
-    // My bests
-    const{data:mine}=await sb.from('leaderboard')
-      .select('level_id,time_ms')
-      .in('level_id',ids)
-      .eq('user_id',currentUser.id)
-      .order('time_ms',{ascending:true});
-    const myBests={};
-    if(mine)mine.forEach(r=>{if(!myBests[r.level_id])myBests[r.level_id]=r.time_ms;});
-
-    // Update cells
-    levels.forEach(l=>{
-      const tr=document.querySelector(`tr[data-level-id="${l.id}"]`);
-      if(!tr)return;
-      const wr=tr.querySelector('.lvl-td-record');
-      const my=tr.querySelector('.lvl-td-myrecord');
-      if(wr)wr.textContent=worldBests[l.id]?fmtMs(worldBests[l.id]):'—';
-      if(my)my.textContent=myBests[l.id]?fmtMs(myBests[l.id]):'—';
-    });
-  }
+  // Fetch leaderboard
+  const{data:records}=await sb.from('leaderboard').select('level_id,time_ms').in('level_id',ids).order('time_ms',{ascending:true});
+  const worldBests={};
+  if(records)records.forEach(r=>{if(!worldBests[r.level_id])worldBests[r.level_id]=r.time_ms;});
+  const{data:mine}=await sb.from('leaderboard').select('level_id,time_ms').in('level_id',ids).eq('user_id',currentUser.id).order('time_ms',{ascending:true});
+  const myBests={};
+  if(mine)mine.forEach(r=>{if(!myBests[r.level_id])myBests[r.level_id]=r.time_ms;});
+  levels.forEach(l=>{
+    const tr=document.querySelector(`tr[data-level-id="${l.id}"]`);
+    if(!tr)return;
+    const wr=tr.querySelector('.lvl-td-record');
+    const my=tr.querySelector('.lvl-td-myrecord');
+    if(wr)wr.textContent=worldBests[l.id]?fmtMs(worldBests[l.id]):'—';
+    if(my)my.textContent=myBests[l.id]?fmtMs(myBests[l.id]):'—';
+  });
 }
 
 async function duplicateLevelSettings(l){
   function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
-  const{error}=await sb.from('levels').insert({
-    user_id:currentUser.id,
-    title:(l.title||'Sans titre')+' (copie)',
-    data:l.data,
-    plays:0,
-    completions:0,
-    visibility:'private',
-    share_code:genCode(),
-    author_completed:false,
-    is_published:false
-  });
+  const{error}=await sb.from('levels').insert({user_id:currentUser.id,title:(l.title||'Sans titre')+' (copie)',data:l.data,plays:0,completions:0,visibility:'private',share_code:genCode(),author_completed:false,is_published:false});
   if(error){alert('Erreur: '+error.message);return;}
   showToast(lang==='fr'?'Niveau dupliqué !':'Level duplicated!');
   loadStats();
 }
 
-async function setVisibility(levelId, targetVis, btn, lvlData){
+async function setVisibility(levelId,targetVis,btn,lvlData){
   const cur=lvlData.visibility||'private';
   if(cur===targetVis)return;
   const l=lang||'fr';
-  const plays=lvlData.plays||0;
-  const isPublished=lvlData.is_published||false;
-  let errorMsg=null;
-
-  if(targetVis==='private'){
-    // Always allowed to go private (even with plays)
-  }else{
-    // public or code
-    if(cur==='private'){
-      if(!isPublished){
-        // Never been public/code → must publish through the game first
-        errorMsg=l==='fr'
-          ?'Pour publier, termine le niveau dans le jeu et clique sur "RENDRE PUBLIC" ou "PAR CODE".'
-          :'To publish, finish the level in-game and click "MAKE PUBLIC" or "BY CODE".';
-      }
-      // Was published before (is_published=true) → allow re-publishing directly
-    }
-    // public ↔ code always allowed
-  }
-
-  if(errorMsg){
-    showConfirm(errorMsg,null,{title:'⚠️ '+(l==='fr'?'IMPOSSIBLE':'NOT ALLOWED'),okOnly:true});
+  if(targetVis!=='private'&&cur==='private'&&!lvlData.is_published){
+    showConfirm(
+      l==='fr'?'Pour publier, termine le niveau dans le jeu et clique sur "RENDRE PUBLIC" ou "PAR CODE".':'To publish, finish the level in-game and click "MAKE PUBLIC" or "BY CODE".',
+      null,{title:'⚠️ '+(l==='fr'?'IMPOSSIBLE':'NOT ALLOWED'),okOnly:true}
+    );
     return;
   }
-
   const{error}=await sb.from('levels').update({visibility:targetVis}).eq('id',levelId).eq('user_id',currentUser.id);
   if(error){alert((l==='fr'?'Erreur: ':'Error: ')+error.message);return;}
   lvlData.visibility=targetVis;
-
-  // Update buttons
   const group=btn.closest('.vis-btn-group');
-  if(group){
-    group.querySelectorAll('.vis-btn').forEach(b=>b.className='vis-btn');
-    btn.classList.add('active-'+targetVis);
-  }
+  if(group){group.querySelectorAll('.vis-btn').forEach(b=>b.className='vis-btn');btn.classList.add('active-'+targetVis);}
 }
-
-async function cycleVisibility(levelId, badge, lvlData){
-  const cur=lvlData.visibility||'private';
-  const plays=lvlData.plays||0;
-  const completed=lvlData.author_completed||false;
-  const l=lang||'fr';
-
-  // Determine allowed transitions
-  let next=null;
-  let errorMsg=null;
-
-  if(cur==='private'){
-    // Publish only from game.html win screen
-    showConfirm(
-      l==='fr'?'Pour publier, termine le niveau dans le jeu et clique sur "RENDRE PUBLIC" ou "PAR CODE".':'To publish, finish the level in-game and click "MAKE PUBLIC" or "BY CODE".',
-      null,{title:'ℹ️ '+(l==='fr'?'INFORMATION':'INFORMATION'),okOnly:true}
-    );
-    return;
-  }else if(cur==='public'){
-    // PUBLIC → CODE always allowed
-    next='code';
-  }else if(cur==='code'){
-    // CODE → PUBLIC always allowed
-    next='public';
-  }
-
-  if(errorMsg){
-    showConfirm(errorMsg, null, {title:'⚠️ '+(l==='fr'?'IMPOSSIBLE':'NOT ALLOWED'), okOnly:true});
-    return;
-  }
-
-  if(!next)return;
-
-  // If going from public/code → private but plays>0 (blocked above for code)
-  // If going private→public, reset author_completed to false to require re-completion after edits
-  const updates={visibility:next};
-
-  const{error}=await sb.from('levels').update(updates).eq('id',levelId).eq('user_id',currentUser.id);
-  if(error){alert((l==='fr'?'Erreur: ':'Error: ')+error.message);return;}
-
-  // Update local data
-  lvlData.visibility=next;
-
-  // No badge to update (handled by 3-button group)
-}
-
 
 async function loadProfile(){
   const{data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
@@ -711,38 +564,37 @@ async function loadProfile(){
 }
 
 async function saveProfile(updates){
-  // Upsert profile
   const{error}=await sb.from('profiles').upsert({id:currentUser.id,...updates},{onConflict:'id'});
   return error;
 }
 
-// Override selectChar to also save to DB
-const _origSelectChar=selectChar;
 selectChar=async function(id){
   selectedChar=id;
   document.querySelectorAll('.char-item').forEach(el=>el.classList.remove('selected'));
-  document.getElementById('char-'+id).classList.add('selected');
+  const el=document.getElementById('char-'+id);
+  if(el)el.classList.add('selected');
   localStorage.setItem('fl_char',id);
   await saveProfile({character:id});
   const t=T('settings');
   const msg=document.getElementById('char-msg');
-  msg.className='msg ok';msg.textContent=t.charSaved;
-  setTimeout(()=>msg.className='msg',2000);
+  if(msg){msg.className='msg ok';msg.textContent=t.charSaved||'Saved!';setTimeout(()=>msg.className='msg',2000);}
 };
 
-// Override saveLang to also save to DB
-const _origSaveLang=saveLang;
 saveLang=async function(){
   lang=selectedLang;
   localStorage.setItem('fl_lang',lang);
-  await saveProfile({lang:lang});
-  applyLang(lang);
+  await saveProfile({lang});
+  await loadLangData(lang);
+  await applyLang(lang);
+  // Refresh lang option selection
+  document.querySelectorAll('.lang-option').forEach(el=>el.classList.remove('selected'));
+  const el=document.getElementById('lang-'+lang);
+  if(el)el.classList.add('selected');
   const msg=document.getElementById('lang-msg');
-  msg.className='msg ok';msg.textContent=T('settings').langSaved;
-  setTimeout(()=>msg.className='msg',2000);
+  const t=T('settings');
+  if(msg){msg.className='msg ok';msg.textContent=(t&&t.langSaved)||'Saved!';setTimeout(()=>msg.className='msg',2000);}
 };
 
-// Init
 function switchTab(tab){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
@@ -753,23 +605,17 @@ function switchTab(tab){
 }
 
 let _pseudoTimer=null;
-let _pseudoInfo=null; // {changes, reset_date}
+let _pseudoInfo=null;
 const MAX_CHANGES=2;
 const RESET_MONTHS=12;
 
 async function loadPseudoInfo(){
-  const{data}=await sb.from('profiles')
-    .select('pseudo_changes,pseudo_reset_date')
-    .eq('id',currentUser.id).single();
+  const{data}=await sb.from('profiles').select('pseudo_changes,pseudo_reset_date').eq('id',currentUser.id).single();
   if(!data)return;
-
-  // Check if we need to reset (12 months passed)
   const resetDate=new Date(data.pseudo_reset_date);
   const now=new Date();
   const monthsDiff=(now.getFullYear()-resetDate.getFullYear())*12+(now.getMonth()-resetDate.getMonth());
-  
   if(monthsDiff>=RESET_MONTHS){
-    // Reset counter
     await sb.from('profiles').update({pseudo_changes:0,pseudo_reset_date:now.toISOString()}).eq('id',currentUser.id);
     _pseudoInfo={changes:0,reset_date:now};
   }else{
@@ -782,29 +628,21 @@ function updatePseudoCounter(){
   const el=document.getElementById('pseudo-counter');
   if(!el||!_pseudoInfo)return;
   const remaining=MAX_CHANGES-_pseudoInfo.changes;
-  const resetDate=_pseudoInfo.reset_date;
-  const nextReset=new Date(resetDate);
+  const nextReset=new Date(_pseudoInfo.reset_date);
   nextReset.setMonth(nextReset.getMonth()+RESET_MONTHS);
   const nextResetStr=nextReset.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
-
   if(remaining<=0){
     el.style.color='var(--red)';
-    el.textContent=lang==='fr'
-      ?'🚫 Plus de changements disponibles. Réinitialisation le '+nextResetStr
-      :'🚫 No changes left. Resets on '+nextResetStr;
+    el.textContent=lang==='fr'?'🚫 Plus de changements disponibles. Réinitialisation le '+nextResetStr:'🚫 No changes left. Resets on '+nextResetStr;
     document.getElementById('new-pseudo').disabled=true;
     document.getElementById('btn-save-pseudo').disabled=true;
     document.getElementById('btn-save-pseudo').style.opacity='.3';
   }else if(remaining===1){
     el.style.color='var(--red)';
-    el.textContent=lang==='fr'
-      ?'⚠️ Il te reste 1 changement (réinit le '+nextResetStr+')'
-      :'⚠️ 1 change remaining (resets on '+nextResetStr+')';
+    el.textContent=lang==='fr'?'⚠️ Il te reste 1 changement (réinit le '+nextResetStr+')':'⚠️ 1 change remaining (resets on '+nextResetStr+')';
   }else{
     el.style.color='var(--green)';
-    el.textContent=lang==='fr'
-      ?'✅ '+remaining+' changements disponibles cette année'
-      :'✅ '+remaining+' changes available this year';
+    el.textContent=lang==='fr'?'✅ '+remaining+' changements disponibles cette année':'✅ '+remaining+' changes available this year';
   }
 }
 
@@ -814,38 +652,16 @@ async function checkPseudoAvail(){
   const avail=document.getElementById('pseudo-avail');
   const btn=document.getElementById('btn-save-pseudo');
   const val=input.value.trim();
-
-  avail.textContent='';
-  btn.disabled=true;
-  btn.style.opacity='.5';
-
-  if(val.length<3){
-    avail.style.color='var(--muted)';
-    avail.textContent=val.length>0?(lang==='fr'?'Minimum 3 caractères':'Minimum 3 characters'):'';
-    return;
-  }
-  if(!/^[a-zA-Z0-9_-]+$/.test(val)){
-    avail.style.color='var(--red)';
-    avail.textContent=lang==='fr'?'Lettres, chiffres, _ et - uniquement':'Letters, numbers, _ and - only';
-    return;
-  }
-
+  avail.textContent='';btn.disabled=true;btn.style.opacity='.5';
+  if(val.length<3){avail.style.color='var(--muted)';avail.textContent=val.length>0?(lang==='fr'?'Minimum 3 caractères':'Minimum 3 characters'):'';return;}
+  if(!/^[a-zA-Z0-9_-]+$/.test(val)){avail.style.color='var(--red)';avail.textContent=lang==='fr'?'Lettres, chiffres, _ et - uniquement':'Letters, numbers, _ and - only';return;}
   clearTimeout(_pseudoTimer);
-  avail.style.color='var(--muted)';
-  avail.textContent=lang==='fr'?'Vérification...':'Checking...';
-
+  avail.style.color='var(--muted)';avail.textContent=lang==='fr'?'Vérification...':'Checking...';
   _pseudoTimer=setTimeout(async()=>{
     const{data}=await sb.from('profiles').select('id').ilike('username',val).maybeSingle();
     const taken=data&&data.id!==currentUser.id;
-    if(taken){
-      avail.style.color='var(--red)';
-      avail.textContent='❌ '+(lang==='fr'?'Pseudo déjà utilisé !':'Username already taken!');
-      btn.disabled=true;btn.style.opacity='.5';
-    }else{
-      avail.style.color='var(--green)';
-      avail.textContent='✅ '+(lang==='fr'?'Disponible !':'Available!');
-      btn.disabled=false;btn.style.opacity='1';
-    }
+    if(taken){avail.style.color='var(--red)';avail.textContent='❌ '+(lang==='fr'?'Pseudo déjà utilisé !':'Username already taken!');btn.disabled=true;btn.style.opacity='.5';}
+    else{avail.style.color='var(--green)';avail.textContent='✅ '+(lang==='fr'?'Disponible !':'Available!');btn.disabled=false;btn.style.opacity='1';}
   },500);
 }
 
@@ -854,51 +670,22 @@ async function savePseudo(){
   const msg=document.getElementById('pseudo-msg');
   const btn=document.getElementById('btn-save-pseudo');
   if(!val||val.length<3)return;
-  if(!_pseudoInfo||_pseudoInfo.changes>=MAX_CHANGES){
-    msg.className='msg err';
-    msg.textContent=lang==='fr'?'Plus de changements disponibles cette année.':'No changes left this year.';
-    return;
-  }
-
-  btn.disabled=true;
-  btn.innerHTML='<span class="spinner"></span>'+(lang==='fr'?'SAUVEGARDE...':'SAVING...');
-  msg.className='msg';
-
+  if(!_pseudoInfo||_pseudoInfo.changes>=MAX_CHANGES){msg.className='msg err';msg.textContent=lang==='fr'?'Plus de changements disponibles cette année.':'No changes left this year.';return;}
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>'+(lang==='fr'?'SAUVEGARDE...':'SAVING...');msg.className='msg';
   const newChanges=(_pseudoInfo.changes||0)+1;
-  // Double-check availability before saving
   const{data:taken}=await sb.from('profiles').select('id').ilike('username',val).maybeSingle();
-  if(taken&&taken.id!==currentUser.id){
-    btn.disabled=false;btn.innerHTML='💾 '+(lang==='fr'?'SAUVEGARDER':'SAVE');
-    msg.className='msg err';
-    msg.textContent=lang==='fr'?'❌ Pseudo déjà utilisé !':'❌ Username already taken!';
-    return;
-  }
-  const{error}=await sb.from('profiles').update({
-    username:val,
-    pseudo_changes:newChanges
-  }).eq('id',currentUser.id);
-
-  btn.disabled=false;
-  btn.innerHTML='💾 '+(lang==='fr'?'SAUVEGARDER':'SAVE');
-
+  if(taken&&taken.id!==currentUser.id){btn.disabled=false;btn.innerHTML='💾 '+(lang==='fr'?'SAUVEGARDER':'SAVE');msg.className='msg err';msg.textContent=lang==='fr'?'❌ Pseudo déjà utilisé !':'❌ Username already taken!';return;}
+  const{error}=await sb.from('profiles').update({username:val,pseudo_changes:newChanges}).eq('id',currentUser.id);
+  btn.disabled=false;btn.innerHTML='💾 '+(lang==='fr'?'SAUVEGARDER':'SAVE');
   if(error){
-    if(error.code==='23505'){
-      msg.className='msg err';
-      msg.textContent=lang==='fr'?'❌ Pseudo déjà utilisé !':'❌ Username already taken!';
-    }else{
-      msg.className='msg err';
-      msg.textContent='Erreur: '+error.message;
-    }
+    msg.className='msg err';
+    msg.textContent=error.code==='23505'?(lang==='fr'?'❌ Pseudo déjà utilisé !':'❌ Username already taken!'):'Erreur: '+error.message;
   }else{
     await sb.auth.updateUser({data:{username:val}});
     _pseudoInfo.changes=newChanges;
-    msg.className='msg ok';
-    msg.textContent=lang==='fr'?'✅ Pseudo mis à jour !':'✅ Username updated!';
-    document.getElementById('new-pseudo').value='';
-    document.getElementById('pseudo-avail').textContent='';
-    updatePseudoCounter();
-    loadAccountInfo();
-    showToast(lang==='fr'?'Pseudo mis à jour !':'Username updated!');
+    msg.className='msg ok';msg.textContent=lang==='fr'?'✅ Pseudo mis à jour !':'✅ Username updated!';
+    document.getElementById('new-pseudo').value='';document.getElementById('pseudo-avail').textContent='';
+    updatePseudoCounter();loadAccountInfo();showToast(lang==='fr'?'Pseudo mis à jour !':'Username updated!');
     setTimeout(()=>msg.className='msg',3000);
   }
 }
@@ -916,27 +703,24 @@ async function loadAccountInfo(){
   if(el_s)el_s.innerHTML='<strong>'+(lang==='fr'?'Membre depuis':'Member since')+':</strong> '+since;
 }
 
-(async()=>{
-  const{data}=await sb.auth.getSession();
-  if(!data.session){window.location.href='login.html';return;}
-  currentUser=data.session.user;
-  await loadLangData(lang);
-  await loadLangData(lang==='fr'?'en':'fr'); // preload other lang
-  await loadManifest();
-  await loadLangOptions();
-  await loadProfile();
-  loadAccountInfo();
-  selectedLang=lang;
-  document.getElementById('lang-fr').classList.toggle('selected',lang==='fr');
-  document.getElementById('lang-en').classList.toggle('selected',lang==='en');
-  applyLang(lang);
-  buildCharGrid();
-  loadStats();
-})();
+async function changePassword(){
+  const l=lang||'fr';
+  const newPass=document.getElementById('new-pass-input').value;
+  const confirmPass=document.getElementById('confirm-pass-input').value;
+  const msgEl=document.getElementById('pass-msg');
+  msgEl.className='msg';msgEl.textContent='';
+  if(!newPass||newPass.length<8){msgEl.className='msg err';msgEl.textContent=l==='fr'?'Mot de passe trop court (8 min).':'Password too short (8 min).';return;}
+  if(newPass!==confirmPass){msgEl.className='msg err';msgEl.textContent=l==='fr'?'Les mots de passe ne correspondent pas !':'Passwords do not match!';return;}
+  if(!/[a-zA-Z]/.test(newPass)||!/[0-9]/.test(newPass)){msgEl.className='msg err';msgEl.textContent=l==='fr'?'Le mot de passe doit contenir des lettres et des chiffres.':'Password must contain letters and digits.';return;}
+  const btn=event.target;btn.disabled=true;btn.textContent='⏳...';
+  const{error}=await sb.auth.updateUser({password:newPass});
+  btn.disabled=false;btn.textContent='🔑 '+(l==='fr'?'CHANGER LE MOT DE PASSE':'CHANGE PASSWORD');
+  if(error){msgEl.className='msg err';msgEl.textContent=error.message;}
+  else{msgEl.className='msg ok';msgEl.textContent=l==='fr'?'✅ Mot de passe changé !':'✅ Password changed!';document.getElementById('new-pass-input').value='';document.getElementById('confirm-pass-input').value='';}
+}
 
 let _confirmCallback=null;
-
-function showConfirm(msg, onOk, opts){
+function showConfirm(msg,onOk,opts){
   const modal=document.getElementById('confirm-modal');
   const desc=document.getElementById('confirm-desc');
   const title=document.getElementById('confirm-title');
@@ -944,125 +728,86 @@ function showConfirm(msg, onOk, opts){
   const noBtn=document.getElementById('confirm-no');
   const l=lang||'fr';
   if(desc)desc.textContent=msg;
-  if(opts&&opts.title){
-    if(title)title.textContent=opts.title;
-  }else{
-    if(title)title.textContent='🗑 '+(l==='fr'?'SUPPRIMER':'DELETE');
-  }
-  if(opts&&opts.okOnly){
-    if(yesBtn)yesBtn.style.display='none';
-    if(noBtn)noBtn.textContent='OK';
-  }else{
-    if(yesBtn)yesBtn.style.display='';
-    if(noBtn)noBtn.textContent=l==='fr'?'ANNULER':'CANCEL';
-  }
+  if(title)title.textContent=(opts&&opts.title)?opts.title:'🗑 '+(l==='fr'?'SUPPRIMER':'DELETE');
+  if(opts&&opts.okOnly){if(yesBtn)yesBtn.style.display='none';if(noBtn)noBtn.textContent='OK';}
+  else{if(yesBtn)yesBtn.style.display='';if(noBtn)noBtn.textContent=l==='fr'?'ANNULER':'CANCEL';}
   modal.classList.add('show');
   _confirmCallback=onOk;
 }
-function confirmOk(){
-  document.getElementById('confirm-modal').classList.remove('show');
-  if(_confirmCallback)_confirmCallback();
-  _confirmCallback=null;
-}
+function confirmOk(){document.getElementById('confirm-modal').classList.remove('show');if(_confirmCallback)_confirmCallback();_confirmCallback=null;}
 function confirmCancel(){
   document.getElementById('confirm-modal').classList.remove('show');
-  // Restore buttons to default state
-  const yesBtn=document.getElementById('confirm-yes');
-  const noBtn=document.getElementById('confirm-no');
-  const l=lang||'fr';
-  if(yesBtn)yesBtn.style.display='';
-  if(noBtn)noBtn.textContent=l==='fr'?'ANNULER':'CANCEL';
+  const yesBtn=document.getElementById('confirm-yes');const noBtn=document.getElementById('confirm-no');
+  if(yesBtn)yesBtn.style.display='';if(noBtn)noBtn.textContent=lang==='fr'?'ANNULER':'CANCEL';
   _confirmCallback=null;
 }
 function showAccountDeleteConfirm(){
-  const modal=document.getElementById('confirm-modal');
-  const desc=document.getElementById('confirm-desc');
-  const title=document.getElementById('confirm-title');
   const l=lang||'fr';
-  if(title)title.textContent='⚠️ SUPPRIMER MON COMPTE';
-  if(desc)desc.textContent=l==='fr'?'Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ?':'Are you sure you want to delete your account and all your levels?';
-  modal.classList.add('show');
-  _confirmCallback=async()=>{await doDelete();};
-}
-
-async function changePassword(){
-  const l=lang||'fr';
-  const newPass=document.getElementById('new-pass-input').value;
-  const confirmPass=document.getElementById('confirm-pass-input').value;
-  const msgEl=document.getElementById('pass-msg');
-  msgEl.className='msg';msgEl.textContent='';
-
-  if(!newPass||newPass.length<8){
-    msgEl.className='msg error';
-    msgEl.textContent=l==='fr'?'Mot de passe trop court (8 min).':'Password too short (8 min).';
-    return;
-  }
-  if(newPass!==confirmPass){
-    msgEl.className='msg error';
-    msgEl.textContent=l==='fr'?'Les mots de passe ne correspondent pas !':'Passwords do not match!';
-    return;
-  }
-  if(!/[a-zA-Z]/.test(newPass)||!/[0-9]/.test(newPass)){
-    msgEl.className='msg error';
-    msgEl.textContent=l==='fr'?'Le mot de passe doit contenir des lettres et des chiffres.':'Password must contain letters and digits.';
-    return;
-  }
-  const btn=event.target;
-  btn.disabled=true;btn.textContent='⏳...';
-
-  const{error}=await sb.auth.updateUser({password:newPass});
-  btn.disabled=false;btn.textContent='🔑 '+(l==='fr'?'CHANGER LE MOT DE PASSE':'CHANGE PASSWORD');
-
-  if(error){
-    msgEl.className='msg error';
-    msgEl.textContent=error.message;
-  }else{
-    msgEl.className='msg success';
-    msgEl.textContent=l==='fr'?'✅ Mot de passe changé !':'✅ Password changed!';
-    document.getElementById('new-pass-input').value='';
-    document.getElementById('confirm-pass-input').value='';
-  }
+  showConfirm(l==='fr'?'Es-tu sûr de vouloir supprimer ton compte et tous tes niveaux ?':'Are you sure you want to delete your account and all your levels?',async()=>{await doDelete();},{title:'⚠️ '+(l==='fr'?'SUPPRIMER MON COMPTE':'DELETE MY ACCOUNT')});
 }
 
 async function doDelete(){
   if(!currentUser)return;
-  const uid=currentUser.id;
-  const l=lang||'fr';
+  const uid=currentUser.id;const l=lang||'fr';
   try{
-    // 1. Delete leaderboard entries
     await sb.from('leaderboard').delete().eq('user_id',uid);
-    // 2. Delete ratings
     await sb.from('ratings').delete().eq('user_id',uid);
-    // 3. Delete levels
     await sb.from('levels').delete().eq('user_id',uid);
-    // 4. Delete profile
     await sb.from('profiles').delete().eq('id',uid);
-    // 5. Delete auth account
     const{error}=await sb.rpc('delete_user');
-    if(error){
-      // Fallback: sign out even if RPC fails
-      console.warn('delete_user RPC error:', error.message);
-    }
+    if(error)console.warn('delete_user RPC error:',error.message);
     await sb.auth.signOut();
     window.location.href='index.html';
-  }catch(e){
-    alert((l==='fr'?'Erreur lors de la suppression : ':'Error during deletion: ')+e.message);
-  }
+  }catch(e){alert((l==='fr'?'Erreur lors de la suppression : ':'Error during deletion: ')+e.message);}
 }
 
-async function deleteLevelSettings(id, title, tr){
-  const msg=(lang==='fr')
-    ?('Supprimer "'+title+'" ? Cette action est irreversible.')
-    :('Delete "'+title+'" ? This cannot be undone.');
-  showConfirm(msg, async()=>{
+async function deleteLevelSettings(id,title,tr){
+  const msg=lang==='fr'?('Supprimer "'+title+'" ? Cette action est irréversible.'):('Delete "'+title+'" ? This cannot be undone.');
+  showConfirm(msg,async()=>{
     const{error}=await sb.from('levels').delete().eq('id',id).eq('user_id',currentUser.id);
     if(error){alert((lang==='fr'?'Erreur : ':'Error: ')+error.message);return;}
-    tr.style.transition='opacity .3s';
-    tr.style.opacity='0';
-    setTimeout(()=>tr.remove(),300);
+    tr.style.transition='opacity .3s';tr.style.opacity='0';setTimeout(()=>tr.remove(),300);
   });
 }
 
+// ── INIT ──
+(async()=>{
+  // 1. Vérif session
+  const{data}=await sb.auth.getSession();
+  if(!data.session){window.location.href='login.html';return;}
+  currentUser=data.session.user;
+
+  // 2. Charge profil (pour récupérer la langue sauvegardée)
+  setLoadingText('LOADING PROFILE...');
+  await loadProfile();
+
+  // 3. Charge la langue active EN PREMIER → pas de flash
+  setLoadingText('LOADING LANGUAGE...');
+  await loadLangData(lang);
+
+  // 4. Applique la langue avant de montrer quoi que ce soit
+  await applyLang(lang);
+
+  // 5. Charge l'autre langue en arrière-plan (sans bloquer)
+  loadLangData(lang==='fr'?'en':'fr');
+
+  // 6. Charge les données UI
+  setLoadingText('LOADING DATA...');
+  await loadManifest();
+  await loadLangOptions();
+
+  // Sélectionne la langue courante dans les options
+  document.querySelectorAll('.lang-option').forEach(el=>el.classList.remove('selected'));
+  const langEl=document.getElementById('lang-'+lang);
+  if(langEl)langEl.classList.add('selected');
+
+  buildCharGrid();
+  loadAccountInfo();
+  loadStats();
+
+  // 7. Cache le loading → tout est prêt
+  hideLoading();
+})();
 </script>
 </body>
-</html>s
+</html>
