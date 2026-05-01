@@ -555,7 +555,6 @@ function checkBlockSpikes(b){
   if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return false;
   if(!ov(gPlayer,b))return false;
   const sp=b.spikes;const hidden=sp.hidden||false;const delay=(sp.delay||0)*60;
-  if(hidden&&sp._touched&&sp._delayTimer<delay)sp._delayTimer++;
   if(!hidden){killPlayer();return true;}
   if(!sp._touched)sp._touched=true;
   const delayDone=delay===0||sp._delayTimer>=delay;
@@ -675,11 +674,23 @@ function gUpdate(now){
   gTrail=gTrail.filter(t=>t.life>0);gTrail.forEach(t=>{t.x+=t.vx;t.y+=t.vy;t.vx*=0.9;t.vy*=0.9;t.life-=t.decay;});
   gConfetti=gConfetti.filter(c=>c.life>0);gConfetti.forEach(c=>{if(c.delay>0){c.delay--;return;}c.x+=c.vx;c.y+=c.vy;c.vy+=c.gravity;c.vx*=0.975;c.rot+=c.rotSpd;c.life-=c.decay;});
 
+  // ── Tick continu des timers de spikes hidden ──
+  ['fixed','invis','bounce','mobile','push','flash','trap','gblock'].forEach(k=>{
+    (gLv[k]||[]).forEach(b=>{
+      if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return;
+      const sp=b.spikes;
+      if(sp.hidden&&sp._touched&&sp._delayTimer<(sp.delay||0)*60)sp._delayTimer++;
+    });
+  });
+  (gLv.spike||[]).forEach(sp=>{
+    if(sp.hidden&&sp._touched&&sp._delayTimer<(sp.activationDelay||0)*60)sp._delayTimer++;
+  });
+
   if(gPlayer.dead){
     gPlayer.dT++;
     if(gPlayer.dT>55&&!gDeadPending){
       gDeadPending=true;gRunning=false;stopTimer();
-      _saveSession(false); // ← enregistre la mort
+      _saveSession(false);
       setTimeout(()=>{
         document.getElementById('ovDie').classList.add('show');
         if(_currentLevelId&&_levelData&&(_levelData.visibility==='public'||_levelData.visibility==='code')&&!_isOwner){setTimeout(()=>showRatingOverlay('rating-inline-die'),400);}
@@ -730,7 +741,6 @@ function gUpdate(now){
     if(jump&&gPlayer.onGround){gPlayer.vy=(gd==='d')?-zoneJspd:zoneJspd;gPlayer.onGround=false;gPlayer.sq=0.6;gPlayer._jumpHeld=true;spawnP(gPlayer.x+11,gPlayer.y+(gd==='d'?32:0),'#ffffff20',5);_jumpReady=false;}
   }
 
-  // Saut variable : relâcher tôt = saut plus court
   if(gPlayer._jumpHeld&&!jumpHeld){
     gPlayer._jumpHeld=false;
     if(gd==='d'&&gPlayer.vy<0)gPlayer.vy*=0.45;
@@ -814,7 +824,6 @@ function gUpdate(now){
 
   (gLv.spike||[]).forEach(sp=>{
     const hidden=sp.hidden||false;const delay=(sp.activationDelay||0)*60;
-    if(hidden&&sp._touched&&sp._delayTimer<delay)sp._delayTimer++;
     if(!ov(gPlayer,sp))return;
     if(!hidden){killPlayer();return;}
     if(!sp._touched)sp._touched=true;
@@ -836,7 +845,7 @@ function gUpdate(now){
     gWon=true;gRunning=false;stopTimer();
     const winTime=_currentTimeMs;const l=_lang();
     spawnP(gLv.end.x,gLv.end.y-20,PCOL.flagB,30);spawnConfetti(gLv.end.x+14,gLv.end.y-40);
-    _saveSession(true); // ← enregistre la victoire
+    _saveSession(true);
     const prevBest=_bestTime;
     saveTime(winTime).then(isNewRecord=>{showWinScreen(winTime,prevBest,isNewRecord,l);});
     if(_currentLevelId){fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{method:'PATCH',headers:{'apikey':_sbKey,'Authorization':'Bearer '+(_getToken()||_sbKey),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({completions:(_levelData?.completions||0)+1})});}
