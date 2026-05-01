@@ -46,18 +46,19 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 .lvl-table{width:100%;border-collapse:collapse;}
 .lvl-table thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
 .lvl-table th{font-family:'Press Start 2P',monospace;font-size:8px;color:#6060aa;letter-spacing:1px;padding:12px 16px;text-align:left;white-space:nowrap;}
-.lvl-tr{border-bottom:1px solid #1a1a35;cursor:pointer;transition:background .1s;}
+.lvl-tr{border-bottom:1px solid #1a1a35;cursor:pointer;transition:background .1s;height:52px;}
 .lvl-tr:last-child{border-bottom:none;}
 .lvl-tr:hover{background:#0f0f20;}
-.lvl-td{padding:14px 16px;vertical-align:middle;}
+.lvl-td{padding:10px 16px;vertical-align:middle;}
 .lvl-td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lvl-td-name .new-badge{font-family:'Press Start 2P',monospace;font-size:6px;padding:2px 6px;background:var(--accent);color:#000;border-radius:2px;margin-left:8px;}
 .lvl-td-date{font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;white-space:nowrap;width:120px;}
 .lvl-td-author{font-family:Rajdhani,sans-serif;font-size:13px;color:#a0a0cc;width:140px;}
 .lvl-td-rating{width:100px;white-space:nowrap;}
-.lvl-td-record{width:120px;white-space:nowrap;}
+.lvl-td-record{width:150px;}
 .lvl-td-vis{width:90px;}
-.lvl-td-actions{width:80px;text-align:right;}
+.lvl-td-actions{width:100px;text-align:right;}
+.record-cell{display:flex;flex-direction:column;gap:2px;}
 .author-link{color:#a0a0cc;text-decoration:none;transition:color .15s;}
 .author-link:hover{color:#f0e040;}
 .edit-btn{font-family:'Press Start 2P',monospace;font-size:8px;padding:6px 12px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap;}
@@ -435,8 +436,8 @@ async function loadSection(s){
     const cell=document.querySelector(`.record-cell[data-id="${l.id}"]`);
     if(!cell)return;
     let html='';
-    if(worldBests[l.id])html+=`<span title="${lang==='fr'?'Record mondial':'World record'}" style="font-family:Orbitron,monospace;font-size:10px;color:#c0a0ff;">🏆 ${fmtMs(worldBests[l.id])}</span>`;
-    if(myBests[l.id])html+=(html?'<br>':'')+`<span title="${lang==='fr'?'Mon record':'My record'}" style="font-family:Orbitron,monospace;font-size:9px;color:#f0e040;">⭐ ${fmtMs(myBests[l.id])}</span>`;
+    if(worldBests[l.id]!=null)html+=`<span title="${lang==='fr'?'Record mondial':'World record'}" style="font-family:Orbitron,monospace;font-size:10px;color:#c0a0ff;display:block;line-height:1.4;">🏆 ${fmtMs(worldBests[l.id])}</span>`;
+    if(myBests[l.id]!=null)html+=`<span title="${lang==='fr'?'Mon record':'My record'}" style="font-family:Orbitron,monospace;font-size:9px;color:#f0e040;display:block;line-height:1.4;">⭐ ${fmtMs(myBests[l.id])}</span>`;
     cell.innerHTML=html||'<span style="color:#3a3a55;">—</span>';
   });
 }
