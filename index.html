@@ -550,8 +550,12 @@ function levelRow(l){
     <td class="lvl-td lvl-td-date">${dateStr}</td>
     <td class="lvl-td lvl-td-author">${authorLink}</td>
     <td class="lvl-td lvl-td-stars">
-  <div><span class="star-display">${l.avgRating?`<span style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#f0e040;">★ ${l.avgRating.toFixed(2)}</span><span style="font-family:Rajdhani,sans-serif;font-size:11px;color:#6060aa;margin-left:4px;">(${l.ratingCount})</span>`:'<span style="color:#3a3a55;">—</span>'}</span></div>
-  <span class="star-count" data-id="${l.id}" style="font-family:Orbitron,monospace;font-size:9px;color:#c0a0ff;"></span>${l.avgRating?`<span style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#f0e040;">★ ${l.avgRating.toFixed(2)}</span><span style="font-family:Rajdhani,sans-serif;font-size:11px;color:#6060aa;margin-left:4px;">(${l.ratingCount})</span>`:'<span style="color:#3a3a55;">—</span>'}</span></td>
+      <div>${l.avgRating
+        ?`<span style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#f0e040;">★ ${l.avgRating.toFixed(2)}</span><span style="font-family:Rajdhani,sans-serif;font-size:11px;color:#6060aa;margin-left:4px;">(${l.ratingCount})</span>`
+        :'<span style="color:#3a3a55;">—</span>'
+      }</div>
+      <div class="star-count" data-id="${l.id}" style="font-family:Orbitron,monospace;font-size:9px;color:#c0a0ff;margin-top:3px;"></div>
+    </td>
     ${currentSection==='mine'?`<td class="lvl-td lvl-td-vis"><span class="vis-badge vis-${l.visibility||'private'}">${visLabel}</span></td>`:''}
     <td class="lvl-td lvl-td-actions">${isOwner?`<button class="edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'">✏️ ${lang==='fr'?'ÉDITER':'EDIT'}</button>`:''}</td>
   </tr>`;
