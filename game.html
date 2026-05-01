@@ -436,14 +436,27 @@ function updateStarDisplay(rating){
   document.querySelectorAll('.star-btn').forEach(s=>{const v=parseInt(s.dataset.val);s.classList.toggle('filled',v<=rating);});
   document.querySelectorAll('.ovstar').forEach(s=>{const v=parseInt(s.dataset.val);s.style.color=v<=rating?'#f0e040':'#2a2a55';});
 }
-function showRatingOverlay(containerId){
+async function showRatingOverlay(containerId){
   if(!_currentLevelId)return;
   const container=document.getElementById(containerId);
   if(!container)return;
+  
+  // Si le rating n'est pas encore chargé, on attend
+  if(_userRating===0){
+    await loadUserRating();
+  }
+  
   container.style.display='flex';
   const ovStars=container.querySelectorAll('.ovstar');
   const msgId=containerId==='rating-inline-win'?'rating-win-msg':'rating-die-msg';
+  
+  // Applique l'état actuel APRÈS le chargement
   ovStars.forEach(s=>s.style.color=parseInt(s.dataset.val)<=_userRating?'#f0e040':'#2a2a55');
+  
+  const labels=['','😐','🙂','😊','😍','🔥'];
+  const msg=document.getElementById(msgId);
+  if(msg&&_userRating>0)msg.textContent=labels[_userRating]||'';
+  
   ovStars.forEach(star=>{
     const val=parseInt(star.dataset.val);
     star.onmouseenter=()=>{ovStars.forEach(s=>s.style.color=parseInt(s.dataset.val)<=val?'#f0c040':'#2a2a55');};
@@ -451,9 +464,8 @@ function showRatingOverlay(containerId){
     star.onclick=async()=>{
       await saveRating(val);
       ovStars.forEach(s=>{s.style.color=parseInt(s.dataset.val)<=val?'#f0e040':'#2a2a55';if(parseInt(s.dataset.val)<=val){s.classList.remove('burst');void s.offsetWidth;s.classList.add('burst');}});
-      const labels=['','😐','🙂','😊','😍','🔥'];
-      const msg=document.getElementById(msgId);
-      if(msg)msg.textContent=labels[val]||'';
+      const msg2=document.getElementById(msgId);
+      if(msg2)msg2.textContent=labels[val]||'';
     };
   });
 }
