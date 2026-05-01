@@ -472,7 +472,11 @@ function startGameFrom(sx,sy){
   (gLv.push||[]).forEach(p=>{p.x=p.ox;p.y=p.oy;p.vx=0;p.vy=0;});
   (gLv.gravflip||[]).forEach(z=>{if(z.dir===undefined){z.dir=(z.grav??-10)<0?'u':'d';z.strength=Math.abs(z.grav??10);}});
   (gLv.spike||[]).forEach(s=>{s.state='idle';s.timer=0;s._touched=false;s._delayTimer=0;});
-  ['fixed','invis','bounce','mobile','push','flash','trap','slider','gblock'].forEach(k=>{(gLv[k]||[]).forEach(b=>{if(b.spikes){b.spikes._touched=false;b.spikes._delayTimer=0;}});});
+  ['fixed','invis','bounce','mobile','push','flash','trap','gblock'].forEach(k=>{
+    (gLv[k]||[]).forEach(b=>{
+      if(b.spikes){b.spikes._touched=false;b.spikes._delayTimer=0;}
+    });
+  });
   (gLv.gblock||[]).forEach(g=>{g._attached=false;g._justJumped=false;});
   (gLv.flash||[]).forEach(f=>{f._visible=true;f._timer=0;});
   gParts=[];gBullets=[];gBounceEffects=[];gGravEffects=[];gPushEffects=[];gConfetti=[];gTrail=[];_currentSpeedMult=1;
@@ -484,7 +488,7 @@ function startGameFrom(sx,sy){
   document.querySelectorAll('.ov').forEach(o=>o.classList.remove('show'));
   _attempt++;updateAttemptDisplay();
   resetTimer();
-  _markAttemptStart(); // ← démarre le chrono de la tentative
+  _markAttemptStart();
   if(gRafId){cancelAnimationFrame(gRafId);gRafId=null;}
   requestAnimationFrame(()=>{
     gDraw();
