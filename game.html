@@ -568,7 +568,7 @@ function checkBlockSpikes(b){
 
 function drawBlockSpikes(b){
   if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return;
-  const sp=b.spikes;const hidden=sp.hidden||false;const delay=(sp.delay||0)*60;const activated=hidden?(sp._delayTimer>=delay):true;
+  const sp=b.spikes;const hidden=sp.hidden||false;const delay=(sp.delay||0)*60;const activated=hidden?(sp._touched&&sp._delayTimer>=delay):true;
   if(!hidden||activated){
     const x=Math.round(b.x),y=Math.round(b.y),w=Math.round(b.w),h=Math.round(b.h);GX.fillStyle='#ff4060';const sz=10;
     sp.dirs.forEach(dir=>{const horiz=(dir==='u'||dir==='d');const count=Math.max(1,Math.floor((horiz?w:h)/sz));const gap=(horiz?w:h)/count;for(let k=0;k<count;k++){const cx=horiz?x+gap*(k+0.5):x;const cy=horiz?y:y+gap*(k+0.5);GX.beginPath();if(dir==='u'){GX.moveTo(cx-sz/2,y);GX.lineTo(cx+sz/2,y);GX.lineTo(cx,y-sz);}else if(dir==='d'){GX.moveTo(cx-sz/2,y+h);GX.lineTo(cx+sz/2,y+h);GX.lineTo(cx,y+h+sz);}else if(dir==='l'){GX.moveTo(x,cy-sz/2);GX.lineTo(x,cy+sz/2);GX.lineTo(x-sz,cy);}else if(dir==='r'){GX.moveTo(x+w,cy-sz/2);GX.lineTo(x+w,cy+sz/2);GX.lineTo(x+w+sz,cy);}GX.closePath();GX.fill();}});
@@ -643,7 +643,8 @@ function gDraw(){
   gPushEffects.forEach(e=>{e.life-=0.08;const a=Math.max(0,e.life);const expand=(1-e.life)*10;GX.save();GX.globalAlpha=a*0.5;GX.strokeStyle='#c0c0ff';GX.lineWidth=2;GX.strokeRect(e.x-expand,e.y-expand,e.w+expand*2,e.h+expand*2);GX.restore();});
   (gLv.flash||[]).forEach(f=>{const cycle=f.onMs+f.offMs;f._timer=(f._timer||0)+1;const period=Math.round(cycle/16.67);if(f._timer>=period){f._timer=0;f._visible=!f._visible;}if(!f._visible)return;const x=Math.round(f.x),y=Math.round(f.y),w=Math.round(f.w),h=Math.round(f.h);GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);GX.fillStyle='#40c0f0';GX.fillRect(x,y,w,4);GX.fillStyle='#80e0ff88';GX.font='6px "Press Start 2P"';GX.textAlign='center';GX.fillText('⚡',x+w/2,y+h/2+3);GX.textAlign='left';drawBlockSpikes(f);});
   (gLv.spike||[]).forEach(sp=>{
-    const hidden=sp.hidden||false;const delay=(sp.activationDelay||0)*60;const activated=hidden?(sp._delayTimer>=delay):true;
+    const hidden=sp.hidden||false;const delay=(sp.activationDelay||0)*60;
+    const activated=hidden?(sp._touched&&sp._delayTimer>=delay):true;
     const x=Math.round(sp.x),y=Math.round(sp.y),w=Math.round(sp.w),h=Math.round(sp.h);
     GX.fillStyle=PCOL.plat;GX.fillRect(x,y,w,h);GX.fillStyle=PCOL.platT;GX.fillRect(x,y,w,4);GX.fillStyle=PCOL.platS;for(let i=x+7;i<x+w-4;i+=9)GX.fillRect(i,y+1,3,2);
     if(!hidden||activated){GX.fillStyle=activated?'#ff4060':'#884040';const sz=10;const dirs=(sp.dir||'u')==='all'?['u','d','l','r']:(sp.dir||'u').split(',');dirs.forEach(dir=>{const horiz=(dir==='u'||dir==='d');const count=Math.max(1,Math.floor((horiz?w:h)/sz));const gap=(horiz?w:h)/count;for(let k=0;k<count;k++){const cx=horiz?x+gap*(k+0.5):x;const cy=horiz?y:y+gap*(k+0.5);GX.beginPath();if(dir==='u'){GX.moveTo(cx-sz/2,y);GX.lineTo(cx+sz/2,y);GX.lineTo(cx,y-sz);}else if(dir==='d'){GX.moveTo(cx-sz/2,y+h);GX.lineTo(cx+sz/2,y+h);GX.lineTo(cx,y+h+sz);}else if(dir==='l'){GX.moveTo(x,cy-sz/2);GX.lineTo(x,cy+sz/2);GX.lineTo(x-sz,cy);}else if(dir==='r'){GX.moveTo(x+w,cy-sz/2);GX.lineTo(x+w,cy+sz/2);GX.lineTo(x+w+sz,cy);}GX.closePath();GX.fill();}});}
