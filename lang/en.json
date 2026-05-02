@@ -1,5 +1,8 @@
 {
   "studio": {
+    "errLoginRequired": "LOGIN REQUIRED",
+"errLoginBtn": "LOG IN",
+"errAccessDenied": "ACCESS DENIED",
     "tDarkness": "🌑 DARK",
 "tipDarkness": "🌑 DARKNESS\nDark zone around player.\nSet the halo radius.",
 "pInfoDarkness": "Dark zone: only a halo\naround the player stays visible.",
