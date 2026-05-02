@@ -1,5 +1,8 @@
 {
   "studio": {
+    "errLoginRequired": "CONNEXION REQUISE",
+"errLoginBtn": "SE CONNECTER",
+"errAccessDenied": "ACCÈS REFUSÉ",
     "tDarkness": "🌑 OBSCUR",
 "tipDarkness": "🌑 OBSCURITÉ\nZone sombre autour du joueur.\nRègle le rayon du halo.",
 "pInfoDarkness": "Zone sombre : seul un halo\nautour du joueur reste visible.",
