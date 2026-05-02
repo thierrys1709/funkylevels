@@ -688,8 +688,8 @@ body {
 
     <!-- DARKNESS -->
     <div id="s-darkness" class="psec">
-      <div class="pinfo" style="font-size:13px;line-height:1.8;background:#0b0b20;padding:10px;border-radius:4px;border:1px solid var(--border2);color:var(--text);">Zone sombre : seul un halo autour du joueur reste visible.</div>
-      <div class="prow"><label>RAYON DU HALO (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="dk-radius" min="40" max="400" step="10" value="120" oninput="dkParamChanged()"><span class="pval" id="dk-radius-v">120</span></div></div>
+      <div class="pinfo" data-info="pInfoDarkness"></div>
+      <div class="prow"><label data-lbl="darkRadius">RAYON DU HALO (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="dk-radius" min="40" max="400" step="10" value="120" oninput="dkParamChanged()"><span class="pval" id="dk-radius-v">120</span></div></div>
     </div>
 
     <div style="height:1px;background:#1a1a2a;margin:4px 0;"></div>
