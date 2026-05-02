@@ -1928,8 +1928,8 @@ function unsavedStay(){document.getElementById('unsaved-modal').style.display='n
 // ─────────────────────────────────────────────
 function showPublishedModal(title){
   document.querySelectorAll('.act-btn,#btn-save,#btn-clear,#btn-load').forEach(b=>{if(b.id!=='btn-load')b.style.opacity='0.3';});
-  const l=_lang();
-  const msg=l==='fr'?'<strong style="color:#f0e040;">'+title+'</strong><br><br>Ce niveau est publié et ne peut pas être modifié directement.<br>Crée une copie privée pour y apporter des modifications.':'<strong style="color:#f0e040;">'+title+'</strong><br><br>This level is published and cannot be edited directly.<br>Create a private copy to make changes.';
+  const l=_lang();const t=STUDIO_T[l]||{};
+  const msg='<strong style="color:#f0e040;">'+title+'</strong><br><br>'+(t.publishedModalMsg1||'This level is published and cannot be edited directly.')+'<br>'+(t.publishedModalMsg2||'Create a private copy to make changes.');
   document.getElementById('published-modal-msg').innerHTML=msg;
   document.getElementById('published-modal').style.display='flex';
 }
@@ -1939,11 +1939,11 @@ async function confirmDuplicateFromModal(){
   await duplicateLevel();
 }
 function showDupModal(){
-  const l=_lang();
-  document.getElementById('dup-msg').innerHTML=l==='fr'?'Ce niveau est publié.<br>Tu ne peux pas le modifier directement.<br><br>Une copie privée sera créée.':'This level is published.<br>You cannot edit it directly.<br><br>A private copy will be created.';
+  const l=_lang();const t=STUDIO_T[l]||{};
+  document.getElementById('dup-msg').innerHTML=(t.dupModalMsg||'This level is published.\nYou cannot edit it directly.\n\nA private copy will be created.').replace(/\n/g,'<br>');
   const dc=document.getElementById('dup-cancel-btn');const dok=document.getElementById('dup-ok-btn');
-  if(dc)dc.textContent=l==='fr'?'ANNULER':'CANCEL';
-  if(dok)dok.textContent=l==='fr'?'⧉ CRÉER UNE COPIE':'⧉ CREATE A COPY';
+  if(dc)dc.textContent=t.dupCancel||'CANCEL';
+  if(dok)dok.textContent=t.dupOk||'⧉ CREATE A COPY';
   document.getElementById('dup-modal').style.display='flex';
 }
 function closeDupModal(){document.getElementById('dup-modal').style.display='none';}
