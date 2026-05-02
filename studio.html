@@ -833,18 +833,18 @@ async function applyStudioLang() {
   });
 
   // ── Boutons outil (texte + tooltip) ───────
-  const TOOL_MAP = {
-    fixed:'tFixed', invis:'tInvis', bounce:'tBounce', mobile:'tMobile',
-    push:'tPush', flash:'tFlash', gblock:'tGblock',
-    gravflip:'tGravflip', speed:'tSpeed',
-    start:'tStart', end:'tEnd', select:'tSelect'
-  };
-  const TIP_MAP = {
-    fixed:'tipFixed', invis:'tipInvis', bounce:'tipBounce', mobile:'tipMobile',
-    push:'tipPush', flash:'tipFlash', gblock:'tipGblock',
-    gravflip:'tipGravflip', speed:'tipSpeed',
-    start:'tipStart', end:'tipEnd', select:'tipSelect'
-  };
+      const TOOL_MAP = {
+      fixed:'tFixed', invis:'tInvis', bounce:'tBounce', mobile:'tMobile',
+      push:'tPush', flash:'tFlash', gblock:'tGblock',
+      gravflip:'tGravflip', speed:'tSpeed', darkness:'tDarkness',
+      start:'tStart', end:'tEnd', select:'tSelect'
+    };
+    const TIP_MAP = {
+      fixed:'tipFixed', invis:'tipInvis', bounce:'tipBounce', mobile:'tipMobile',
+      push:'tipPush', flash:'tipFlash', gblock:'tipGblock',
+      gravflip:'tipGravflip', speed:'tipSpeed', darkness:'tipDarkness',
+      start:'tipStart', end:'tipEnd', select:'tipSelect'
+    };
   Object.entries(TOOL_MAP).forEach(([id, key]) => {
     const el = document.getElementById('t-' + id);
     if (el && t[key]) el.textContent = t[key];
