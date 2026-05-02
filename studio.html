@@ -1319,7 +1319,8 @@ function dkPanelLoad(z){document.getElementById('dk-radius').value=z.radius??120
 function showDkPanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-darkness').classList.add('show');
-  document.getElementById('ptitle').textContent='DARKNESS';
+  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  document.getElementById('ptitle').textContent=p+(n.darkness||'DARKNESS');
 }
 
 // ─────────────────────────────────────────────
