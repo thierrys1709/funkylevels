@@ -1728,7 +1728,8 @@ function redraw(){
     EX.fillStyle='rgba(255,40,60,0.05)';EX.fillRect(0,GAME_HEIGHT,EW,EH-GAME_HEIGHT);
     EX.save();EX.strokeStyle='#ff4060';EX.lineWidth=2;EX.setLineDash([14,8]);EX.beginPath();EX.moveTo(0,GAME_HEIGHT);EX.lineTo(EW,GAME_HEIGHT);EX.stroke();EX.setLineDash([]);
     EX.font='7px "Press Start 2P"';EX.fillStyle='#ff406099';
-    for(let lx=8;lx<EW;lx+=400)EX.fillText('⬇ MORT',lx,GAME_HEIGHT-6);
+     const _td=STUDIO_T[_lang()]||{};
+    for(let lx=8;lx<EW;lx+=400)EX.fillText(_td.deathLine||'⬇ DEATH',lx,GAME_HEIGHT-6);
     EX.restore();
   }
 
