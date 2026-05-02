@@ -1144,7 +1144,7 @@ async function duplicateLevel() {
   const ni=document.getElementById('level-name-input'); if(ni) ni.value=inserted.title;
   history.replaceState(null,'','studio.html');
   undoStack.push(JSON.stringify(lv)); if(undoStack.length>60) undoStack.shift(); redoStack=[];
-  const l=_lang(); status(STUDIO_T[l]?.msgLoaded || 'Dupliqué !');
+  const l=_lang(); status(STUDIO_T[l]?.msgDuplicated || STUDIO_T[l]?.msgLoaded || 'Duplicated!');
 }
 function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(lv));lv=JSON.parse(undoStack.pop());clearSel();redraw();}
 function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(lv));lv=JSON.parse(redoStack.pop());clearSel();redraw();}
@@ -1194,7 +1194,8 @@ function gfParamChanged(){
   const dir=document.getElementById('gf-dir').value; const str=+document.getElementById('gf-str').value;
   document.getElementById('gf-str-v').textContent=str;
   const isFr=_lang()==='fr';
-  document.getElementById('gf-hint').textContent=str===0?(isFr?'○ Apesanteur':'○ Weightless'):GF_HINTS()[dir];
+  const _t=STUDIO_T[_lang()]||{};
+  document.getElementById('gf-hint').textContent=str===0?(_t.gfWeightless||'○ Weightless'):GF_HINTS()[dir];
   if(selection.length===1&&selectedType==='gravflip'){const z=lv.gravflip[selectedIdx];if(z){z.dir=dir;z.strength=str;}}
   redraw();
 }
