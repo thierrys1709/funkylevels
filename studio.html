@@ -1547,10 +1547,10 @@ function closeLoadModal(){document.getElementById('load-modal').classList.remove
 function renderLoadItems(data){
   const list=document.getElementById('load-list');const l=_lang();
   if(!data||!data.length){list.innerHTML='<div class="load-empty">'+(STUDIO_T[l]?.emptySearch||'No results.')+'</div>';return;}
-  const VIS={
-    private:{label:l==='fr'?'Privé':'Private',cls:'private'},
-    public: {label:'Public',cls:'public'},
-    code:   {label:l==='fr'?'Invitation':'Invite',cls:'code'}
+    const VIS={
+    private:{label:t2.visPrivate||'Private',cls:'private'},
+    public: {label:t2.visPublic||'Public',cls:'public'},
+    code:   {label:t2.visCode||'Invite',cls:'code'}
   };
   const t2=STUDIO_T[l]||{};
   let html=`<table class="load-table"><thead><tr><th>${t2.colName||'NOM'}</th><th>${t2.colDate||'DERNIÈRE MODIF.'}</th><th>${t2.colStatus||'ÉTAT'}</th></tr></thead><tbody>`;
