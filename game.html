@@ -845,11 +845,72 @@ function gUpdate(now){
   });
 
   (gLv.push||[]).forEach(t=>{
-    t.vy=(t.vy||0)+GRAV;t.vy=Math.min(t.vy,20);t.vx=(t.vx||0)*(t.fric||0.8);t.x+=t.vx;t.y+=t.vy;
+    // ── Gravité directionnelle pour les blocs push ──
+    let pGravDir='d',pGravStr=GRAV;
+    // 1. Zones gravflip
+    (gLv.gravflip||[]).forEach(z=>{const margin=4,tz={x:z.x+margin,y:z.y+margin,w:z.w-margin*2,h:z.h-margin*2};if(tz.w>0&&tz.h>0&&ov(t,tz)){pGravDir=z.dir??'u';pGravStr=(z.strength??10)*GRAV/10;}});
+    // 2. Zones gblock (planète) si pas déjà dans une gravflip
+    if(pGravDir==='d'){
+      (gLv.gblock||[]).forEach(g=>{
+        const STICK=20,halo={x:g.x-STICK,y:g.y-STICK,w:g.w+STICK*2,h:g.h+STICK*2};if(!ov(t,halo))return;
+        const tcx=t.x+t.w/2,tcy=t.y+t.h/2;
+        const dTop=g.y-(t.y+t.h),dBot=t.y-(g.y+g.h),dLeft=g.x-(t.x+t.w),dRight=t.x-(g.x+g.w);
+        const aH=tcx>g.x&&tcx<g.x+g.w,aV=tcy>g.y&&tcy<g.y+g.h;
+        const cands=[];
+        if(aH&&dTop>=-STICK&&dTop<=STICK)cands.push({dir:'d',d:Math.abs(dTop)});
+        if(aH&&dBot>=-STICK&&dBot<=STICK)cands.push({dir:'u',d:Math.abs(dBot)});
+        if(aV&&dLeft>=-STICK&&dLeft<=STICK)cands.push({dir:'r',d:Math.abs(dLeft)});
+        if(aV&&dRight>=-STICK&&dRight<=STICK)cands.push({dir:'l',d:Math.abs(dRight)});
+        if(!cands.length)return;cands.sort((a,b)=>a.d-b.d);pGravDir=cands[0].dir;pGravStr=GRAV;
+      });
+    }
+    // Appliquer la gravité selon la direction
+    if(pGravDir==='d'){t.vy=(t.vy||0)+pGravStr;t.vy=Math.min(t.vy,20);t.vx=(t.vx||0)*(t.fric||0.8);}
+    else if(pGravDir==='u'){t.vy=(t.vy||0)-pGravStr;t.vy=Math.max(t.vy,-20);t.vx=(t.vx||0)*(t.fric||0.8);}
+    else if(pGravDir==='r'){t.vx=(t.vx||0)+pGravStr;t.vx=Math.min(t.vx,20);t.vy=(t.vy||0)*(t.fric||0.8);}
+    else if(pGravDir==='l'){t.vx=(t.vx||0)-pGravStr;t.vx=Math.max(t.vx,-20);t.vy=(t.vy||0)*(t.fric||0.8);}
+    t.x+=t.vx;t.y+=t.vy;
+    // Détection hors-écran selon direction
+    const outOfBounds=(pGravDir==='d'&&t.y>EH+200)||(pGravDir==='u'&&t.y<-t.h-200)||(pGravDir==='r'&&t.x>EW+200)||(pGravDir==='l'&&t.x<-t.w-200);
+    // Collisions avec solides
     const solidBlocks=[...gLv.fixed,...(gLv.invis||[]),...(gLv.mobile||[]),...(gLv.bounce||[])];
-    solidBlocks.forEach(f=>{if(!ov(t,f))return;const oT=(t.y+t.h)-f.y,oB=(f.y+f.h)-t.y,oL=(t.x+t.w)-f.x,oR=(f.x+f.w)-t.x,m=Math.min(oT,oB,oL,oR);if(m===oT&&t.vy>=0){t.y=f.y-t.h;t.vy=0;}else if(m===oB&&t.vy<0){t.y=f.y+f.h;t.vy=0;}else if(m===oL){t.x=f.x-t.w;t.vx=0;}else if(m===oR){t.x=f.x+f.w;t.vx=0;}});
-    if(ov(gPlayer,t)){const oT=(gPlayer.y+gPlayer.h)-t.y,oB=(t.y+t.h)-gPlayer.y,oL=(gPlayer.x+gPlayer.w)-t.x,oR=(t.x+t.w)-gPlayer.x,m=Math.min(oT,oB,oL,oR);if(m===oB&&t.vy>2)killPlayer();else if(m===oT&&gPlayer.vy>=0){gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}else if(m===oB&&gPlayer.vy<0){gPlayer.y=t.y+t.h;gPlayer.vy=0;}else if(m===oL){t.vx=Math.max(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x-gPlayer.w;gPushEffects.push({x:t.x,y:t.y,w:t.w,h:t.h,life:1});}else if(m===oR){t.vx=Math.min(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x+t.w;gPushEffects.push({x:t.x,y:t.y,w:t.w,h:t.h,life:1});}}
-    checkBlockSpikes(t);if(t.y>EH+200){t.x=t.ox;t.y=t.oy;t.vx=0;t.vy=0;}
+    solidBlocks.forEach(f=>{
+      if(!ov(t,f))return;
+      const oT=(t.y+t.h)-f.y,oB=(f.y+f.h)-t.y,oL=(t.x+t.w)-f.x,oR=(f.x+f.w)-t.x,m=Math.min(oT,oB,oL,oR);
+      if(pGravDir==='r'||pGravDir==='l'){
+        if(m===oL&&t.vx>=0){t.x=f.x-t.w;t.vx=0;}
+        else if(m===oR&&t.vx<=0){t.x=f.x+f.w;t.vx=0;}
+        else if(m===oT){t.y=f.y-t.h;t.vy=0;}
+        else if(m===oB){t.y=f.y+f.h;t.vy=0;}
+      }else{
+        if(m===oT&&t.vy>=0){t.y=f.y-t.h;t.vy=0;}
+        else if(m===oB&&t.vy<=0){t.y=f.y+f.h;t.vy=0;}
+        else if(m===oL){t.x=f.x-t.w;t.vx=0;}
+        else if(m===oR){t.x=f.x+f.w;t.vx=0;}
+      }
+    });
+    // Interaction joueur ↔ bloc push
+    if(ov(gPlayer,t)){
+      const oT=(gPlayer.y+gPlayer.h)-t.y,oB=(t.y+t.h)-gPlayer.y,oL=(gPlayer.x+gPlayer.w)-t.x,oR=(t.x+t.w)-gPlayer.x,m=Math.min(oT,oB,oL,oR);
+      const gd=gPlayer.gravDir;
+      // Écrasement selon direction du push
+      if(m===oT&&pGravDir==='d'&&t.vy>2){killPlayer();}
+      else if(m===oB&&pGravDir==='u'&&t.vy<-2){killPlayer();}
+      else if(m===oL&&pGravDir==='r'&&t.vx>2){killPlayer();}
+      else if(m===oR&&pGravDir==='l'&&t.vx<-2){killPlayer();}
+      // Atterrissage du joueur sur le push (selon gravité du joueur)
+      else if(m===oT&&gd==='d'){gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}
+      else if(m===oB&&gd==='u'){gPlayer.y=t.y+t.h;gPlayer.vy=0;gPlayer.onGround=true;}
+      else if(m===oL&&gd==='r'){gPlayer.x=t.x-gPlayer.w;gPlayer.vx=0;gPlayer.onGround=true;}
+      else if(m===oR&&gd==='l'){gPlayer.x=t.x+t.w;gPlayer.vx=0;gPlayer.onGround=true;}
+      // Pousser le bloc latéralement
+      else if(m===oL){t.vx=Math.max(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x-gPlayer.w;gPushEffects.push({x:t.x,y:t.y,w:t.w,h:t.h,life:1});}
+      else if(m===oR){t.vx=Math.min(t.vx,gPlayer.vx*0.5);gPlayer.x=t.x+t.w;gPushEffects.push({x:t.x,y:t.y,w:t.w,h:t.h,life:1});}
+      else if(m===oT){gPlayer.y=t.y-gPlayer.h;gPlayer.vy=0;gPlayer.onGround=true;}
+      else if(m===oB&&gPlayer.vy<0){gPlayer.y=t.y+t.h;gPlayer.vy=0;}
+    }
+    checkBlockSpikes(t);
+    if(outOfBounds){t.x=t.ox;t.y=t.oy;t.vx=0;t.vy=0;}
   });
 
   (gLv.bounce||[]).forEach(p=>{
