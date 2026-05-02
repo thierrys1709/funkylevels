@@ -416,23 +416,23 @@ body {
       <div id="multi-type-panel" style="display:flex;flex-direction:column;gap:10px;"></div>
       <div class="spike-sub" id="multi-spike-sub">
         <button class="spike-toggle" id="multi-spike-toggle" onclick="toggleSpikeOpts('multi')">🗡 PIQUES ▸</button>
-        <div class="spike-opts" id="multi-spike-opts">
-          <div class="prow"><label>DIRECTIONS</label>
+<div class="spike-opts" id="multi-spike-opts">
+          <div class="prow"><label data-lbl="spikeDirs">DIRECTIONS</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-              <div class="crow"><input type="checkbox" id="multi-sp-u" onchange="multiSpikeChanged()"><label for="multi-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-              <div class="crow"><input type="checkbox" id="multi-sp-d" onchange="multiSpikeChanged()"><label for="multi-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-              <div class="crow"><input type="checkbox" id="multi-sp-l" onchange="multiSpikeChanged()"><label for="multi-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-              <div class="crow"><input type="checkbox" id="multi-sp-r" onchange="multiSpikeChanged()"><label for="multi-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+              <div class="crow"><input type="checkbox" id="multi-sp-u" onchange="multiSpikeChanged()"><label for="multi-sp-u" style="cursor:pointer;" data-lbl="spikeUp">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="multi-sp-d" onchange="multiSpikeChanged()"><label for="multi-sp-d" style="cursor:pointer;" data-lbl="spikeDown">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="multi-sp-l" onchange="multiSpikeChanged()"><label for="multi-sp-l" style="cursor:pointer;" data-lbl="spikeLeft">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="multi-sp-r" onchange="multiSpikeChanged()"><label for="multi-sp-r" style="cursor:pointer;" data-lbl="spikeRight">→ DROITE</label></div>
             </div>
           </div>
-          <div class="prow"><div class="crow"><input type="checkbox" id="multi-sp-hidden" onchange="multiSpikeChanged()"><label for="multi-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
-          <div class="prow"><label>DÉLAI (s)</label>
+          <div class="prow"><div class="crow"><input type="checkbox" id="multi-sp-hidden" onchange="multiSpikeChanged()"><label for="multi-sp-hidden" style="cursor:pointer;" data-lbl="spikeHidden">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow"><label data-lbl="spikeDelay">DÉLAI (s)</label>
             <div style="display:flex;gap:4px;align-items:center">
               <input type="range" id="multi-sp-delay" min="0" max="10" step="0.5" value="0" oninput="multiSpikeChanged()">
               <span class="pval" id="multi-sp-delay-v">0</span>
             </div>
           </div>
-          <button onclick="multiSpikeClear()" style="font-family:Rajdhani,sans-serif;font-size:13px;font-weight:700;padding:6px;background:#1a0808;border:1.5px solid #f04060;color:#f04060;border-radius:4px;cursor:pointer;margin-top:2px;">✕ ENLEVER PIQUES</button>
+          <button onclick="multiSpikeClear()" data-lbl="spikeRemove" style="font-family:Rajdhani,sans-serif;font-size:13px;font-weight:700;padding:6px;background:#1a0808;border:1.5px solid #f04060;color:#f04060;border-radius:4px;cursor:pointer;margin-top:2px;">✕ ENLEVER PIQUES</button>
         </div>
       </div>
     </div>
