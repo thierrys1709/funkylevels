@@ -657,7 +657,9 @@ function gDraw(){
   (gLv.trap||[]).forEach(t=>{if(t.state==='gone')return;if(t.state==='predelay'){const shakeAmt=1+((t.preTimer||0)/Math.max(1,(t.preDelay||0)*60))*2,ox=t.x;t.x+=(Math.random()-0.5)*shakeAmt*2;gPlatform(t);t.x=ox;drawBlockSpikes(t);}else{gPlatform(t);drawBlockSpikes(t);}});
   (gLv.mobile||[]).forEach(t=>{const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);GX.fillStyle=(t.trigger==='approach')?'#20c0f0':'#4090f0';GX.fillRect(x,y,w,4);drawBlockSpikes(t);});
   (gLv.push||[]).forEach(t=>{gPlatform(t);drawBlockSpikes(t);});
-  (gLv.speed||[]).forEach(z=>{
+    (gLv.speed||[]).forEach(z=>{
+    const isActive=ov(gPlayer,z)||(gLv.push||[]).some(p=>ov(p,z));
+    if(!isActive)return;
     const x=Math.round(z.x),y=Math.round(z.y),w=Math.round(z.w),h=Math.round(z.h);
     const mult=(z.spd??5)/5;const fast=mult>1;
     GX.save();GX.globalAlpha=0.18;GX.fillStyle=fast?'#40f0c0':'#f04060';GX.fillRect(x,y,w,h);
