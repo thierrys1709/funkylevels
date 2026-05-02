@@ -933,7 +933,7 @@ function updatePanelState() {
   const sameType = types.length === 1;
   const type = sameType ? types[0] : null;
   const l = _lang(); const tn = STUDIO_T[l]?.toolNames || {};
-  if (count) { const label = sameType ? (tn[type] || type.toUpperCase()) : (l === 'fr' ? 'types mixtes' : 'mixed types'); count.textContent = `${selection.length} blocs • ${label}`; }
+  if (count) { const label = sameType ? (tn[type] || type.toUpperCase()) : (t.multiMixed || 'mixed types'); count.textContent = `${selection.length} ${t.multiBlocs||'blocs'} • ${label}`; }
   const typePanel = document.getElementById('multi-type-panel');
   if (typePanel) typePanel.innerHTML = '';
   if (sameType) loadMultiTypePanel(type);
@@ -1043,7 +1043,7 @@ function loadMultiSpikePanel() {
   const hasSpikes = spikes.filter(sp => sp && sp.dirs && sp.dirs.length > 0);
   const opts = document.getElementById('multi-spike-opts'); const btn = document.getElementById('multi-spike-toggle');
   if (hasSpikes.length === 0) {
-    if(opts) opts.classList.remove('show'); if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
+    if(opts) opts.classList.remove('show'); if(btn){btn.classList.remove('active');btn.textContent=t.spikeToggleOff||'🗡 SPIKES ▸';}
     ['multi-sp-u','multi-sp-d','multi-sp-l','multi-sp-r','multi-sp-hidden'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=false;});
     const del=document.getElementById('multi-sp-delay');if(del)del.value=0;const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=0;return;
   }
