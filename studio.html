@@ -1091,17 +1091,25 @@ function multiSpikeClear() {
 function addToSel(type, idx) {
   if (!selection.find(s => s.type===type && s.idx===idx)) selection.push({type,idx});
   syncLegacy();
-  if(selection.length===1&&type==='fixed'){const b=lv.fixed[idx];if(b)blockSpikePanelLoad('fixed',b);}
-  if(selection.length===1&&type==='invis'){const b=lv.invis[idx];if(b)blockSpikePanelLoad('invis',b);}
+  if(selection.length===1&&type==='fixed'){const b=lv.fixed[idx];if(b){blockSpikePanelLoad('fixed',b);_showSection('fixed');}}
+  if(selection.length===1&&type==='invis'){const b=lv.invis[idx];if(b){blockSpikePanelLoad('invis',b);_showSection('invis');}}
   if(selection.length===1&&type==='bounce'){const b=lv.bounce[idx];if(b){bouncePanelLoad(b);blockSpikePanelLoad('bounce',b);showBouncePanel();}}
   if(selection.length===1&&(type==='mobile'||type==='slider')){const m=lv.mobile[idx];if(m){moPanelLoad(m);blockSpikePanelLoad('mobile',m);showMoPanel();}}
-  if(selection.length===1&&type==='push'){const b=lv.push[idx];if(b)blockSpikePanelLoad('push',b);}
+  if(selection.length===1&&type==='push'){const b=lv.push[idx];if(b){blockSpikePanelLoad('push',b);_showSection('push');}}
   if(selection.length===1&&type==='gravflip'){const z=lv.gravflip[idx];if(z){gfPanelLoad(z);showGfPanel();}}
   if(selection.length===1&&type==='speed'){const z=lv.speed[idx];if(z){spPanelLoad(z);showSpPanel();}}
   if(selection.length===1&&type==='flash'){const f=lv.flash[idx];if(f){flashPanelLoad(f);blockSpikePanelLoad('flash',f);showFlashPanel();}}
   if(selection.length===1&&type==='gblock'){const g=lv.gblock[idx];if(g){gblockPanelLoad(g);blockSpikePanelLoad('gblock',g);showGblockPanel();}}
   if(selection.length===1&&type==='darkness'){const dk=lv.darkness[idx];if(dk){dkPanelLoad(dk);showDkPanel();}}
   updatePanelState();
+}
+function _showSection(type) {
+  document.querySelectorAll('.psec').forEach(s => s.classList.remove('show'));
+  document.getElementById('s-' + type)?.classList.add('show');
+  const l = _lang(); const st = STUDIO_T[l] || {};
+  const prefix = st.paramPrefix || 'PARAMS: ';
+  const names  = st.toolNames  || {};
+  document.getElementById('ptitle').textContent = prefix + (names[type] || type.toUpperCase());
 }
 function toggleSel(type,idx){const i=selection.findIndex(s=>s.type===type&&s.idx===idx);if(i>=0)selection.splice(i,1);else selection.push({type,idx});syncLegacy();updatePanelState();}
 function isSelected(type,idx){return!!selection.find(s=>s.type===type&&s.idx===idx);}
