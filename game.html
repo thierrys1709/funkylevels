@@ -665,7 +665,10 @@ function gDraw(){
     GX.globalAlpha=0.7;GX.fillStyle=fast?'#40f0c0':'#f04060';GX.font='bold 11px "Press Start 2P"';GX.textAlign='center';
     GX.fillText(fast?'▶▶':'◀◀',x+w/2,y+h/2+4);GX.textAlign='left';GX.restore();
   });
-  (gLv.gravflip||[]).forEach(z=>{
+    (gLv.gravflip||[]).forEach(z=>{
+    // Vérifier si le joueur ou un bloc push est dans la zone
+    const isActive=ov(gPlayer,z)||(gLv.push||[]).some(p=>ov(p,z));
+    if(!isActive)return;
     const x=Math.round(z.x),y=Math.round(z.y),w=Math.round(z.w),h=Math.round(z.h);
     const dir=z.dir||'u';const GFC=GF_COLS[dir]||GF_COLS.u;
     GX.save();GX.globalAlpha=0.15;GX.fillStyle=GFC.bg;GX.fillRect(x,y,w,h);
