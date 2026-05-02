@@ -514,7 +514,7 @@ body{background:var(--bg);font-family:'Rajdhani',sans-serif;display:flex;flex-di
       <input type="text" id="pub-name" placeholder="Mon niveau funky..." maxlength="40" style="margin-top:8px;">
     </div>
     <div id="pub-vis-section" style="display:none;">
-      <label id="pub-vis-lbl" style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--label);letter-spacing:1px;text-transform:uppercase;">VISIBILITÉ</label>
+      <label id="pub-vis-lbl" style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--label);letter-spacing:1px;text-transform:uppercase;"></label>
       <div style="display:flex;gap:8px;margin-top:8px;">
         <button class="pub-vis-btn active" id="vis-private" onclick="setVis('private')">🔒 PRIVÉ</button>
         <button class="pub-vis-btn"        id="vis-public"  onclick="setVis('public')">🌍 PUBLIC</button>
@@ -536,8 +536,8 @@ body{background:var(--bg);font-family:'Rajdhani',sans-serif;display:flex;flex-di
     <div id="published-modal-title" style="font-family:Orbitron,monospace;font-size:13px;color:#f0a040;text-align:center;letter-spacing:2px;">🔒 PUBLISHED LEVEL</div>
     <p id="published-modal-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.8;text-align:center;"></p>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button onclick="confirmDuplicateFromModal()" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#2a1a00;border:2px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;">⧉ CRÉER UNE COPIE MODIFIABLE</button>
-      <button onclick="document.getElementById('published-modal').style.display='none';openLoadModal();" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">📂 CHARGER UN AUTRE NIVEAU</button>
+      <button id="published-dup-btn" onclick="confirmDuplicateFromModal()" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#2a1a00;border:2px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;">⧉ CRÉER UNE COPIE MODIFIABLE</button>
+      <button id="published-load-btn" onclick="document.getElementById('published-modal').style.display='none';openLoadModal();" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#12122a;border:1.5px solid #4040aa;color:#8080cc;border-radius:6px;cursor:pointer;">📂 CHARGER UN AUTRE NIVEAU</button>
     </div>
   </div>
 </div>
@@ -558,7 +558,7 @@ body{background:var(--bg);font-family:'Rajdhani',sans-serif;display:flex;flex-di
 <!-- DUPLICATE MODAL -->
 <div id="dup-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
   <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
-    <div style="font-family:Orbitron,monospace;font-size:12px;color:#f0a040;text-align:center;letter-spacing:1px;">🔒 NIVEAU PUBLIÉ</div>
+    <div id="dup-modal-title" style="font-family:Orbitron,monospace;font-size:12px;color:#f0a040;text-align:center;letter-spacing:1px;">🔒 NIVEAU PUBLIÉ</div>
     <p id="dup-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.7;text-align:center;"></p>
     <div style="display:flex;gap:10px;">
       <button onclick="closeDupModal()" style="flex:1;font-family:Orbitron,monospace;font-size:9px;padding:12px;background:#12122a;border:1.5px solid #2a2a55;color:#6060aa;border-radius:6px;cursor:pointer;" id="dup-cancel-btn">ANNULER</button>
@@ -634,7 +634,7 @@ async function applyStudioLang(){
 
   // Load modal header
   const lh=document.getElementById('load-modal-title');
-  if(lh)lh.textContent='📂 '+(data.home?.stabMine||(l==='fr'?'MES NIVEAUX':'MY LEVELS'));
+  const homeT=(_langCache[l]||{}).home||{};if(lh)lh.textContent='📂 '+(homeT.stabMine||(l==='fr'?'MES NIVEAUX':'MY LEVELS'));
 
   // Unsaved modal
   const su=(id,key)=>{const el=document.getElementById(id);if(el&&t[key])el.innerHTML=t[key];};
@@ -1341,11 +1341,15 @@ function setVis(v){
   if(hint){const tp=STUDIO_T._pub||{};const map={private:tp.hintPrivate,public:tp.hintPublic,code:tp.hintCode};hint.textContent=map[v]||'';}
 }
 function _applyPubLang(){
+  const l=_lang();
   const tp=STUDIO_T._pub||{};
   const s=(id,val,prop='textContent')=>{const el=document.getElementById(id);if(el&&val)el[prop]=val;};
   s('pub-title-lbl',tp.title);s('pub-name-lbl',tp.nameLbl);s('pub-name',tp.ph,'placeholder');
   s('pub-vis-lbl',tp.visLbl);s('pub-cancel-btn',tp.cancel);s('pub-ok-btn',tp.ok);
-  ['private','public','code'].forEach(v=>{const el=document.getElementById('vis-'+v);if(el)el.textContent=v==='private'?'🔒 PRIVÉ':v==='public'?'🌍 PUBLIC':'🔑 CODE';});
+  const stL=STUDIO_T[l]||{};
+  const vbp=document.getElementById('vis-private');if(vbp)vbp.textContent='🔒 '+(stL.visPrivate||'PRIVÉ');
+  const vbu=document.getElementById('vis-public');if(vbu)vbu.textContent='🌍 '+(stL.visPublic||'PUBLIC');
+  const vbc=document.getElementById('vis-code');if(vbc)vbc.textContent='🔑 '+(stL.visCode||'CODE');
   setVis(_currentVisibility);
 }
 function openPublish(){
@@ -1598,6 +1602,9 @@ function showPublishedModal(title){
   const l=_lang();const t=STUDIO_T[l]||{};
   const msg='<strong style="color:#f0e040;">'+title+'</strong><br><br>'+(t.publishedModalMsg1||'This level is published and cannot be edited directly.')+'<br>'+(t.publishedModalMsg2||'Create a private copy to make changes.');
   document.getElementById('published-modal-msg').innerHTML=msg;
+  const pmTitle=document.getElementById('published-modal-title');if(pmTitle)pmTitle.textContent=t.publishedModalTitle||'🔒 PUBLISHED LEVEL';
+  const pmDup=document.getElementById('published-dup-btn');if(pmDup)pmDup.textContent=t.publishedDupBtn||'⧉ CRÉER UNE COPIE MODIFIABLE';
+  const pmLoad=document.getElementById('published-load-btn');if(pmLoad)pmLoad.textContent=t.publishedLoadBtn||'📂 CHARGER UN AUTRE NIVEAU';
   document.getElementById('published-modal').style.display='flex';
 }
 async function confirmDuplicateFromModal(){
@@ -1607,6 +1614,7 @@ async function confirmDuplicateFromModal(){
 }
 function showDupModal(){
   const l=_lang();const t=STUDIO_T[l]||{};
+  const dmTitle=document.getElementById('dup-modal-title');if(dmTitle)dmTitle.textContent=t.dupModalTitle||'🔒 NIVEAU PUBLIÉ';
   document.getElementById('dup-msg').innerHTML=(t.dupModalMsg||'This level is published.\nYou cannot edit it directly.\n\nA private copy will be created.').replace(/\n/g,'<br>');
   const dc=document.getElementById('dup-cancel-btn');const dok=document.getElementById('dup-ok-btn');
   if(dc)dc.textContent=t.dupCancel||'CANCEL';
@@ -1654,11 +1662,11 @@ async function loadPlayerProfile(){
   }
   if(!lid){checkAutosaveOnLoad();return;}
   const{data:sess}=await _sb.auth.getSession();
-  if(!sess.session){document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 CONNEXION REQUISE</div><a href="login.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">SE CONNECTER</a></div>`;return;}
+  if(!sess.session){const _el=STUDIO_T[_lang()]||{};document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 ${_el.errLoginRequired||'CONNEXION REQUISE'}</div><a href="login.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">${_el.errLoginBtn||'SE CONNECTER'}</a></div>`;return;}
   const{data,error}=await _sb.from('levels').select('*').eq('id',lid).single();
   const l2=_lang();
   if(error||!data){showSaveToast(STUDIO_T[l2]?.toastNotFound||'⚠️ Level not found');return;}
-  if(data.user_id!==sess.session.user.id){document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 ACCÈS REFUSÉ</div><a href="index.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">🏠 ACCUEIL</a></div>`;return;}
+  if(data.user_id!==sess.session.user.id){const _el=STUDIO_T[_lang()]||{};document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;background:#06060e;font-family:Orbitron,monospace;"><div style="font-size:14px;color:#f04060;">🔒 ${_el.errAccessDenied||'ACCÈS REFUSÉ'}</div><a href="index.html" style="font-size:11px;color:#7060f0;padding:12px 24px;border:1.5px solid #7060f0;border-radius:6px;text-decoration:none;">${_el.btnAccueil||'🏠 ACCUEIL'}</a></div>`;return;}
   lv=data.data;
   ['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock','darkness'].forEach(k=>{if(!lv[k])lv[k]=[];});
   _currentLevelId=lid;_currentVisibility=data.visibility||'private';_authorCompleted=data.author_completed||false;_isPublished=data.is_published||false;
