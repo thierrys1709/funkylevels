@@ -406,7 +406,7 @@ body {
 <div id="layout" style="visibility:hidden;">
   <div id="panel">
     <div id="panel-overlay"></div>
-    <div id="panel-no-sel">AUCUN BLOC<br>SÉLECTIONNÉ</div>
+    <div id="panel-no-sel" data-lbl="noSel">AUCUN BLOC<br>SÉLECTIONNÉ</div>
     <h2 id="ptitle">OUTIL : FIXE</h2>
 
     <!-- Multi-sélection -->
@@ -747,7 +747,7 @@ body {
 <!-- PUBLISHED LEVEL MODAL -->
 <div id="published-modal" style="display:none;position:fixed;inset:0;background:#000000dd;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:36px 32px;width:min(440px,90vw);display:flex;flex-direction:column;gap:20px;">
-    <div style="font-family:Orbitron,monospace;font-size:13px;color:#f0a040;text-align:center;letter-spacing:2px;">🔒 NIVEAU PUBLIÉ</div>
+    <div id="published-modal-title" style="font-family:Orbitron,monospace;font-size:13px;color:#f0a040;text-align:center;letter-spacing:2px;">🔒 PUBLISHED LEVEL</div>
     <p id="published-modal-msg" style="font-family:Rajdhani,sans-serif;font-size:14px;color:#a0a0cc;line-height:1.8;text-align:center;"></p>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <button onclick="confirmDuplicateFromModal()" style="font-family:Orbitron,monospace;font-size:9px;padding:14px;background:#2a1a00;border:2px solid #f0a040;color:#f0a040;border-radius:6px;cursor:pointer;">⧉ CRÉER UNE COPIE MODIFIABLE</button>
@@ -933,6 +933,7 @@ function updatePanelState() {
   const sameType = types.length === 1;
   const type = sameType ? types[0] : null;
   const l = _lang(); const tn = STUDIO_T[l]?.toolNames || {};
+ const t = STUDIO_T[l] || {};
   if (count) { const label = sameType ? (tn[type] || type.toUpperCase()) : (t.multiMixed || 'mixed types'); count.textContent = `${selection.length} ${t.multiBlocs||'blocs'} • ${label}`; }
   const typePanel = document.getElementById('multi-type-panel');
   if (typePanel) typePanel.innerHTML = '';
@@ -1039,6 +1040,7 @@ function multiBounceChanged() {
 //  MULTI-SPIKE
 // ─────────────────────────────────────────────
 function loadMultiSpikePanel() {
+  const t = STUDIO_T[_lang()] || {};
   const spikes = selection.map(s => lv[s.type]?.[s.idx]?.spikes);
   const hasSpikes = spikes.filter(sp => sp && sp.dirs && sp.dirs.length > 0);
   const opts = document.getElementById('multi-spike-opts'); const btn = document.getElementById('multi-spike-toggle');
@@ -1548,12 +1550,12 @@ function closeLoadModal(){document.getElementById('load-modal').classList.remove
 function renderLoadItems(data){
   const list=document.getElementById('load-list');const l=_lang();
   if(!data||!data.length){list.innerHTML='<div class="load-empty">'+(STUDIO_T[l]?.emptySearch||'No results.')+'</div>';return;}
-    const VIS={
+     const t2=STUDIO_T[l]||{};
+  const VIS={
     private:{label:t2.visPrivate||'Private',cls:'private'},
     public: {label:t2.visPublic||'Public',cls:'public'},
     code:   {label:t2.visCode||'Invite',cls:'code'}
   };
-  const t2=STUDIO_T[l]||{};
   let html=`<table class="load-table"><thead><tr><th>${t2.colName||'NOM'}</th><th>${t2.colDate||'DERNIÈRE MODIF.'}</th><th>${t2.colStatus||'ÉTAT'}</th></tr></thead><tbody>`;
   data.forEach(lvl=>{
     const ts=lvl.updated_at||lvl.created_at;const d=new Date(ts);
