@@ -1047,7 +1047,7 @@ function loadMultiSpikePanel() {
     ['multi-sp-u','multi-sp-d','multi-sp-l','multi-sp-r','multi-sp-hidden'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=false;});
     const del=document.getElementById('multi-sp-delay');if(del)del.value=0;const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=0;return;
   }
-  if(opts) opts.classList.add('show'); if(btn){btn.classList.add('active');btn.textContent='🗡 PIQUES ▾';}
+  if(opts) opts.classList.add('show'); if(btn){btn.classList.add('active');btn.textContent=t.spikeToggleOn||'🗡 SPIKES ▾';}
   const allDirs=hasSpikes.map(sp=>JSON.stringify([...sp.dirs].sort()));
   const allHidden=hasSpikes.map(sp=>sp.hidden||false);
   const allDelay=hasSpikes.map(sp=>sp.delay||0);
@@ -1552,7 +1552,8 @@ function renderLoadItems(data){
     public: {label:'Public',cls:'public'},
     code:   {label:l==='fr'?'Invitation':'Invite',cls:'code'}
   };
-  let html='<table class="load-table"><thead><tr><th>NOM</th><th>DERNIÈRE MODIF.</th><th>ÉTAT</th></tr></thead><tbody>';
+  const t2=STUDIO_T[l]||{};
+  let html=`<table class="load-table"><thead><tr><th>${t2.colName||'NOM'}</th><th>${t2.colDate||'DERNIÈRE MODIF.'}</th><th>${t2.colStatus||'ÉTAT'}</th></tr></thead><tbody>`;
   data.forEach(lvl=>{
     const ts=lvl.updated_at||lvl.created_at;const d=new Date(ts);
     const dateStr=d.toLocaleDateString(l==='fr'?'fr-FR':'en-GB');
