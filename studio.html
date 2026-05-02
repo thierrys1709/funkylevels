@@ -5,316 +5,109 @@
 <title>Platformer Studio</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
-
-:root {
-  --bg:        #04040c;
-  --bg2:       #0a0a1a;
-  --bg3:       #10102a;
-  --border:    #252550;
-  --border2:   #3a3a70;
-  --accent:    #ffe040;
-  --accent2:   #8070ff;
-  --accent3:   #40d0ff;
-  --green:     #40ff90;
-  --red:       #ff4060;
-  --text:      #f0f0ff;
-  --text2:     #c0c0e8;
-  --muted:     #8080bb;
-  --tool-bg:   #0c0c20;
-  --tool-hover:#181838;
-  --tool-active:#22226a;
-  --sep:       #22224a;
-  --label:     #9090dd;
-  --input-bg:  #06060f;
-  --shadow:    0 4px 24px #00000099;
-}
-
-body.light {
-  --bg:        #f0f0fa;
-  --bg2:       #e4e4f4;
-  --bg3:       #d8d8ee;
-  --border:    #c0c0dc;
-  --border2:   #a0a0c8;
-  --text:      #111128;
-  --text2:     #444466;
-  --muted:     #888899;
-  --tool-bg:   #e0e0f0;
-  --tool-hover:#d0d0e8;
-  --tool-active:#b0b0e0;
-  --sep:       #c0c0dc;
-  --label:     #6060aa;
-  --input-bg:  #f8f8ff;
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  background: var(--bg);
-  font-family: 'Rajdhani', sans-serif;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-  color: var(--text);
-  user-select: none;
-  transition: background .3s, color .3s;
-}
-
-#topbar h1 {
-  font-family: 'Orbitron', monospace;
-  font-size: 13px;
-  font-weight: 900;
-  color: var(--accent);
-  letter-spacing: 2px;
-  text-shadow: 0 0 16px var(--accent), 0 0 32px var(--accent)66;
-  margin-right: 4px;
-  white-space: nowrap;
-}
-
-.sep { width: 1px; height: 36px; background: var(--sep); margin: 0 8px; flex-shrink: 0; }
-.tb-label { font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700; color: var(--label); text-transform: uppercase; letter-spacing: 2px; }
-
-#topbar {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 0 10px;
-  background: #060614;
-  border-bottom: 2px solid var(--border2);
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  min-height: 62px;
-  box-shadow: 0 2px 24px #00000088;
-  overflow: visible;
-  position: relative;
-  z-index: 50;
-}
-.tb-group { display: flex; gap: 3px; align-items: center; }
-
-.tool-btn, .act-btn, .zoom-btn { position: relative; }
-
-.tool-btn {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  padding: 7px 11px;
-  border: 2px solid var(--border2);
-  border-radius: 5px;
-  cursor: pointer;
-  background: var(--tool-bg);
-  color: var(--text);
-  white-space: nowrap;
-  transition: all .12s;
-  letter-spacing: 0.5px;
-}
-.tool-btn:hover { border-color: var(--accent2); color: #fff; background: var(--tool-hover); transform: translateY(-1px); box-shadow: 0 3px 14px #8070ff44; }
-.tool-btn.active { background: var(--tool-active); border-color: var(--accent2); color: var(--accent); box-shadow: 0 0 12px #8070ff66; }
-
-.act-btn {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  padding: 7px 14px;
-  border-radius: 5px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all .12s;
-  letter-spacing: 0.5px;
-}
-.act-btn:hover { filter: brightness(1.4); transform: translateY(-1px); }
-#btn-play  { background: #0d2a0d; border: 2px solid #50aa50; color: var(--green); }
-#btn-save  { background: #0d0d2a; border: 2px solid #5050cc; color: #b0c0ff; }
-#btn-load  { background: #0d0d2a; border: 2px solid #5050cc; color: #b0c0ff; }
-#btn-clear { background: #2a0d0d; border: 2px solid #cc4040; color: var(--red); }
-
-.grid-sel {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 600;
-  font-size: 11px;
-  background: var(--input-bg);
-  border: 1.5px solid var(--border2);
-  color: var(--text);
-  padding: 5px 6px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.zoom-btn {
-  font-family: 'Orbitron', monospace;
-  font-size: 11px;
-  padding: 4px 10px;
-  border: 1.5px solid var(--border2);
-  border-radius: 4px;
-  cursor: pointer;
-  background: var(--tool-bg);
-  color: var(--text2);
-  transition: all .12s;
-}
-.zoom-btn:hover { color: var(--text); border-color: var(--accent2); background: var(--tool-hover); }
-
-#zoomLbl { font-family: 'Orbitron', monospace; font-size: 10px; color: var(--muted); min-width: 36px; text-align: center; }
-
-#level-name-input {
-  font-family: 'Orbitron', monospace;
-  font-size: 9px;
-  font-weight: 700;
-  background: var(--input-bg);
-  border: 1.5px solid var(--border2);
-  border-radius: 4px;
-  color: var(--accent);
-  padding: 6px 10px;
-  width: 175px;
-  outline: none;
-  transition: border-color .2s, box-shadow .2s;
-  letter-spacing: 1px;
-}
-#level-name-input:focus { border-color: var(--accent2); box-shadow: 0 0 8px #7060f044; }
-#level-name-input::placeholder { color: var(--muted); }
-
-.tool-btn[data-tip]:hover::after,
-.act-btn[data-tip]:hover::after,
-.zoom-btn[data-tip]:hover::after {
-  content: attr(data-tip);
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg2);
-  border: 1px solid var(--accent2);
-  color: var(--text);
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.7;
-  padding: 6px 12px;
-  border-radius: 4px;
-  white-space: pre;
-  pointer-events: none;
-  z-index: 9999 !important;
-  min-width: 140px;
-  text-align: center;
-  box-shadow: 0 6px 24px #00000099;
-}
-
-#layout { display: flex; flex: 1; overflow: hidden; position: relative; }
-
-#panel {
-  width: 230px;
-  flex-shrink: 0;
-  background: #06060f;
-  border-right: 2px solid var(--border2);
-  overflow-y: auto;
-  padding: 12px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  position: relative;
-}
-#panel::-webkit-scrollbar { width: 4px; }
-#panel::-webkit-scrollbar-track { background: var(--bg); }
-#panel::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-#panel h2 {
-  font-family: 'Orbitron', monospace;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent);
-  border-bottom: 2px solid var(--border2);
-  padding-bottom: 6px;
-  letter-spacing: 1px;
-}
-
-.psec { display: none; flex-direction: column; gap: 10px; }
-.psec.show { display: flex; }
-
-.pinfo {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.8;
-  background: #0b0b20;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid var(--border2);
-}
-
-.prow { display: flex; flex-direction: column; gap: 5px; }
-.prow label { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; color: var(--label); text-transform: uppercase; letter-spacing: 1px; }
-.prow select, .prow input[type=number] { width: 100%; background: var(--input-bg); border: 2px solid var(--border2); color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 15px; padding: 6px 8px; border-radius: 4px; }
-.prow input[type=range] { width: 100%; accent-color: var(--accent2); }
-.prow .crow { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--text); }
-.pval { font-family: 'Orbitron', monospace; font-size: 13px; color: var(--accent); min-width: 36px; text-align: right; font-weight: 700; }
-
-#cwrap { flex: 1; overflow: auto; position: relative; background: var(--bg); }
-#cwrap::-webkit-scrollbar { width: 6px; height: 6px; }
-#cwrap::-webkit-scrollbar-track { background: var(--bg); }
-#cwrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-#ecanvas { display: block; cursor: crosshair; }
-
-#statusbar { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 600; color: var(--text2); line-height: 1.8; padding: 3px 6px; border-top: 2px solid var(--border2); margin-top: 4px; }
-
-#publish-modal { display:none; position:fixed; inset:0; background:#000000bb; z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
-#publish-modal.show { display: flex; }
-.pub-box { background: var(--bg2); border: 2px solid var(--border2); border-radius: 8px; padding: 28px 24px; width: 360px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 0 60px #00000099, 0 0 30px #7060f022; }
-.pub-box h3 { font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700; color: var(--accent3); text-align: center; letter-spacing: 1px; }
-.pub-box label { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; color: var(--label); letter-spacing: 1px; text-transform: uppercase; }
-.pub-box input { background: var(--input-bg); border: 1.5px solid var(--border2); border-radius: 4px; color: var(--text); font-family: 'Orbitron', monospace; font-size: 11px; padding: 10px 12px; outline: none; width: 100%; transition: border-color .2s; margin-top: 6px; }
-.pub-box input:focus { border-color: var(--accent2); }
-.pub-row { display: flex; gap: 10px; }
-.pub-btn { flex: 1; font-family: 'Orbitron', monospace; font-size: 10px; font-weight: 700; padding: 12px; border: none; border-radius: 4px; cursor: pointer; transition: all .15s; letter-spacing: 0.5px; }
-.pub-btn.ok { background: var(--accent3); color: #111; }
-.pub-btn.ok:hover { background: #80e8ff; transform: translateY(-1px); }
-.pub-btn.ok:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-.pub-btn.cancel { background: var(--bg3); color: var(--text2); border: 1.5px solid var(--border2); }
-.pub-btn.cancel:hover { color: var(--text); }
-.pub-msg { font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:600; padding:10px 12px; border-radius:4px; display:none; line-height:1.8; text-align:center; }
-.pub-msg.ok  { background: #40f09018; border:1px solid var(--green); color:var(--green); display:block; }
-.pub-msg.err { background: #f0406018; border:1px solid var(--red);   color:var(--red);   display:block; }
-
-.pub-vis-btn { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 12px; padding: 8px 10px; border: 1.5px solid var(--border2); border-radius: 4px; cursor: pointer; background: var(--input-bg); color: var(--text2); transition: all .15px; flex: 1; letter-spacing: 0.5px; }
-.pub-vis-btn:hover { border-color: var(--accent2); color: var(--text); }
-.pub-vis-btn.active { border-color: var(--accent2); color: var(--accent); background: var(--tool-active); }
-
-#load-modal { display:none; position:fixed; inset:0; background:#000000bb; z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
-#load-modal.show { display:flex; }
-.load-box { background: #0d0d1e; border: 2px solid #2a2a55; border-radius: 10px; padding: 0; width: min(700px, 92vw); max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 0 80px #00000099, 0 0 30px #7060f022; overflow: hidden; }
-.load-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid #1e1e40; flex-shrink: 0; background: #12122a; }
-.load-header h3 { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; color: #a090ff; letter-spacing: 1px; margin: 0; }
-.load-close { font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700; width: 32px; height: 32px; background: #12122a; border: 1.5px solid #2a2a55; border-radius: 50%; color: #a0a0cc; cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: center; }
-.load-close:hover { color: #f04060; border-color: #f04060; background: #2a1a1a; }
-.load-search-wrap { padding: 14px 22px 10px; flex-shrink: 0; border-bottom: 1px solid #1e1e40; background: #0d0d1e; }
-#load-list { overflow-y: auto; display: flex; flex-direction: column; gap: 0; flex: 1; padding: 8px 0; background: #0d0d1e; }
-#load-list::-webkit-scrollbar { width: 5px; }
-#load-list::-webkit-scrollbar-track { background: #0d0d1e; }
-#load-list::-webkit-scrollbar-thumb { background: #2a2a55; border-radius: 3px; }
-.load-empty { font-family:Rajdhani,sans-serif; font-size:14px; color:#6060aa; text-align:center; padding:40px; }
-.load-table { width:100%; border-collapse:collapse; }
-.load-table thead tr { background:#12122a; border-bottom:2px solid #2a2a55; }
-.load-table th { font-family:Rajdhani,sans-serif; font-size:10px; font-weight:700; color:#6060aa; letter-spacing:2px; text-transform:uppercase; padding:10px 22px; text-align:left; }
-.load-row { cursor:pointer; border-bottom:1px solid #1a1a35; transition:background .1s; }
-.load-row:last-child { border-bottom:none; }
-.load-row:hover { background:#1a1a44; }
-.load-col-name { font-family:'Orbitron',monospace; font-size:11px; font-weight:700; color:#ffffff; padding:14px 22px; max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.load-col-date { padding:14px 22px; white-space:nowrap; }
-.load-date { font-family:Rajdhani,sans-serif; font-size:13px; font-weight:700; color:#e0e0ff; display:block; }
-.load-time { font-family:Rajdhani,sans-serif; font-size:11px; color:#6060aa; }
-.load-col-vis { padding:14px 22px; }
-.load-item-vis { font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; flex-shrink:0; letter-spacing:.5px; }
-.load-item-vis.private { background:#1a2a4a; color:#90c0f0; border:1px solid #4060c0; }
-.load-item-vis.public  { background:#1a3a2a; color:#60e090; border:1px solid #40a060; }
-.load-item-vis.code    { background:#2a1a4a; color:#c090f0; border:1px solid #8040c0; }
-
+:root{--bg:#04040c;--bg2:#0a0a1a;--bg3:#10102a;--border:#252550;--border2:#3a3a70;--accent:#ffe040;--accent2:#8070ff;--accent3:#40d0ff;--green:#40ff90;--red:#ff4060;--text:#f0f0ff;--text2:#c0c0e8;--muted:#8080bb;--tool-bg:#0c0c20;--tool-hover:#181838;--tool-active:#22226a;--sep:#22224a;--label:#9090dd;--input-bg:#06060f;--shadow:0 4px 24px #00000099;}
+body.light{--bg:#f0f0fa;--bg2:#e4e4f4;--bg3:#d8d8ee;--border:#c0c0dc;--border2:#a0a0c8;--text:#111128;--text2:#444466;--muted:#888899;--tool-bg:#e0e0f0;--tool-hover:#d0d0e8;--tool-active:#b0b0e0;--sep:#c0c0dc;--label:#6060aa;--input-bg:#f8f8ff;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);font-family:'Rajdhani',sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden;color:var(--text);user-select:none;transition:background .3s,color .3s;}
+#topbar h1{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--accent);letter-spacing:2px;text-shadow:0 0 16px var(--accent),0 0 32px var(--accent)66;margin-right:4px;white-space:nowrap;}
+.sep{width:1px;height:36px;background:var(--sep);margin:0 8px;flex-shrink:0;}
+.tb-label{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:2px;}
+#topbar{display:flex;align-items:center;gap:0;padding:0 10px;background:#060614;border-bottom:2px solid var(--border2);flex-shrink:0;flex-wrap:wrap;min-height:62px;box-shadow:0 2px 24px #00000088;overflow:visible;position:relative;z-index:50;}
+.tb-group{display:flex;gap:3px;align-items:center;}
+.tool-btn,.act-btn,.zoom-btn{position:relative;}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;padding:7px 11px;border:2px solid var(--border2);border-radius:5px;cursor:pointer;background:var(--tool-bg);color:var(--text);white-space:nowrap;transition:all .12s;letter-spacing:0.5px;}
+.tool-btn:hover{border-color:var(--accent2);color:#fff;background:var(--tool-hover);transform:translateY(-1px);box-shadow:0 3px 14px #8070ff44;}
+.tool-btn.active{background:var(--tool-active);border-color:var(--accent2);color:var(--accent);box-shadow:0 0 12px #8070ff66;}
+.act-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;padding:7px 14px;border-radius:5px;cursor:pointer;white-space:nowrap;transition:all .12s;letter-spacing:0.5px;}
+.act-btn:hover{filter:brightness(1.4);transform:translateY(-1px);}
+#btn-play{background:#0d2a0d;border:2px solid #50aa50;color:var(--green);}
+#btn-save{background:#0d0d2a;border:2px solid #5050cc;color:#b0c0ff;}
+#btn-load{background:#0d0d2a;border:2px solid #5050cc;color:#b0c0ff;}
+#btn-clear{background:#2a0d0d;border:2px solid #cc4040;color:var(--red);}
+.zoom-btn{font-family:'Orbitron',monospace;font-size:11px;padding:4px 10px;border:1.5px solid var(--border2);border-radius:4px;cursor:pointer;background:var(--tool-bg);color:var(--text2);transition:all .12s;}
+.zoom-btn:hover{color:var(--text);border-color:var(--accent2);background:var(--tool-hover);}
+#zoomLbl{font-family:'Orbitron',monospace;font-size:10px;color:var(--muted);min-width:36px;text-align:center;}
+#level-name-input{font-family:'Orbitron',monospace;font-size:9px;font-weight:700;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:4px;color:var(--accent);padding:6px 10px;width:175px;outline:none;transition:border-color .2s,box-shadow .2s;letter-spacing:1px;}
+#level-name-input:focus{border-color:var(--accent2);box-shadow:0 0 8px #7060f044;}
+#level-name-input::placeholder{color:var(--muted);}
+.tool-btn[data-tip]:hover::after,.act-btn[data-tip]:hover::after,.zoom-btn[data-tip]:hover::after{content:attr(data-tip);position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--accent2);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;line-height:1.7;padding:6px 12px;border-radius:4px;white-space:pre;pointer-events:none;z-index:9999!important;min-width:140px;text-align:center;box-shadow:0 6px 24px #00000099;}
+#layout{display:flex;flex:1;overflow:hidden;position:relative;}
+#panel{width:230px;flex-shrink:0;background:#06060f;border-right:2px solid var(--border2);overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:10px;position:relative;}
+#panel::-webkit-scrollbar{width:4px;}
+#panel::-webkit-scrollbar-track{background:var(--bg);}
+#panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+#panel h2{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--accent);border-bottom:2px solid var(--border2);padding-bottom:6px;letter-spacing:1px;}
+.psec{display:none;flex-direction:column;gap:10px;}
+.psec.show{display:flex;}
+.pinfo{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;color:var(--text);line-height:1.8;background:#0b0b20;padding:10px;border-radius:4px;border:1px solid var(--border2);}
+.prow{display:flex;flex-direction:column;gap:5px;}
+.prow label{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:1px;}
+.prow select,.prow input[type=number]{width:100%;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;padding:6px 8px;border-radius:4px;}
+.prow input[type=range]{width:100%;accent-color:var(--accent2);}
+.prow .crow{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--text);}
+.pval{font-family:'Orbitron',monospace;font-size:13px;color:var(--accent);min-width:36px;text-align:right;font-weight:700;}
+#cwrap{flex:1;overflow:auto;position:relative;background:var(--bg);}
+#cwrap::-webkit-scrollbar{width:6px;height:6px;}
+#cwrap::-webkit-scrollbar-track{background:var(--bg);}
+#cwrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+#ecanvas{display:block;cursor:crosshair;}
+#statusbar{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--text2);line-height:1.8;padding:3px 6px;border-top:2px solid var(--border2);margin-top:4px;}
+#publish-modal{display:none;position:fixed;inset:0;background:#000000bb;z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+#publish-modal.show{display:flex;}
+.pub-box{background:var(--bg2);border:2px solid var(--border2);border-radius:8px;padding:28px 24px;width:360px;display:flex;flex-direction:column;gap:18px;box-shadow:0 0 60px #00000099,0 0 30px #7060f022;}
+.pub-box h3{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--accent3);text-align:center;letter-spacing:1px;}
+.pub-box label{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--label);letter-spacing:1px;text-transform:uppercase;}
+.pub-box input{background:var(--input-bg);border:1.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:'Orbitron',monospace;font-size:11px;padding:10px 12px;outline:none;width:100%;transition:border-color .2s;margin-top:6px;}
+.pub-box input:focus{border-color:var(--accent2);}
+.pub-row{display:flex;gap:10px;}
+.pub-btn{flex:1;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;padding:12px;border:none;border-radius:4px;cursor:pointer;transition:all .15s;letter-spacing:0.5px;}
+.pub-btn.ok{background:var(--accent3);color:#111;}
+.pub-btn.ok:hover{background:#80e8ff;transform:translateY(-1px);}
+.pub-btn.ok:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.pub-btn.cancel{background:var(--bg3);color:var(--text2);border:1.5px solid var(--border2);}
+.pub-btn.cancel:hover{color:var(--text);}
+.pub-msg{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;padding:10px 12px;border-radius:4px;display:none;line-height:1.8;text-align:center;}
+.pub-msg.ok{background:#40f09018;border:1px solid var(--green);color:var(--green);display:block;}
+.pub-msg.err{background:#f0406018;border:1px solid var(--red);color:var(--red);display:block;}
+.pub-vis-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;padding:8px 10px;border:1.5px solid var(--border2);border-radius:4px;cursor:pointer;background:var(--input-bg);color:var(--text2);transition:all .15s;flex:1;letter-spacing:0.5px;}
+.pub-vis-btn:hover{border-color:var(--accent2);color:var(--text);}
+.pub-vis-btn.active{border-color:var(--accent2);color:var(--accent);background:var(--tool-active);}
+#load-modal{display:none;position:fixed;inset:0;background:#000000bb;z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+#load-modal.show{display:flex;}
+.load-box{background:#0d0d1e;border:2px solid #2a2a55;border-radius:10px;padding:0;width:min(700px,92vw);max-height:80vh;display:flex;flex-direction:column;box-shadow:0 0 80px #00000099,0 0 30px #7060f022;overflow:hidden;}
+.load-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #1e1e40;flex-shrink:0;background:#12122a;}
+.load-header h3{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#a090ff;letter-spacing:1px;margin:0;}
+.load-close{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;width:32px;height:32px;background:#12122a;border:1.5px solid #2a2a55;border-radius:50%;color:#a0a0cc;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.load-close:hover{color:#f04060;border-color:#f04060;background:#2a1a1a;}
+.load-search-wrap{padding:14px 22px 10px;flex-shrink:0;border-bottom:1px solid #1e1e40;background:#0d0d1e;}
+#load-list{overflow-y:auto;display:flex;flex-direction:column;gap:0;flex:1;padding:8px 0;background:#0d0d1e;}
+#load-list::-webkit-scrollbar{width:5px;}
+#load-list::-webkit-scrollbar-track{background:#0d0d1e;}
+#load-list::-webkit-scrollbar-thumb{background:#2a2a55;border-radius:3px;}
+.load-empty{font-family:Rajdhani,sans-serif;font-size:14px;color:#6060aa;text-align:center;padding:40px;}
+.load-table{width:100%;border-collapse:collapse;}
+.load-table thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
+.load-table th{font-family:Rajdhani,sans-serif;font-size:10px;font-weight:700;color:#6060aa;letter-spacing:2px;text-transform:uppercase;padding:10px 22px;text-align:left;}
+.load-row{cursor:pointer;border-bottom:1px solid #1a1a35;transition:background .1s;}
+.load-row:last-child{border-bottom:none;}
+.load-row:hover{background:#1a1a44;}
+.load-col-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#ffffff;padding:14px 22px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.load-col-date{padding:14px 22px;white-space:nowrap;}
+.load-date{font-family:Rajdhani,sans-serif;font-size:13px;font-weight:700;color:#e0e0ff;display:block;}
+.load-time{font-family:Rajdhani,sans-serif;font-size:11px;color:#6060aa;}
+.load-col-vis{padding:14px 22px;}
+.load-item-vis{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;flex-shrink:0;letter-spacing:.5px;}
+.load-item-vis.private{background:#1a2a4a;color:#90c0f0;border:1px solid #4060c0;}
+.load-item-vis.public{background:#1a3a2a;color:#60e090;border:1px solid #40a060;}
+.load-item-vis.code{background:#2a1a4a;color:#c090f0;border:1px solid #8040c0;}
 #s-flash .prow input[type=number]{width:70px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);font-family:Rajdhani,sans-serif;font-size:13px;padding:4px 6px;border-radius:4px;text-align:center;}
-#panel-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:10;border-radius:0;pointer-events:none;}
+#panel-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:10;pointer-events:none;}
 #panel-overlay.show{display:block;}
 #panel-no-sel{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Press Start 2P',monospace;font-size:7px;color:#4040aa;text-align:center;line-height:2.2;pointer-events:none;z-index:11;white-space:nowrap;}
 #panel-no-sel.show{display:block;}
 #multi-sel-panel{display:none;flex-direction:column;gap:10px;padding:10px;background:#0b0b20;border:2px solid var(--border2);border-radius:6px;margin-top:4px;}
 #multi-sel-panel.show{display:flex;}
 #multi-sel-title{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--accent);letter-spacing:1px;}
-.mixed-val{opacity:0.45;filter:grayscale(0.5);}
-.mixed-val input,.mixed-val select{color:var(--muted)!important;border-color:var(--border)!important;}
 .spike-sub{border-top:1px solid var(--border);margin-top:6px;padding-top:8px;display:flex;flex-direction:column;gap:8px;}
 .spike-toggle{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--text2);cursor:pointer;padding:6px 8px;background:#0e0e28;border:2px solid var(--border2);border-radius:3px;text-align:left;width:100%;transition:all .1s;}
 .spike-toggle:hover{border-color:#f04060;color:#f04060;}
@@ -328,7 +121,6 @@ body {
 <div id="topbar" style="visibility:hidden;">
   <h1>✦ STUDIO</h1>
   <div class="sep"></div>
-
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblBlocs">BLOCS</span>
     <div class="tb-group">
@@ -342,7 +134,6 @@ body {
     </div>
   </div>
   <div class="sep"></div>
-
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblZones">ZONES</span>
     <div class="tb-group">
@@ -352,7 +143,6 @@ body {
     </div>
   </div>
   <div class="sep"></div>
-
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblNiveau">NIVEAU</span>
     <div class="tb-group">
@@ -362,7 +152,6 @@ body {
     </div>
   </div>
   <div class="sep"></div>
-
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblNom">NOM</span>
     <input type="text" id="level-name-input" placeholder="Sans titre..."
@@ -370,7 +159,6 @@ body {
       oninput="onLevelNameChange()" onfocus="this.style.borderColor='#5050c0'" onblur="this.style.borderColor='#1e1e35'">
   </div>
   <div class="sep"></div>
-
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblSave">SAUVEGARDE</span>
     <div class="tb-group">
@@ -380,7 +168,6 @@ body {
     </div>
   </div>
   <div class="sep"></div>
-
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblJeu">JEU</span>
     <div class="tb-group">
@@ -388,12 +175,11 @@ body {
     </div>
   </div>
   <div class="sep"></div>
-
   <div style="display:flex;flex-direction:column;gap:4px;">
     <span class="tb-label" data-lbl="lblProfil">PROFIL</span>
     <div class="tb-group" style="gap:6px;align-items:center;">
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
-        <span id="studio-nav-lbl" style="font-family:'Press Start 2P',monospace;font-size:5px;color:#4040aa;letter-spacing:1px;">NAVIGATION</span>
+        <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:#4040aa;letter-spacing:1px;" data-lbl="navLabel">NAVIGATION</span>
         <div style="display:flex;gap:6px;">
           <button id="btn-nav-profile" onclick="goToProfile()" style="font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 10px;background:#1a0a2a;border:1.5px solid #a040f0;color:#c080ff;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background='#2a1040'" onmouseout="this.style.background='#1a0a2a'">👤 PROFIL</button>
           <button id="btn-nav-home"    onclick="goToHome()"    style="font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 10px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background='#1a1a3a'" onmouseout="this.style.background='#0d0d28'">🏠 ACCUEIL</button>
@@ -411,12 +197,12 @@ body {
 
     <!-- Multi-sélection -->
     <div id="multi-sel-panel">
-      <div id="multi-sel-title">✦ MULTI-SÉLECTION</div>
+      <div id="multi-sel-title" data-lbl="multiSel">✦ MULTI-SÉLECTION</div>
       <div id="multi-sel-count" style="font-family:Rajdhani,sans-serif;font-size:13px;color:var(--text2);"></div>
       <div id="multi-type-panel" style="display:flex;flex-direction:column;gap:10px;"></div>
       <div class="spike-sub" id="multi-spike-sub">
-        <button class="spike-toggle" id="multi-spike-toggle" onclick="toggleSpikeOpts('multi')">🗡 PIQUES ▸</button>
-<div class="spike-opts" id="multi-spike-opts">
+        <button class="spike-toggle" id="multi-spike-toggle" onclick="toggleSpikeOpts('multi')" data-lbl="spikeToggleOff">🗡 PIQUES ▸</button>
+        <div class="spike-opts" id="multi-spike-opts">
           <div class="prow"><label data-lbl="spikeDirs">DIRECTIONS</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
               <div class="crow"><input type="checkbox" id="multi-sp-u" onchange="multiSpikeChanged()"><label for="multi-sp-u" style="cursor:pointer;" data-lbl="spikeUp">↑ HAUT</label></div>
@@ -440,19 +226,19 @@ body {
     <!-- FIXED -->
     <div id="s-fixed" class="psec show">
       <div class="pinfo" data-info="pInfoFixed"></div>
-      <div class="spike-sub" id="fixed-spike-sub">
-        <button class="spike-toggle" id="fixed-spike-toggle" onclick="toggleSpikeOpts('fixed')">🗡 PIQUES ▸</button>
+      <div class="spike-sub">
+        <button class="spike-toggle" id="fixed-spike-toggle" onclick="toggleSpikeOpts('fixed')" data-lbl="spikeToggleOff">🗡 PIQUES ▸</button>
         <div class="spike-opts" id="fixed-spike-opts">
-          <div class="prow"><label>DIRECTIONS</label>
+          <div class="prow"><label data-lbl="spikeDirs">DIRECTIONS</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-              <div class="crow"><input type="checkbox" id="fixed-sp-u" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-              <div class="crow"><input type="checkbox" id="fixed-sp-d" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-              <div class="crow"><input type="checkbox" id="fixed-sp-l" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-              <div class="crow"><input type="checkbox" id="fixed-sp-r" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+              <div class="crow"><input type="checkbox" id="fixed-sp-u" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-u" style="cursor:pointer;" data-lbl="spikeUp">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="fixed-sp-d" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-d" style="cursor:pointer;" data-lbl="spikeDown">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="fixed-sp-l" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-l" style="cursor:pointer;" data-lbl="spikeLeft">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="fixed-sp-r" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-r" style="cursor:pointer;" data-lbl="spikeRight">→ DROITE</label></div>
             </div>
           </div>
-          <div class="prow"><div class="crow"><input type="checkbox" id="fixed-sp-hidden" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
-          <div class="prow" id="fixed-sp-delay-row"><label>DÉLAI (s)</label>
+          <div class="prow"><div class="crow"><input type="checkbox" id="fixed-sp-hidden" onchange="blockSpikeChanged('fixed')"><label for="fixed-sp-hidden" style="cursor:pointer;" data-lbl="spikeHidden">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow"><label data-lbl="spikeDelay">DÉLAI (s)</label>
             <div style="display:flex;gap:4px;align-items:center">
               <input type="range" id="fixed-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('fixed')">
               <span class="pval" id="fixed-sp-delay-v">0</span>
@@ -465,20 +251,20 @@ body {
     <!-- BOUNCE -->
     <div id="s-bounce" class="psec">
       <div class="pinfo" data-info="pInfoBounce"></div>
-      <div class="prow"><label>FORCE (1 - 10)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="bo-force" min="1" max="10" step="0.5" value="2" oninput="bounceParamChanged()"><span class="pval" id="bo-force-v">2</span></div></div>
-      <div class="spike-sub" id="bounce-spike-sub">
-        <button class="spike-toggle" id="bounce-spike-toggle" onclick="toggleSpikeOpts('bounce')">🗡 PIQUES ▸</button>
+      <div class="prow"><label data-lbl="boForce">FORCE (1-10)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="bo-force" min="1" max="10" step="0.5" value="2" oninput="bounceParamChanged()"><span class="pval" id="bo-force-v">2</span></div></div>
+      <div class="spike-sub">
+        <button class="spike-toggle" id="bounce-spike-toggle" onclick="toggleSpikeOpts('bounce')" data-lbl="spikeToggleOff">🗡 PIQUES ▸</button>
         <div class="spike-opts" id="bounce-spike-opts">
-          <div class="prow"><label>DIRECTIONS</label>
+          <div class="prow"><label data-lbl="spikeDirs">DIRECTIONS</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-              <div class="crow"><input type="checkbox" id="bounce-sp-u" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-              <div class="crow"><input type="checkbox" id="bounce-sp-d" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-              <div class="crow"><input type="checkbox" id="bounce-sp-l" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-              <div class="crow"><input type="checkbox" id="bounce-sp-r" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+              <div class="crow"><input type="checkbox" id="bounce-sp-u" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-u" style="cursor:pointer;" data-lbl="spikeUp">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="bounce-sp-d" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-d" style="cursor:pointer;" data-lbl="spikeDown">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="bounce-sp-l" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-l" style="cursor:pointer;" data-lbl="spikeLeft">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="bounce-sp-r" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-r" style="cursor:pointer;" data-lbl="spikeRight">→ DROITE</label></div>
             </div>
           </div>
-          <div class="prow"><div class="crow"><input type="checkbox" id="bounce-sp-hidden" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
-          <div class="prow" id="bounce-sp-delay-row"><label>DÉLAI (s)</label>
+          <div class="prow"><div class="crow"><input type="checkbox" id="bounce-sp-hidden" onchange="blockSpikeChanged('bounce')"><label for="bounce-sp-hidden" style="cursor:pointer;" data-lbl="spikeHidden">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow"><label data-lbl="spikeDelay">DÉLAI (s)</label>
             <div style="display:flex;gap:4px;align-items:center">
               <input type="range" id="bounce-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('bounce')">
               <span class="pval" id="bounce-sp-delay-v">0</span>
@@ -491,19 +277,19 @@ body {
     <!-- INVIS -->
     <div id="s-invis" class="psec">
       <div class="pinfo" data-info="pInfoInvis"></div>
-      <div class="spike-sub" id="invis-spike-sub">
-        <button class="spike-toggle" id="invis-spike-toggle" onclick="toggleSpikeOpts('invis')">🗡 PIQUES ▸</button>
+      <div class="spike-sub">
+        <button class="spike-toggle" id="invis-spike-toggle" onclick="toggleSpikeOpts('invis')" data-lbl="spikeToggleOff">🗡 PIQUES ▸</button>
         <div class="spike-opts" id="invis-spike-opts">
-          <div class="prow"><label>DIRECTIONS</label>
+          <div class="prow"><label data-lbl="spikeDirs">DIRECTIONS</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-              <div class="crow"><input type="checkbox" id="invis-sp-u" onchange="blockSpikeChanged('invis')"><label for="invis-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-              <div class="crow"><input type="checkbox" id="invis-sp-d" onchange="blockSpikeChanged('invis')"><label for="invis-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-              <div class="crow"><input type="checkbox" id="invis-sp-l" onchange="blockSpikeChanged('invis')"><label for="invis-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-              <div class="crow"><input type="checkbox" id="invis-sp-r" onchange="blockSpikeChanged('invis')"><label for="invis-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+              <div class="crow"><input type="checkbox" id="invis-sp-u" onchange="blockSpikeChanged('invis')"><label for="invis-sp-u" style="cursor:pointer;" data-lbl="spikeUp">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="invis-sp-d" onchange="blockSpikeChanged('invis')"><label for="invis-sp-d" style="cursor:pointer;" data-lbl="spikeDown">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="invis-sp-l" onchange="blockSpikeChanged('invis')"><label for="invis-sp-l" style="cursor:pointer;" data-lbl="spikeLeft">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="invis-sp-r" onchange="blockSpikeChanged('invis')"><label for="invis-sp-r" style="cursor:pointer;" data-lbl="spikeRight">→ DROITE</label></div>
             </div>
           </div>
-          <div class="prow"><div class="crow"><input type="checkbox" id="invis-sp-hidden" onchange="blockSpikeChanged('invis')"><label for="invis-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
-          <div class="prow" id="invis-sp-delay-row"><label>DÉLAI (s)</label>
+          <div class="prow"><div class="crow"><input type="checkbox" id="invis-sp-hidden" onchange="blockSpikeChanged('invis')"><label for="invis-sp-hidden" style="cursor:pointer;" data-lbl="spikeHidden">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow"><label data-lbl="spikeDelay">DÉLAI (s)</label>
             <div style="display:flex;gap:4px;align-items:center">
               <input type="range" id="invis-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('invis')">
               <span class="pval" id="invis-sp-delay-v">0</span>
@@ -517,47 +303,47 @@ body {
     <div id="s-mobile" class="psec">
       <div class="pinfo" data-info="pInfoMobile"></div>
       <div class="prow">
-        <label>DÉCLENCHEMENT</label>
+        <label data-lbl="moTrigger">DÉCLENCHEMENT</label>
         <select id="mo-trigger" onchange="moParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:14px;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
-          <option value="continuous">↺ EN CONTINU</option>
-          <option value="approach">👁 À L'APPROCHE</option>
+          <option value="continuous" data-lbl="moTrigContinuous">↺ EN CONTINU</option>
+          <option value="approach" data-lbl="moTrigApproach">👁 À L'APPROCHE</option>
         </select>
       </div>
       <div class="prow" id="mo-trig-dist-row" style="display:none">
-        <label>DISTANCE DE DÉCLENCHEMENT (px)</label>
+        <label data-lbl="moTrigDist">DISTANCE DE DÉCLENCHEMENT (px)</label>
         <div style="display:flex;gap:4px;align-items:center">
           <input type="range" id="mo-trig-dist" min="8" max="300" step="8" value="80" oninput="moParamChanged()">
           <span class="pval" id="mo-trig-dist-v">80</span>
         </div>
       </div>
       <div class="prow">
-        <label>DIRECTION</label>
+        <label data-lbl="moDir">DIRECTION</label>
         <select id="mo-dir" onchange="moParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:14px;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
-          <option value="r">→ DROITE</option>
-          <option value="l">← GAUCHE</option>
-          <option value="u">↑ HAUT</option>
-          <option value="d">↓ BAS</option>
-          <option value="omni">⊕ OMNIDIRECTIONNEL</option>
-          <option value="fall">⬇ CHUTE</option>
+          <option value="r" data-lbl="moDirR">→ DROITE</option>
+          <option value="l" data-lbl="moDirL">← GAUCHE</option>
+          <option value="u" data-lbl="moDirU">↑ HAUT</option>
+          <option value="d" data-lbl="moDirD">↓ BAS</option>
+          <option value="omni" data-lbl="moDirOmni">⊕ OMNIDIRECTIONNEL</option>
+          <option value="fall" data-lbl="moDirFall">⬇ CHUTE</option>
         </select>
       </div>
-      <div class="prow"><label>VITESSE</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-spd" min="0.5" max="12" step="0.5" value="2" oninput="moParamChanged()"><span class="pval" id="mo-spd-v">2</span></div></div>
-      <div class="prow" id="mo-dist-row"><label>DISTANCE (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-dist" min="16" max="800" step="8" value="160" oninput="moParamChanged()"><span class="pval" id="mo-dist-v">160</span></div></div>
-      <div class="prow" id="mo-loop-row"><div class="crow"><input type="checkbox" id="mo-loop" checked onchange="moParamChanged()"><label for="mo-loop" style="cursor:pointer;">ALLER-RETOUR EN BOUCLE</label></div></div>
-      <div class="prow" id="mo-wait-row"><label>ATTENTE AVANT RETOUR (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-wait" min="0" max="10" step="0.5" value="0" oninput="moParamChanged()"><span class="pval" id="mo-wait-v">0</span></div></div>
-      <div class="spike-sub" id="mobile-spike-sub">
-        <button class="spike-toggle" id="mobile-spike-toggle" onclick="toggleSpikeOpts('mobile')">🗡 PIQUES ▸</button>
+      <div class="prow"><label data-lbl="moSpeed">VITESSE</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-spd" min="0.5" max="12" step="0.5" value="2" oninput="moParamChanged()"><span class="pval" id="mo-spd-v">2</span></div></div>
+      <div class="prow" id="mo-dist-row"><label data-lbl="moDist">DISTANCE (px)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-dist" min="16" max="800" step="8" value="160" oninput="moParamChanged()"><span class="pval" id="mo-dist-v">160</span></div></div>
+      <div class="prow" id="mo-loop-row"><div class="crow"><input type="checkbox" id="mo-loop" checked onchange="moParamChanged()"><label for="mo-loop" style="cursor:pointer;" data-lbl="moLoop">ALLER-RETOUR EN BOUCLE</label></div></div>
+      <div class="prow" id="mo-wait-row"><label data-lbl="moWait">ATTENTE AVANT RETOUR (s)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="mo-wait" min="0" max="10" step="0.5" value="0" oninput="moParamChanged()"><span class="pval" id="mo-wait-v">0</span></div></div>
+      <div class="spike-sub">
+        <button class="spike-toggle" id="mobile-spike-toggle" onclick="toggleSpikeOpts('mobile')" data-lbl="spikeToggleOff">🗡 PIQUES ▸</button>
         <div class="spike-opts" id="mobile-spike-opts">
-          <div class="prow"><label>DIRECTIONS</label>
+          <div class="prow"><label data-lbl="spikeDirs">DIRECTIONS</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-              <div class="crow"><input type="checkbox" id="mobile-sp-u" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-              <div class="crow"><input type="checkbox" id="mobile-sp-d" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-              <div class="crow"><input type="checkbox" id="mobile-sp-l" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-              <div class="crow"><input type="checkbox" id="mobile-sp-r" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+              <div class="crow"><input type="checkbox" id="mobile-sp-u" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-u" style="cursor:pointer;" data-lbl="spikeUp">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="mobile-sp-d" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-d" style="cursor:pointer;" data-lbl="spikeDown">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="mobile-sp-l" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-l" style="cursor:pointer;" data-lbl="spikeLeft">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="mobile-sp-r" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-r" style="cursor:pointer;" data-lbl="spikeRight">→ DROITE</label></div>
             </div>
           </div>
-          <div class="prow"><div class="crow"><input type="checkbox" id="mobile-sp-hidden" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
-          <div class="prow" id="mobile-sp-delay-row"><label>DÉLAI (s)</label>
+          <div class="prow"><div class="crow"><input type="checkbox" id="mobile-sp-hidden" onchange="blockSpikeChanged('mobile')"><label for="mobile-sp-hidden" style="cursor:pointer;" data-lbl="spikeHidden">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow"><label data-lbl="spikeDelay">DÉLAI (s)</label>
             <div style="display:flex;gap:4px;align-items:center">
               <input type="range" id="mobile-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('mobile')">
               <span class="pval" id="mobile-sp-delay-v">0</span>
@@ -570,20 +356,20 @@ body {
     <!-- PUSH -->
     <div id="s-push" class="psec">
       <div class="pinfo" data-info="pInfoPush"></div>
-      <div class="prow"><label>FRICTION</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="pu-fric" min="0.5" max="0.99" step="0.01" value="0.8" oninput="document.getElementById('pu-fric-v').textContent=this.value"><span class="pval" id="pu-fric-v">0.8</span></div></div>
-      <div class="spike-sub" id="push-spike-sub">
-        <button class="spike-toggle" id="push-spike-toggle" onclick="toggleSpikeOpts('push')">🗡 PIQUES ▸</button>
+      <div class="prow"><label data-lbl="puFric">FRICTION</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="pu-fric" min="0.5" max="0.99" step="0.01" value="0.8" oninput="document.getElementById('pu-fric-v').textContent=this.value"><span class="pval" id="pu-fric-v">0.8</span></div></div>
+      <div class="spike-sub">
+        <button class="spike-toggle" id="push-spike-toggle" onclick="toggleSpikeOpts('push')" data-lbl="spikeToggleOff">🗡 PIQUES ▸</button>
         <div class="spike-opts" id="push-spike-opts">
-          <div class="prow"><label>DIRECTIONS</label>
+          <div class="prow"><label data-lbl="spikeDirs">DIRECTIONS</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-              <div class="crow"><input type="checkbox" id="push-sp-u" onchange="blockSpikeChanged('push')"><label for="push-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-              <div class="crow"><input type="checkbox" id="push-sp-d" onchange="blockSpikeChanged('push')"><label for="push-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-              <div class="crow"><input type="checkbox" id="push-sp-l" onchange="blockSpikeChanged('push')"><label for="push-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-              <div class="crow"><input type="checkbox" id="push-sp-r" onchange="blockSpikeChanged('push')"><label for="push-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+              <div class="crow"><input type="checkbox" id="push-sp-u" onchange="blockSpikeChanged('push')"><label for="push-sp-u" style="cursor:pointer;" data-lbl="spikeUp">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="push-sp-d" onchange="blockSpikeChanged('push')"><label for="push-sp-d" style="cursor:pointer;" data-lbl="spikeDown">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="push-sp-l" onchange="blockSpikeChanged('push')"><label for="push-sp-l" style="cursor:pointer;" data-lbl="spikeLeft">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="push-sp-r" onchange="blockSpikeChanged('push')"><label for="push-sp-r" style="cursor:pointer;" data-lbl="spikeRight">→ DROITE</label></div>
             </div>
           </div>
-          <div class="prow"><div class="crow"><input type="checkbox" id="push-sp-hidden" onchange="blockSpikeChanged('push')"><label for="push-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
-          <div class="prow" id="push-sp-delay-row"><label>DÉLAI (s)</label>
+          <div class="prow"><div class="crow"><input type="checkbox" id="push-sp-hidden" onchange="blockSpikeChanged('push')"><label for="push-sp-hidden" style="cursor:pointer;" data-lbl="spikeHidden">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow"><label data-lbl="spikeDelay">DÉLAI (s)</label>
             <div style="display:flex;gap:4px;align-items:center">
               <input type="range" id="push-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('push')">
               <span class="pval" id="push-sp-delay-v">0</span>
@@ -597,33 +383,33 @@ body {
     <div id="s-flash" class="psec">
       <div class="pinfo" data-info="pInfoFlash"></div>
       <div class="prow">
-        <label>TEMPS VISIBLE (cs = 1/100s)</label>
+        <label data-lbl="flOn">TEMPS VISIBLE (cs = 1/100s)</label>
         <div style="display:flex;gap:8px;align-items:center;">
           <input type="number" id="fl-on" min="1" max="9999" step="1" value="50" oninput="flashParamChanged()" style="width:80px;">
           <span style="font-size:11px;color:var(--muted);">× 10ms</span>
         </div>
       </div>
       <div class="prow">
-        <label>TEMPS CACHÉ (cs = 1/100s)</label>
+        <label data-lbl="flOff">TEMPS CACHÉ (cs = 1/100s)</label>
         <div style="display:flex;gap:8px;align-items:center;">
           <input type="number" id="fl-off" min="1" max="9999" step="1" value="50" oninput="flashParamChanged()" style="width:80px;">
           <span style="font-size:11px;color:var(--muted);">× 10ms</span>
         </div>
       </div>
-      <div class="prow"><label>DÉCALAGE DE PHASE (cs)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="fl-phase" min="0" max="200" step="1" value="0" oninput="flashParamChanged()"><span class="pval" id="fl-phase-v">0</span></div></div>
-      <div class="spike-sub" id="flash-spike-sub">
-        <button class="spike-toggle" id="flash-spike-toggle" onclick="toggleSpikeOpts('flash')">🗡 PIQUES ▸</button>
+      <div class="prow"><label data-lbl="flPhase">DÉCALAGE DE PHASE (cs)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="fl-phase" min="0" max="200" step="1" value="0" oninput="flashParamChanged()"><span class="pval" id="fl-phase-v">0</span></div></div>
+      <div class="spike-sub">
+        <button class="spike-toggle" id="flash-spike-toggle" onclick="toggleSpikeOpts('flash')" data-lbl="spikeToggleOff">🗡 PIQUES ▸</button>
         <div class="spike-opts" id="flash-spike-opts">
-          <div class="prow"><label>DIRECTIONS</label>
+          <div class="prow"><label data-lbl="spikeDirs">DIRECTIONS</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-              <div class="crow"><input type="checkbox" id="flash-sp-u" onchange="blockSpikeChanged('flash')"><label for="flash-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-              <div class="crow"><input type="checkbox" id="flash-sp-d" onchange="blockSpikeChanged('flash')"><label for="flash-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-              <div class="crow"><input type="checkbox" id="flash-sp-l" onchange="blockSpikeChanged('flash')"><label for="flash-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-              <div class="crow"><input type="checkbox" id="flash-sp-r" onchange="blockSpikeChanged('flash')"><label for="flash-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+              <div class="crow"><input type="checkbox" id="flash-sp-u" onchange="blockSpikeChanged('flash')"><label for="flash-sp-u" style="cursor:pointer;" data-lbl="spikeUp">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="flash-sp-d" onchange="blockSpikeChanged('flash')"><label for="flash-sp-d" style="cursor:pointer;" data-lbl="spikeDown">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="flash-sp-l" onchange="blockSpikeChanged('flash')"><label for="flash-sp-l" style="cursor:pointer;" data-lbl="spikeLeft">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="flash-sp-r" onchange="blockSpikeChanged('flash')"><label for="flash-sp-r" style="cursor:pointer;" data-lbl="spikeRight">→ DROITE</label></div>
             </div>
           </div>
-          <div class="prow"><div class="crow"><input type="checkbox" id="flash-sp-hidden" onchange="blockSpikeChanged('flash')"><label for="flash-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
-          <div class="prow" id="flash-sp-delay-row"><label>DÉLAI (s)</label>
+          <div class="prow"><div class="crow"><input type="checkbox" id="flash-sp-hidden" onchange="blockSpikeChanged('flash')"><label for="flash-sp-hidden" style="cursor:pointer;" data-lbl="spikeHidden">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow"><label data-lbl="spikeDelay">DÉLAI (s)</label>
             <div style="display:flex;gap:4px;align-items:center">
               <input type="range" id="flash-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('flash')">
               <span class="pval" id="flash-sp-delay-v">0</span>
@@ -636,19 +422,19 @@ body {
     <!-- GBLOCK -->
     <div id="s-gblock" class="psec">
       <div class="pinfo" data-info="pInfoGblock"></div>
-      <div class="spike-sub" id="gblock-spike-sub">
-        <button class="spike-toggle" id="gblock-spike-toggle" onclick="toggleSpikeOpts('gblock')">🗡 PIQUES ▸</button>
+      <div class="spike-sub">
+        <button class="spike-toggle" id="gblock-spike-toggle" onclick="toggleSpikeOpts('gblock')" data-lbl="spikeToggleOff">🗡 PIQUES ▸</button>
         <div class="spike-opts" id="gblock-spike-opts">
-          <div class="prow"><label>DIRECTIONS</label>
+          <div class="prow"><label data-lbl="spikeDirs">DIRECTIONS</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-              <div class="crow"><input type="checkbox" id="gblock-sp-u" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-u" style="cursor:pointer;">↑ HAUT</label></div>
-              <div class="crow"><input type="checkbox" id="gblock-sp-d" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-d" style="cursor:pointer;">↓ BAS</label></div>
-              <div class="crow"><input type="checkbox" id="gblock-sp-l" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-l" style="cursor:pointer;">← GAUCHE</label></div>
-              <div class="crow"><input type="checkbox" id="gblock-sp-r" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-r" style="cursor:pointer;">→ DROITE</label></div>
+              <div class="crow"><input type="checkbox" id="gblock-sp-u" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-u" style="cursor:pointer;" data-lbl="spikeUp">↑ HAUT</label></div>
+              <div class="crow"><input type="checkbox" id="gblock-sp-d" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-d" style="cursor:pointer;" data-lbl="spikeDown">↓ BAS</label></div>
+              <div class="crow"><input type="checkbox" id="gblock-sp-l" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-l" style="cursor:pointer;" data-lbl="spikeLeft">← GAUCHE</label></div>
+              <div class="crow"><input type="checkbox" id="gblock-sp-r" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-r" style="cursor:pointer;" data-lbl="spikeRight">→ DROITE</label></div>
             </div>
           </div>
-          <div class="prow"><div class="crow"><input type="checkbox" id="gblock-sp-hidden" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-hidden" style="cursor:pointer;">👁 INVISIBLE AU DÉPART</label></div></div>
-          <div class="prow" id="gblock-sp-delay-row"><label>DÉLAI (s)</label>
+          <div class="prow"><div class="crow"><input type="checkbox" id="gblock-sp-hidden" onchange="blockSpikeChanged('gblock')"><label for="gblock-sp-hidden" style="cursor:pointer;" data-lbl="spikeHidden">👁 INVISIBLE AU DÉPART</label></div></div>
+          <div class="prow"><label data-lbl="spikeDelay">DÉLAI (s)</label>
             <div style="display:flex;gap:4px;align-items:center">
               <input type="range" id="gblock-sp-delay" min="0" max="10" step="0.5" value="0" oninput="blockSpikeChanged('gblock')">
               <span class="pval" id="gblock-sp-delay-v">0</span>
@@ -667,22 +453,22 @@ body {
     <div id="s-gravflip" class="psec">
       <div class="pinfo" data-info="pInfoGravflip"></div>
       <div class="prow">
-        <label>DIRECTION</label>
+        <label data-lbl="gfDir">DIRECTION</label>
         <select id="gf-dir" onchange="gfParamChanged()" style="font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;background:var(--input-bg);border:1.5px solid var(--border2);color:var(--text);padding:6px 8px;border-radius:4px;width:100%">
-          <option value="u">↑ Vers le HAUT</option>
-          <option value="d">↓ Vers le BAS</option>
-          <option value="l">← Vers la GAUCHE</option>
-          <option value="r">→ Vers la DROITE</option>
+          <option value="u" data-lbl="gfDirU">↑ Vers le HAUT</option>
+          <option value="d" data-lbl="gfDirD">↓ Vers le BAS</option>
+          <option value="l" data-lbl="gfDirL">← Vers la GAUCHE</option>
+          <option value="r" data-lbl="gfDirR">→ Vers la DROITE</option>
         </select>
       </div>
-      <div class="prow"><label>FORCE (0 = apesanteur)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="gf-str" min="0" max="50" step="1" value="10" oninput="gfParamChanged()"><span class="pval" id="gf-str-v">10</span></div></div>
+      <div class="prow"><label data-lbl="gfStrength">FORCE (0 = apesanteur)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="gf-str" min="0" max="50" step="1" value="10" oninput="gfParamChanged()"><span class="pval" id="gf-str-v">10</span></div></div>
       <div style="font-size:6px;color:#a040f0;margin-top:2px;padding:4px;background:#0a0a16;border-radius:2px;" id="gf-hint"></div>
     </div>
 
     <!-- SPEED -->
     <div id="s-speed" class="psec">
       <div class="pinfo" data-info="pInfoSpeed"></div>
-      <div class="prow"><label>VITESSE (1 – 20)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sp-val" min="1" max="20" step="0.5" value="5" oninput="spParamChanged()"><span class="pval" id="sp-val-v">5</span></div></div>
+      <div class="prow"><label data-lbl="spSpeed">VITESSE (1-20)</label><div style="display:flex;gap:4px;align-items:center"><input type="range" id="sp-val" min="1" max="20" step="0.5" value="5" oninput="spParamChanged()"><span class="pval" id="sp-val-v">5</span></div></div>
       <div style="font-size:6px;color:#00e5ff;margin-top:2px;padding:4px;background:#0a0a16;border-radius:2px;" id="sp-hint">= normal</div>
     </div>
 
@@ -759,7 +545,7 @@ body {
 <!-- UNSAVED CHANGES MODAL -->
 <div id="unsaved-modal" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
   <div style="background:#0d0d1e;border:2px solid #f0a040;border-radius:12px;padding:32px 28px;width:min(400px,90vw);display:flex;flex-direction:column;gap:18px;">
-    <div id="unsaved-title" style="font-family:Orbitron,monospace;font-size:14px;color:#f0a040;text-align:center;letter-spacing:1px;">⚠️ MODIFICATIONS NON SAUVEGARDÉES</div>
+    <div id="unsaved-title" style="font-family:Orbitron,monospace;font-size:14px;color:#f0a040;text-align:center;letter-spacing:1px;"></div>
     <p id="unsaved-desc" style="font-family:Rajdhani,sans-serif;font-size:17px;color:#c0c0dd;text-align:center;line-height:1.7;margin:0;"></p>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <button id="unsaved-btn-save"  onclick="unsavedSave()"  style="font-family:Orbitron,monospace;font-size:11px;padding:13px;background:#0d2a0d;border:1.5px solid #40f090;color:#40f090;border-radius:6px;cursor:pointer;"></button>
@@ -783,224 +569,185 @@ body {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ─────────────────────────────────────────────
-//  CONSTANTES
-// ─────────────────────────────────────────────
-const GAME_HEIGHT = 640;
-const SUPABASE_URL = 'https://ydpkyktfvpdnjjiewctf.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
-const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const GAME_HEIGHT=640;
+const SUPABASE_URL='https://ydpkyktfvpdnjjiewctf.supabase.co';
+const SUPABASE_KEY='sb_publishable_q44xvrQ9qmYhv80WuCnAdg_aTkxslmD';
+const _sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-// ─────────────────────────────────────────────
-//  I18N — chargement des fichiers JSON
-// ─────────────────────────────────────────────
-const _lang = () => localStorage.getItem('fl_lang') || 'fr';
-let STUDIO_T = { fr:{}, en:{} };   // studio section
-let _langCache = {};
+const _lang=()=>localStorage.getItem('fl_lang')||'fr';
+let STUDIO_T={fr:{},en:{}};
+let _langCache={};
 
-async function loadLang(l) {
-  if (_langCache[l]) return _langCache[l];
-  try {
-    const r = await fetch('lang/' + l + '.json');
-    if (!r.ok) { if (l !== 'fr') return loadLang('fr'); return null; }
-    const data = await r.json();
-    _langCache[l] = data;
-    return data;
-  } catch(e) { if (l !== 'fr') return loadLang('fr'); return null; }
+async function loadLang(l){
+  if(_langCache[l])return _langCache[l];
+  try{const r=await fetch('lang/'+l+'.json');if(!r.ok){if(l!=='fr')return loadLang('fr');return null;}const data=await r.json();_langCache[l]=data;return data;}
+  catch(e){if(l!=='fr')return loadLang('fr');return null;}
 }
 
-async function applyStudioLang() {
-  const l    = _lang();
-  const data = await loadLang(l);
-  if (!data) return;
+async function applyStudioLang(){
+  const l=_lang();
+  const data=await loadLang(l);
+  if(!data)return;
+  const t=data.studio||{};
+  const tp=data.publish||{};
+  STUDIO_T[l]=t;
+  STUDIO_T._pub=tp;
 
-  const t  = data.studio  || {};
-  const tp = data.publish || {};
-
-  STUDIO_T[l]   = t;
-  STUDIO_T._pub = tp;
-
-  // ── data-lbl (labels topbar) ──────────────
-  document.querySelectorAll('[data-lbl]').forEach(el => {
-    const key = el.getAttribute('data-lbl');
-    if (t[key]) el.textContent = t[key];
+  // data-lbl : tous les éléments avec data-lbl
+  document.querySelectorAll('[data-lbl]').forEach(el=>{
+    const key=el.getAttribute('data-lbl');
+    if(t[key])el.textContent=t[key];
   });
 
-  // ── data-info (textes panel) ──────────────
-  document.querySelectorAll('[data-info]').forEach(el => {
-    const key = el.getAttribute('data-info');
-    if (t[key]) el.innerHTML = t[key].replace(/\n/g, '<br>');
+  // data-lbl sur les options de select (ne pas changer textContent si vide)
+  document.querySelectorAll('option[data-lbl]').forEach(el=>{
+    const key=el.getAttribute('data-lbl');
+    if(t[key])el.textContent=t[key];
   });
 
-  // ── Boutons outil (texte + tooltip) ───────
-      const TOOL_MAP = {
-      fixed:'tFixed', invis:'tInvis', bounce:'tBounce', mobile:'tMobile',
-      push:'tPush', flash:'tFlash', gblock:'tGblock',
-      gravflip:'tGravflip', speed:'tSpeed', darkness:'tDarkness',
-      start:'tStart', end:'tEnd', select:'tSelect'
-    };
-    const TIP_MAP = {
-      fixed:'tipFixed', invis:'tipInvis', bounce:'tipBounce', mobile:'tipMobile',
-      push:'tipPush', flash:'tipFlash', gblock:'tipGblock',
-      gravflip:'tipGravflip', speed:'tipSpeed', darkness:'tipDarkness',
-      start:'tipStart', end:'tipEnd', select:'tipSelect'
-    };
-  Object.entries(TOOL_MAP).forEach(([id, key]) => {
-    const el = document.getElementById('t-' + id);
-    if (el && t[key]) el.textContent = t[key];
-  });
-  Object.entries(TIP_MAP).forEach(([id, key]) => {
-    const el = document.getElementById('t-' + id);
-    if (el && t[key]) el.setAttribute('data-tip', t[key]);
+  // data-info : textes panel
+  document.querySelectorAll('[data-info]').forEach(el=>{
+    const key=el.getAttribute('data-info');
+    if(t[key])el.innerHTML=t[key].replace(/\n/g,'<br>');
   });
 
-  // ── Boutons action topbar ─────────────────
-  const sa = (id, key) => { const el = document.getElementById(id); if (el && t[key]) el.textContent = t[key]; };
-  sa('btn-play',        'btnPlay');
-  sa('btn-save',        'btnSave');
-  sa('btn-load',        'btnLoad');
-  sa('btn-clear',       'btnClear');
-  sa('btn-nav-profile', 'btnProfil');
-  sa('btn-nav-home',    'btnAccueil');
+  // Boutons outil texte + tooltip
+  const TOOL_MAP={fixed:'tFixed',invis:'tInvis',bounce:'tBounce',mobile:'tMobile',push:'tPush',flash:'tFlash',gblock:'tGblock',gravflip:'tGravflip',speed:'tSpeed',darkness:'tDarkness',start:'tStart',end:'tEnd',select:'tSelect'};
+  const TIP_MAP={fixed:'tipFixed',invis:'tipInvis',bounce:'tipBounce',mobile:'tipMobile',push:'tipPush',flash:'tipFlash',gblock:'tipGblock',gravflip:'tipGravflip',speed:'tipSpeed',darkness:'tipDarkness',start:'tipStart',end:'tipEnd',select:'tipSelect'};
+  Object.entries(TOOL_MAP).forEach(([id,key])=>{const el=document.getElementById('t-'+id);if(el&&t[key])el.textContent=t[key];});
+  Object.entries(TIP_MAP).forEach(([id,key])=>{const el=document.getElementById('t-'+id);if(el&&t[key])el.setAttribute('data-tip',t[key]);});
 
-  // ── Panel titre ───────────────────────────
-  const prefix = t.toolPrefix || 'TOOL: ';
-  const names  = t.toolNames  || {};
-  const ptitle = document.getElementById('ptitle');
-  if (ptitle) ptitle.textContent = prefix + (names[currentTool] || currentTool.toUpperCase());
+  // Boutons action
+  const sa=(id,key)=>{const el=document.getElementById(id);if(el&&t[key])el.textContent=t[key];};
+  sa('btn-play','btnPlay');sa('btn-save','btnSave');sa('btn-load','btnLoad');sa('btn-clear','btnClear');
+  sa('btn-nav-profile','btnProfil');sa('btn-nav-home','btnAccueil');
 
-  // ── Statusbar ─────────────────────────────
-  const sb = document.getElementById('statusbar');
-  if (sb && t.ready) sb.textContent = t.ready;
+  // Panel titre
+  const prefix=t.toolPrefix||'TOOL: ';
+  const names=t.toolNames||{};
+  const ptitle=document.getElementById('ptitle');
+  if(ptitle)ptitle.textContent=prefix+(names[currentTool]||currentTool.toUpperCase());
 
-  // ── Load modal header ─────────────────────
-  const lh = document.getElementById('load-modal-title');
-  if (lh && t.tipLoad) lh.textContent = '📂 ' + (t.toolNames?.select ? '' : '') + (data.home?.stabMine || (l === 'fr' ? 'MES NIVEAUX' : 'MY LEVELS'));
+  // Statusbar
+  const sb=document.getElementById('statusbar');
+  if(sb&&t.ready)sb.textContent=t.ready;
 
-  // ── Unsaved modal ─────────────────────────
-  const su = (id, key) => { const el = document.getElementById(id); if (el && t[key]) el.innerHTML = t[key]; };
-  su('unsaved-title',    'unsavedTitle');
-  su('unsaved-desc',     'unsavedDesc');
-  su('unsaved-btn-save', 'unsavedSave');
-  su('unsaved-btn-leave','unsavedLeave');
-  su('unsaved-btn-stay', 'unsavedStay');
+  // Load modal header
+  const lh=document.getElementById('load-modal-title');
+  if(lh)lh.textContent='📂 '+(data.home?.stabMine||(l==='fr'?'MES NIVEAUX':'MY LEVELS'));
 
-  // ── Placeholder level-name ────────────────
-  const ni = document.getElementById('level-name-input');
-  if (ni && t.untitled) ni.placeholder = t.untitled + '...';
+  // Unsaved modal
+  const su=(id,key)=>{const el=document.getElementById(id);if(el&&t[key])el.innerHTML=t[key];};
+  su('unsaved-title','unsavedTitle');su('unsaved-desc','unsavedDesc');
+  su('unsaved-btn-save','unsavedSave');su('unsaved-btn-leave','unsavedLeave');su('unsaved-btn-stay','unsavedStay');
+
+  // Placeholder level-name
+  const ni=document.getElementById('level-name-input');
+  if(ni&&t.untitled)ni.placeholder=t.untitled+'...';
 }
 
-// ─────────────────────────────────────────────
-//  CANVAS & ÉTAT ÉDITEUR
-// ─────────────────────────────────────────────
-const EC = document.getElementById('ecanvas');
-const EX = EC.getContext('2d');
-let EW = EC.width, EH = EC.height;
+// ── CANVAS & ÉTAT ──────────────────────────────────
+const EC=document.getElementById('ecanvas');
+const EX=EC.getContext('2d');
+let EW=EC.width,EH=EC.height;
 
-function resizeEditor() {
-  const wrap = document.getElementById('cwrap');
-  const h = Math.max(GAME_HEIGHT, wrap.clientHeight);
-  if (h > 0 && h !== EC.height) { EC.height = h; EH = h; redraw(); }
-}
-window.addEventListener('resize', resizeEditor);
-setTimeout(resizeEditor, 50);
-document.addEventListener('DOMContentLoaded', () => setTimeout(resizeEditor, 100));
+function resizeEditor(){const wrap=document.getElementById('cwrap');const h=Math.max(GAME_HEIGHT,wrap.clientHeight);if(h>0&&h!==EC.height){EC.height=h;EH=h;redraw();}}
+window.addEventListener('resize',resizeEditor);
+setTimeout(resizeEditor,50);
+document.addEventListener('DOMContentLoaded',()=>setTimeout(resizeEditor,100));
 
-let GRID = 16, ZOOM = 1, currentTool = 'fixed';
-let drawing = false, startPt = null, mousePos = {x:0, y:0};
-let selection = [], dragState = null, rubberBand = null;
+let GRID=16,ZOOM=1,currentTool='fixed';
+let drawing=false,startPt=null,mousePos={x:0,y:0};
+let selection=[],dragState=null,rubberBand=null;
 
-function getSelObj() { if (selection.length !== 1) return null; const s = selection[0]; return lv[s.type]?.[s.idx] ?? null; }
-let selectedIdx = -1, selectedType = null;
-function syncLegacy() { if (selection.length === 1) { selectedIdx = selection[0].idx; selectedType = selection[0].type; } else { selectedIdx = -1; selectedType = null; } }
-function clearSel() { selection = []; selectedIdx = -1; selectedType = null; updatePanelState(); }
+function getSelObj(){if(selection.length!==1)return null;const s=selection[0];return lv[s.type]?.[s.idx]??null;}
+let selectedIdx=-1,selectedType=null;
+function syncLegacy(){if(selection.length===1){selectedIdx=selection[0].idx;selectedType=selection[0].type;}else{selectedIdx=-1;selectedType=null;}}
+function clearSel(){selection=[];selectedIdx=-1;selectedType=null;updatePanelState();}
 
-// ─────────────────────────────────────────────
-//  PANEL STATE
-// ─────────────────────────────────────────────
-function updatePanelState() {
-  const overlay    = document.getElementById('panel-overlay');
-  const noSel      = document.getElementById('panel-no-sel');
-  const multiPanel = document.getElementById('multi-sel-panel');
-  if (!overlay) return;
-  if (selection.length === 0) { overlay.classList.add('show'); noSel.classList.add('show'); if (multiPanel) multiPanel.classList.remove('show'); return; }
-  overlay.classList.remove('show'); noSel.classList.remove('show');
-  if (selection.length === 1) { if (multiPanel) multiPanel.classList.remove('show'); return; }
-  document.querySelectorAll('.psec').forEach(s => s.classList.remove('show'));
-  if (multiPanel) multiPanel.classList.add('show');
-  const count = document.getElementById('multi-sel-count');
-  const types = [...new Set(selection.map(s => s.type))];
-  const sameType = types.length === 1;
-  const type = sameType ? types[0] : null;
-  const l = _lang(); const tn = STUDIO_T[l]?.toolNames || {};
- const t = STUDIO_T[l] || {};
-  if (count) { const label = sameType ? (tn[type] || type.toUpperCase()) : (t.multiMixed || 'mixed types'); count.textContent = `${selection.length} ${t.multiBlocs||'blocs'} • ${label}`; }
-  const typePanel = document.getElementById('multi-type-panel');
-  if (typePanel) typePanel.innerHTML = '';
-  if (sameType) loadMultiTypePanel(type);
+// ── PANEL STATE ────────────────────────────────────
+function updatePanelState(){
+  const overlay=document.getElementById('panel-overlay');
+  const noSel=document.getElementById('panel-no-sel');
+  const multiPanel=document.getElementById('multi-sel-panel');
+  if(!overlay)return;
+  if(selection.length===0){overlay.classList.add('show');noSel.classList.add('show');if(multiPanel)multiPanel.classList.remove('show');return;}
+  overlay.classList.remove('show');noSel.classList.remove('show');
+  if(selection.length===1){if(multiPanel)multiPanel.classList.remove('show');return;}
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  if(multiPanel)multiPanel.classList.add('show');
+  const count=document.getElementById('multi-sel-count');
+  const types=[...new Set(selection.map(s=>s.type))];
+  const sameType=types.length===1;
+  const type=sameType?types[0]:null;
+  const l=_lang();const t=STUDIO_T[l]||{};const tn=t.toolNames||{};
+  if(count){const label=sameType?(tn[type]||type.toUpperCase()):(t.multiMixed||'mixed types');count.textContent=`${selection.length} ${t.multiBlocs||'blocs'} • ${label}`;}
+  const typePanel=document.getElementById('multi-type-panel');
+  if(typePanel)typePanel.innerHTML='';
+  if(sameType)loadMultiTypePanel(type);
   loadMultiSpikePanel();
 }
 
-function _getMultiBlocks() { return selection.map(s => lv[s.type]?.[s.idx]).filter(Boolean); }
-function _commonVal(blocks, getter) { const vals = blocks.map(getter); const first = vals[0]; return vals.every(v => v === first) ? first : null; }
-function _applyToAll(setter) { snapshot(); _getMultiBlocks().forEach(b => setter(b)); redraw(); }
+function _getMultiBlocks(){return selection.map(s=>lv[s.type]?.[s.idx]).filter(Boolean);}
+function _commonVal(blocks,getter){const vals=blocks.map(getter);const first=vals[0];return vals.every(v=>v===first)?first:null;}
+function _applyToAll(setter){snapshot();_getMultiBlocks().forEach(b=>setter(b));redraw();}
 
-function loadMultiTypePanel(type) {
-  const tp = document.getElementById('multi-type-panel');
-  if (!tp) return;
-  const blocks = _getMultiBlocks();
-  if (type === 'mobile') { tp.innerHTML = buildMultiMobileHTML(); loadMultiMobileValues(blocks); }
-  else if (type === 'bounce') { tp.innerHTML = buildMultiBounceHTML(); loadMultiBounceValues(blocks); }
+function loadMultiTypePanel(type){
+  const tp=document.getElementById('multi-type-panel');if(!tp)return;
+  const blocks=_getMultiBlocks();
+  if(type==='mobile'){tp.innerHTML=buildMultiMobileHTML();loadMultiMobileValues(blocks);}
+  else if(type==='bounce'){tp.innerHTML=buildMultiBounceHTML();loadMultiBounceValues(blocks);}
 }
 
-function buildMultiMobileHTML() {
-  return `<div class="prow"><label>DÉCLENCHEMENT</label>
+function buildMultiMobileHTML(){
+  const l=_lang();const t=STUDIO_T[l]||{};
+  return`<div class="prow"><label>${t.moTrigger||'DÉCLENCHEMENT'}</label>
     <select id="mm-trigger" onchange="multiMobileChanged()" style="width:100%;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);font-family:Rajdhani,sans-serif;font-size:14px;padding:6px 8px;border-radius:4px;">
-      <option value="">—</option><option value="continuous">↺ EN CONTINU</option><option value="approach">👁 À L'APPROCHE</option></select></div>
-  <div class="prow" id="mm-trig-dist-row"><label>DISTANCE DÉCLENCHEMENT (px)</label>
+      <option value="">—</option><option value="continuous">${t.moTrigContinuous||'↺ EN CONTINU'}</option><option value="approach">${t.moTrigApproach||'👁 À L\'APPROCHE'}</option></select></div>
+  <div class="prow" id="mm-trig-dist-row"><label>${t.moTrigDist||'DISTANCE DÉCLENCHEMENT (px)'}</label>
     <div style="display:flex;gap:4px;align-items:center"><input type="range" id="mm-trig-dist" min="8" max="300" step="8" value="80" oninput="multiMobileChanged()">
     <span class="pval" id="mm-trig-dist-v">80</span></div></div>
-  <div class="prow"><label>DIRECTION</label>
+  <div class="prow"><label>${t.moDir||'DIRECTION'}</label>
     <select id="mm-dir" onchange="multiMobileChanged()" style="width:100%;background:var(--input-bg);border:2px solid var(--border2);color:var(--text);font-family:Rajdhani,sans-serif;font-size:14px;padding:6px 8px;border-radius:4px;">
-      <option value="">—</option><option value="r">→ DROITE</option><option value="l">← GAUCHE</option>
-      <option value="u">↑ HAUT</option><option value="d">↓ BAS</option>
-      <option value="omni">⊕ OMNIDIRECTIONNEL</option><option value="fall">⬇ CHUTE</option></select></div>
-  <div class="prow"><label>VITESSE</label><div style="display:flex;gap:4px;align-items:center">
+      <option value="">—</option><option value="r">${t.moDirR||'→ DROITE'}</option><option value="l">${t.moDirL||'← GAUCHE'}</option>
+      <option value="u">${t.moDirU||'↑ HAUT'}</option><option value="d">${t.moDirD||'↓ BAS'}</option>
+      <option value="omni">${t.moDirOmni||'⊕ OMNIDIRECTIONNEL'}</option><option value="fall">${t.moDirFall||'⬇ CHUTE'}</option></select></div>
+  <div class="prow"><label>${t.moSpeed||'VITESSE'}</label><div style="display:flex;gap:4px;align-items:center">
     <input type="range" id="mm-spd" min="0.5" max="12" step="0.5" value="2" oninput="multiMobileChanged()">
     <span class="pval" id="mm-spd-v">—</span></div></div>
-  <div class="prow" id="mm-dist-row"><label>DISTANCE (px)</label><div style="display:flex;gap:4px;align-items:center">
+  <div class="prow" id="mm-dist-row"><label>${t.moDist||'DISTANCE (px)'}</label><div style="display:flex;gap:4px;align-items:center">
     <input type="range" id="mm-dist" min="16" max="800" step="8" value="160" oninput="multiMobileChanged()">
     <span class="pval" id="mm-dist-v">—</span></div></div>
   <div class="prow"><div class="crow"><input type="checkbox" id="mm-loop" onchange="multiMobileChanged()">
-    <label for="mm-loop" style="cursor:pointer;">ALLER-RETOUR EN BOUCLE</label></div></div>
-  <div class="prow"><label>ATTENTE AVANT RETOUR (s)</label><div style="display:flex;gap:4px;align-items:center">
+    <label for="mm-loop" style="cursor:pointer;">${t.moLoop||'ALLER-RETOUR EN BOUCLE'}</label></div></div>
+  <div class="prow"><label>${t.moWait||'ATTENTE AVANT RETOUR (s)'}</label><div style="display:flex;gap:4px;align-items:center">
     <input type="range" id="mm-wait" min="0" max="10" step="0.5" value="0" oninput="multiMobileChanged()">
     <span class="pval" id="mm-wait-v">—</span></div></div>`;
 }
 
-function loadMultiMobileValues(blocks) {
-  const cTrigger = _commonVal(blocks, b => b.trigger||'continuous');
-  const cDir     = _commonVal(blocks, b => b.dir||'r');
-  const cSpd     = _commonVal(blocks, b => b.speed??2);
-  const cDist    = _commonVal(blocks, b => b.dist??160);
-  const cLoop    = _commonVal(blocks, b => b.loop??true);
-  const cWait    = _commonVal(blocks, b => b.waitDelay??0);
-  const cTD      = _commonVal(blocks, b => b.trigDist??80);
-  const se = (id,val) => { const el=document.getElementById(id); if(el) el.value=val??''; };
-  const sv = (id,val) => { const el=document.getElementById(id); if(el) el.textContent=val!==null?val:'—'; };
-  const sc = (id,val) => { const el=document.getElementById(id); if(el) el.checked=val===true; if(el&&val===null) el.indeterminate=true; };
-  se('mm-trigger',cTrigger); se('mm-dir',cDir);
+function loadMultiMobileValues(blocks){
+  const cTrigger=_commonVal(blocks,b=>b.trigger||'continuous');
+  const cDir=_commonVal(blocks,b=>b.dir||'r');
+  const cSpd=_commonVal(blocks,b=>b.speed??2);
+  const cDist=_commonVal(blocks,b=>b.dist??160);
+  const cLoop=_commonVal(blocks,b=>b.loop??true);
+  const cWait=_commonVal(blocks,b=>b.waitDelay??0);
+  const cTD=_commonVal(blocks,b=>b.trigDist??80);
+  const se=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val??'';};
+  const sv=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val!==null?val:'—';};
+  const sc=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=val===true;if(el&&val===null)el.indeterminate=true;};
+  se('mm-trigger',cTrigger);se('mm-dir',cDir);
   if(cSpd!==null){se('mm-spd',cSpd);sv('mm-spd-v',cSpd);}
   if(cDist!==null){se('mm-dist',cDist);sv('mm-dist-v',cDist);}
   if(cWait!==null){se('mm-wait',cWait);sv('mm-wait-v',cWait);}
   if(cTD!==null){se('mm-trig-dist',cTD);sv('mm-trig-dist-v',cTD);}
   sc('mm-loop',cLoop);
-  const isFall=cDir==='fall'; const isApproach=cTrigger==='approach';
-  const trigRow=document.getElementById('mm-trig-dist-row'); if(trigRow) trigRow.style.display=isApproach?'':'none';
-  const distRow=document.getElementById('mm-dist-row'); if(distRow) distRow.style.display=isFall?'none':'';
+  const isFall=cDir==='fall';const isApproach=cTrigger==='approach';
+  const trigRow=document.getElementById('mm-trig-dist-row');if(trigRow)trigRow.style.display=isApproach?'':'none';
+  const distRow=document.getElementById('mm-dist-row');if(distRow)distRow.style.display=isFall?'none':'';
 }
 
-function multiMobileChanged() {
+function multiMobileChanged(){
   const trigger=document.getElementById('mm-trigger')?.value;
   const dir=document.getElementById('mm-dir')?.value;
   const spd=document.getElementById('mm-spd')?.value;
@@ -1010,46 +757,48 @@ function multiMobileChanged() {
   const trigDist=document.getElementById('mm-trig-dist')?.value;
   const sv=(id,val)=>{const el=document.getElementById(id);if(el&&val!==undefined)el.textContent=val;};
   sv('mm-spd-v',spd);sv('mm-dist-v',dist);sv('mm-wait-v',wait);sv('mm-trig-dist-v',trigDist);
-  const isFall=dir==='fall'; const isApproach=trigger==='approach';
-  const trigRow=document.getElementById('mm-trig-dist-row'); if(trigRow) trigRow.style.display=isApproach?'':'none';
-  const distRow=document.getElementById('mm-dist-row'); if(distRow) distRow.style.display=isFall?'none':'';
+  const isFall=dir==='fall';const isApproach=trigger==='approach';
+  const trigRow=document.getElementById('mm-trig-dist-row');if(trigRow)trigRow.style.display=isApproach?'':'none';
+  const distRow=document.getElementById('mm-dist-row');if(distRow)distRow.style.display=isFall?'none':'';
   _applyToAll(b=>{
-    if(trigger) b.trigger=trigger; if(dir) b.dir=dir; if(spd) b.speed=+spd;
-    if(dist) b.dist=+dist; if(loop!==undefined) b.loop=loop; if(wait) b.waitDelay=+wait; if(trigDist) b.trigDist=+trigDist;
+    if(trigger)b.trigger=trigger;if(dir)b.dir=dir;if(spd)b.speed=+spd;
+    if(dist)b.dist=+dist;if(loop!==undefined)b.loop=loop;if(wait)b.waitDelay=+wait;if(trigDist)b.trigDist=+trigDist;
   });
 }
 
-function buildMultiBounceHTML() {
-  return `<div class="prow"><label>FORCE (1-10)</label>
+function buildMultiBounceHTML(){
+  const l=_lang();const t=STUDIO_T[l]||{};
+  return`<div class="prow"><label>${t.boForce||'FORCE (1-10)'}</label>
     <div style="display:flex;gap:4px;align-items:center">
       <input type="range" id="mb-force" min="1" max="10" step="0.5" value="2" oninput="multiBounceChanged()">
       <span class="pval" id="mb-force-v">—</span></div></div>`;
 }
-function loadMultiBounceValues(blocks) {
-  const cForce = _commonVal(blocks, b => b.force??2);
-  const el = document.getElementById('mb-force'); const vl = document.getElementById('mb-force-v');
-  if (el && cForce !== null) { el.value = cForce; if (vl) vl.textContent = cForce; } else if (vl) vl.textContent = '—';
+function loadMultiBounceValues(blocks){
+  const cForce=_commonVal(blocks,b=>b.force??2);
+  const el=document.getElementById('mb-force');const vl=document.getElementById('mb-force-v');
+  if(el&&cForce!==null){el.value=cForce;if(vl)vl.textContent=cForce;}else if(vl)vl.textContent='—';
 }
-function multiBounceChanged() {
-  const force = +document.getElementById('mb-force')?.value;
-  const vl = document.getElementById('mb-force-v'); if (vl) vl.textContent = force;
-  _applyToAll(b => { b.force = force; });
+function multiBounceChanged(){
+  const force=+document.getElementById('mb-force')?.value;
+  const vl=document.getElementById('mb-force-v');if(vl)vl.textContent=force;
+  _applyToAll(b=>{b.force=force;});
 }
 
-// ─────────────────────────────────────────────
-//  MULTI-SPIKE
-// ─────────────────────────────────────────────
-function loadMultiSpikePanel() {
-  const t = STUDIO_T[_lang()] || {};
-  const spikes = selection.map(s => lv[s.type]?.[s.idx]?.spikes);
-  const hasSpikes = spikes.filter(sp => sp && sp.dirs && sp.dirs.length > 0);
-  const opts = document.getElementById('multi-spike-opts'); const btn = document.getElementById('multi-spike-toggle');
-  if (hasSpikes.length === 0) {
-    if(opts) opts.classList.remove('show'); if(btn){btn.classList.remove('active');btn.textContent=t.spikeToggleOff||'🗡 SPIKES ▸';}
+// ── MULTI-SPIKE ────────────────────────────────────
+function loadMultiSpikePanel(){
+  const t=STUDIO_T[_lang()]||{};
+  const spikes=selection.map(s=>lv[s.type]?.[s.idx]?.spikes);
+  const hasSpikes=spikes.filter(sp=>sp&&sp.dirs&&sp.dirs.length>0);
+  const opts=document.getElementById('multi-spike-opts');const btn=document.getElementById('multi-spike-toggle');
+  if(hasSpikes.length===0){
+    if(opts)opts.classList.remove('show');
+    if(btn){btn.classList.remove('active');btn.textContent=t.spikeToggleOff||'🗡 SPIKES ▸';}
     ['multi-sp-u','multi-sp-d','multi-sp-l','multi-sp-r','multi-sp-hidden'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=false;});
-    const del=document.getElementById('multi-sp-delay');if(del)del.value=0;const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=0;return;
+    const del=document.getElementById('multi-sp-delay');if(del)del.value=0;
+    const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=0;return;
   }
-  if(opts) opts.classList.add('show'); if(btn){btn.classList.add('active');btn.textContent=t.spikeToggleOn||'🗡 SPIKES ▾';}
+  if(opts)opts.classList.add('show');
+  if(btn){btn.classList.add('active');btn.textContent=t.spikeToggleOn||'🗡 SPIKES ▾';}
   const allDirs=hasSpikes.map(sp=>JSON.stringify([...sp.dirs].sort()));
   const allHidden=hasSpikes.map(sp=>sp.hidden||false);
   const allDelay=hasSpikes.map(sp=>sp.delay||0);
@@ -1064,34 +813,34 @@ function loadMultiSpikePanel() {
   if(del){if(sameDelay){del.value=allDelay[0];if(delv)delv.textContent=allDelay[0];}else{del.value=0;if(delv)delv.textContent='—';}}
 }
 
-function multiSpikeChanged() {
-  const u=document.getElementById('multi-sp-u')?.checked; const d=document.getElementById('multi-sp-d')?.checked;
-  const l=document.getElementById('multi-sp-l')?.checked; const r=document.getElementById('multi-sp-r')?.checked;
+function multiSpikeChanged(){
+  const u=document.getElementById('multi-sp-u')?.checked;const d=document.getElementById('multi-sp-d')?.checked;
+  const l=document.getElementById('multi-sp-l')?.checked;const r=document.getElementById('multi-sp-r')?.checked;
   const hidden=document.getElementById('multi-sp-hidden')?.checked||false;
   const delay=+(document.getElementById('multi-sp-delay')?.value||0);
-  const delv=document.getElementById('multi-sp-delay-v'); if(delv) delv.textContent=delay;
+  const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=delay;
   const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);
   snapshot();
   selection.forEach(s=>{const b=lv[s.type]?.[s.idx];if(!b)return;if(dirs.length===0){delete b.spikes;}else{b.spikes={dirs,hidden,delay};}});
   redraw();
 }
 
-function multiSpikeClear() {
+function multiSpikeClear(){
   snapshot();
   selection.forEach(s=>{const b=lv[s.type]?.[s.idx];if(b)delete b.spikes;});
   ['multi-sp-u','multi-sp-d','multi-sp-l','multi-sp-r','multi-sp-hidden'].forEach(id=>{const el=document.getElementById(id);if(el){el.checked=false;el.indeterminate=false;}});
-  const del=document.getElementById('multi-sp-delay'); if(del) del.value=0;
-  const delv=document.getElementById('multi-sp-delay-v'); if(delv) delv.textContent=0;
-  const opts=document.getElementById('multi-spike-opts'); const btn=document.getElementById('multi-spike-toggle');
-  if(opts) opts.classList.remove('show'); if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
+  const del=document.getElementById('multi-sp-delay');if(del)del.value=0;
+  const delv=document.getElementById('multi-sp-delay-v');if(delv)delv.textContent=0;
+  const t=STUDIO_T[_lang()]||{};
+  const opts=document.getElementById('multi-spike-opts');const btn=document.getElementById('multi-spike-toggle');
+  if(opts)opts.classList.remove('show');
+  if(btn){btn.classList.remove('active');btn.textContent=t.spikeToggleOff||'🗡 SPIKES ▸';}
   redraw();
 }
 
-// ─────────────────────────────────────────────
-//  SÉLECTION
-// ─────────────────────────────────────────────
-function addToSel(type, idx) {
-  if (!selection.find(s => s.type===type && s.idx===idx)) selection.push({type,idx});
+// ── SÉLECTION ──────────────────────────────────────
+function addToSel(type,idx){
+  if(!selection.find(s=>s.type===type&&s.idx===idx))selection.push({type,idx});
   syncLegacy();
   if(selection.length===1&&type==='fixed'){const b=lv.fixed[idx];if(b){blockSpikePanelLoad('fixed',b);_showSection('fixed');}}
   if(selection.length===1&&type==='invis'){const b=lv.invis[idx];if(b){blockSpikePanelLoad('invis',b);_showSection('invis');}}
@@ -1105,118 +854,105 @@ function addToSel(type, idx) {
   if(selection.length===1&&type==='darkness'){const dk=lv.darkness[idx];if(dk){dkPanelLoad(dk);showDkPanel();}}
   updatePanelState();
 }
-function _showSection(type) {
-  document.querySelectorAll('.psec').forEach(s => s.classList.remove('show'));
-  document.getElementById('s-' + type)?.classList.add('show');
-  const l = _lang(); const st = STUDIO_T[l] || {};
-  const prefix = st.paramPrefix || 'PARAMS: ';
-  const names  = st.toolNames  || {};
-  document.getElementById('ptitle').textContent = prefix + (names[type] || type.toUpperCase());
+function _showSection(type){
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
+  document.getElementById('s-'+type)?.classList.add('show');
+  const l=_lang();const st=STUDIO_T[l]||{};
+  const prefix=st.paramPrefix||'PARAMS: ';
+  const names=st.toolNames||{};
+  document.getElementById('ptitle').textContent=prefix+(names[type]||type.toUpperCase());
 }
 function toggleSel(type,idx){const i=selection.findIndex(s=>s.type===type&&s.idx===idx);if(i>=0)selection.splice(i,1);else selection.push({type,idx});syncLegacy();updatePanelState();}
 function isSelected(type,idx){return!!selection.find(s=>s.type===type&&s.idx===idx);}
 
-// ─────────────────────────────────────────────
-//  UNDO / REDO
-// ─────────────────────────────────────────────
-let undoStack=[], redoStack=[];
-let _currentLevelId=null, _currentVisibility='private', _authorCompleted=false, _isPublished=false;
-let _hasUnsavedChanges=false, _loadingLevel=false;
+// ── UNDO / REDO ────────────────────────────────────
+let undoStack=[],redoStack=[];
+let _currentLevelId=null,_currentVisibility='private',_authorCompleted=false,_isPublished=false;
+let _hasUnsavedChanges=false,_loadingLevel=false;
 
-function snapshot() {
-  if (_isPublished && _currentLevelId) return;
-  _hasUnsavedChanges = true;
+function snapshot(){
+  if(_isPublished&&_currentLevelId)return;
+  _hasUnsavedChanges=true;
   undoStack.push(JSON.stringify(lv));
-  if (undoStack.length > 60) undoStack.shift();
-  redoStack = [];
+  if(undoStack.length>60)undoStack.shift();
+  redoStack=[];
 }
-function snapshotWithDupCheck() {
-  if (_currentLevelId && !window._authorCompletedReset) { window._authorCompletedReset=true; _sb.from('levels').update({author_completed:false}).eq('id',_currentLevelId).then(()=>{_authorCompleted=false;}); }
-  if (_isPublished && _currentLevelId && !window._dupConfirmed) { showDupModal(); return; }
+function snapshotWithDupCheck(){
+  if(_currentLevelId&&!window._authorCompletedReset){window._authorCompletedReset=true;_sb.from('levels').update({author_completed:false}).eq('id',_currentLevelId).then(()=>{_authorCompleted=false;});}
+  if(_isPublished&&_currentLevelId&&!window._dupConfirmed){showDupModal();return;}
   snapshot();
 }
-async function duplicateLevel() {
-  const {data:sess} = await _sb.auth.getSession(); if (!sess.session) return;
-  const user = sess.session.user;
+async function duplicateLevel(){
+  const{data:sess}=await _sb.auth.getSession();if(!sess.session)return;
+  const user=sess.session.user;
   function genCode(){const r=()=>Math.floor(Math.random()*90000+10000);return r()+'-'+r()+'-'+r();}
-  const {data:inserted,error} = await _sb.from('levels').insert({user_id:user.id,title:(document.getElementById('level-name-input')?.value||'Untitled')+' (copie)',data:lv,plays:0,visibility:'private',share_code:genCode(),author_completed:false,is_published:false}).select().single();
-  if (error) { showSaveToast('⚠️ '+error.message); window._dupWarningShown=false; return; }
-  _currentLevelId=inserted.id; _currentVisibility='private'; _authorCompleted=false; _isPublished=false;
-  window._dupConfirmed=true; window._dupWarningShown=false;
-  const ni=document.getElementById('level-name-input'); if(ni) ni.value=inserted.title;
+  const{data:inserted,error}=await _sb.from('levels').insert({user_id:user.id,title:(document.getElementById('level-name-input')?.value||'Untitled')+' (copie)',data:lv,plays:0,visibility:'private',share_code:genCode(),author_completed:false,is_published:false}).select().single();
+  if(error){showSaveToast('⚠️ '+error.message);window._dupWarningShown=false;return;}
+  _currentLevelId=inserted.id;_currentVisibility='private';_authorCompleted=false;_isPublished=false;
+  window._dupConfirmed=true;window._dupWarningShown=false;
+  const ni=document.getElementById('level-name-input');if(ni)ni.value=inserted.title;
   history.replaceState(null,'','studio.html');
-  undoStack.push(JSON.stringify(lv)); if(undoStack.length>60) undoStack.shift(); redoStack=[];
-  const l=_lang(); status(STUDIO_T[l]?.msgDuplicated || STUDIO_T[l]?.msgLoaded || 'Duplicated!');
+  undoStack.push(JSON.stringify(lv));if(undoStack.length>60)undoStack.shift();redoStack=[];
+  const l=_lang();status(STUDIO_T[l]?.msgDuplicated||STUDIO_T[l]?.msgLoaded||'Duplicated!');
 }
 function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(lv));lv=JSON.parse(undoStack.pop());clearSel();redraw();}
 function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(lv));lv=JSON.parse(redoStack.pop());clearSel();redraw();}
 
-// ─────────────────────────────────────────────
-//  CLIPBOARD
-// ─────────────────────────────────────────────
-let clipboard = null;
+// ── CLIPBOARD ──────────────────────────────────────
+let clipboard=null;
 function copySelected(){if(!selection.length)return;clipboard=selection.map(s=>({type:s.type,data:JSON.parse(JSON.stringify(lv[s.type][s.idx]))}));}
 function pasteClip(){
   if(!clipboard||!clipboard.length)return;snapshot();clearSel();
   clipboard.forEach(c=>{const d=JSON.parse(JSON.stringify(c.data));d.x+=GRID*2;d.y+=GRID*2;lv[c.type].push(d);addToSel(c.type,lv[c.type].length-1);});
-  redraw();
-  const l=_lang(); status(STUDIO_T[l]?.msgPaste || 'Collé.');
+  redraw();const l=_lang();status(STUDIO_T[l]?.msgPaste||'Pasted.');
 }
 
-// ─────────────────────────────────────────────
-//  NIVEAU
-// ─────────────────────────────────────────────
-let lv = emptyLevel();
+// ── NIVEAU ─────────────────────────────────────────
+let lv=emptyLevel();
 function emptyLevel(){return{fixed:[],trap:[],slider:[],invis:[],bounce:[],mobile:[],push:[],gravflip:[],speed:[],flash:[],spike:[],gblock:[],darkness:[],start:{x:80,y:480},end:null};}
 
-// ─────────────────────────────────────────────
-//  OUTIL ACTIF
-// ─────────────────────────────────────────────
-function setTool(t) {
-  currentTool = t; dragState = null; selectedIdx = -1; selectedType = null;
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+// ── OUTIL ACTIF ────────────────────────────────────
+function setTool(t){
+  currentTool=t;dragState=null;selectedIdx=-1;selectedType=null;
+  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('t-'+t)?.classList.add('active');
-  document.querySelectorAll('.psec').forEach(s => s.classList.remove('show'));
+  document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-'+t)?.classList.add('show');
-  const l = _lang(); const st = STUDIO_T[l] || {};
-  const prefix = st.toolPrefix || 'TOOL: ';
-  const names  = st.toolNames  || {};
-  document.getElementById('ptitle').textContent = prefix + (names[t] || t.toUpperCase());
+  const l=_lang();const st=STUDIO_T[l]||{};
+  const prefix=st.toolPrefix||'TOOL: ';const names=st.toolNames||{};
+  document.getElementById('ptitle').textContent=prefix+(names[t]||t.toUpperCase());
   redraw();
 }
 
-// ─────────────────────────────────────────────
-//  PANELS PARAMÈTRES
-// ─────────────────────────────────────────────
-const GF_HINTS_FR = {u:'↑ Attire vers le haut (plafond)',d:'↓ Attire vers le bas (sol)',l:'← Attire vers la gauche (mur gauche)',r:'→ Attire vers la droite (mur droit)'};
-const GF_HINTS_EN = {u:'↑ Pulls to ceiling',d:'↓ Pulls to floor',l:'← Pulls to left wall',r:'→ Pulls to right wall'};
-const GF_HINTS = () => _lang()==='fr' ? GF_HINTS_FR : GF_HINTS_EN;
+// ── PANELS PARAMÈTRES ──────────────────────────────
+const GF_HINTS_FR={u:'↑ Attire vers le haut (plafond)',d:'↓ Attire vers le bas (sol)',l:'← Attire vers la gauche (mur gauche)',r:'→ Attire vers la droite (mur droit)'};
+const GF_HINTS_EN={u:'↑ Pulls to ceiling',d:'↓ Pulls to floor',l:'← Pulls to left wall',r:'→ Pulls to right wall'};
+const GF_HINTS=()=>_lang()==='fr'?GF_HINTS_FR:GF_HINTS_EN;
 
 function gfParamChanged(){
-  const dir=document.getElementById('gf-dir').value; const str=+document.getElementById('gf-str').value;
+  const dir=document.getElementById('gf-dir').value;const str=+document.getElementById('gf-str').value;
   document.getElementById('gf-str-v').textContent=str;
-  const isFr=_lang()==='fr';
   const _t=STUDIO_T[_lang()]||{};
   document.getElementById('gf-hint').textContent=str===0?(_t.gfWeightless||'○ Weightless'):GF_HINTS()[dir];
   if(selection.length===1&&selectedType==='gravflip'){const z=lv.gravflip[selectedIdx];if(z){z.dir=dir;z.strength=str;}}
   redraw();
 }
 function gfPanelLoad(z){
-  const dir=z.dir??(((z.grav??-10)<0)?'u':'d'); const str=z.strength??Math.abs(z.grav??10);
-  document.getElementById('gf-dir').value=dir; document.getElementById('gf-str').value=str;
+  const dir=z.dir??(((z.grav??-10)<0)?'u':'d');const str=z.strength??Math.abs(z.grav??10);
+  document.getElementById('gf-dir').value=dir;document.getElementById('gf-str').value=str;
   document.getElementById('gf-str-v').textContent=str;
-  const isFr=_lang()==='fr';
-  document.getElementById('gf-hint').textContent=str===0?(isFr?'○ Apesanteur':'○ Weightless'):GF_HINTS()[dir];
+  const _t=STUDIO_T[_lang()]||{};
+  document.getElementById('gf-hint').textContent=str===0?(_t.gfWeightless||'○ Weightless'):GF_HINTS()[dir];
 }
 function showGfPanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-gravflip').classList.add('show');
-  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  const l=_lang();const st=STUDIO_T[l]||{};const p=st.paramPrefix||'PARAMS: ';const n=st.toolNames||{};
   document.getElementById('ptitle').textContent=p+(n.gravflip||'GRAVITY');
 }
 
 function spParamChanged(){
-  const val=+document.getElementById('sp-val').value; document.getElementById('sp-val-v').textContent=val;
+  const val=+document.getElementById('sp-val').value;document.getElementById('sp-val-v').textContent=val;
   const isFr=_lang()==='fr';
   const hint=val<3?(isFr?'⬇ très lent':'⬇ very slow'):val<5?(isFr?'⬇ lent':'⬇ slow'):val===5?'= normal':val<10?(isFr?'⬆ rapide':'⬆ fast'):val<15?(isFr?'⬆⬆ très rapide':'⬆⬆ very fast'):'⚡ turbo';
   document.getElementById('sp-hint').textContent=hint;
@@ -1227,7 +963,7 @@ function spPanelLoad(z){document.getElementById('sp-val').value=z.spd??5;documen
 function showSpPanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-speed').classList.add('show');
-  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  const l=_lang();const st=STUDIO_T[l]||{};const p=st.paramPrefix||'PARAMS: ';const n=st.toolNames||{};
   document.getElementById('ptitle').textContent=p+(n.speed||'SPEED');
 }
 
@@ -1240,18 +976,18 @@ function bouncePanelLoad(b){document.getElementById('bo-force').value=b.force??2
 function showBouncePanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-bounce').classList.add('show');
-  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  const l=_lang();const st=STUDIO_T[l]||{};const p=st.paramPrefix||'PARAMS: ';const n=st.toolNames||{};
   document.getElementById('ptitle').textContent=p+(n.bounce||'BOUNCE');
 }
 
 function moParamChanged(){
-  const trigger=document.getElementById('mo-trigger').value; const dir=document.getElementById('mo-dir').value;
-  const spd=+document.getElementById('mo-spd').value; const dist=+document.getElementById('mo-dist').value;
-  const loop=document.getElementById('mo-loop').checked; const wait=+document.getElementById('mo-wait').value;
+  const trigger=document.getElementById('mo-trigger').value;const dir=document.getElementById('mo-dir').value;
+  const spd=+document.getElementById('mo-spd').value;const dist=+document.getElementById('mo-dist').value;
+  const loop=document.getElementById('mo-loop').checked;const wait=+document.getElementById('mo-wait').value;
   const trigDist=+document.getElementById('mo-trig-dist').value;
-  document.getElementById('mo-spd-v').textContent=spd; document.getElementById('mo-dist-v').textContent=dist;
-  document.getElementById('mo-wait-v').textContent=wait; document.getElementById('mo-trig-dist-v').textContent=trigDist;
-  const isFall=dir==='fall'; const isApproach=trigger==='approach';
+  document.getElementById('mo-spd-v').textContent=spd;document.getElementById('mo-dist-v').textContent=dist;
+  document.getElementById('mo-wait-v').textContent=wait;document.getElementById('mo-trig-dist-v').textContent=trigDist;
+  const isFall=dir==='fall';const isApproach=trigger==='approach';
   document.getElementById('mo-trig-dist-row').style.display=isApproach?'':'none';
   document.getElementById('mo-dist-row').style.display=isFall?'none':'';
   document.getElementById('mo-loop-row').style.display=isFall?'none':'';
@@ -1276,13 +1012,13 @@ function moPanelLoad(m){
 function showMoPanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-mobile').classList.add('show');
-  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  const l=_lang();const st=STUDIO_T[l]||{};const p=st.paramPrefix||'PARAMS: ';const n=st.toolNames||{};
   document.getElementById('ptitle').textContent=p+(n.mobile||'MOBILE');
 }
 function getMoValues(){return{trigger:document.getElementById('mo-trigger').value,dir:document.getElementById('mo-dir').value,speed:+document.getElementById('mo-spd').value,dist:+document.getElementById('mo-dist').value,loop:document.getElementById('mo-loop').checked,waitDelay:+document.getElementById('mo-wait').value,trigDist:+document.getElementById('mo-trig-dist').value};}
 
 function flashParamChanged(){
-  const onCs=+document.getElementById('fl-on').value||50; const offCs=+document.getElementById('fl-off').value||50;
+  const onCs=+document.getElementById('fl-on').value||50;const offCs=+document.getElementById('fl-off').value||50;
   const phase=+document.getElementById('fl-phase').value||0;
   document.getElementById('fl-phase-v').textContent=phase;
   if(selection.length===1&&selectedType==='flash'){const f=lv.flash[selectedIdx];if(f){f.onMs=onCs*10;f.offMs=offCs*10;f.phase=phase*10;}}
@@ -1297,7 +1033,7 @@ function flashPanelLoad(f){
 function showFlashPanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-flash').classList.add('show');
-  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  const l=_lang();const st=STUDIO_T[l]||{};const p=st.paramPrefix||'PARAMS: ';const n=st.toolNames||{};
   document.getElementById('ptitle').textContent=p+(n.flash||'FLASH');
 }
 
@@ -1305,7 +1041,7 @@ function gblockPanelLoad(g){blockSpikePanelLoad('gblock',g);}
 function showGblockPanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-gblock').classList.add('show');
-  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  const l=_lang();const st=STUDIO_T[l]||{};const p=st.paramPrefix||'PARAMS: ';const n=st.toolNames||{};
   document.getElementById('ptitle').textContent=p+(n.gblock||'PLANET');
 }
 
@@ -1319,21 +1055,20 @@ function dkPanelLoad(z){document.getElementById('dk-radius').value=z.radius??120
 function showDkPanel(){
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('show'));
   document.getElementById('s-darkness').classList.add('show');
-  const l=_lang(); const st=STUDIO_T[l]||{}; const p=st.paramPrefix||'PARAMS: '; const n=st.toolNames||{};
+  const l=_lang();const st=STUDIO_T[l]||{};const p=st.paramPrefix||'PARAMS: ';const n=st.toolNames||{};
   document.getElementById('ptitle').textContent=p+(n.darkness||'DARKNESS');
 }
 
-// ─────────────────────────────────────────────
-//  SPIKES PANEL
-// ─────────────────────────────────────────────
+// ── SPIKES PANEL ───────────────────────────────────
 function toggleSpikeOpts(prefix){
-  const opts=document.getElementById(prefix+'-spike-opts'); const btn=document.getElementById(prefix+'-spike-toggle');
-  if(!opts)return; opts.classList.toggle('show'); btn.classList.toggle('active');
-  btn.textContent=opts.classList.contains('show')?'🗡 PIQUES ▾':'🗡 PIQUES ▸';
+  const opts=document.getElementById(prefix+'-spike-opts');const btn=document.getElementById(prefix+'-spike-toggle');
+  if(!opts)return;opts.classList.toggle('show');btn.classList.toggle('active');
+  const t=STUDIO_T[_lang()]||{};
+  btn.textContent=opts.classList.contains('show')?(t.spikeToggleOn||'🗡 SPIKES ▾'):(t.spikeToggleOff||'🗡 SPIKES ▸');
 }
 function blockSpikeChanged(prefix){
-  const u=document.getElementById(prefix+'-sp-u')?.checked; const d=document.getElementById(prefix+'-sp-d')?.checked;
-  const l=document.getElementById(prefix+'-sp-l')?.checked; const r=document.getElementById(prefix+'-sp-r')?.checked;
+  const u=document.getElementById(prefix+'-sp-u')?.checked;const d=document.getElementById(prefix+'-sp-d')?.checked;
+  const l=document.getElementById(prefix+'-sp-l')?.checked;const r=document.getElementById(prefix+'-sp-r')?.checked;
   const hidden=document.getElementById(prefix+'-sp-hidden')?.checked;
   const delay=+document.getElementById(prefix+'-sp-delay')?.value||0;
   document.getElementById(prefix+'-sp-delay-v').textContent=delay;
@@ -1344,36 +1079,33 @@ function blockSpikeChanged(prefix){
   redraw();
 }
 function blockSpikePanelLoad(prefix,b){
-  const sp=b.spikes; const hasSp=sp&&sp.dirs&&sp.dirs.length>0;
-  const opts=document.getElementById(prefix+'-spike-opts'); const btn=document.getElementById(prefix+'-spike-toggle');
+  const sp=b.spikes;const hasSp=sp&&sp.dirs&&sp.dirs.length>0;
+  const opts=document.getElementById(prefix+'-spike-opts');const btn=document.getElementById(prefix+'-spike-toggle');
+  const t=STUDIO_T[_lang()]||{};
   if(hasSp){
-    if(opts)opts.classList.add('show');if(btn){btn.classList.add('active');btn.textContent='🗡 PIQUES ▾';}
+    if(opts)opts.classList.add('show');
+    if(btn){btn.classList.add('active');btn.textContent=t.spikeToggleOn||'🗡 SPIKES ▾';}
     ['u','d','l','r'].forEach(dir=>{const el=document.getElementById(prefix+'-sp-'+dir);if(el)el.checked=sp.dirs.includes(dir);});
     const h=document.getElementById(prefix+'-sp-hidden');if(h)h.checked=sp.hidden||false;
     const del=document.getElementById(prefix+'-sp-delay');if(del)del.value=sp.delay||0;
     const delv=document.getElementById(prefix+'-sp-delay-v');if(delv)delv.textContent=sp.delay||0;
   }else{
-    if(opts)opts.classList.remove('show');if(btn){btn.classList.remove('active');btn.textContent='🗡 PIQUES ▸';}
+    if(opts)opts.classList.remove('show');
+    if(btn){btn.classList.remove('active');btn.textContent=t.spikeToggleOff||'🗡 SPIKES ▸';}
     ['sp-u','sp-d','sp-l','sp-r','sp-hidden'].forEach(id=>{const el=document.getElementById(prefix+'-'+id);if(el)el.checked=false;});
     const del=document.getElementById(prefix+'-sp-delay');if(del)del.value=0;
     const delv=document.getElementById(prefix+'-sp-delay-v');if(delv)delv.textContent=0;
   }
 }
 function getSpikeFromPanel(prefix){
-  const u=document.getElementById(prefix+'-sp-u')?.checked; const d=document.getElementById(prefix+'-sp-d')?.checked;
-  const l=document.getElementById(prefix+'-sp-l')?.checked; const r=document.getElementById(prefix+'-sp-r')?.checked;
-  const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean); if(dirs.length===0)return undefined;
+  const u=document.getElementById(prefix+'-sp-u')?.checked;const d=document.getElementById(prefix+'-sp-d')?.checked;
+  const l=document.getElementById(prefix+'-sp-l')?.checked;const r=document.getElementById(prefix+'-sp-r')?.checked;
+  const dirs=[u&&'u',d&&'d',l&&'l',r&&'r'].filter(Boolean);if(dirs.length===0)return undefined;
   return{dirs,hidden:document.getElementById(prefix+'-sp-hidden')?.checked||false,delay:+document.getElementById(prefix+'-sp-delay')?.value||0};
 }
 
-// ─────────────────────────────────────────────
-//  STATUSBAR
-// ─────────────────────────────────────────────
+// ── STATUSBAR / TOAST ──────────────────────────────
 function status(s){document.getElementById('statusbar').textContent=s;}
-
-// ─────────────────────────────────────────────
-//  TOAST
-// ─────────────────────────────────────────────
 function showSaveToast(msg){
   let toast=document.getElementById('save-toast');
   if(!toast){toast=document.createElement('div');toast.id='save-toast';toast.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:#0d0d1e;border:2px solid #40f090;color:#40f090;font-family:Orbitron,monospace;font-size:14px;font-weight:700;padding:18px 32px;border-radius:8px;z-index:9999;box-shadow:0 0 40px #40f09044;pointer-events:none;transition:transform .2s,opacity .3s;opacity:0;letter-spacing:1px;';document.body.appendChild(toast);}
@@ -1381,9 +1113,7 @@ function showSaveToast(msg){
   clearTimeout(toast._timer);toast._timer=setTimeout(()=>{toast.style.transform='translate(-50%,-50%) scale(0.8)';toast.style.opacity='0';},1800);
 }
 
-// ─────────────────────────────────────────────
-//  CANVAS EVENTS
-// ─────────────────────────────────────────────
+// ── CANVAS EVENTS ──────────────────────────────────
 function snap(v){return Math.round(v/GRID)*GRID;}
 const HS=7;
 function getHandles(p){return{nw:{x:p.x,y:p.y},n:{x:p.x+p.w/2,y:p.y},ne:{x:p.x+p.w,y:p.y},e:{x:p.x+p.w,y:p.y+p.h/2},se:{x:p.x+p.w,y:p.y+p.h},s:{x:p.x+p.w/2,y:p.y+p.h},sw:{x:p.x,y:p.y+p.h},w:{x:p.x,y:p.y+p.h/2}};}
@@ -1404,11 +1134,7 @@ EC.addEventListener('mousedown',e=>{
   if(currentTool==='end'){snapshot();lv.end={x:snap(x),y:snap(y)};redraw();return;}
   if(lv.start){const sx=lv.start.x,sy=lv.start.y;if(x>=sx&&x<=sx+40&&y>=sy-52&&y<=sy+8){dragState={mode:'flag',flag:'start',sm:{x,y},orig:{x:sx,y:sy}};redraw();return;}}
   if(lv.end){const ex=lv.end.x,ey=lv.end.y;if(x>=ex&&x<=ex+40&&y>=ey-52&&y<=ey+8){dragState={mode:'flag',flag:'end',sm:{x,y},orig:{x:ex,y:ey}};redraw();return;}}
-  if(selection.length===1){
-    const obj=getSelObj();
-    const h=obj?hitHandle(obj,x,y):null;
-    if(h){dragState={mode:'resize',handle:h,sm:{x,y},sr:{x:obj.x,y:obj.y,w:obj.w,h:obj.h}};return;}
-  }
+  if(selection.length===1){const obj=getSelObj();const h=obj?hitHandle(obj,x,y):null;if(h){dragState={mode:'resize',handle:h,sm:{x,y},sr:{x:obj.x,y:obj.y,w:obj.w,h:obj.h}};return;}}
   if(currentTool==='select'){
     const hit=findBlockAt(x,y);
     if(hit){if(e.shiftKey)toggleSel(hit.type,hit.idx);else if(!isSelected(hit.type,hit.idx)){clearSel();addToSel(hit.type,hit.idx);}
@@ -1490,7 +1216,7 @@ function zoom(d,cx,cy){
   const prevZoom=ZOOM;ZOOM=Math.max(0.25,Math.min(3,ZOOM+d));
   if(cx!==undefined&&cy!==undefined){const wrap=document.getElementById('cwrap');const scrollX=wrap.scrollLeft,scrollY=wrap.scrollTop;const ratio=ZOOM/prevZoom;wrap.scrollLeft=cx*ratio-(cx-scrollX);wrap.scrollTop=cy*ratio-(cy-scrollY);}
   EC.style.transform='scale('+ZOOM+')';EC.style.transformOrigin='top left';
-  document.getElementById('zoomLbl') && (document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%');
+  document.getElementById('zoomLbl')&&(document.getElementById('zoomLbl').textContent=Math.round(ZOOM*100)+'%');
 }
 document.getElementById('cwrap').addEventListener('wheel',e=>{
   e.preventDefault();
@@ -1498,22 +1224,18 @@ document.getElementById('cwrap').addEventListener('wheel',e=>{
   zoom(e.deltaY<0?0.15:-0.15,(e.clientX-rect.left+wrap.scrollLeft),(e.clientY-rect.top+wrap.scrollTop));
 },{passive:false});
 
-// ─────────────────────────────────────────────
-//  SAUVEGARDE / CHARGEMENT
-// ─────────────────────────────────────────────
+// ── SAUVEGARDE / CHARGEMENT ────────────────────────
 function onLevelNameChange(){
   clearTimeout(window._nameSaveTimer);
   if(_currentLevelId){window._nameSaveTimer=setTimeout(async()=>{
     const title=document.getElementById('level-name-input').value.trim();
-    if(title){await _sb.from('levels').update({title}).eq('id',_currentLevelId);
-      const l=_lang();status(STUDIO_T[l]?.msgTitleUpdated||'Title updated.');}
+    if(title){await _sb.from('levels').update({title}).eq('id',_currentLevelId);const l=_lang();status(STUDIO_T[l]?.msgTitleUpdated||'Title updated.');}
   },1000);}
 }
 
 function saveLevel(){
   _sb.auth.getSession().then(async({data})=>{
-    if(!data.session){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));a.download='level.json';a.click();
-      const l=_lang();status(STUDIO_T[l]?.msgSavedShort||'Saved.');return;}
+    if(!data.session){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(lv,null,2)],{type:'application/json'}));a.download='level.json';a.click();const l=_lang();status(STUDIO_T[l]?.msgSavedShort||'Saved.');return;}
     if(_currentLevelId)await doQuickSave();else openPublish();
   });
 }
@@ -1523,8 +1245,7 @@ async function doQuickSave(){
   const{data,error}=await _sb.from('levels').update({title,data:lv,visibility:_currentVisibility}).eq('id',_currentLevelId).select();
   if(error){status((STUDIO_T[l]?.toastLoadError||'Error')+': '+error.message);}
   else{
-    status(STUDIO_T[l]?.msgSaved||'✅ Saved!');
-    showSaveToast(STUDIO_T[l]?.toastSaved||'✅ SAVED!');
+    status(STUDIO_T[l]?.msgSaved||'✅ Saved!');showSaveToast(STUDIO_T[l]?.toastSaved||'✅ SAVED!');
     _hasUnsavedChanges=false;autosaveClear();doAfterSaveNav();
     sessionStorage.setItem('fl_preview_level',JSON.stringify(lv));
     if(_currentLevelId)sessionStorage.setItem('fl_preview_id',_currentLevelId);
@@ -1537,25 +1258,25 @@ function loadLevel(){openLoadModal();}
 async function openLoadModal(){
   const modal=document.getElementById('load-modal');const list=document.getElementById('load-list');
   modal.classList.add('show');
-  const l=_lang();
-  list.innerHTML='<div class="load-empty">'+(STUDIO_T[l]?.loading||'Loading...')+'</div>';
+  const l=_lang();const t=STUDIO_T[l]||{};
+  list.innerHTML='<div class="load-empty">'+(t.loading||'Loading...')+'</div>';
   const{data:sess}=await _sb.auth.getSession();
-  if(!sess.session){list.innerHTML='<div class="load-empty">'+(STUDIO_T[l]?.notLogged||'Log in to see your levels.')+'</div>';return;}
+  if(!sess.session){list.innerHTML='<div class="load-empty">'+(t.notLogged||'Log in to see your levels.')+'</div>';return;}
   const{data,error}=await _sb.from('levels').select('id,title,visibility,created_at,updated_at').eq('user_id',sess.session.user.id).order('updated_at',{ascending:false});
   if(error){list.innerHTML='<div class="load-empty">'+error.message+'</div>';return;}
-  if(!data||!data.length){list.innerHTML='<div class="load-empty">'+(STUDIO_T[l]?.emptyMine||'No levels yet.')+'</div>';return;}
+  if(!data||!data.length){list.innerHTML='<div class="load-empty">'+(t.emptyMine||'No levels yet.')+'</div>';return;}
   window._loadData=data;renderLoadItems(data);
   setTimeout(()=>{const s=document.getElementById('load-search');if(s){s.value='';s.focus();}},50);
 }
 function closeLoadModal(){document.getElementById('load-modal').classList.remove('show');const s=document.getElementById('load-search');if(s)s.value='';}
+
 function renderLoadItems(data){
-  const list=document.getElementById('load-list');const l=_lang();
-  if(!data||!data.length){list.innerHTML='<div class="load-empty">'+(STUDIO_T[l]?.emptySearch||'No results.')+'</div>';return;}
-     const t2=STUDIO_T[l]||{};
+  const list=document.getElementById('load-list');const l=_lang();const t2=STUDIO_T[l]||{};
+  if(!data||!data.length){list.innerHTML='<div class="load-empty">'+(t2.emptySearch||'No results.')+'</div>';return;}
   const VIS={
     private:{label:t2.visPrivate||'Private',cls:'private'},
-    public: {label:t2.visPublic||'Public',cls:'public'},
-    code:   {label:t2.visCode||'Invite',cls:'code'}
+    public:{label:t2.visPublic||'Public',cls:'public'},
+    code:{label:t2.visCode||'Invite',cls:'code'}
   };
   let html=`<table class="load-table"><thead><tr><th>${t2.colName||'NOM'}</th><th>${t2.colDate||'DERNIÈRE MODIF.'}</th><th>${t2.colStatus||'ÉTAT'}</th></tr></thead><tbody>`;
   data.forEach(lvl=>{
@@ -1572,8 +1293,8 @@ function filterLoadList(q){if(!window._loadData)return;const filtered=q.trim()?w
 
 async function doLoadLevel(id,title){
   const{data,error}=await _sb.from('levels').select('*').eq('id',id).single();
-  const l=_lang();
-  if(error||!data){showSaveToast(STUDIO_T[l]?.toastLoadError||'⚠️ Load error');return;}
+  const l=_lang();const t=STUDIO_T[l]||{};
+  if(error||!data){showSaveToast(t.toastLoadError||'⚠️ Load error');return;}
   _isPublished=false;window._dupConfirmed=false;
   document.querySelectorAll('.act-btn,#btn-save,#btn-clear,#btn-load').forEach(b=>b.style.opacity='');
   lv=data.data;
@@ -1583,7 +1304,7 @@ async function doLoadLevel(id,title){
   history.replaceState(null,'','studio.html');
   sessionStorage.setItem('fl_preview_level',JSON.stringify(lv));sessionStorage.setItem('fl_preview_id',id);sessionStorage.setItem('fl_preview_title',data.title||'');
   redraw();closeLoadModal();_hasUnsavedChanges=false;autosaveClear();
-  status((STUDIO_T[l]?.msgLoaded||'Loaded.')+' "'+title+'"');
+  status((t.msgLoaded||'Loaded.')+' "'+title+'"');
 }
 
 function loadFile(e){
@@ -1600,7 +1321,7 @@ function loadFile(e){
 }
 
 function clearLevel(){
-  const l=_lang();
+  const l=_lang();const t=STUDIO_T[l]||{};
   if(!confirm(l==='fr'?'Vider le niveau ?':'Clear the level?'))return;
   sessionStorage.removeItem('fl_autosave_level');sessionStorage.removeItem('fl_autosave_id');sessionStorage.removeItem('fl_autosave_name');
   _hasUnsavedChanges=false;_currentLevelId=null;
@@ -1608,40 +1329,27 @@ function clearLevel(){
   lv=emptyLevel();selectedIdx=-1;selectedType=null;_currentVisibility='private';_authorCompleted=false;_isPublished=false;window._dupWarningShown=false;
   const ni=document.getElementById('level-name-input');if(ni)ni.value='';
   history.replaceState(null,'','studio.html');redraw();
-  status(STUDIO_T[l]?.msgCleared||'Cleared.');
+  status(t.msgCleared||'Cleared.');
 }
 
-// ─────────────────────────────────────────────
-//  PUBLISH MODAL
-// ─────────────────────────────────────────────
+// ── PUBLISH MODAL ──────────────────────────────────
 function setVis(v){
   _currentVisibility=v;
   document.querySelectorAll('.pub-vis-btn').forEach(b=>b.classList.remove('active'));
   const btn=document.getElementById('vis-'+v);if(btn)btn.classList.add('active');
   const hint=document.getElementById('pub-vis-hint');
-  if(hint){
-    const tp=STUDIO_T._pub||{};
-    const map={private:tp.hintPrivate,public:tp.hintPublic,code:tp.hintCode};
-    hint.textContent=map[v]||'';
-  }
+  if(hint){const tp=STUDIO_T._pub||{};const map={private:tp.hintPrivate,public:tp.hintPublic,code:tp.hintCode};hint.textContent=map[v]||'';}
 }
 function _applyPubLang(){
   const tp=STUDIO_T._pub||{};
   const s=(id,val,prop='textContent')=>{const el=document.getElementById(id);if(el&&val)el[prop]=val;};
-  s('pub-title-lbl', tp.title);
-  s('pub-name-lbl',  tp.nameLbl);
-  s('pub-name',      tp.ph,'placeholder');
-  s('pub-vis-lbl',   tp.visLbl);
-  s('pub-cancel-btn',tp.cancel);
-  s('pub-ok-btn',    tp.ok);
-  // vis button labels
-  const vmap={private:'🔒 '+(tp.hintPrivate?.split(' ').slice(1,3).join(' ')||'PRIVÉ'),public:'🌍 '+(tp.hintPublic?.split(' ').slice(1,3).join(' ')||'PUBLIC'),code:'🔑 CODE'};
-  ['private','public','code'].forEach(v=>{const el=document.getElementById('vis-'+v);if(el)el.textContent=v==='private'?(tp.hintPrivate?'🔒 PRIVÉ':'🔒 PRIVÉ'):v==='public'?(tp.hintPublic?'🌍 PUBLIC':'🌍 PUBLIC'):'🔑 CODE';});
+  s('pub-title-lbl',tp.title);s('pub-name-lbl',tp.nameLbl);s('pub-name',tp.ph,'placeholder');
+  s('pub-vis-lbl',tp.visLbl);s('pub-cancel-btn',tp.cancel);s('pub-ok-btn',tp.ok);
+  ['private','public','code'].forEach(v=>{const el=document.getElementById('vis-'+v);if(el)el.textContent=v==='private'?'🔒 PRIVÉ':v==='public'?'🌍 PUBLIC':'🔑 CODE';});
   setVis(_currentVisibility);
 }
 function openPublish(){
-  _applyPubLang();
-  document.getElementById('pub-msg').className='pub-msg';
+  _applyPubLang();document.getElementById('pub-msg').className='pub-msg';
   const ni=document.getElementById('level-name-input');const pubName=document.getElementById('pub-name');
   if(ni&&pubName&&ni.value)pubName.value=ni.value;
   document.getElementById('publish-modal').classList.add('show');if(pubName)pubName.focus();
@@ -1649,8 +1357,7 @@ function openPublish(){
 function closePublish(){document.getElementById('publish-modal').classList.remove('show');}
 
 async function doPublish(){
-  const tp=STUDIO_T._pub||{};
-  const l=_lang();
+  const tp=STUDIO_T._pub||{};const l=_lang();
   const title=document.getElementById('pub-name').value.trim();
   const msgEl=document.getElementById('pub-msg');const okBtn=document.getElementById('pub-ok-btn');
   const{data:sess}=await _sb.auth.getSession();
@@ -1687,16 +1394,13 @@ async function doPublish(){
       msgEl.innerHTML=(tp.successNew||'Saved!')+'<br>'+(tp.codeMsg||'Code: ')+'<b>'+shareCode+'</b><br><span style="font-size:10px;color:#40f090aa;">'+(tp.codeCopied||'(copied!)')+'</span>';
       setTimeout(()=>closePublish(),4000);
     }else{
-      msgEl.className='pub-msg ok';
-      msgEl.textContent=shareCode?(tp.successNew||'Saved!'):(tp.successUpdate||'Updated!');
+      msgEl.className='pub-msg ok';msgEl.textContent=shareCode?(tp.successNew||'Saved!'):(tp.successUpdate||'Updated!');
       setTimeout(()=>closePublish(),1800);
     }
   }
 }
 
-// ─────────────────────────────────────────────
-//  RENDU ÉDITEUR
-// ─────────────────────────────────────────────
+// ── RENDU ÉDITEUR ──────────────────────────────────
 const EC_COL={bg:'#0c0c1a',grid:'#12122a',fixed:{b:'#4a5568',t:'#718096',s:'#a0aec0'},flagA:'#68d391',flagB:'#fc8181',sel:'#f0e040',ghost:'#ffffff18'};
 const GF_COLS={u:{bg:'#6020c0',stroke:'#a040f0',light:'#c060ff',arrow:'↑'},d:{bg:'#206040',stroke:'#40f090',light:'#60ffa0',arrow:'↓'},l:{bg:'#204060',stroke:'#4090f0',light:'#60c0ff',arrow:'←'},r:{bg:'#602020',stroke:'#f04040',light:'#ff8060',arrow:'→'}};
 
@@ -1731,22 +1435,15 @@ function redraw(){
     EX.fillStyle='rgba(255,40,60,0.05)';EX.fillRect(0,GAME_HEIGHT,EW,EH-GAME_HEIGHT);
     EX.save();EX.strokeStyle='#ff4060';EX.lineWidth=2;EX.setLineDash([14,8]);EX.beginPath();EX.moveTo(0,GAME_HEIGHT);EX.lineTo(EW,GAME_HEIGHT);EX.stroke();EX.setLineDash([]);
     EX.font='7px "Press Start 2P"';EX.fillStyle='#ff406099';
-     const _td=STUDIO_T[_lang()]||{};
+    const _td=STUDIO_T[_lang()]||{};
     for(let lx=8;lx<EW;lx+=400)EX.fillText(_td.deathLine||'⬇ DEATH',lx,GAME_HEIGHT-6);
     EX.restore();
   }
-
   lv.fixed.forEach((p,i)=>{ePlatform(p,EC_COL.fixed);eDrawSpikes(p);if(isSelected('fixed',i)){if(selection.length===1&&selectedType==='fixed'&&selectedIdx===i)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}});
-
-  (lv.trap||[]).forEach((p,i)=>{
-    ePlatform(p,EC_COL.fixed);EX.fillStyle='#ff9020cc';EX.font='8px sans-serif';EX.textAlign='center';EX.fillText('⚠',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';eDrawSpikes(p);
-    if(isSelected('trap',i)){if(selection.length===1&&selectedType==='trap'&&selectedIdx===i)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
-  });
-
+  (lv.trap||[]).forEach((p,i)=>{ePlatform(p,EC_COL.fixed);EX.fillStyle='#ff9020cc';EX.font='8px sans-serif';EX.textAlign='center';EX.fillText('⚠',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';eDrawSpikes(p);if(isSelected('trap',i)){if(selection.length===1&&selectedType==='trap'&&selectedIdx===i)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}});
   (lv.mobile||[]).forEach((p,i)=>{
     const isSel=isSelected('mobile',i);const trigger=p.trigger||'continuous';const dir=p.dir||'r';const dist=p.dist||160;
-    const ARROWS={r:'→',l:'←',u:'↑',d:'↓',omni:'⊕',fall:'⬇'};
-    const VEC={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1]};
+    const ARROWS={r:'→',l:'←',u:'↑',d:'↓',omni:'⊕',fall:'⬇'};const VEC={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1]};
     if(dir!=='omni'&&dir!=='fall'){
       const[dx,dy]=VEC[dir]||[1,0];const gx=p.x+dx*dist,gy=p.y+dy*dist;
       EX.save();EX.strokeStyle=isSel?'#4090f0cc':'#4090f055';EX.lineWidth=1.5;EX.setLineDash([6,4]);EX.beginPath();EX.moveTo(p.x+p.w/2,p.y+p.h/2);EX.lineTo(gx+p.w/2,gy+p.h/2);EX.stroke();EX.setLineDash([]);
@@ -1759,17 +1456,13 @@ function redraw(){
     EX.font='6px "Press Start 2P"';EX.fillStyle='#4090f0cc';EX.fillText(trigger==='approach'?'TRIG':'AUTO',p.x+2,p.y+p.h-4);EX.textAlign='left';eDrawSpikes(p);
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
-
   (lv.push||[]).forEach((p,i)=>{const isSel=isSelected('push',i);EX.fillStyle='#3d2b1a';EX.fillRect(p.x,p.y,p.w,p.h);EX.fillStyle='#8b6340';EX.fillRect(p.x,p.y,p.w,4);EX.fillStyle='#c49a6ccc';EX.font='7px sans-serif';EX.textAlign='center';EX.fillText('PUSH',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';eDrawSpikes(p);if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}});
-
   (lv.bounce||[]).forEach((p,i)=>{
     const isSel=isSelected('bounce',i);ePlatform(p,{b:'#8b6914',t:'#f0c040',s:'#fde68a'});
     EX.fillStyle='#f0c040cc';EX.font='6px "Press Start 2P"';EX.textAlign='center';EX.fillText(`x${p.force}`,p.x+p.w/2,p.y+p.h-4);EX.textAlign='left';eDrawSpikes(p);
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
-
   (lv.invis||[]).forEach((p,i)=>{const isSel=isSelected('invis',i);EX.fillStyle=isSel?'#ffffff12':'#ffffff07';EX.fillRect(p.x,p.y,p.w,p.h);EX.strokeStyle=isSel?'#ffffffcc':'#ffffff44';EX.lineWidth=isSel?1.5:1;EX.setLineDash([5,5]);EX.strokeRect(p.x,p.y,p.w,p.h);EX.setLineDash([]);EX.fillStyle='#ffffff55';EX.font='6px "Press Start 2P"';EX.textAlign='center';EX.fillText('INV',p.x+p.w/2,p.y+p.h/2+3);EX.textAlign='left';eDrawSpikes(p);if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}});
-
   (lv.gravflip||[]).forEach((p,i)=>{
     const isSel=isSelected('gravflip',i);const dir=p.dir??'u';const str=p.strength??Math.abs(p.grav??10);const c=GF_COLS[dir]||GF_COLS.u;
     EX.fillStyle=c.bg+'22';EX.fillRect(p.x,p.y,p.w,p.h);EX.strokeStyle=isSel?c.stroke+'ee':c.stroke+'66';EX.lineWidth=isSel?1.5:1;EX.setLineDash([6,3]);EX.strokeRect(p.x,p.y,p.w,p.h);EX.setLineDash([]);
@@ -1781,7 +1474,6 @@ function redraw(){
     EX.textAlign='left';EX.fillStyle=isSel?c.stroke+'cc':c.stroke+'88';EX.font='6px "Press Start 2P"';EX.fillText(str===0?'○ apes.':`${c.arrow} f=${str}`,p.x+4,p.y+p.h-4);
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
-
   (lv.speed||[]).forEach((p,i)=>{
     const isSel=isSelected('speed',i);const spd=p.spd??5;const fast=spd>5;
     const col=spd===5?{bg:'#1a3a1a',stroke:'#40c040',light:'#80ff80'}:fast?{bg:'#1a1a3a',stroke:'#4040f0',light:'#8080ff'}:{bg:'#3a1a1a',stroke:'#f04040',light:'#ff8080'};
@@ -1790,7 +1482,6 @@ function redraw(){
     EX.fillStyle=isSel?col.stroke+'cc':col.stroke+'99';EX.font='6px "Press Start 2P"';EX.fillText(`spd=${spd}`,p.x+4,p.y+p.h-4);
     if(isSel){if(selection.length===1)eSelection(p);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(p.x-2,p.y-2,p.w+4,p.h+4);}}
   });
-
   const _flashEditorTime=Date.now();
   (lv.flash||[]).forEach((f,i)=>{
     const isSel=isSelected('flash',i);const cycle=f.onMs+f.offMs;const pos=(_flashEditorTime+(f.phase||0))%cycle;const visible=pos<f.onMs;
@@ -1799,7 +1490,6 @@ function redraw(){
     if(isSel){EX.strokeStyle='#f0e040cc';EX.lineWidth=1.5;EX.strokeRect(f.x-2,f.y-2,f.w+4,f.h+4);}
     EX.fillStyle='#40c0f0cc';EX.font='6px "Press Start 2P"';EX.fillText(`${f.onMs/10}/${f.offMs/10}cs`,f.x+2,f.y+f.h-4);eDrawSpikes(f);
   });
-
   (lv.gblock||[]).forEach((g,i)=>{
     const isSel=isSelected('gblock',i);const cx=g.x+g.w/2,cy=g.y+g.h/2,rad=g.radius||120;
     EX.strokeStyle=isSel?'#00c06066':'#00c06033';EX.lineWidth=1;EX.setLineDash([5,5]);EX.beginPath();EX.arc(cx,cy,rad,0,Math.PI*2);EX.stroke();EX.setLineDash([]);
@@ -1808,7 +1498,6 @@ function redraw(){
     if(isSel){EX.strokeStyle='#f0e040cc';EX.lineWidth=1.5;EX.strokeRect(g.x-2,g.y-2,g.w+4,g.h+4);}
     if(selection.length===1&&selectedType==='gblock'&&selectedIdx===i)eSelection(g);
   });
-
   (lv.darkness||[]).forEach((d,i)=>{
     const isSel=isSelected('darkness',i);
     EX.fillStyle='rgba(0,0,0,0.55)';EX.fillRect(d.x,d.y,d.w,d.h);
@@ -1819,7 +1508,6 @@ function redraw(){
     EX.fillStyle='#9060cccc';EX.font='7px "Press Start 2P"';EX.textAlign='center';EX.fillText('🌑',d.x+d.w/2,d.y+d.h/2+3);EX.textAlign='left';EX.fillText(`r=${d.radius??120}`,d.x+4,d.y+d.h-4);
     if(isSel){if(selection.length===1)eSelection(d);else{EX.strokeStyle=EC_COL.sel+'99';EX.lineWidth=2;EX.strokeRect(d.x-2,d.y-2,d.w+4,d.h+4);}}
   });
-
   if(lv.start){eFlag(lv.start.x,lv.start.y,EC_COL.flagA,'A');if(window._hovFlag==='start'||dragState?.flag==='start'){EX.strokeStyle=EC_COL.flagA;EX.lineWidth=1.5;EX.strokeRect(lv.start.x-2,lv.start.y-54,44,62);}}
   if(lv.end){eFlag(lv.end.x,lv.end.y,EC_COL.flagB,'B');if(window._hovFlag==='end'||dragState?.flag==='end'){EX.strokeStyle=EC_COL.flagB;EX.lineWidth=1.5;EX.strokeRect(lv.end.x-2,lv.end.y-54,44,62);}}
   if(rubberBand){const rx=Math.min(rubberBand.sx,rubberBand.ex),ry=Math.min(rubberBand.sy,rubberBand.ey),rw=Math.abs(rubberBand.ex-rubberBand.sx),rh=Math.abs(rubberBand.ey-rubberBand.sy);EX.fillStyle='#5050c022';EX.fillRect(rx,ry,rw,rh);EX.strokeStyle='#8080f0cc';EX.lineWidth=1.5;EX.setLineDash([5,3]);EX.strokeRect(rx,ry,rw,rh);EX.setLineDash([]);}
@@ -1829,9 +1517,7 @@ function redraw(){
   EX.fillStyle='#ffffff20';EX.font='6px "Press Start 2P"';EX.fillText(`${snap(mousePos.x)}, ${snap(mousePos.y)}`,mousePos.x+6,mousePos.y-4);
 }
 
-// ─────────────────────────────────────────────
-//  CLAVIER
-// ─────────────────────────────────────────────
+// ── CLAVIER ────────────────────────────────────────
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
   if(e.ctrlKey&&e.code==='KeyZ'){e.preventDefault();undo();}
@@ -1848,51 +1534,33 @@ document.addEventListener('keydown',e=>{
 redraw();
 updatePanelState();
 
-// ─────────────────────────────────────────────
-//  PLAY
-// ─────────────────────────────────────────────
+// ── PLAY ───────────────────────────────────────────
 async function playLevel(){
   sessionStorage.setItem('fl_preview_level',JSON.stringify(lv));
   sessionStorage.setItem('fl_preview_id',_currentLevelId||'');
   const titleEl=document.getElementById('level-name-input');
   sessionStorage.setItem('fl_preview_title',titleEl?titleEl.value:'');
   autosaveSave();
-
-  // Sauvegarde automatique avant de jouer
-  if(_currentLevelId){
-    const title=titleEl?.value.trim()||STUDIO_T[_lang()]?.untitled||'Untitled';
-    await _sb.from('levels').update({title,data:lv,visibility:_currentVisibility}).eq('id',_currentLevelId);
-  }
-
+  if(_currentLevelId){const title=titleEl?.value.trim()||STUDIO_T[_lang()]?.untitled||'Untitled';await _sb.from('levels').update({title,data:lv,visibility:_currentVisibility}).eq('id',_currentLevelId);}
   if(_currentLevelId)window.location.href='game.html?preview=1&level='+_currentLevelId+'&from=studio';
   else window.location.href='game.html?preview=1&from=studio';
 }
 
-// ─────────────────────────────────────────────
-//  AUTOSAVE
-// ─────────────────────────────────────────────
+// ── AUTOSAVE ───────────────────────────────────────
 function autosaveSave(){
   if(_loadingLevel)return;
   try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');const ni=document.getElementById('level-name-input');sessionStorage.setItem('fl_autosave_name',ni?ni.value:'');}catch(ex){}
 }
 function autosaveClear(){sessionStorage.removeItem('fl_autosave_level');sessionStorage.removeItem('fl_autosave_id');sessionStorage.removeItem('fl_autosave_name');}
 function checkAutosaveOnLoad(){
-  const savedLv=sessionStorage.getItem('fl_autosave_level');
-  if(!savedLv)return;
-  const l=_lang();
-  const savedName=sessionStorage.getItem('fl_autosave_name')||(STUDIO_T[l]?.untitled||'Untitled');
+  const savedLv=sessionStorage.getItem('fl_autosave_level');if(!savedLv)return;
+  const l=_lang();const savedName=sessionStorage.getItem('fl_autosave_name')||(STUDIO_T[l]?.untitled||'Untitled');
   try{
-    const restored=JSON.parse(savedLv);
-    lv=restored;
+    const restored=JSON.parse(savedLv);lv=restored;
     ['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock','darkness'].forEach(k=>{if(!lv[k])lv[k]=[];});
-    const ni=document.getElementById('level-name-input');
-    if(ni&&savedName)ni.value=savedName;
-    const savedId=sessionStorage.getItem('fl_autosave_id');
-    if(savedId)_currentLevelId=savedId;
-    _hasUnsavedChanges=true;
-    // ← Réécrire immédiatement pour survivre au pagehide
-    autosaveSave();
-    redraw&&redraw();
+    const ni=document.getElementById('level-name-input');if(ni&&savedName)ni.value=savedName;
+    const savedId=sessionStorage.getItem('fl_autosave_id');if(savedId)_currentLevelId=savedId;
+    _hasUnsavedChanges=true;autosaveSave();redraw&&redraw();
     status(STUDIO_T[l]?.msgDraftRestored||'⚡ Draft restored');
   }catch(ex){}
 }
@@ -1900,14 +1568,10 @@ window.addEventListener('beforeunload',function(){
   if(lv&&typeof lv==='object'){try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');sessionStorage.setItem('fl_autosave_name',document.getElementById('level-name-input')?.value||'');}catch(ex){}}
 });
 
-// ─────────────────────────────────────────────
-//  NAVIGATION (unsaved changes)
-// ─────────────────────────────────────────────
+// ── NAVIGATION ─────────────────────────────────────
 let _pendingNavUrl=null;
 history.pushState(null,'',location.href);
-window.addEventListener('popstate',function(){
-  if(_hasUnsavedChanges){history.pushState(null,'',location.href);_pendingNavUrl='__BACK__';showUnsavedModal();}else{autosaveClear();}
-});
+window.addEventListener('popstate',function(){if(_hasUnsavedChanges){history.pushState(null,'',location.href);_pendingNavUrl='__BACK__';showUnsavedModal();}else{autosaveClear();}});
 window.addEventListener('pagehide',function(){if(!_hasUnsavedChanges)autosaveClear();});
 
 function goToHome(){if(_hasUnsavedChanges){_pendingNavUrl='index.html';showUnsavedModal();}else{autosaveClear();window.location.href='index.html';}}
@@ -1928,9 +1592,7 @@ function unsavedLeave(){
 }
 function unsavedStay(){document.getElementById('unsaved-modal').style.display='none';_pendingNavUrl=null;}
 
-// ─────────────────────────────────────────────
-//  DUPLICATE MODAL
-// ─────────────────────────────────────────────
+// ── DUPLICATE MODAL ────────────────────────────────
 function showPublishedModal(title){
   document.querySelectorAll('.act-btn,#btn-save,#btn-clear,#btn-load').forEach(b=>{if(b.id!=='btn-load')b.style.opacity='0.3';});
   const l=_lang();const t=STUDIO_T[l]||{};
@@ -1954,9 +1616,7 @@ function showDupModal(){
 function closeDupModal(){document.getElementById('dup-modal').style.display='none';}
 function confirmDuplicate(){closeDupModal();window._dupConfirmed=true;document.querySelectorAll('.act-btn,#btn-save,#btn-clear,#btn-load').forEach(b=>b.style.opacity='');duplicateLevel();}
 
-// ─────────────────────────────────────────────
-//  INIT
-// ─────────────────────────────────────────────
+// ── INIT ───────────────────────────────────────────
 let _charSprite=null,_charId='default';
 async function loadCharacterSprite(charId){return new Promise(resolve=>{const img=new Image();img.onload=()=>{_charSprite=img;resolve(img);};img.onerror=()=>{_charSprite=null;resolve(null);};img.src=`characters/${charId}.svg`;});}
 async function loadPlayerProfile(){
@@ -1970,15 +1630,8 @@ async function loadPlayerProfile(){
 }
 
 (async()=>{
-  try{
-    await loadPlayerProfile();
-    await applyStudioLang();
-    const tb=document.getElementById('topbar');const ly=document.getElementById('layout');
-    if(tb)tb.style.visibility='';if(ly)ly.style.visibility='';
-  }catch(err){
-    const tb=document.getElementById('topbar');const ly=document.getElementById('layout');
-    if(tb)tb.style.visibility='';if(ly)ly.style.visibility='';
-  }
+  try{await loadPlayerProfile();await applyStudioLang();const tb=document.getElementById('topbar');const ly=document.getElementById('layout');if(tb)tb.style.visibility='';if(ly)ly.style.visibility='';}
+  catch(err){const tb=document.getElementById('topbar');const ly=document.getElementById('layout');if(tb)tb.style.visibility='';if(ly)ly.style.visibility='';}
 })();
 
 (async()=>{
@@ -1996,9 +1649,7 @@ async function loadPlayerProfile(){
       const savedId=sessionStorage.getItem('fl_preview_id');const savedTitle=sessionStorage.getItem('fl_preview_title');
       if(savedId){_currentLevelId=savedId;history.replaceState(null,'','studio.html');}
       const ni=document.getElementById('level-name-input');if(ni&&savedTitle)ni.value=savedTitle;
-      redraw();
-      const l=_lang();status(STUDIO_T[l]?.msgRestored||'✅ Level restored.');
-      return;
+      redraw();const l=_lang();status(STUDIO_T[l]?.msgRestored||'✅ Level restored.');return;
     }catch(e){}}
   }
   if(!lid){checkAutosaveOnLoad();return;}
@@ -2018,7 +1669,6 @@ async function loadPlayerProfile(){
 })();
 
 _loadingLevel=false;
-// ⚠️ Ne pas reset _hasUnsavedChanges ici — checkAutosaveOnLoad l'a peut-être mis à true
 </script>
 </body>
 </html>
