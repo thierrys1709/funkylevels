@@ -319,13 +319,14 @@ function f1Start(callback){
 // ─────────────────────────────────────────────
 //  LEADERBOARD
 // ─────────────────────────────────────────────
+let _wrdLoaded=false;
 async function loadBestTime(){
-  if(!_currentLevelId)return;
+  if(!_currentLevelId||_wrdLoaded)return;
+  _wrdLoaded=true;
 
-  // Afficher un placeholder pendant le chargement
   const el_time=document.getElementById('hud-global-time');
   const el_user=document.getElementById('hud-global-user');
-  if(el_time)el_time.textContent='...';
+  const hudGlobal=document.getElementById('hud-global');
 
   const{data:sess}=await _sb.auth.getSession();
   if(sess.session){
@@ -339,7 +340,8 @@ async function loadBestTime(){
     .eq('level_id',_currentLevelId).order('time_ms',{ascending:true}).limit(1).maybeSingle();
 
   if(global){
-    const{data:profile}=await _sb.from('profiles').select('username').eq('id',global.user_id).single();
+    const{data:profile}=await _sb.from('profiles').select('username')
+      .eq('id',global.user_id).single();
     const username=profile?.username||'???';
     if(el_time)el_time.textContent=fmtTimeFull(global.time_ms);
     if(el_user){
@@ -352,19 +354,14 @@ async function loadBestTime(){
       a.onmouseout=()=>a.style.color='#c0a0ff';
       el_user.appendChild(a);
     }
+    if(hudGlobal)hudGlobal.style.display='';
   }else{
-    // Aucun record — masquer proprement le bloc et son séparateur
-    if(el_time)el_time.textContent='';
-    if(el_user)el_user.innerHTML='';
-    const hudGlobal=document.getElementById('hud-global');
-    if(hudGlobal)hudGlobal.style.display='none';
-    // Masquer le 2e séparateur (celui après hud-global)
-    const hudGlobalEl=document.getElementById('hud-global');
-    if(hudGlobalEl){
-      const nextSep=hudGlobalEl.nextElementSibling;
-      if(nextSep&&nextSep.classList.contains('hud-sep'))nextSep.style.display='none';
-      const prevSep=hudGlobalEl.previousElementSibling;
-      if(prevSep&&prevSep.classList.contains('hud-sep'))prevSep.style.display='none';
+    if(hudGlobal){
+      hudGlobal.style.display='none';
+      const prev=hudGlobal.previousElementSibling;
+      const next=hudGlobal.nextElementSibling;
+      if(prev&&prev.classList.contains('hud-sep'))prev.style.display='none';
+      if(next&&next.classList.contains('hud-sep'))next.style.display='none';
     }
   }
 
