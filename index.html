@@ -83,7 +83,7 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 
 <nav>
   <a href="index.html" class="nav-logo">⚡ FUNKYLEVELS</a>
-  <a href="studio.html" class="nav-btn" id="nav-create" style="display:none;">✏️ CRÉER</a>
+  <a href="studio.html?new=1" class="nav-btn" id="nav-create" style="display:none;">✏️ CRÉER</a>
   <div style="flex:1;"></div>
   <div class="lang-bar">
     <button class="lang-btn" id="btn-fr" onclick="setLang('fr')">FR</button>
@@ -99,7 +99,7 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
   <h1 id="hero-title">⚡ FUNKYLEVELS</h1>
   <p id="hero-sub">Crée des niveaux de platformer fous,<br>partage-les et joue à ceux des autres !</p>
   <div class="hero-btns">
-    <a href="studio.html" class="hero-btn a" id="hero-btn-create" style="display:none;">✏️ CRÉER UN NIVEAU</a>
+    <a href="studio.html?new=1" class="hero-btn a" id="hero-btn-create" style="display:none;">✏️ CRÉER UN NIVEAU</a>
     <a href="browse.html" class="hero-btn b" id="hero-btn-browse">🎮 PARCOURIR</a>
   </div>
 </div>
@@ -432,24 +432,18 @@ async function loadSection(s){
   const ids=levels.map(l=>l.id);
   const allRecords=await sbFetch('leaderboard?select=level_id,time_ms,user_id&level_id=in.('+ids.join(',')+')'+'&order=time_ms.asc');
 
-  // Calculer world best, my best, creator best depuis la même requête
   const worldBests={};
   const myBests={};
   const creatorBests={};
-
-  // Construire une map créateur : level_id → user_id du créateur
   const creatorMap={};
   levels.forEach(l=>{creatorMap[l.id]=l.user_id;});
 
   if(Array.isArray(allRecords)){
     allRecords.forEach(r=>{
-      // World best (premier de chaque level_id car trié asc)
       if(!worldBests[r.level_id])worldBests[r.level_id]=r.time_ms;
-      // My best
       if(currentUser&&r.user_id===currentUser.id){
         if(!myBests[r.level_id])myBests[r.level_id]=r.time_ms;
       }
-      // Creator best
       if(creatorMap[r.level_id]&&r.user_id===creatorMap[r.level_id]){
         if(!creatorBests[r.level_id])creatorBests[r.level_id]=r.time_ms;
       }
@@ -460,23 +454,9 @@ async function loadSection(s){
     const myCell=document.querySelector(`.record-mine[data-id="${l.id}"]`);
     const worldCell=document.querySelector(`.record-world[data-id="${l.id}"]`);
     const creatorCell=document.querySelector(`.record-creator[data-id="${l.id}"]`);
-
-    if(myCell){
-      myCell.innerHTML=myBests[l.id]!=null
-        ?`<span class="record-val mine">${fmtMs(myBests[l.id])}</span>`
-        :`<span class="record-empty">—</span>`;
-    }
-    if(worldCell){
-      worldCell.innerHTML=worldBests[l.id]!=null
-        ?`<span class="record-val world">${fmtMs(worldBests[l.id])}</span>`
-        :`<span class="record-empty">—</span>`;
-    }
-    if(creatorCell){
-      // Si le créateur est aussi le joueur courant, on affiche quand même
-      creatorCell.innerHTML=creatorBests[l.id]!=null
-        ?`<span class="record-val creator">${fmtMs(creatorBests[l.id])}</span>`
-        :`<span class="record-empty">—</span>`;
-    }
+    if(myCell)myCell.innerHTML=myBests[l.id]!=null?`<span class="record-val mine">${fmtMs(myBests[l.id])}</span>`:`<span class="record-empty">—</span>`;
+    if(worldCell)worldCell.innerHTML=worldBests[l.id]!=null?`<span class="record-val world">${fmtMs(worldBests[l.id])}</span>`:`<span class="record-empty">—</span>`;
+    if(creatorCell)creatorCell.innerHTML=creatorBests[l.id]!=null?`<span class="record-val creator">${fmtMs(creatorBests[l.id])}</span>`:`<span class="record-empty">—</span>`;
   });
 }
 
