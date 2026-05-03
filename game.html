@@ -478,7 +478,7 @@ async function init(){
   if(lv.trap&&lv.trap.length){lv.trap.forEach(t=>{lv.mobile.push({...t,trigger:'approach',dir:'fall',dist:0,loop:t.returns!==false,waitDelay:t.riseDelay||0,trigDist:t.trigDist||48,speed:t.fallSpeed||3,state:'idle',t:0,going:true,waitTimer:0,_triggered:false});});lv.trap=[];}
 
   if(_currentLevelId&&_levelData){fetch(_sbUrl+'/rest/v1/levels?id=eq.'+_currentLevelId,{method:'PATCH',headers:{'apikey':_sbKey,'Authorization':'Bearer '+(_getToken()||_sbKey),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({plays:(_levelData.plays||0)+1})});}
-  if(_currentLevelId)await loadBestTime();
+  if(_currentLevelId&&!_isTestMode)await loadBestTime();
   _isOwner=!!(sess.session&&_levelData&&sess.session.user.id===_levelData.user_id);
 
   const btnDieEditor=document.getElementById('btn-die-editor');const btnDieHome=document.getElementById('btn-die-home');
