@@ -321,34 +321,53 @@ function f1Start(callback){
 // ─────────────────────────────────────────────
 async function loadBestTime(){
   if(!_currentLevelId)return;
+
+  // Afficher un placeholder pendant le chargement
+  const el_time=document.getElementById('hud-global-time');
+  const el_user=document.getElementById('hud-global-user');
+  if(el_time)el_time.textContent='...';
+
   const{data:sess}=await _sb.auth.getSession();
-  if(sess.session){const{data:personal}=await _sb.from('leaderboard').select('time_ms').eq('level_id',_currentLevelId).eq('user_id',sess.session.user.id).order('time_ms',{ascending:true}).limit(1).maybeSingle();_bestTime=personal?personal.time_ms:null;}
-  const{data:global}=await _sb.from('leaderboard').select('time_ms,user_id').eq('level_id',_currentLevelId).order('time_ms',{ascending:true}).limit(1).maybeSingle();
- const el_time=document.getElementById('hud-global-time');
-const el_user=document.getElementById('hud-global-user');
-if(global){
+  if(sess.session){
+    const{data:personal}=await _sb.from('leaderboard').select('time_ms')
+      .eq('level_id',_currentLevelId).eq('user_id',sess.session.user.id)
+      .order('time_ms',{ascending:true}).limit(1).maybeSingle();
+    _bestTime=personal?personal.time_ms:null;
+  }
+
+  const{data:global}=await _sb.from('leaderboard').select('time_ms,user_id')
+    .eq('level_id',_currentLevelId).order('time_ms',{ascending:true}).limit(1).maybeSingle();
+
+  if(global){
     const{data:profile}=await _sb.from('profiles').select('username').eq('id',global.user_id).single();
     const username=profile?.username||'???';
     if(el_time)el_time.textContent=fmtTimeFull(global.time_ms);
     if(el_user){
-        el_user.innerHTML='';
-        const a=document.createElement('a');
-        a.textContent='@'+username;
-        a.href='profile.html?id='+global.user_id;
-        a.style.cssText='color:#c0a0ff;text-decoration:none;font-family:Orbitron,monospace;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;';
-        a.onmouseover=()=>a.style.color='#f0e040';
-        a.onmouseout=()=>a.style.color='#c0a0ff';
-        el_user.appendChild(a);
+      el_user.innerHTML='';
+      const a=document.createElement('a');
+      a.textContent='@'+username;
+      a.href='profile.html?id='+global.user_id;
+      a.style.cssText='color:#c0a0ff;text-decoration:none;font-family:Orbitron,monospace;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;';
+      a.onmouseover=()=>a.style.color='#f0e040';
+      a.onmouseout=()=>a.style.color='#c0a0ff';
+      el_user.appendChild(a);
     }
-}else{
-    // Pas de record — cacher le bloc proprement
+  }else{
+    // Aucun record — masquer proprement le bloc et son séparateur
+    if(el_time)el_time.textContent='';
+    if(el_user)el_user.innerHTML='';
     const hudGlobal=document.getElementById('hud-global');
     if(hudGlobal)hudGlobal.style.display='none';
-    const seps=document.querySelectorAll('.hud-sep');
-    // cacher le sep juste après hud-global
-    if(seps[1])seps[1].style.display='none';
-}
-updateBestDisplay();
+    // Masquer le 2e séparateur (celui après hud-global)
+    const hudGlobalEl=document.getElementById('hud-global');
+    if(hudGlobalEl){
+      const nextSep=hudGlobalEl.nextElementSibling;
+      if(nextSep&&nextSep.classList.contains('hud-sep'))nextSep.style.display='none';
+      const prevSep=hudGlobalEl.previousElementSibling;
+      if(prevSep&&prevSep.classList.contains('hud-sep'))prevSep.style.display='none';
+    }
+  }
+
   updateBestDisplay();
 }
 function updateBestDisplay(){const el=document.getElementById('hud-best');if(!el)return;el.textContent=_bestTime!==null?fmtTimeFull(_bestTime):'—';}
