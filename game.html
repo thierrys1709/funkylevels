@@ -763,15 +763,21 @@ function gUpdate(now){
   gConfetti=gConfetti.filter(c=>c.life>0);gConfetti.forEach(c=>{if(c.delay>0){c.delay--;return;}c.x+=c.vx;c.y+=c.vy;c.vy+=c.gravity;c.vx*=0.975;c.rot+=c.rotSpd;c.life-=c.decay;});
 
   ['fixed','invis','bounce','mobile','push','flash','trap','gblock'].forEach(k=>{
-    (gLv[k]||[]).forEach(b=>{
-      if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return;
-      const sp=b.spikes;
-      if(sp.hidden&&sp._touched&&sp._delayTimer<(sp.delay||0)*60)sp._delayTimer++;
-    });
+  (gLv[k]||[]).forEach(b=>{
+    if(!b.spikes||!b.spikes.dirs||b.spikes.dirs.length===0)return;
+    const sp=b.spikes;
+    if(sp.hidden&&sp._touched&&sp._delayTimer<(sp.delay||0)*60){
+      sp._delayTimer++;
+      if(sp._delayTimer>=(sp.delay||0)*60)playSound('spike');
+    }
   });
+});
   (gLv.spike||[]).forEach(sp=>{
-    if(sp.hidden&&sp._touched&&sp._delayTimer<(sp.activationDelay||0)*60)sp._delayTimer++;
-  });
+  if(sp.hidden&&sp._touched&&sp._delayTimer<(sp.activationDelay||0)*60){
+    sp._delayTimer++;
+    if(sp._delayTimer>=(sp.activationDelay||0)*60)playSound('spike');
+  }
+});
 
   if(gPlayer.dead){
     gPlayer.dT++;
