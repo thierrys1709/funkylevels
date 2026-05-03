@@ -1010,11 +1010,16 @@ function gLoop(now){
 //  CLAVIER
 // ─────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
   gKeys[e.code]=true;
   if(['Space','ArrowUp','ArrowLeft','ArrowRight','ArrowDown'].includes(e.code))e.preventDefault();
   if(e.code==='Escape')goToIndex();
 });
-document.addEventListener('keyup',e=>{gKeys[e.code]=false;if(JUMP_KEYS.includes(e.code))_jumpReady=true;});
+document.addEventListener('keyup',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  gKeys[e.code]=false;
+  if(JUMP_KEYS.includes(e.code))_jumpReady=true;
+});
 
 // ─────────────────────────────────────────────
 //  AUDIO
