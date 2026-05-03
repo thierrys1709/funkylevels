@@ -90,7 +90,7 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .lvl-td-date{font-family:Rajdhani,sans-serif;font-size:11px;color:#a0a0cc;white-space:nowrap;width:70px;}
 .lvl-td-stats{font-family:Rajdhani,sans-serif;font-size:11px;color:#8080aa;white-space:nowrap;width:100px;}
 .lvl-td-vis{width:160px;}
-.lvl-td-actions{width:140px;white-space:nowrap;}
+.lvl-td-actions{width:160px;white-space:nowrap;}
 .lvl-vis-badge{font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;cursor:pointer;}
 .lvl-vis-badge.private{background:#1a2a4a;color:#90c0f0;border:1px solid #4060c0;}
 .lvl-vis-badge.public{background:#1a3a2a;color:#60e090;border:1px solid #40a060;}
@@ -109,6 +109,7 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .lvl-act-play.test-mode{background:#2a1a00;border-color:#f0a040;color:#f0a040;}
 .lvl-act-edit{background:#0d0d28;border-color:#4040aa;color:#90a0f0;}
 .lvl-act-dup{background:#1a1a0d;border-color:#7a7a3a;color:#e0d060;}
+.lvl-act-share{background:#1a0d2a;border-color:#7040b0;color:#c090f0;}
 .lvl-act-del{background:#280d0d;border-color:#aa3030;color:#f06060;}
 .no-levels{font-family:Rajdhani,sans-serif;font-size:14px;font-weight:600;color:var(--muted);text-align:center;padding:40px;}
 
@@ -132,6 +133,22 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
 .confirm-btn.yes:hover{background:#ff6070;}
 .confirm-btn.no{background:var(--bg3);color:var(--text2);border:1.5px solid var(--border2);}
 .confirm-btn.no:hover{color:var(--text);}
+
+/* SHARE MODAL */
+#share-modal{display:none;position:fixed;inset:0;background:#000000cc;z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+#share-modal.show{display:flex;}
+.share-box{background:var(--bg2);border:2px solid var(--accent2);border-radius:8px;padding:28px 24px;width:500px;max-width:92vw;display:flex;flex-direction:column;gap:16px;box-shadow:0 0 40px #7060f033;}
+.share-box h3{font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:var(--accent2);text-align:center;letter-spacing:1px;}
+.share-box p{font-family:Rajdhani,sans-serif;font-size:13px;color:var(--text2);text-align:center;margin:0;}
+.share-url-row{display:flex;gap:8px;align-items:center;}
+.share-url-input{flex:1;background:var(--bg3);border:1.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:Rajdhani,sans-serif;font-size:13px;font-weight:600;padding:10px 12px;outline:none;cursor:text;user-select:all;min-width:0;}
+.share-url-input:focus{border-color:var(--accent2);}
+.share-copy-btn{font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:10px 18px;background:var(--accent);color:#111;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;letter-spacing:.5px;}
+.share-copy-btn:hover{background:#fff;}
+.share-copy-btn.copied{background:var(--green);color:#111;}
+.share-footer{display:flex;justify-content:center;}
+.share-close-btn{font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;padding:10px 28px;background:var(--bg3);color:var(--text2);border:1.5px solid var(--border2);border-radius:4px;cursor:pointer;transition:all .15s;}
+.share-close-btn:hover{color:var(--text);border-color:var(--text2);}
 
 /* TOAST */
 #settings-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg2);border:1.5px solid var(--green);color:var(--green);font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;padding:12px 22px;border-radius:4px;z-index:999;transition:transform .3s;pointer-events:none;}
@@ -252,6 +269,21 @@ nav{position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur
   </div>
 </div>
 
+<!-- SHARE MODAL -->
+<div id="share-modal">
+  <div class="share-box">
+    <h3 id="share-modal-title">🔗 PARTAGER LE NIVEAU</h3>
+    <p id="share-modal-subtitle">Copie ce lien pour partager le niveau</p>
+    <div class="share-url-row">
+      <input class="share-url-input" id="share-url-input" type="text" readonly onclick="this.select()">
+      <button class="share-copy-btn" id="share-copy-btn" onclick="copyShareUrl()">📋 COPIER</button>
+    </div>
+    <div class="share-footer">
+      <button class="share-close-btn" onclick="document.getElementById('share-modal').classList.remove('show')">FERMER</button>
+    </div>
+  </div>
+</div>
+
 <div id="settings-toast"></div>
 
 <script>
@@ -261,7 +293,6 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let CHARACTERS=[];
 let _langData={};
-// Détermine la langue sans flash : localStorage d'abord, sinon navigateur
 let lang=localStorage.getItem('fl_lang')||(navigator.language?.startsWith('fr')?'fr':'en');
 let currentUser=null;
 let selectedChar=localStorage.getItem('fl_char')||'default';
@@ -407,6 +438,50 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
+// ── SHARE MODAL ──
+function showShareModal(levelId){
+  const url=window.location.origin+'/game.html?level='+levelId;
+  const input=document.getElementById('share-url-input');
+  const title=document.getElementById('share-modal-title');
+  const sub=document.getElementById('share-modal-subtitle');
+  const copyBtn=document.getElementById('share-copy-btn');
+  if(input)input.value=url;
+  if(title)title.textContent='🔗 '+(lang==='fr'?'PARTAGER LE NIVEAU':'SHARE LEVEL');
+  if(sub)sub.textContent=lang==='fr'?'Copie ce lien pour partager le niveau':'Copy this link to share the level';
+  if(copyBtn){
+    copyBtn.textContent='📋 '+(lang==='fr'?'COPIER':'COPY');
+    copyBtn.classList.remove('copied');
+  }
+  document.getElementById('share-modal').classList.add('show');
+  // Auto-select the URL after a short delay
+  setTimeout(()=>{if(input){input.focus();input.select();}},80);
+}
+
+function copyShareUrl(){
+  const input=document.getElementById('share-url-input');
+  const btn=document.getElementById('share-copy-btn');
+  if(!input)return;
+  input.select();
+  navigator.clipboard?.writeText(input.value).then(()=>{
+    if(btn){
+      btn.textContent='✅ '+(lang==='fr'?'COPIÉ !':'COPIED!');
+      btn.classList.add('copied');
+      setTimeout(()=>{
+        btn.textContent='📋 '+(lang==='fr'?'COPIER':'COPY');
+        btn.classList.remove('copied');
+      },2200);
+    }
+    showToast(lang==='fr'?'Lien copié !':'Link copied!');
+  }).catch(()=>{
+    try{document.execCommand('copy');}catch(e){}
+  });
+}
+
+// Close share modal on backdrop click
+document.getElementById('share-modal').addEventListener('click',function(e){
+  if(e.target===this)this.classList.remove('show');
+});
+
 async function loadStats(){
   await loadLangData(lang);
   const t=T('settings');
@@ -445,6 +520,7 @@ async function loadStats(){
     const ts=l.updated_at||l.created_at;
     const d=new Date(ts);
     const dateStr=d.toLocaleDateString(lang==='fr'?'fr-FR':'en-GB');
+    const canShare=(vis==='public'||vis==='code');
 
     const tr=document.createElement('tr');
     tr.className='lvl-row';
@@ -469,6 +545,7 @@ async function loadStats(){
         '<button class="lvl-act-btn lvl-act-play'+(l.is_published?'':' test-mode')+'" title="'+(l.is_published?(lang==='fr'?'Jouer':'Play'):(lang==='fr'?'Tester':'Test'))+'">'+(l.is_published?'▶':'🧪')+'</button>'+
         '<button class="lvl-act-btn lvl-act-edit" title="'+(lang==='fr'?'Éditer':'Edit')+'">✏️</button>'+
         '<button class="lvl-act-btn lvl-act-dup" title="'+(lang==='fr'?'Dupliquer':'Duplicate')+'">⧉</button>'+
+        (canShare?'<button class="lvl-act-btn lvl-act-share" title="'+(lang==='fr'?'Partager':'Share')+'">🔗</button>':'')+
         '<button class="lvl-act-btn lvl-act-del" title="'+(lang==='fr'?'Supprimer':'Delete')+'">🗑</button>'+
       '</div></td>';
 
@@ -501,6 +578,10 @@ async function loadStats(){
     tr.querySelector('.lvl-act-edit').onclick=(e)=>{e.stopPropagation();window.location.href='studio.html?level='+l.id+'&mode=edit';};
     tr.querySelector('.lvl-act-dup').onclick=(e)=>{e.stopPropagation();duplicateLevelSettings(l);};
     tr.querySelector('.lvl-act-del').onclick=(e)=>{e.stopPropagation();deleteLevelSettings(l.id,l.title,tr);};
+
+    // Share button (only if public or code)
+    const shareBtn=tr.querySelector('.lvl-act-share');
+    if(shareBtn)shareBtn.onclick=(e)=>{e.stopPropagation();showShareModal(l.id);};
 
     tbody.appendChild(tr);
   });
@@ -553,6 +634,26 @@ async function setVisibility(levelId,targetVis,btn,lvlData){
   lvlData.visibility=targetVis;
   const group=btn.closest('.vis-btn-group');
   if(group){group.querySelectorAll('.vis-btn').forEach(b=>b.className='vis-btn');btn.classList.add('active-'+targetVis);}
+
+  // Show or hide the share button depending on new visibility
+  const tr=btn.closest('tr');
+  if(tr){
+    const actions=tr.querySelector('.lvl-actions');
+    const existingShare=tr.querySelector('.lvl-act-share');
+    const canShare=(targetVis==='public'||targetVis==='code');
+    if(canShare&&!existingShare&&actions){
+      const delBtn=tr.querySelector('.lvl-act-del');
+      const shareBtn=document.createElement('button');
+      shareBtn.className='lvl-act-btn lvl-act-share';
+      shareBtn.title=lang==='fr'?'Partager':'Share';
+      shareBtn.textContent='🔗';
+      shareBtn.onclick=(e)=>{e.stopPropagation();showShareModal(levelId);};
+      if(delBtn)actions.insertBefore(shareBtn,delBtn);
+      else actions.appendChild(shareBtn);
+    }else if(!canShare&&existingShare){
+      existingShare.remove();
+    }
+  }
 }
 
 async function loadProfile(){
@@ -586,7 +687,6 @@ saveLang=async function(){
   await saveProfile({lang});
   await loadLangData(lang);
   await applyLang(lang);
-  // Refresh lang option selection
   document.querySelectorAll('.lang-option').forEach(el=>el.classList.remove('selected'));
   const el=document.getElementById('lang-'+lang);
   if(el)el.classList.add('selected');
@@ -772,31 +872,24 @@ async function deleteLevelSettings(id,title,tr){
 
 // ── INIT ──
 (async()=>{
-  // 1. Vérif session
   const{data}=await sb.auth.getSession();
   if(!data.session){window.location.href='login.html';return;}
   currentUser=data.session.user;
 
-  // 2. Charge profil (pour récupérer la langue sauvegardée)
   setLoadingText('LOADING PROFILE...');
   await loadProfile();
 
-  // 3. Charge la langue active EN PREMIER → pas de flash
   setLoadingText('LOADING LANGUAGE...');
   await loadLangData(lang);
 
-  // 4. Applique la langue avant de montrer quoi que ce soit
   await applyLang(lang);
 
-  // 5. Charge l'autre langue en arrière-plan (sans bloquer)
   loadLangData(lang==='fr'?'en':'fr');
 
-  // 6. Charge les données UI
   setLoadingText('LOADING DATA...');
   await loadManifest();
   await loadLangOptions();
 
-  // Sélectionne la langue courante dans les options
   document.querySelectorAll('.lang-option').forEach(el=>el.classList.remove('selected'));
   const langEl=document.getElementById('lang-'+lang);
   if(langEl)langEl.classList.add('selected');
@@ -805,7 +898,6 @@ async function deleteLevelSettings(id,title,tr){
   loadAccountInfo();
   loadStats();
 
-  // 7. Cache le loading → tout est prêt
   hideLoading();
 })();
 </script>
