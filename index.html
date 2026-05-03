@@ -353,7 +353,7 @@ async function loadSection(s){
   let levels=[];
 
   if(s==='new'){
-    let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=eq.public&order=created_at.desc&limit=24';
+    let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&visibility=eq.public&order=created_at.desc&limit=30';
     if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
     levels=await sbFetch(url);
     if(levels.length){
@@ -377,13 +377,13 @@ async function loadSection(s){
         levels.forEach(l=>{const r=rmap[l.id];l.avgRating=r?(Math.round((r.sum/r.count)*100)/100):null;l.ratingCount=r?r.count:0;});
         levels=levels.filter(l=>l.avgRating!=null);
         levels.sort((a,b)=>b.avgRating-a.avgRating);
-        levels=levels.slice(0,24);
+        levels=levels.slice(0,30);
       }
     }
   }else if(s==='mine'){
     if(!currentUser){grid.innerHTML=`<div class="empty"><div class="icon">🔒</div><p>${t.notLogged}</p></div>`;return;}
     const token=getToken();
-    let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&user_id=eq.'+currentUser.id+'&order=created_at.desc';
+    let url='levels?select=id,title,plays,completions,created_at,visibility,user_id&user_id=eq.'+currentUser.id+'&order=created_at.desc&limit=30';
     if(q)url+='&title=ilike.*'+encodeURIComponent(q)+'*';
     levels=await sbFetch(url,token);
     if(levels.length){
