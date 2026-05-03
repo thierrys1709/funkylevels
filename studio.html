@@ -1661,10 +1661,28 @@ async function loadPlayerProfile(){
 
 (async()=>{
   const params=new URLSearchParams(window.location.search);
-  const lid=params.get('level');
-  const fromGame=sessionStorage.getItem('fl_from_game')==='1';
-  if(lid)history.replaceState(null,'','studio.html');
-  if(!lid&&!fromGame){sessionStorage.removeItem('fl_preview_level');sessionStorage.removeItem('fl_preview_id');sessionStorage.removeItem('fl_preview_title');}
+const lid=params.get('level');
+const isNew=params.get('new')==='1';
+const fromGame=sessionStorage.getItem('fl_from_game')==='1';
+
+// ?new=1 → forcer un niveau vierge, ignorer autosave et niveau en mémoire
+if(isNew){
+  history.replaceState(null,'','studio.html');
+  sessionStorage.removeItem('fl_autosave_level');
+  sessionStorage.removeItem('fl_autosave_id');
+  sessionStorage.removeItem('fl_autosave_name');
+  sessionStorage.removeItem('fl_preview_level');
+  sessionStorage.removeItem('fl_preview_id');
+  sessionStorage.removeItem('fl_preview_title');
+  lv=emptyLevel();
+  _currentLevelId=null;_currentVisibility='private';_authorCompleted=false;_isPublished=false;
+  const ni=document.getElementById('level-name-input');if(ni)ni.value='';
+  _hasUnsavedChanges=false;
+  redraw();return;
+}
+
+if(lid)history.replaceState(null,'','studio.html');
+if(!lid&&!fromGame){sessionStorage.removeItem('fl_preview_level');sessionStorage.removeItem('fl_preview_id');sessionStorage.removeItem('fl_preview_title');}
   if(fromGame){
     sessionStorage.removeItem('fl_from_game');
     const raw=sessionStorage.getItem('fl_preview_level');
