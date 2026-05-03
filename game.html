@@ -657,7 +657,7 @@ function gDraw(){
   (gLv.trap||[]).forEach(t=>{if(t.state==='gone')return;if(t.state==='predelay'){const shakeAmt=1+((t.preTimer||0)/Math.max(1,(t.preDelay||0)*60))*2,ox=t.x;t.x+=(Math.random()-0.5)*shakeAmt*2;gPlatform(t);t.x=ox;drawBlockSpikes(t);}else{gPlatform(t);drawBlockSpikes(t);}});
   (gLv.mobile||[]).forEach(t=>{const x=Math.round(t.x),y=Math.round(t.y),w=Math.round(t.w),h=Math.round(t.h);GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);GX.fillStyle=(t.trigger==='approach')?'#20c0f0':'#4090f0';GX.fillRect(x,y,w,4);drawBlockSpikes(t);});
   (gLv.push||[]).forEach(t=>{gPlatform(t);drawBlockSpikes(t);});
-    (gLv.speed||[]).forEach(z=>{
+  (gLv.speed||[]).forEach(z=>{
     const isActive=ov(gPlayer,z)||(gLv.push||[]).some(p=>ov(p,z));
     if(!isActive)return;
     const x=Math.round(z.x),y=Math.round(z.y),w=Math.round(z.w),h=Math.round(z.h);
@@ -667,8 +667,7 @@ function gDraw(){
     GX.globalAlpha=0.7;GX.fillStyle=fast?'#40f0c0':'#f04060';GX.font='bold 11px "Press Start 2P"';GX.textAlign='center';
     GX.fillText(fast?'▶▶':'◀◀',x+w/2,y+h/2+4);GX.textAlign='left';GX.restore();
   });
-    (gLv.gravflip||[]).forEach(z=>{
-    // Vérifier si le joueur ou un bloc push est dans la zone
+  (gLv.gravflip||[]).forEach(z=>{
     const isActive=ov(gPlayer,z)||(gLv.push||[]).some(p=>ov(p,z));
     if(!isActive)return;
     const x=Math.round(z.x),y=Math.round(z.y),w=Math.round(z.w),h=Math.round(z.h);
@@ -682,7 +681,13 @@ function gDraw(){
   gGravEffects.forEach(e=>{e.life-=0.05;const a=Math.max(0,e.life);const r=(1-e.life)*36;GX.save();GX.globalAlpha=a*0.7;GX.strokeStyle=e.col;GX.lineWidth=2.5;GX.beginPath();GX.arc(e.x,e.y,r,0,Math.PI*2);GX.stroke();GX.globalAlpha=a*0.3;GX.lineWidth=1.5;GX.beginPath();GX.arc(e.x,e.y,r*0.5,0,Math.PI*2);GX.stroke();GX.restore();});
   gPushEffects=gPushEffects.filter(e=>e.life>0);
   gPushEffects.forEach(e=>{e.life-=0.08;const a=Math.max(0,e.life);const expand=(1-e.life)*10;GX.save();GX.globalAlpha=a*0.5;GX.strokeStyle='#c0c0ff';GX.lineWidth=2;GX.strokeRect(e.x-expand,e.y-expand,e.w+expand*2,e.h+expand*2);GX.restore();});
-  (gLv.flash||[]).forEach(f=>{const cycle=f.onMs+f.offMs;f._timer=(f._timer||0)+1;const period=Math.round(cycle/16.67);if(f._timer>=period){f._timer=0;f._visible=!f._visible;}if(!f._visible)return;const x=Math.round(f.x),y=Math.round(f.y),w=Math.round(f.w),h=Math.round(f.h);GX.fillStyle='#1a3060';GX.fillRect(x,y,w,h);GX.fillStyle='#40c0f0';GX.fillRect(x,y,w,4);GX.fillStyle='#80e0ff88';GX.font='6px "Press Start 2P"';GX.textAlign='center';GX.fillText('⚡',x+w/2,y+h/2+3);GX.textAlign='left';drawBlockSpikes(f);});
+  (gLv.flash||[]).forEach(f=>{
+    const cycle=f.onMs+f.offMs;f._timer=(f._timer||0)+1;
+    const period=Math.round(cycle/16.67);
+    if(f._timer>=period){f._timer=0;f._visible=!f._visible;}
+    if(!f._visible)return;
+    gPlatform(f);drawBlockSpikes(f);
+  });
   (gLv.spike||[]).forEach(sp=>{
     const hidden=sp.hidden||false;const delay=(sp.activationDelay||0)*60;
     const activated=hidden?(sp._touched&&sp._delayTimer>=delay):true;
@@ -690,7 +695,11 @@ function gDraw(){
     GX.fillStyle=PCOL.plat;GX.fillRect(x,y,w,h);GX.fillStyle=PCOL.platT;GX.fillRect(x,y,w,4);GX.fillStyle=PCOL.platS;for(let i=x+7;i<x+w-4;i+=9)GX.fillRect(i,y+1,3,2);
     if(!hidden||activated){GX.fillStyle=activated?'#ff4060':'#884040';const sz=10;const dirs=(sp.dir||'u')==='all'?['u','d','l','r']:(sp.dir||'u').split(',');dirs.forEach(dir=>{const horiz=(dir==='u'||dir==='d');const count=Math.max(1,Math.floor((horiz?w:h)/sz));const gap=(horiz?w:h)/count;for(let k=0;k<count;k++){const cx=horiz?x+gap*(k+0.5):x;const cy=horiz?y:y+gap*(k+0.5);GX.beginPath();if(dir==='u'){GX.moveTo(cx-sz/2,y);GX.lineTo(cx+sz/2,y);GX.lineTo(cx,y-sz);}else if(dir==='d'){GX.moveTo(cx-sz/2,y+h);GX.lineTo(cx+sz/2,y+h);GX.lineTo(cx,y+h+sz);}else if(dir==='l'){GX.moveTo(x,cy-sz/2);GX.lineTo(x,cy+sz/2);GX.lineTo(x-sz,cy);}else if(dir==='r'){GX.moveTo(x+w,cy-sz/2);GX.lineTo(x+w,cy+sz/2);GX.lineTo(x+w+sz,cy);}GX.closePath();GX.fill();}});}
   });
-  (gLv.gblock||[]).forEach(g=>{const x=Math.round(g.x),y=Math.round(g.y),w=Math.round(g.w),h=Math.round(g.h);GX.fillStyle='#1a3a1a';GX.fillRect(x,y,w,h);GX.fillStyle='#40c060';GX.fillRect(x,y,w,4);GX.strokeStyle='#40c06018';GX.lineWidth=1;GX.beginPath();GX.arc(x+w/2,y+h/2,g.radius||120,0,Math.PI*2);GX.stroke();drawBlockSpikes(g);});
+  (gLv.gblock||[]).forEach(g=>{
+    const x=Math.round(g.x),y=Math.round(g.y),w=Math.round(g.w),h=Math.round(g.h);
+    GX.strokeStyle='#40c06018';GX.lineWidth=1;GX.beginPath();GX.arc(x+w/2,y+h/2,g.radius||120,0,Math.PI*2);GX.stroke();
+    gPlatform(g);drawBlockSpikes(g);
+  });
   if(gLv.start)gFlag(gLv.start,PCOL.flagA);if(gLv.end)gFlag(gLv.end,PCOL.flagB);
   gParts.forEach(p=>{GX.globalAlpha=Math.max(0,p.life);GX.fillStyle=p.col;GX.beginPath();GX.arc(p.x,p.y,Math.max(0,p.r*p.life),0,Math.PI*2);GX.fill();});GX.globalAlpha=1;
   gTrail.forEach(t=>{const a=Math.max(0,t.life)*t.alpha;GX.save();GX.globalAlpha=a;const r=Math.round(80+t.mult*60),g=Math.round(160+t.mult*40),b=255;GX.fillStyle=`rgb(${r},${g},${b})`;const s=t.size*t.life;GX.beginPath();GX.arc(t.x,t.y,Math.max(0.5,s),0,Math.PI*2);GX.fill();GX.restore();});
