@@ -1069,6 +1069,7 @@ function playSound(type){
     else if(type==='die'){osc.type='sawtooth';osc.frequency.setValueAtTime(440,ctx.currentTime);osc.frequency.exponentialRampToValueAtTime(55,ctx.currentTime+0.4);gain.gain.setValueAtTime(0.2,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.4);}
     else if(type==='win'){const notes=[523,659,784,1047];notes.forEach((freq,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='square';const t=ctx.currentTime+i*0.12;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0.15,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.15);o.start(t);o.stop(t+0.15);});}
     else if(type==='bounce'){osc.type='sine';osc.frequency.setValueAtTime(300,ctx.currentTime);osc.frequency.exponentialRampToValueAtTime(600,ctx.currentTime+0.1);gain.gain.setValueAtTime(0.18,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.12);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.12);}
+    else if(type==='spike'){osc.type='sawtooth';osc.frequency.setValueAtTime(880,ctx.currentTime);osc.frequency.exponentialRampToValueAtTime(220,ctx.currentTime+0.06);gain.gain.setValueAtTime(0.22,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.08);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.08);}
   }catch(e){}
 }
 
