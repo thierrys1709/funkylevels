@@ -38,10 +38,10 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 .search-input{flex:1;background:var(--panel);border:1.5px solid var(--border);border-radius:4px;color:var(--text);font-family:Rajdhani,sans-serif;font-size:14px;padding:12px 16px;outline:none;}
 .search-input:focus{border-color:var(--accent2);}
 .search-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:12px 16px;background:var(--accent2);color:#fff;border:none;border-radius:4px;cursor:pointer;}
-.section-tabs{display:flex;gap:0;max-width:900px;margin:0 auto 24px;padding:0 24px;border-bottom:2px solid var(--border);}
+.section-tabs{display:flex;gap:0;max-width:1100px;margin:0 auto 24px;padding:0 24px;border-bottom:2px solid var(--border);}
 .stab{font-family:'Press Start 2P',monospace;font-size:8px;padding:12px 20px;background:transparent;border:none;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;display:flex;align-items:center;gap:8px;}
 .stab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.levels-wrap{max-width:900px;margin:0 auto;padding:0 24px 60px;}
+.levels-wrap{max-width:1100px;margin:0 auto;padding:0 24px 60px;}
 .levels-grid{width:100%;}
 .lvl-table{width:100%;border-collapse:collapse;}
 .lvl-table thead tr{background:#12122a;border-bottom:2px solid #2a2a55;}
@@ -50,15 +50,19 @@ nav{position:sticky;top:0;z-index:100;background:#06060ecc;backdrop-filter:blur(
 .lvl-tr:last-child{border-bottom:none;}
 .lvl-tr:hover{background:#0f0f20;}
 .lvl-td{padding:10px 16px;vertical-align:middle;}
-.lvl-td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lvl-td-name{font-family:Orbitron,monospace;font-size:11px;font-weight:700;color:#e8e8ff;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lvl-td-name .new-badge{font-family:'Press Start 2P',monospace;font-size:6px;padding:2px 6px;background:var(--accent);color:#000;border-radius:2px;margin-left:8px;}
-.lvl-td-date{font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;white-space:nowrap;width:120px;}
-.lvl-td-author{font-family:Rajdhani,sans-serif;font-size:13px;color:#a0a0cc;width:140px;}
-.lvl-td-rating{width:100px;white-space:nowrap;}
-.lvl-td-record{width:150px;}
-.lvl-td-vis{width:90px;}
-.lvl-td-actions{width:100px;text-align:right;}
-.record-cell{display:flex;flex-direction:column;gap:2px;}
+.lvl-td-date{font-family:Rajdhani,sans-serif;font-size:12px;color:#6060aa;white-space:nowrap;width:100px;}
+.lvl-td-author{font-family:Rajdhani,sans-serif;font-size:13px;color:#a0a0cc;width:120px;}
+.lvl-td-rating{width:90px;white-space:nowrap;}
+.lvl-td-record{width:110px;white-space:nowrap;}
+.lvl-td-vis{width:80px;}
+.lvl-td-actions{width:90px;text-align:right;}
+.record-val{font-family:Orbitron,monospace;font-size:10px;display:block;line-height:1.5;white-space:nowrap;}
+.record-val.world{color:#c0a0ff;}
+.record-val.mine{color:#f0e040;}
+.record-val.creator{color:#40d0f0;}
+.record-empty{color:#3a3a55;}
 .author-link{color:#a0a0cc;text-decoration:none;transition:color .15s;}
 .author-link:hover{color:#f0e040;}
 .edit-btn{font-family:'Press Start 2P',monospace;font-size:8px;padding:6px 12px;background:#0d0d28;border:1.5px solid #4040aa;color:#90a0f0;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap;}
@@ -173,7 +177,8 @@ const T={
     notLogged:'Connecte-toi pour voir tes niveaux.',
     plays:'parties',noRating:'non noté',new:'NOUVEAU',
     edit:'ÉDITER',play:'JOUER',logoutOk:'Déconnecté !',
-    thName:'NOM',thDate:'DATE',thCreator:'CRÉATEUR',thRating:'NOTE',thRecord:'MEILLEUR TEMPS',thStatus:'ÉTAT'
+    thName:'NOM',thDate:'DATE',thCreator:'CRÉATEUR',thRating:'NOTE',
+    thMyRecord:'MON RECORD',thWorldRecord:'WORLD',thCreatorRecord:'CRÉATEUR',thStatus:'ÉTAT'
   },
   en:{
     heroTitle:'⚡ FUNKYLEVELS',heroSub:'Create crazy platformer levels,\nshare them and play others\'!',
@@ -190,7 +195,8 @@ const T={
     notLogged:'Log in to see your levels.',
     plays:'plays',noRating:'not rated',new:'NEW',
     edit:'EDIT',play:'PLAY',logoutOk:'Logged out!',
-    thName:'NAME',thDate:'DATE',thCreator:'CREATOR',thRating:'RATING',thRecord:'BEST TIME',thStatus:'STATUS'
+    thName:'NAME',thDate:'DATE',thCreator:'CREATOR',thRating:'RATING',
+    thMyRecord:'MY BEST',thWorldRecord:'WORLD',thCreatorRecord:'CREATOR',thStatus:'STATUS'
   }
 };
 
@@ -413,32 +419,64 @@ async function loadSection(s){
     <th>${t.thDate}</th>
     <th>${t.thCreator}</th>
     <th>${t.thRating}</th>
-    <th>${t.thRecord}</th>
+    <th title="${lang==='fr'?'Mon meilleur temps':'My best time'}">⭐ ${t.thMyRecord}</th>
+    <th title="${lang==='fr'?'Meilleur temps mondial':'World best time'}">🏆 ${t.thWorldRecord}</th>
+    <th title="${lang==='fr'?'Meilleur temps du créateur':'Creator best time'}">🎨 ${t.thCreatorRecord}</th>
     ${s==='mine'?`<th>${t.thStatus}</th>`:''}
     <th></th>
   </tr></thead>`;
 
   grid.innerHTML=`<table class="lvl-table">${thead}<tbody>${levels.map(l=>levelRow(l)).join('')}</tbody></table>`;
 
-  // Leaderboard — en async après le rendu
+  // ── Leaderboard — une seule requête avec user_id ──
   const ids=levels.map(l=>l.id);
-  const records=await sbFetch('leaderboard?select=level_id,time_ms&level_id=in.('+ids.join(',')+')'+'&order=time_ms.asc');
-  const worldBests={};
-  if(Array.isArray(records))records.forEach(r=>{if(!worldBests[r.level_id])worldBests[r.level_id]=r.time_ms;});
+  const allRecords=await sbFetch('leaderboard?select=level_id,time_ms,user_id&level_id=in.('+ids.join(',')+')'+'&order=time_ms.asc');
 
-  let myBests={};
-  if(currentUser){
-    const mine=await sbFetch('leaderboard?select=level_id,time_ms&level_id=in.('+ids.join(',')+')'+'&user_id=eq.'+currentUser.id+'&order=time_ms.asc',getToken());
-    if(Array.isArray(mine))mine.forEach(r=>{if(!myBests[r.level_id])myBests[r.level_id]=r.time_ms;});
+  // Calculer world best, my best, creator best depuis la même requête
+  const worldBests={};
+  const myBests={};
+  const creatorBests={};
+
+  // Construire une map créateur : level_id → user_id du créateur
+  const creatorMap={};
+  levels.forEach(l=>{creatorMap[l.id]=l.user_id;});
+
+  if(Array.isArray(allRecords)){
+    allRecords.forEach(r=>{
+      // World best (premier de chaque level_id car trié asc)
+      if(!worldBests[r.level_id])worldBests[r.level_id]=r.time_ms;
+      // My best
+      if(currentUser&&r.user_id===currentUser.id){
+        if(!myBests[r.level_id])myBests[r.level_id]=r.time_ms;
+      }
+      // Creator best
+      if(creatorMap[r.level_id]&&r.user_id===creatorMap[r.level_id]){
+        if(!creatorBests[r.level_id])creatorBests[r.level_id]=r.time_ms;
+      }
+    });
   }
 
   levels.forEach(l=>{
-    const cell=document.querySelector(`.record-cell[data-id="${l.id}"]`);
-    if(!cell)return;
-    let html='';
-    if(worldBests[l.id]!=null)html+=`<span title="${lang==='fr'?'Record mondial':'World record'}" style="font-family:Orbitron,monospace;font-size:10px;color:#c0a0ff;display:block;line-height:1.4;">🏆 ${fmtMs(worldBests[l.id])}</span>`;
-    if(myBests[l.id]!=null)html+=`<span title="${lang==='fr'?'Mon record':'My record'}" style="font-family:Orbitron,monospace;font-size:9px;color:#f0e040;display:block;line-height:1.4;">⭐ ${fmtMs(myBests[l.id])}</span>`;
-    cell.innerHTML=html||'<span style="color:#3a3a55;">—</span>';
+    const myCell=document.querySelector(`.record-mine[data-id="${l.id}"]`);
+    const worldCell=document.querySelector(`.record-world[data-id="${l.id}"]`);
+    const creatorCell=document.querySelector(`.record-creator[data-id="${l.id}"]`);
+
+    if(myCell){
+      myCell.innerHTML=myBests[l.id]!=null
+        ?`<span class="record-val mine">${fmtMs(myBests[l.id])}</span>`
+        :`<span class="record-empty">—</span>`;
+    }
+    if(worldCell){
+      worldCell.innerHTML=worldBests[l.id]!=null
+        ?`<span class="record-val world">${fmtMs(worldBests[l.id])}</span>`
+        :`<span class="record-empty">—</span>`;
+    }
+    if(creatorCell){
+      // Si le créateur est aussi le joueur courant, on affiche quand même
+      creatorCell.innerHTML=creatorBests[l.id]!=null
+        ?`<span class="record-val creator">${fmtMs(creatorBests[l.id])}</span>`
+        :`<span class="record-empty">—</span>`;
+    }
   });
 }
 
@@ -461,7 +499,9 @@ function levelRow(l){
     <td class="lvl-td lvl-td-date">${dateStr}</td>
     <td class="lvl-td lvl-td-author">${authorLink}</td>
     <td class="lvl-td lvl-td-rating">${ratingHtml}</td>
-    <td class="lvl-td lvl-td-record"><span class="record-cell" data-id="${l.id}"><span style="color:#3a3a55;">—</span></span></td>
+    <td class="lvl-td lvl-td-record"><span class="record-mine" data-id="${l.id}"><span class="record-empty">—</span></span></td>
+    <td class="lvl-td lvl-td-record"><span class="record-world" data-id="${l.id}"><span class="record-empty">—</span></span></td>
+    <td class="lvl-td lvl-td-record"><span class="record-creator" data-id="${l.id}"><span class="record-empty">—</span></span></td>
     ${currentSection==='mine'?`<td class="lvl-td lvl-td-vis"><span class="vis-badge vis-${l.visibility||'private'}">${visLabel}</span></td>`:''}
     <td class="lvl-td lvl-td-actions">${isOwner?`<button class="edit-btn" onclick="event.stopPropagation();window.location.href='studio.html?level=${l.id}&mode=edit'">✏️ ${lang==='fr'?'ÉDITER':'EDIT'}</button>`:''}</td>
   </tr>`;
