@@ -356,14 +356,17 @@ async function loadBestTime(){
     }
     if(hudGlobal)hudGlobal.style.display='';
   }else{
-  // Pas encore de record — afficher — au lieu de cacher
-  if(el_time)el_time.textContent='—';
+  if(el_time)el_time.textContent='---';
   if(el_user)el_user.innerHTML='';
 }
 
   updateBestDisplay();
 }
-function updateBestDisplay(){const el=document.getElementById('hud-best');if(!el)return;el.textContent=_bestTime!==null?fmtTimeFull(_bestTime):'—';}
+function updateBestDisplay(){
+  const el=document.getElementById('hud-best');
+  if(!el)return;
+  el.textContent=_bestTime!==null?fmtTimeFull(_bestTime):'---';
+}
 function updateAttemptDisplay(){const el=document.getElementById('hud-attempt');if(!el)return;el.textContent=_attempt;}
 
 async function saveTime(ms){
