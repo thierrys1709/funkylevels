@@ -1303,7 +1303,9 @@ async function doLoadLevel(id,title){
   const nameInput=document.getElementById('level-name-input');if(nameInput)nameInput.value=data.title||'';
   history.replaceState(null,'','studio.html');
   sessionStorage.setItem('fl_preview_level',JSON.stringify(lv));sessionStorage.setItem('fl_preview_id',id);sessionStorage.setItem('fl_preview_title',data.title||'');
-  redraw();closeLoadModal();_hasUnsavedChanges=false;autosaveClear();
+  redraw();closeLoadModal();_hasUnsavedChanges=false;
+  // Sauvegarder pour survivre au F5
+  try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',id);sessionStorage.setItem('fl_autosave_name',data.title||'');}catch(ex){}
   status((t.msgLoaded||'Loaded.')+' "'+title+'"');
 }
 
@@ -1564,8 +1566,12 @@ function checkAutosaveOnLoad(){
     ['fixed','trap','slider','invis','bounce','mobile','push','gravflip','speed','flash','spike','gblock','darkness'].forEach(k=>{if(!lv[k])lv[k]=[];});
     const ni=document.getElementById('level-name-input');if(ni&&savedName)ni.value=savedName;
     const savedId=sessionStorage.getItem('fl_autosave_id');if(savedId)_currentLevelId=savedId;
-    _hasUnsavedChanges=true;autosaveSave();redraw&&redraw();
-    status(STUDIO_T[l]?.msgDraftRestored||'⚡ Draft restored');
+    // Si on a un id, c'est un niveau sauvegardé (pas un brouillon) — restauré après F5
+    if(savedId){_hasUnsavedChanges=false;}else{_hasUnsavedChanges=true;}
+    autosaveSave();redraw&&redraw();
+    const _restoredMsg=savedId?(STUDIO_T[l]?.msgRestored||'✅ Level restored.'):(STUDIO_T[l]?.msgDraftRestored||'⚡ Draft restored');
+    status(_restoredMsg);
+    if(savedId)checkPublishedStatus(savedId);
   }catch(ex){}
 }
 window.addEventListener('beforeunload',function(){
@@ -1576,7 +1582,10 @@ window.addEventListener('beforeunload',function(){
 let _pendingNavUrl=null;
 history.pushState(null,'',location.href);
 window.addEventListener('popstate',function(){if(_hasUnsavedChanges){history.pushState(null,'',location.href);_pendingNavUrl='__BACK__';showUnsavedModal();}else{autosaveClear();}});
-window.addEventListener('pagehide',function(){if(!_hasUnsavedChanges)autosaveClear();});
+window.addEventListener('pagehide',function(){
+  // Toujours sauvegarder l'état courant pour le F5
+  if(lv&&typeof lv==='object'){try{sessionStorage.setItem('fl_autosave_level',JSON.stringify(lv));sessionStorage.setItem('fl_autosave_id',_currentLevelId||'');sessionStorage.setItem('fl_autosave_name',document.getElementById('level-name-input')?.value||'');}catch(ex){}}
+});
 
 function goToHome(){if(_hasUnsavedChanges){_pendingNavUrl='index.html';showUnsavedModal();}else{autosaveClear();window.location.href='index.html';}}
 function goToProfile(){if(_hasUnsavedChanges){_pendingNavUrl='settings.html';showUnsavedModal();}else{window.location.href='settings.html';}}
@@ -1627,6 +1636,14 @@ function confirmDuplicate(){closeDupModal();window._dupConfirmed=true;document.q
 // ── INIT ───────────────────────────────────────────
 let _charSprite=null,_charId='default';
 async function loadCharacterSprite(charId){return new Promise(resolve=>{const img=new Image();img.onload=()=>{_charSprite=img;resolve(img);};img.onerror=()=>{_charSprite=null;resolve(null);};img.src=`characters/${charId}.svg`;});}
+async function checkPublishedStatus(id){
+  if(!id)return;
+  try{
+    const{data}=await _sb.from('levels').select('is_published,visibility,author_completed').eq('id',id).single();
+    if(data){_isPublished=data.is_published||false;_currentVisibility=data.visibility||'private';_authorCompleted=data.author_completed||false;
+      if(_isPublished){const ni=document.getElementById('level-name-input');showPublishedModal(ni?.value||'');}}
+  }catch(e){}
+}
 async function loadPlayerProfile(){
   let charId='default';
   try{
